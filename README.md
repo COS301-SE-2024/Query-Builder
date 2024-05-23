@@ -1,31 +1,3 @@
-<style>
-body {
-    import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-    font-family: 'Barlow Condensed', sans-serif;
-    
-}
-.teamHeader{
-    font-size: 2.5rem
-}
-.teamColour{
-    color: #0b5394
-}
-.demo {
-    font-size: 1.2em
-}
-
-.documents{
-    font-size: 1.2em
-}
-
-.doc{
-    display: flex;
-    flex-direction: column;
-}
-.member{
-    font-size: 1.2em
-}
-</style>
 
 <div align="center" class="teamHeader"><h1><span class="teamColour">Ctrl</span> Alt <span class="teamColour">Elite</span></h1></div>
 <div align="center"><h2>Project: QBEE</h2></div>
@@ -49,49 +21,38 @@ body {
 </div>
 
 
-<div class="introduction">
+## Project Introduction
 
-</div>
+## Demos
 
-<div class="demo">
-    <h2> Demos </h2>
-    <h3> Demo 1 </h3>
-    <a href="">Presentation</a>
-</div>
+## Demo 1
+[Presentation]()
 
 
-<div class="documents">
-    <h2> Documentation </h2>
-    <div class="doc">
-        <h3> Software Requirements Specification </h3>
-        <a href="">Document</a>
-    </div>
-    <div class="doc">
-        <h3> Coding Standards </h3>
-        <a href="">Document</a>
-    </div>
-    <div class="doc">
-        <h3> Testing Policy </h3>
-        <a href="">Document</a>
-    </div>
-    <div class="doc">
-        <h3> Architecture Documents </h3>
-        <a href="">Diagram</a>
-        <a href="">Document</a>
-    </div>
-    <div class="doc">
-        <h3> Deployment Diagram </h3>
-        <a href="">Deployment</a>
-    </div>
-    <div class="doc">
-        <h3> User Manual </h3>
-        <a href="">Manual</a>
-    </div>
-    <div class="doc">
-        <h3> Project Management Tools </h3>
-        <a href="">Project Board</a>
-    </div>
-</div>
+
+## Documentation
+
+### Software Requirements Specification 
+[Document]()
+
+### Coding Standards
+[Document]()
+
+### Testing Policy
+[Document]()
+
+### Architecture Documents 
+[Diagram]()
+[Document]()
+
+### Deployment Diagram
+[Deployment]()
+
+### User Manual
+[Manual]()
+
+### Project Management Tools </h3>
+[Project Board]()
 
 ## Team Members
 
