@@ -125,6 +125,7 @@
     <p>
        I am currently in my final year of BSc Computer Science. My passions range from figuring out new and interesting concepts in the world of tech to baking pastries and cakes in my free time; so I definitely know how to manage my time. Most importantly, I like to challenge myself. Most vacations, I work for BBD Software on vacation projects. I particularly enjoy designing front-ends and using better technologies and innovations to have a better user and developer experience, like implementing Module Federation for front-end designs. I also enjoy Data Analytics and curious to understand how it will influence data predictions and projections, for Machine Learning purposes.
     </p>
+    <p>Email: <a href="mailto:xadrian.vanheerden@tuks.co.za?subject?subject=QBEE Query - Xadrian">xadrian.vanheerden@tuks.co.za</a></p>
     <a href="https://github.com/XadrianvHeerden" target="_blank">
             <img src="https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white"/>
     </a> <br>
