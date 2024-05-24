@@ -24,7 +24,7 @@
 ## Project Introduction
 
 ### Local Setup
-Clone the repo:
+Clone the repo
 ```shell
 git clone https://github.com/COS301-SE-2024/Query-Builder.git
 ```
