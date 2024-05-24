@@ -23,6 +23,22 @@
 
 ## Project Introduction
 
+### Local Setup
+Clone the repo:
+```shell
+git clone https://github.com/COS301-SE-2024/Query-Builder.git
+```
+
+Go to the Query-Builder app directory 
+```shell
+cd query-builder-app
+```
+
+Install dependencies
+```shell
+pnpm i
+```
+
 ## Demos
 
 ### Demo 1
