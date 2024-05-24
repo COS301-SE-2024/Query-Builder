@@ -57,7 +57,7 @@
 ## Team Members
 
 <div>   
-    <div class="member"><strong> Zane Augustyn - u </strong></div><br>
+    <div class="member"><strong> Zane Augustyn - u22528424 </strong></div><br>
     <img align="right" src="" width=180 height=180>    
     <p>
        Zane is a final-year BSc Computer Science student. He enjoys learning about different ways to do certain things and takes various courses to broaden his scope in the programming world. This includes Microsoft certifications in Azure, Python, JavaScript, and HTML & CSS, as well as a newly acquired DNS introductory course by ZADNA and ZARC. He has also developed a few mobile applications using Flutter and React, enjoying improving the overall efficiency in which the user interacts with the backend.
@@ -72,7 +72,7 @@
 <br><br><br><br>
 
 <div>   
-    <div class="member"><strong> Graeme Blain - u </strong></div><br>
+    <div class="member"><strong> Graeme Blain - u22625462 </strong></div><br>
     <img align="right" src="" width=180 height=180>    
     <p>
        Graeme is a third-year BSc Computer Science student at the University of Pretoria. He possesses strong analytical and problem-solving skills, allowing him to dissect challenges and craft effective solutions. He is eager to learn in the process of bringing the QBee to life. 
@@ -88,7 +88,7 @@
 <br><br><br><br>
 
 <div>   
-    <div class="member"><strong> Keanu Canto - u </strong></div><br>
+    <div class="member"><strong> Keanu Canto - u20693398 </strong></div><br>
     <img align="right" src="" width=180 height=180>    
     <p>
        Keanu is a final year student who is pursuing a BSc Computer Science with a focus on data science. He particularly enjoys artificial intelligence and has experience in frontend-backend integration. He has developed a number of personal projects for both desktop and mobile that have been used by users in over 130 countries worldwide, and he believes that his specialisation in data science will be very useful in taking a data-intensive application such as QBee to the next level.
@@ -104,7 +104,7 @@
 
 
 <div>   
-    <div class="member"><strong> Aidan Chapman - u </strong></div><br>
+    <div class="member"><strong> Aidan Chapman - u22738917 </strong></div><br>
     <img align="right" src="" width=180 height=180>    
     <p>
        Aidan is a third year BSc Computer Science student. He has experience with devops and CI/CD, having managed this in his COS301 mini-project. He also has a passion for robotics, having designed and built his own 3D printer. 
