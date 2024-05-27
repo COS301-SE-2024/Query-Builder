@@ -32,6 +32,24 @@ QBee is the ultimate tool for modern database management and analysis.
 
 </div>
 
+<h2 align='center'> Documentation </h2>
+
+<div align="center" >
+
+
+| Resource                        | Link                                       |
+|---------------------------------|--------------------------------------------|
+| Software Requirements Specification | [Our System Requirements]()            |
+| Coding Standards                | [See Coding Standards]()                   |
+| Architecture Document           | [System design overview]()                 |
+| Architecture Diagram            | [System Diagram]()                         |
+| Deployment Diagram              | [Deployment Diagram]()                     |
+| Testing Policy                  | [Testing Policy]()                         |
+| User Manual                     | [UserManua]()                              |
+
+  
+</div>
+
 
 ### Local Setup
 Clone the repo
@@ -58,27 +76,12 @@ pnpm i
 
 ## Documentation
 
-### Software Requirements Specification 
-[Document]()
-
-### Coding Standards
-[Document]()
-
-### Testing Policy
-[Document]()
-
-### Architecture Documents 
-[Diagram]()
-[Document]()
-
 ### Deployment Diagram
 [Deployment]()
 
 ### User Manual
 [Manual]()
 
-### Project Management Tools </h3>
-[Project Board]()
 
 ## Team Members
 
