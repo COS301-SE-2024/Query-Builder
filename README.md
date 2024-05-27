@@ -21,6 +21,17 @@
 
 
 ## Project Introduction
+<div align='left'>
+
+QBee is an innovative solution that transforms how users interact with databases, regardless of their technical skill level. By replacing traditional query methods with an intuitive drag-and-drop GUI, QBee makes database manipulation effortless and enables real-time query collaboration. 
+It ensures robust data privacy and integrity, providing a secure environment for users.
+
+Beyond basic query building, QBee offers tools to convert databases between formats and visualize data through generated graphs, facilitating deeper insights, enhancing user experience and efficiency.
+
+QBee is the ultimate tool for modern database management and analysis. 
+
+</div>
+
 
 ### Local Setup
 Clone the repo
