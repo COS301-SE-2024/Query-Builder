@@ -470,4 +470,4 @@ I really would recommend reading the [97 things every programmer should know](ht
 
 ## Testing
 
-* Please refer to [Testing Policy]()
+* Please refer to [Testing Policy]
