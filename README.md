@@ -45,7 +45,8 @@ QBee is the ultimate tool for modern database management and analysis.
 | Architecture Diagram            | [System Diagram]()                         |
 | Deployment Diagram              | [Deployment Diagram]()                     |
 | Testing Policy                  | [Testing Policy]()                         |
-| User Manual                     | [UserManua]()                              |
+| User Manual                     | [User Manual]()                            |
+| Project Board                   | [Project Tracking](https://github.com/orgs/COS301-SE-2024/projects/55)|
 
   
 </div>
@@ -71,16 +72,6 @@ pnpm i
 
 ### Demo 1
 [Presentation]()
-
-
-
-## Documentation
-
-### Deployment Diagram
-[Deployment]()
-
-### User Manual
-[Manual]()
 
 
 ## Team Members
