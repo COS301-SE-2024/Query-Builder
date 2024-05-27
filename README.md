@@ -88,6 +88,7 @@ pnpm i
     <p>
        Zane is a final-year BSc Computer Science student. He enjoys learning about different ways to do certain things and takes various courses to broaden his scope in the programming world. This includes Microsoft certifications in Azure, Python, JavaScript, and HTML & CSS, as well as a newly acquired DNS introductory course by ZADNA and ZARC. He has also developed a few mobile applications using Flutter and React, enjoying improving the overall efficiency in which the user interacts with the backend.
     </p>
+    <p>Email: <a href="mailto:xadrian.vanheerden@tuks.co.za?subject?subject=QBEE Query - Zane Augustyn">u22528424@tuks.co.za</a></p>
     <a href="https://github.com/ZaneAugustyn" target="_blank">
             <img src="https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white"/>
     </a> <br>
@@ -104,6 +105,7 @@ pnpm i
        Graeme is a third-year BSc Computer Science student at the University of Pretoria. He possesses strong analytical and problem-solving skills, allowing him to dissect challenges and craft effective solutions. He is eager to learn in the process of bringing the QBee to life. 
        Graeme has an interest particularly in backend development and logical solution crafting and optimisation.   Additionally he has worked a lot with various database schemas and SQL dialects.
     </p>
+    <p>Email: <a href="mailto:u22625462@tuks.co.za?subject?subject=QBEE Query - Graeme Blain">u22625462@tuks.co.za</a></p>
     <a href="https://github.com/GremBleen" target="_blank">
             <img src="https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white"/>
     </a> <br>
@@ -119,6 +121,7 @@ pnpm i
     <p>
        Keanu is a final year student who is pursuing a BSc Computer Science with a focus on data science. He particularly enjoys artificial intelligence and has experience in frontend-backend integration. He has developed a number of personal projects for both desktop and mobile that have been used by users in over 130 countries worldwide, and he believes that his specialisation in data science will be very useful in taking a data-intensive application such as QBee to the next level.
     </p>
+    <p>Email: <a href="mailto:u20693398@tuks.co.za?subject?subject=QBEE Query - Keanu Canto">u20693398@tuks.co.za</a></p>
     <a href="https://github.com/Keanumrc" target="_blank">
             <img src="https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white"/>
     </a> <br>
@@ -136,6 +139,7 @@ pnpm i
        Aidan is a third year BSc Computer Science student. He has experience with devops and CI/CD, having managed this in his COS301 mini-project. He also has a passion for robotics, having designed and built his own 3D printer. 
        He prefers working on the backend where he tackles problems related to the logic of the system. He is a hardworking, critical thinking, time-conscious individual that is persistent in his pursuit of success and is always ready to learn.
     </p>
+    <p>Email: <a href="mailto:u22738917@tuks.co.za?subject?subject=QBEE Query - Aidan Chapman">u22738917@tuks.co.za</a></p>
     <a href="https://github.com/u22738917" target="_blank">
             <img src="https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white"/>
     </a> <br>
