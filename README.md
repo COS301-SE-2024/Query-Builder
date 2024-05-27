@@ -5,13 +5,15 @@
 <!-- Add badges here -->
 <div align="center">
 
-        ![GitHub issues](https://img.shields.io/github/issues/COS301-SE-2024/Query-Builder)
-        ![GitHub pull requests](https://img.shields.io/github/issues-pr/COS301-SE-2024/Query-Builder)
-        ![GitHub Languages](https://img.shields.io/github/languages/count/COS301-SE-2024/Query-Builder)
-        ![GitHub Last Commit](https://img.shields.io/github/last-commit/COS301-SE-2024/Query-Builder)
-        ![GitHub RepoSize](https://img.shields.io/github/repo-size/COS301-SE-2024/Query-Builder)
+![GitHub issues](https://img.shields.io/github/issues/COS301-SE-2024/Query-Builder)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/COS301-SE-2024/Query-Builder)
+![GitHub Languages](https://img.shields.io/github/languages/count/COS301-SE-2024/Query-Builder)
+![GitHub Last Commit](https://img.shields.io/github/last-commit/COS301-SE-2024/Query-Builder)
+![GitHub RepoSize](https://img.shields.io/github/repo-size/COS301-SE-2024/Query-Builder)
+
 </div>
-<hr/>
+
+
 
 <div class="video">
 
