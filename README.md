@@ -51,23 +51,6 @@ QBee is the ultimate tool for modern database management and analysis.
   
 </div>
 
-
-### Local Setup
-Clone the repo
-```shell
-git clone https://github.com/COS301-SE-2024/Query-Builder.git
-```
-
-Go to the Query-Builder app directory 
-```shell
-cd query-builder-app
-```
-
-Install dependencies
-```shell
-pnpm i
-```
-
 ## Demos
 
 ### Demo 1
@@ -157,4 +140,21 @@ pnpm i
             <img src="https://img.shields.io/badge/linkedin-%230077B5.svg?style=for-the-badge&logo=linkedin&logoColor=white"/>
     </a>
 </div>
-<br><br><br><br>
+<br><br><br>
+
+
+### Local Setup
+Clone the repo
+```shell
+git clone https://github.com/COS301-SE-2024/Query-Builder.git
+```
+
+Go to the Query-Builder app directory 
+```shell
+cd query-builder-app
+```
+
+Install dependencies
+```shell
+pnpm i
+```
