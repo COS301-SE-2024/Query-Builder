@@ -1,0 +1,8 @@
+{
+  "label": "Guides and Standards",
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+    "description": "Guides and Standards for the Query Builder application"
+  }
+}
