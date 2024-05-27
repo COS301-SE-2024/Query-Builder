@@ -4,20 +4,12 @@
 
 <!-- Add badges here -->
 <div align="center">
+
         ![GitHub issues](https://img.shields.io/github/issues/COS301-SE-2024/Query-Builder)
         ![GitHub pull requests](https://img.shields.io/github/issues-pr/COS301-SE-2024/Query-Builder)
         ![GitHub Languages](https://img.shields.io/github/languages/count/COS301-SE-2024/Query-Builder)
         ![GitHub Last Commit](https://img.shields.io/github/last-commit/COS301-SE-2024/Query-Builder)
         ![GitHub RepoSize](https://img.shields.io/github/repo-size/COS301-SE-2024/Query-Builder)
-    <!-- <img src="https://github.com/COS301-SE-2023/Avalanche/actions/workflows/tests.yml/badge.svg">
-    <img src="https://github.com/COS301-SE-2023/Avalanche/actions/workflows/test.yml/badge.svg">
-    <img src="https://github.com/COS301-SE-2023/Avalanche/actions/workflows/deployment.yml/badge.svg">
-    <img src="https://github.com/COS301-SE-2023/Avalanche/actions/workflows/javaTest.yml/badge.svg">
-    <a href="https://codecov.io/github/COS301-SE-2023/Avalanche" > 
-    <img src="https://codecov.io/github/COS301-SE-2023/Avalanche/branch/working/graph/badge.svg?token=Q021VJLYQ8"/> 
-    <img src="https://uptime.betterstack.com/status-badges/v1/monitor/uypo.svg"/>
-    </a> -->
-
 </div>
 <hr/>
 
