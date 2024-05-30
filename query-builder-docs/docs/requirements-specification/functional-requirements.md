@@ -1,3 +1,8 @@
+---
+title: System Requirements Specification
+description: The system requirements specification for the Query Builder Application
+---
+
 # Functional Requirements
 
 ## 1. User Management System
