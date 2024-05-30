@@ -3,18 +3,17 @@
 <div align="center"><h2>Project: QBEE</h2></div>
 
 <!-- Add badges here -->
-<!-- <div align="center">
-    <img src="https://github.com/COS301-SE-2023/Avalanche/actions/workflows/tests.yml/badge.svg">
-    <img src="https://github.com/COS301-SE-2023/Avalanche/actions/workflows/test.yml/badge.svg">
-    <img src="https://github.com/COS301-SE-2023/Avalanche/actions/workflows/deployment.yml/badge.svg">
-    <img src="https://github.com/COS301-SE-2023/Avalanche/actions/workflows/javaTest.yml/badge.svg">
-    <a href="https://codecov.io/github/COS301-SE-2023/Avalanche" > 
-    <img src="https://codecov.io/github/COS301-SE-2023/Avalanche/branch/working/graph/badge.svg?token=Q021VJLYQ8"/> 
-    <img src="https://uptime.betterstack.com/status-badges/v1/monitor/uypo.svg"/>
-    </a>
+<div align="center">
+
+![GitHub issues](https://img.shields.io/github/issues/COS301-SE-2024/Query-Builder)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/COS301-SE-2024/Query-Builder)
+![GitHub Languages](https://img.shields.io/github/languages/count/COS301-SE-2024/Query-Builder)
+![GitHub Last Commit](https://img.shields.io/github/last-commit/COS301-SE-2024/Query-Builder)
+![GitHub RepoSize](https://img.shields.io/github/repo-size/COS301-SE-2024/Query-Builder)
 
 </div>
-<hr/> -->
+
+
 
 <div class="video">
 
@@ -22,37 +21,41 @@
 
 
 ## Project Introduction
+<div align='left'>
+
+QBee is an innovative solution that transforms how users interact with databases, regardless of their technical skill level. By replacing traditional query methods with an intuitive drag-and-drop GUI, QBee makes database manipulation effortless and enables real-time query collaboration. 
+It ensures robust data privacy and integrity, providing a secure environment for users.
+
+Beyond basic query building, QBee offers tools to convert databases between formats and visualize data through generated graphs, facilitating deeper insights, enhancing user experience and efficiency.
+
+QBee is the ultimate tool for modern database management and analysis. 
+
+</div>
+
+<h2 align='center'> Documentation </h2>
+
+<div align="center" >
+
+
+| Resource                        | Link                                       |
+|---------------------------------|--------------------------------------------|
+| Software Requirements Specification | [Our System Requirements]()            |
+| Coding Standards                | [See Coding Standards]()                   |
+| Architecture Document           | [System design overview]()                 |
+| Architecture Diagram            | [System Diagram]()                         |
+| Deployment Diagram              | [Deployment Diagram]()                     |
+| Testing Policy                  | [Testing Policy]()                         |
+| User Manual                     | [User Manual]()                            |
+| Project Board                   | [Project Tracking](https://github.com/orgs/COS301-SE-2024/projects/55)|
+
+  
+</div>
 
 ## Demos
 
 ### Demo 1
 [Presentation]()
 
-
-
-## Documentation
-
-### Software Requirements Specification 
-[Document]()
-
-### Coding Standards
-[Document]()
-
-### Testing Policy
-[Document]()
-
-### Architecture Documents 
-[Diagram]()
-[Document]()
-
-### Deployment Diagram
-[Deployment]()
-
-### User Manual
-[Manual]()
-
-### Project Management Tools </h3>
-[Project Board]()
 
 ## Team Members
 
@@ -62,6 +65,7 @@
     <p>
        Zane is a final-year BSc Computer Science student. He enjoys learning about different ways to do certain things and takes various courses to broaden his scope in the programming world. This includes Microsoft certifications in Azure, Python, JavaScript, and HTML & CSS, as well as a newly acquired DNS introductory course by ZADNA and ZARC. He has also developed a few mobile applications using Flutter and React, enjoying improving the overall efficiency in which the user interacts with the backend.
     </p>
+    <p>Email: <a href="mailto:xadrian.vanheerden@tuks.co.za?subject?subject=QBEE Query - Zane Augustyn">u22528424@tuks.co.za</a></p>
     <a href="https://github.com/ZaneAugustyn" target="_blank">
             <img src="https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white"/>
     </a> <br>
@@ -78,6 +82,7 @@
        Graeme is a third-year BSc Computer Science student at the University of Pretoria. He possesses strong analytical and problem-solving skills, allowing him to dissect challenges and craft effective solutions. He is eager to learn in the process of bringing the QBee to life. 
        Graeme has an interest particularly in backend development and logical solution crafting and optimisation.   Additionally he has worked a lot with various database schemas and SQL dialects.
     </p>
+    <p>Email: <a href="mailto:u22625462@tuks.co.za?subject?subject=QBEE Query - Graeme Blain">u22625462@tuks.co.za</a></p>
     <a href="https://github.com/GremBleen" target="_blank">
             <img src="https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white"/>
     </a> <br>
@@ -93,6 +98,7 @@
     <p>
        Keanu is a final year student who is pursuing a BSc Computer Science with a focus on data science. He particularly enjoys artificial intelligence and has experience in frontend-backend integration. He has developed a number of personal projects for both desktop and mobile that have been used by users in over 130 countries worldwide, and he believes that his specialisation in data science will be very useful in taking a data-intensive application such as QBee to the next level.
     </p>
+    <p>Email: <a href="mailto:u20693398@tuks.co.za?subject?subject=QBEE Query - Keanu Canto">u20693398@tuks.co.za</a></p>
     <a href="https://github.com/Keanumrc" target="_blank">
             <img src="https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white"/>
     </a> <br>
@@ -110,6 +116,7 @@
        Aidan is a third year BSc Computer Science student. He has experience with devops and CI/CD, having managed this in his COS301 mini-project. He also has a passion for robotics, having designed and built his own 3D printer. 
        He prefers working on the backend where he tackles problems related to the logic of the system. He is a hardworking, critical thinking, time-conscious individual that is persistent in his pursuit of success and is always ready to learn.
     </p>
+    <p>Email: <a href="mailto:u22738917@tuks.co.za?subject?subject=QBEE Query - Aidan Chapman">u22738917@tuks.co.za</a></p>
     <a href="https://github.com/u22738917" target="_blank">
             <img src="https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white"/>
     </a> <br>
@@ -133,4 +140,21 @@
             <img src="https://img.shields.io/badge/linkedin-%230077B5.svg?style=for-the-badge&logo=linkedin&logoColor=white"/>
     </a>
 </div>
-<br><br><br><br>
+<br><br><br>
+
+
+### Local Setup
+Clone the repo
+```shell
+git clone https://github.com/COS301-SE-2024/Query-Builder.git
+```
+
+Go to the Query-Builder app directory 
+```shell
+cd query-builder-app
+```
+
+Install dependencies
+```shell
+pnpm i
+```

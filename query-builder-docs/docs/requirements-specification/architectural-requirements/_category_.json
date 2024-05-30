@@ -1,0 +1,8 @@
+{
+  "label": "Architectural Requirements",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "description": "Documentation outlining the architectural requirements of Query Builder."
+  }
+}
