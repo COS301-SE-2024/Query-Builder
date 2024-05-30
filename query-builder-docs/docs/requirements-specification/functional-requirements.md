@@ -1,7 +1,7 @@
 ---
 title: System Requirements Specification
 description: The system requirements specification for the Query Builder Application
-sidebar_position: 1
+sidebar_position: 2
 ---
 
 # Functional Requirements
