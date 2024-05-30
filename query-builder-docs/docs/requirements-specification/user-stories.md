@@ -265,3 +265,131 @@ sidebar_position: 2
          - The saved query becomes accessible to other users in the organisation based on their roles and permissions.
 
 # Use Cases
+
+## Use Cases for User Management Subsystem
+### 1. Provide a Secure Authentication Process to Users
+   1. User Registration with One-Time Pin
+      - __Use Case Name:__ User Registration with One-Time Pin
+
+      - __Actors:__ New User, System
+
+      - __Preconditions:__ The user has not registered on the application before.
+
+      - __Postconditions:__ The user is successfully registered and can log in to the system.
+
+      - Main Success Scenario:
+         1. User initiates registration: The new user accesses the registration page.
+
+         2. User enters email: The user enters their email address and submits the registration form.
+
+         3. System sends OTP: The system generates a one-time pin (OTP) and sends it to the user's email.
+
+         4. User enters OTP: The user receives the OTP and enters it into the registration form.
+
+         5. System verifies OTP: The system verifies the OTP.
+
+         6. User sets password: Upon successful OTP verification, the user is prompted to set a password.
+
+         7. System confirms registration: The system saves the user's credentials and sends a confirmation email.
+
+         8. User receives confirmation: The user receives a confirmation email indicating successful registration.
+
+      - Extensions:
+         - 3a. Invalid email: If the email is invalid, the system prompts the user to enter a valid email.
+         
+         - 4a. OTP not received: If the user does not receive the OTP, they can request a new one.
+         
+         - 5a. Invalid OTP: If the OTP is invalid, the system prompts the user to enter the correct OTP.
+
+   2. User Login
+      - __Use Case Name:__ User Login
+
+      - __Actors:__ User, System
+
+      - __Preconditions:__ The user has already registered on the application.
+
+      - __Postconditions:__ The user is successfully logged in and can access their account.
+
+      - Main Success Scenario:
+         1. User initiates login: The user accesses the login page.
+         
+         2. User enters credentials: The user enters their registered email and password.
+         
+         3. System authenticates credentials: The system checks the credentials.
+         
+         4. System grants access: If the credentials are valid, the system grants access to the user’s account.
+         
+         5. User accesses account: The user is redirected to their account dashboard.
+      - Extensions:
+         - 3a. Invalid credentials: If the credentials are invalid, the system notifies the user of the unsuccessful login attempt.
+
+   3. Password Reset
+      - __Use Case Name:__ Password Reset
+
+      - __Actors:__ User, System
+
+      - __Preconditions:__ The user has a registered account and has forgotten their password.
+
+      - __Postconditions:__ The user has successfully reset their password and can log in with the new password.
+
+      - Main Success Scenario:
+         1. User initiates password reset: The user accesses the password reset page.
+
+         2. User enters email: The user enters their registered email address.
+
+         3. System sends reset link/OTP: The system sends a password reset link or OTP to the user's email.
+
+         4. User receives reset link/OTP: The user receives the password reset link or OTP.
+
+         5. User resets password: The user clicks the reset link or enters the OTP, then creates a new password.
+
+         6. System confirms password reset: The system updates the user's password and sends a confirmation email.
+
+         7. User receives confirmation: The user receives a confirmation email indicating the password reset was successful.
+      
+      - Extensions:
+         - 3a. Invalid email: If the email is not registered, the system notifies the user to enter a valid registered email.
+         
+         - 5b. Expired link/OTP: If the reset link or OTP has expired, the system prompts the user to request a new one.
+
+### 2. Provide an Interface to Edit or Change User's Information
+   1. Edit Personal Information
+      - __Use Case Name:__ Edit Personal Information
+
+      - __Actors:__ User, System
+
+      - __Preconditions:__ The user is logged into the application.
+
+      - __Postconditions:__ The user's personal information is successfully updated in the system.
+
+      - Main Success Scenario:
+         1. User accesses profile: The user navigates to the "Edit Profile" section within the application.
+
+         2. User updates information: The user edits their personal information fields such as name, surname, email, and phone number.
+
+         3. User confirms changes: The user confirms the updates by entering their password.
+         
+         4. System validates changes: The system validates the new information and password.
+         
+         5. System saves changes: The system updates the user's information in the database.
+         
+         6. System sends notification: The system sends a toast notification, within the application, to the user confirming the updates.
+         
+         7. User receives confirmation: The user receives a confirmation toast notification, within the application, indicating their personal information has been successfully updated.
+      
+      - Extensions:
+         - 3a. Incorrect password: If the entered password is incorrect, the system notifies the user and prompts them to enter the correct password.
+
+         - 4a. Invalid information: If any updated information is invalid (e.g., incorrect email format), the system prompts the user to correct the information.
+   
+   2. Set Personal Preferences
+      - __Use Case Name:__ Set Personal Preferences
+
+      - __Actors:__ User, System
+
+      - __Preconditions:__ The user is logged into the application.
+
+      - __Postconditions:__ The user's personal preferences are successfully updated and applied in the system.
+
+      - Main Success Scenario:
+         
