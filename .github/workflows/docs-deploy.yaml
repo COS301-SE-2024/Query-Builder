@@ -1,0 +1,22 @@
+name: Documentation Deploy
+on:
+    push:
+        branches:
+            - main
+        paths:
+            - 'query-builder-docs/**'
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            actions: read
+            deployments: write
+        name: Deploy Documentation
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: deploy
+              run: |
+                echo "Documentation Site is currently not up - This action will be setup further when the site is ready."
+                
