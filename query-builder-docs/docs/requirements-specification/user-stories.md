@@ -833,6 +833,259 @@ sidebar_position: 2
          2. System generates Excel: The system generates an Excel file of the report data.
          
          3. User downloads Excel: The user downloads the Excel file.
-         
+
       - Extensions:
          - 2a. Excel generation error: If an error occurs during Excel generation, the system notifies the user and provides options to retry or contact support.
+
+## Use Cases for the Organisation subsystem
+### 1. Create an Organisation
+   1. Create an Organisation
+      - __Use Case Name:__ Generate Reports of the Query Data
+
+      - __Actors:__ User, System
+
+      - __Preconditions:__ The user is logged into the system.
+
+      - __Postconditions:__ The organisation is created, and the user is assigned as the organisation admin.
+
+      - Main Success Scenario:
+         1. User initiates organisation creation: The user selects the option to create an organisation.
+         
+         2. User enters organisation details: The user enters the organisation's details (e.g., name, address).
+         
+         3. System validates details: The system validates the entered details.
+         
+         4. System creates organisation: The system creates the organisation and assigns the user as the organisation admin.
+         
+         5. System confirms creation: The system sends a confirmation to the user about the successful creation of the organisation.
+      
+      - Extensions: 
+         - 3a. Invalid details: If the entered details are invalid, the system notifies the user to correct the information.
+
+### 2. Connect a Database to the Organisation
+   1. Connect a Database to the Organisation
+      - __Use Case Name:__ Connect a Database to the Organisation
+
+      - __Actors:__ Organisation Admin, System
+
+      - __Preconditions:__ The user is an organisation admin and is logged into the system.
+
+      - __Postconditions:__ The database is connected to the organisation.
+
+      - Main Success Scenario:
+         1. Admin initiates database connection: The organisation admin selects the option to connect a database.
+         
+         2. Admin enters connection details: The admin enters the database connection details (e.g., type, host, port, username, password).
+         
+         3. System validates details: The system validates the entered connection details.
+         
+         4. System establishes connection: The system establishes the connection to the database.
+         
+         5. System confirms connection: The system sends a confirmation to the admin about the successful database connection.
+      
+      - Extensions:
+         - 3a. Invalid connection details: If the connection details are invalid, the system notifies the admin to correct the information.
+
+### 3. Add Other Users to the Organisation
+   1. Invite Unregistered QBEE Users
+      - __Use Case Name:__ Invite Unregistered QBEE Users
+
+      - __Actors:__ Organisation Admin, System, Invited User
+
+      - __Preconditions:__ The user is an organisation admin and is logged into the system.
+
+      - __Postconditions:__ The unregistered user is invited to join the organisation.
+
+      - Main Success Scenario:
+         1. Admin initiates invitation: The organisation admin selects the option to invite users.
+         
+         2. Admin enters email addresses: The admin enters the email addresses of the unregistered users.
+         
+         3. System sends invitations: The system sends invitation emails to the unregistered users.
+         
+         4. Invited user registers: The unregistered users register for an account on QBEE.
+         
+         5. Invited user joins organisation: Upon registration, the users join the organisation.
+
+      - Extensions:
+         - 3a. Invalid email addresses: If the entered email addresses are invalid, the system notifies the admin to correct the information.
+
+   2. Invite Registered QBEE Users
+      - __Use Case Name:__ Invite Registered QBEE Users
+
+      - __Actors:__ Organisation Admin, System, Invited User
+
+      - __Preconditions:__ The user is an organisation admin and is logged into the system.
+
+      - __Postconditions:__ The registered user is invited to join the organisation.
+
+      - Main Success Scenario:
+         1. Admin initiates invitation: The organisation admin selects the option to invite users.
+         
+         2. Admin enters email addresses: The admin enters the email addresses of the registered users.
+         
+         3. System sends invitations: The system sends invitation emails to the registered users.
+         
+         4. Invited user accepts invitation: The registered users accept the invitation to join the organisation.
+         
+         5. System adds users to organisation: The system adds the users to the organisation upon acceptance.
+
+      - Extensions:
+         - 3a. Invalid email addresses: If the entered email addresses are invalid, the system notifies the admin to correct the information.
+      
+### 4. Manage User Roles
+   1. IAssign Roles to Users
+      - __Use Case Name:__ Assign Roles to Users
+
+      - __Actors:__ Organisation Admin, System
+
+      - __Preconditions:__ The user is an organisation admin and is logged into the system.
+
+      - __Postconditions:__ Roles are assigned to users in the organisation.
+
+      - Main Success Scenario:
+         1. Admin views user list: The organisation admin views the list of users in the organisation.
+         
+         2. Admin assigns roles: The admin assigns predefined roles to each user.
+         
+         3. System updates roles: The system updates the users' roles.
+         
+         4. System notifies users: The system sends notifications to the users about their assigned roles.
+
+      - Extensions:
+         - 3a. Role assignment error: If there is an error in assigning roles, the system notifies the admin and suggests corrective actions.
+
+   2. Manage Authorization and Access
+      - __Use Case Name:__ Manage Authorization and Access
+
+      - __Actors:__ Organisation Admin, System
+
+      - __Preconditions:__ The user is an organisation admin and is logged into the system.
+
+      - __Postconditions:__ The permissions and access levels for each role are managed.
+
+      - Main Success Scenario:
+         1. Admin accesses role management: The organisation admin accesses the role management interface.
+         
+         2. Admin modifies permissions: The admin defines or modifies permissions for each role.
+         
+         3. System enforces access control: The system enforces role-based access control based on the defined permissions.
+         
+         4. Users access features: Users access features and data as permitted by their roles.
+
+      - Extensions:
+         - 3a. Permission conflict: If there is a conflict in permissions, the system notifies the admin to resolve it.
+
+   3. Define a New Role
+      - __Use Case Name:__ Define a New Role
+
+      - __Actors:__ Organisation Admin, System
+
+      - __Preconditions:__ The user is an organisation admin and is logged into the system.
+
+      - __Postconditions:__ A new role is defined and available for assignment.
+
+      - Main Success Scenario:
+         1. Admin accesses role management: The organisation admin accesses the role management interface.
+         
+         2. Admin creates new role: The admin creates a new role by specifying its name and permissions.
+         
+         3. System saves new role: The system saves the new role and makes it available for assignment.
+         
+         4. Admin assigns new role: The admin assigns the new role to users in the organisation.
+
+      - Extensions:
+         - 3a. Role creation error: If there is an error in creating the role, the system notifies the admin and suggests corrective actions.
+
+### 5. Leave the Organisation
+   1. Leave the Organisation
+      - __Use Case Name:__ Leave the Organisation
+
+      - __Actors:__ User, System
+
+      - __Preconditions:__ The user is logged into the system and is a member of an organisation.
+
+      - __Postconditions:__ The user is no longer associated with the organisation.
+
+      - Main Success Scenario:
+         1. User initiates leave process: The user selects the option to leave the organisation.
+         
+         2. System confirms decision: The system confirms the user's decision to leave.
+         
+         3. System removes user: The system removes the user from the organisation.
+         
+         4. System updates status: The system updates the user's status to reflect they are no longer part of the organisation.
+
+      - Extensions:
+         - 2a. Leave cancellation: If the user cancels the leave process, the system retains the user's membership in the organisation.
+
+### 6. Remove Users from the Organisation
+   1. Remove Users from the Organisation
+      - __Use Case Name:__ Remove Users from the Organisation
+
+      - __Actors:__ Organisation Admin, System
+
+      - __Preconditions:__ The user is an organisation admin and is logged into the system.
+
+      - __Postconditions:__ The selected users are removed from the organisation.
+
+      - Main Success Scenario:
+         1. Admin views user list: The organisation admin views the list of users in the organisation.
+         
+         2. Admin selects users to remove: The admin selects the users to remove from the organisation, excluding other admins.
+         
+         3. System removes users: The system removes the selected users from the organisation.
+         
+         4. System notifies removed users: The system sends notifications to the removed users about their removal.
+
+      - Extensions:
+         - 3a. Error in removal: If there is an error in removing users, the system notifies the admin and suggests corrective actions.
+
+### 7. Access Organisation Saved Queries
+   1. Access Organisation Saved Queries
+      - __Use Case Name:__ Access Organisation Saved Queries
+
+      - __Actors:__ User, System
+
+      - __Preconditions:__ The user is a member of the organisation and is logged into the system.
+
+      - __Postconditions:__ The user accesses and possibly runs or modifies saved queries.
+
+      - Main Success Scenario:
+         1. User views saved queries: The user views a list of saved queries within the organisation.
+         
+         2. User selects a query: The user selects a saved query from the list.
+         
+         3. System checks permissions: The system checks the user's permissions to ensure access.
+         
+         4. User runs or modifies query: The user runs or modifies the saved query based on their permissions.
+         
+         5. System executes query: The system executes the query and displays the results to the user.
+      
+      - Extensions:
+         - 3a. Access denied: If the user does not have the necessary permissions, the system denies access and notifies the user.
+      
+### 8. Save Queries for the Organisation
+   1. Save Queries for the Organisation
+      - __Use Case Name:__ Save Queries for the Organisation
+
+      - __Actors:__ User, System
+
+      - __Preconditions:__ The user is a member of the organisation with the appropriate permissions and is logged into the system.
+
+      - __Postconditions:__ The query is saved to the organisation's repository.
+
+      - Main Success Scenario:
+         1. User initiates save query: The user selects the option to save a query to the organisation's repository.
+         
+         2. User adds descriptions and tags: The user adds descriptions and tags to the query for easier retrieval.
+         
+         3. System validates query: The system validates the query and the user's permissions.
+         
+         4. System saves query: The system saves the query to the organisation's repository.
+         
+         5. System confirms save: The system confirms that the query has been saved and is accessible to other users based on their roles and permissions.
+
+      - Extensions for;
+         - 3a. Validation error: If the query or user permissions are invalid, the system notifies the user and suggests corrective actions.
+               
