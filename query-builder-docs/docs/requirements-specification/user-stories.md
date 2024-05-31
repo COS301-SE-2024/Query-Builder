@@ -392,4 +392,447 @@ sidebar_position: 2
       - __Postconditions:__ The user's personal preferences are successfully updated and applied in the system.
 
       - Main Success Scenario:
+         1. User accesses preferences: The user navigates to the "Preferences" section within the application.
          
+         2. User updates settings: The user updates various settings such as notification preferences and appearance settings.
+         
+         3. User saves changes: The user saves their updated preferences.
+         
+         4. System validates changes: The system validates the new preferences.
+         
+         5. System saves changes: The system updates the user's preferences in the database.
+         
+         6. System displays notification: The system displays a toast notification within the application indicating that the preferences have been successfully updated.
+      
+      - Extensions:
+         - 2a. Invalid preferences: If any updated preference is invalid or unsupported, the system prompts the user to correct the preference settings.
+   
+## Use Cases for Database Systems Manager Subsystems
+### 1. Allow Users to Connect to External Databases
+   1. Connect to External Databases
+      - __Use Case Name:__ Connect to External Databases
+
+      - __Actors:__ User, System
+
+      - __Preconditions:__ The user is logged into the application.
+
+      - __Postconditions:__ The user successfully connects to an external database and saves the connection details for future use.
+
+      - Main Success Scenario:
+         1. User initiates connection: The user navigates to the "Connect to Database" section within the application.
+         
+         2. User enters connection details: The user enters the required connection details (e.g., database URL, host, Database Anonymous key, username, password).
+         
+         3. System validates details: The system validates the connection details provided by the user.
+         
+         4. System establishes connection: If the details are valid, the system establishes a connection to the external database.
+         
+         5. User saves connection settings: The user saves the connection settings for future use.
+         
+         6. System confirms connection: The system stores the connection settings and displays a toast notification confirming the successful connection and storage.
+         
+         7. User receives confirmation: The user sees the toast notification indicating a successful connection.
+      
+      - Extensions:
+         - 3a. Invalid details: If the connection details are invalid, the system displays a toast notification indicating an unsuccessful connection and prompts the user to correct the details.
+         
+         - 4a. Connection failure: If the system cannot establish a connection, it displays a toast notification indicating an unsuccessful connection and provides troubleshooting options.
+
+### 2. Allow Users to Update Database Connection Details
+   1. Update Database Connection Details
+      - __Use Case Name:__ Update Database Connection Details
+
+      - __Actors:__ User, System
+
+      - __Preconditions:__ The user has previously saved database connection details.
+
+      - __Postconditions:__ The user's updated database connection details are successfully saved and validated.
+
+      - Main Success Scenario:
+         1. User accesses connection settings: The user navigates to the "Manage Database Connections" section within the application.
+         
+         2. User selects a connection: The user selects the saved database connection they wish to update.
+         
+         3. User updates connection details: The user updates the necessary connection details (e.g.Database URL, Anonymous key, host, username, password).
+         
+         4. System validates details: The system validates the updated connection details.
+         
+         5. System saves updates: If the details are valid, the system saves the updated connection settings.
+         
+         6. System confirms update: The system displays a toast notification confirming the successful update of the connection details.
+         
+         7. User receives confirmation: The user sees the toast notification indicating a successful update.
+      
+      - Extensions:
+         - 4a. Invalid details: If the updated connection details are invalid, the system displays a toast notification indicating an unsuccessful update and prompts the user to correct the details.
+         
+         - 5a. Update failure: If the system cannot save the updated details, it displays a toast notification indicating an unsuccessful update and provides troubleshooting options.
+
+### 3. Extract Metadata from Database Schema
+   1. Extract Metadata from Database Schema
+      - __Use Case Name:__ Extract Metadata from Database Schema
+
+      - __Actors:__ User, System
+
+      - __Preconditions:__ The user is logged into the application and connected to an external database.
+
+      - __Postconditions:__ The user successfully extracts and views the summary of the metadata of the database schema.
+
+      - Main Success Scenario:
+         1. User requests metadata extraction: The user navigates to the "Database Metadata" section within the application and requests metadata extraction for the connected database.
+
+         2. System retrieves metadata: The system retrieves the metadata from the connected database, including tables, columns, data types, and constraints.
+
+         3. System displays metadata: The system displays the extracted metadata to the user in a structured format.
+
+         4. User views metadata: The user reviews the displayed metadata to understand the structure and properties of the database.
+      
+      - Extensions:
+         - 2a. Connection failure: If the system cannot connect to the database, it displays an error message and prompts the user to check the connection settings.
+
+         - 2b. Metadata retrieval failure: If the system encounters an error while retrieving metadata, it displays an error message and suggests possible troubleshooting steps.
+
+   
+### 4. Query Execution
+   1. Execute a Specific Query on the Database
+      - __Use Case Name:__ Execute a Specific Query on the Database
+
+      - __Actors:__ User, System
+
+      - __Preconditions:__ The user is logged into the application and connected to an external database.
+
+      - __Postconditions:__ The user's query is successfully executed on the database, and the user is notified of the execution status.
+
+      - Main Success Scenario:
+         1. User selects a query: The user selects a pre-saved query or creates a new query within the application.
+
+         2. System translates the query: The system translates the query into the specific language of the connected database.
+         
+         3. System executes the query: The system executes the translated query on the connected database.
+         
+         4. System notifies execution status: The system notifies the user of the execution status, indicating success or failure.
+
+         5. User receives notification: The user receives a notification of the query execution status.
+
+      - Extensions:
+         - 2a. Invalid query: If the query is invalid or contains errors, the system notifies the user and prompts them to correct the query.
+
+         - 3a. Execution failure: If the system encounters an error during query execution, it displays an error message and suggests possible troubleshooting steps.
+   
+   2.  View Results from Executed Query
+         - __Use Case Name:__ View Results from Executed Query
+
+         - __Actors:__ User, System
+
+         - __Preconditions:__ The user has successfully executed a query on the connected database.
+
+         - __Postconditions:__ The user successfully views the results of the executed query in a readable and organized format.
+
+         - Main Success Scenario:
+            1. System retrieves results: The system retrieves the results of the executed query from the connected database.
+
+            2. System displays results: The system displays the query results to the user in a readable and organized format.
+            
+            3. User views results: The user reviews the displayed results for analysis.
+         
+         - Extensions:
+            - 1a. No results found: If the query returns no results, the system notifies the user that no data was found.
+
+            - 1b. Result retrieval failure: If the system encounters an error while retrieving results, it displays an error message and suggests possible troubleshooting steps.
+   
+## Use Cases for the Query Builder Subsystem
+### 1. Choose Database to Query
+   1. Choose Database to Query
+      - __Use Case Name:__ Choose Database to Query
+
+      - __Actors:__ User, System
+
+      - __Preconditions:__ The user is logged into the application and has connected databases.
+
+      - __Postconditions:__ The user successfully selects a database to run their queries against.
+
+      - Main Success Scenario:
+         1. User views database list: The user navigates to the query builder section and views a list of connected databases.
+         
+         2. User selects a database: The user selects a database from the list.
+         
+         3. System confirms selection: The system confirms the selected database for the query session.
+         
+         4. User proceeds with query creation: The user begins creating a query against the selected database.
+      
+      - Extensions:
+         - 2a. No databases connected: If no databases are connected, the system notifies the user and provides an option to connect a database.
+
+### 2. Create a Query
+   1. Create a Query Using Drag and Drop UI
+      - __Use Case Name:__ Create a Query Using Drag and Drop UI
+
+      - __Actors:__ User, System
+
+      - __Preconditions:__ The user is logged into the application and has selected a database to query.
+
+      - __Postconditions:__ The user successfully creates and runs a query using the drag and drop interface.
+
+      - Main Success Scenario:
+         1. User accesses drag and drop UI: The user navigates to the drag and drop query builder interface.
+         
+         2. User constructs query: The user drags and drops database elements (e.g., tables, columns) to construct a query.
+         
+         3. System visualizes query: The system visually represents the query structure as the user builds it.
+         
+         4. User modifies query: The user can modify the query by adjusting the elements within the drag and drop interface.
+         
+         5. User runs query: The user runs the constructed query.
+         
+         6. System executes query: The system executes the query against the selected database and displays the results.
+      
+      - Extensions:
+         - 5a. Query error: If there is an error in the query, the system notifies the user.
+   
+   2. Create a Query Using a Form
+      - __Use Case Name:__ Create a Query Using a Form
+
+      - __Actors:__ User, System
+
+      - __Preconditions:__ The user is logged into the application and has selected a database to query.
+
+      - __Postconditions:__ The user successfully creates and runs a query using the form-based interface.
+
+      - Main Success Scenario:
+         1. User accesses form interface: The user navigates to the form-based query builder interface.
+
+         2. User inputs query parameters: The user fills out the form with query parameters, selecting tables, columns, and conditions.
+         
+         3. System generates query: The system generates the query based on the input parameters.
+         
+         4. User submits form: The user submits the form to run the query.
+         
+         5. System executes query: The system executes the generated query against the selected database and displays the results.
+
+      - Extensions:
+         - 3a. Invalid input: If any input is invalid, the system notifies the user and prompts them to correct the input.
+   
+### 3. Toggle Between Views
+   1. Toggle Between Views of the Query Building Process
+      - __Use Case Name:__ Toggle Between Views of the Query Building Process
+
+      - __Actors:__ User, System
+
+      - __Preconditions:__ The user is logged into the application and is in the process of creating a query.
+
+      - __Postconditions:__ The user successfully toggles between the drag and drop interface and the form interface without losing the query state.
+
+      - Main Success Scenario:
+         1. User initiates toggle: The user selects an option to switch between the drag and drop interface and the form interface.
+         
+         2. System maintains query state: The system maintains the current query state and converts it appropriately between the two interfaces.
+         
+         3. User continues query creation: The user continues building the query in the new interface.
+         
+         4. System notifies user: The system notifies the user of any changes or discrepancies that may arise from switching views.
+      
+      - Extensions:
+         - 2a. Conversion error: If there is an error in converting the query state, the system notifies the user and provides options to resolve the discrepancies.
+
+### 4. View Query Results Summary
+   1. View Summary of Query Results
+      - __Use Case Name:__ View Summary of Query Results
+
+      - __Actors:__ User, System
+
+      - __Preconditions:__ The user has successfully executed a query.
+
+      - __Postconditions:__ The user views a summary of the query results, including key statistics and a preview of the result set.
+
+      - Main Success Scenario:
+         1. System displays summary: The system displays a summary of the query results, including key statistics such as row count.
+         
+         2. User views summary: The user reviews the summary to quickly understand the outcome of the query.
+         
+         3. System provides preview: The system provides a preview of the result set.
+         
+         4. User accesses detailed results: The user can access detailed results if needed for further analysis.
+      
+      - Extensions: 
+         - 1a. No results found: If the query returns no results, the system notifies the user that no data was found.
+
+### 5. Save Queries
+   1. Save Queries
+      - __Use Case Name:__ Save Queries
+
+      - __Actors:__ User, System
+
+      - __Preconditions:__ The user has created a query using either the drag and drop interface or the form interface.
+
+      - __Postconditions:__ The user successfully saves the query for future use.
+
+      - Main Success Scenario:
+         1. User initiates save: The user selects an option to save the current query.
+         
+         2. User names query: The user provides a name and optional description for the query.
+         
+         3. System saves query: The system saves the query to the user's query library or saved queries list.
+         
+         4. System confirms save: The system confirms the successful save with a notification.
+         
+         5. User accesses saved queries: The user can access and manage saved queries from the query library or saved queries list.
+      
+      - Extensions:
+         - 3a. Save failure: If the system encounters an error while saving the query, it notifies the user and provides options to retry or resolve the issue.
+
+## Use Cases for the Reporting subsystem
+### 1. Generate Reports
+   1. Generate Reports of the Query Data
+      - __Use Case Name:__ Generate Reports of the Query Data
+
+      - __Actors:__ User, System
+
+      - __Preconditions:__ The user has executed a query and has query results available.
+
+      - __Postconditions:__ The user successfully generates a report based on the query data.
+
+      - Main Success Scenario:
+         1. User initiates report generation: The user selects an option to generate a report from the query results.
+         
+         2. System processes data: The system processes the query data.
+         
+         3. User selects report type: The user chooses the type of report to generate (graph or table).
+         
+         4. System generates report: The system generates the selected type of report.
+         
+         5. User views report: The user reviews the generated report.
+
+      - Extensions:
+         - 4a. Invalid data for report type: If the query data is not suitable for the selected report type, the system notifies the user and suggests alternatives.
+   
+   2. Generate Graph Reports
+      - __Use Case Name:__ Generate Graph Reports
+
+      - __Actors:__ User, System
+
+      - __Preconditions:__ The user has executed a query and has query results available.
+
+      - __Postconditions:__ The user successfully generates a graph report based on the query data.
+
+      - Main Success Scenario:
+         1. User selects graph report type: The user chooses to generate a graph report.
+         
+         2. User selects graph type: The user selects the type of graph (e.g., bar, line, pie).
+         
+         3. System generates graph: The system generates the graph based on the query data.
+         
+         4. User customizes graph: The user customizes graph settings and labels.
+         
+         5. System updates graph: The system updates the graph based on the user's customizations.
+         
+         6. User views graph report: The user reviews the generated graph report.
+
+      - Extensions:
+         - 3a. Invalid graph type selection: If the selected graph type is not compatible with the data, the system notifies the user and suggests alternatives.
+   
+   3. Generate Table Reports
+      - __Use Case Name:__ Generate Table Reports
+
+      - __Actors:__ User, System
+
+      - __Preconditions:__ The user has executed a query and has query results available.
+
+      - __Postconditions:__ The user successfully generates a table report based on the query data.
+
+      - Main Success Scenario:
+         1. User selects table report type: The user chooses to generate a table report.
+         
+         2. User selects columns and options: The user selects which columns to include and applies sorting or filtering options.
+         
+         3. System generates table: The system generates a table with the query data.
+         
+         4. User adjusts layout: The user adjusts the table layout and formatting.
+         
+         5. System updates table: The system updates the table based on the user's adjustments.
+         
+         6. User views table report: The user reviews the generated table report.
+      
+      - Extensions:
+         - 2a. Invalid column selection: If the selected columns are not available, the system notifies the user and suggests alternatives.
+
+### 2. Share Reports
+   1. Share Exported Reports with Other Users.
+      - __Use Case Name:__ Share Exported Reports with Other Users
+
+      - __Actors:__ User, System, Recipient
+
+      - __Preconditions:__ The user has generated a report.
+
+      - __Postconditions:__ The report is successfully shared with selected recipients.
+
+      - Main Success Scenario:
+         1. User selects report to share: The user selects an exported report to share.
+         
+         2. User chooses recipients: The user selects individual users to share the report with.
+         
+         3. System sends report: The system sends the report to the selected recipients.
+         
+         4. Recipients receive report: The recipients receive a copy of the exported report.
+         
+         5. System notifies recipients: The system notifies the recipients that a report has been shared with them.
+      
+      - Extensions
+         - 3a. Recipient email invalid: If a recipient's email is invalid, the system notifies the user and prompts for a valid email.
+
+### 3. Export Reports
+   1. Export Reports as PDF
+      - __Use Case Name:__ Export Reports as PDF
+
+      - __Actors:__ User, System
+
+      - __Preconditions:__ The user has generated a report.
+
+      - __Postconditions:__ The user successfully exports the report as a PDF.
+
+      - Main Success Scenario:
+         1. User selects PDF export: The user initiates export as a PDF.
+         
+         2. System generates PDF: The system generates a PDF file of the report.
+         
+         3. User downloads PDF: The user downloads or prints the PDF file.
+      
+      - Extensions:
+         - 2a. PDF generation error: If an error occurs during PDF generation, the system notifies the user and provides options to retry or contact support.
+
+   2. Export Reports as CSV
+      - __Use Case Name:__ Export Reports as CSV
+
+      - __Actors:__ User, System
+
+      - __Preconditions:__ The user has generated a report.
+
+      - __Postconditions:__ The user successfully exports the report as a CSV.
+
+      - Main Success Scenario:
+         1. User selects CSV export: The user initiates export as a CSV.
+         
+         2. System generates CSV: The system generates a CSV file of the report data.
+         
+         3. User downloads CSV: The user downloads the CSV file.
+
+      - Extensions:
+         - 2a. CSV generation error: If an error occurs during CSV generation, the system notifies the user and provides options to retry or contact support.
+
+   3. Export Reports as Excel
+      - __Use Case Name:__ Export Reports as Excel
+
+      - __Actors:__ User, System
+
+      - __Preconditions:__ The user has generated a report.
+
+      - __Postconditions:__ The user successfully exports the report as an Excel file.
+
+      - Main Success Scenario:
+         1. User selects Excel export: The user initiates export as an Excel file.
+         
+         2. System generates Excel: The system generates an Excel file of the report data.
+         
+         3. User downloads Excel: The user downloads the Excel file.
+         
+      - Extensions:
+         - 2a. Excel generation error: If an error occurs during Excel generation, the system notifies the user and provides options to retry or contact support.
