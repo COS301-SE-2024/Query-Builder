@@ -1,7 +1,7 @@
 ---
 title: User Stories
 description: The user stories of the Query Builder Application
-sidebar_position: 1
+sidebar_position: 2
 ---
 
 # User Stories
