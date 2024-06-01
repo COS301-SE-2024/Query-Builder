@@ -13,12 +13,13 @@ sidebar_position: 4
 
 - *QueryBuilder*
 
-    Users can create queries, which are then transformed into an abstract JSON structure on the frontend. This JSON is sent to the backend where it is translated and checked for error checking; any anomalies trigger an error notification to the user. If the query passes validation, it's forwarded to the database for execution. This process ensures security by preventing malicious alterations to the database query.
+    Users can create queries, which are then transformed into an abstract JSON structure on the frontend. This JSON is sent to the backend where it is translated and checked for errors; any anomalies trigger an error notification to the user. If the query passes validation, it's forwarded to the database for execution. This process ensures security by preventing malicious alterations to the database query.
 
     Example of JSON data structure used to query database:
     ```json
     {
         "query_type": "SELECT",
+        "language_type": "SQL",
         "columns": ["column1", "column2", "column3"],
         "table": "table_name",
         "conditions": {
