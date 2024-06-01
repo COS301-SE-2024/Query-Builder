@@ -2,7 +2,10 @@
 sidebar_position: 7
 ---
 
+
 # Technology Requirements
+
+### The technologies used to implement the system
 
 ## Frontend 
 
