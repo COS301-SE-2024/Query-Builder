@@ -73,7 +73,7 @@ git pull
 git checkout feature/hello-world
 
 # rebase the feature branch on the dev branch
-git rebase develop
+git rebase dev
 ```
 > **Note:** This allows for the resolution of merge conflicts locally.
 
