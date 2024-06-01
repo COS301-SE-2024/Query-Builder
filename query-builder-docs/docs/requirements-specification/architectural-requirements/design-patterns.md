@@ -9,7 +9,7 @@ sidebar_position: 3
 
 *The mediator design pattern defines an object that encapsulates how a set of objects interact. This pattern promotes loose coupling by preventing objects from referring to each other explicitly, allowing their interactions to be varied independently. It centralizes complex communications and control logic between related objects.*
 
-Used to talk to the different types of inputs (collegues) using the QueryIntermediateForm as the mediator. Different inputs will give diffrent interfaces that the user can use
+Used to talk to the different types of inputs (colleagues) using the QueryIntermediateForm as the mediator. Different inputs will give different interfaces that the user can use
 
 ## Singleton
 
