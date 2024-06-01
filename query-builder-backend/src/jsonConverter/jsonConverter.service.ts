@@ -1,31 +1,27 @@
 import { Injectable } from '@nestjs/common';
-import { query } from 'express';
 
 @Injectable()
 export class JsonConverterService {
 
     async convertJsonToQuery(jsonData: any): Promise<string> {
-        const query = '';
-        if(jsonData.language === 'sql'){
-            if(jsonData.query_type === 'select')
-                {
-                    if(jsonData.table === '' || jsonData.column === '')
-                    {
-                        return 'Invalid query';
-                    }
-                    const select = jsonData.table;
-                    const from = jsonData.column;
-                    const where = jsonData.condition;
-            
-                    const query = `SELECT ${select} FROM ${from} WHERE ${where}`;
+        let query = '';
+        if (jsonData.language === 'sql') {
+            if (jsonData.query_type === 'select') {
+                if (jsonData.table === '' || jsonData.column === '') {
+                    return 'Invalid query';
                 }
-        }
-        else
-        {
-            const query = 'Invalid language';
+                const select = jsonData.column;
+                const from = jsonData.table;
+                const where = jsonData.condition;
+        
+                query = `SELECT ${select} FROM ${from} WHERE ${where}`;
+            } else {
+                query = 'Unsupported query type';
+            }
+        } else {
+            throw new Error('Invalid language');
         }
 
         return query;
     }
-
 }
