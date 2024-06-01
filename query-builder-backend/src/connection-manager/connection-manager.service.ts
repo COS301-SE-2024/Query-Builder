@@ -21,9 +21,12 @@ export class ConnectionManagerService {
             user: credentials.user,
             password: credentials.password,
           });
+
+          console.log(connection)
     
           connection.connect((err) => {
             if (err) {
+                console.log(connection)
                 console.log(err)
                 reject({ success: false }); // Reject with an error object
             } else {
