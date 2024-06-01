@@ -12,6 +12,14 @@ sidebar_position: 7
 
     We will be using NextJS for our frontend due to its powerful features that enhance both the development process and the performance of our web application. NextJS provides hybrid static and server-side rendering capabilities, allowing us to optimize load times and ensure our content is up-to-date and SEO-friendly. Its Incremental Static Regeneration (ISR) feature enables us to update static content without a full rebuild, striking a perfect balance between static and dynamic content. 
 
+- NextUI
+
+    We are using the NextUI component library to provide a sleek, modern, and highly customizable user interface, accelerating our development process and ensuring a consistent look and feel across our application.
+
+- Storybook
+
+    We are using Storybook for developing and testing UI components in isolation, ensuring they are robust and well-documented before integration into the application.
+
 ## Backend
 
 *In this subsection we will explain what we will be using for the backend of our system*
@@ -53,3 +61,10 @@ sidebar_position: 7
 - Git
 
     We will be using Git for version control to manage changes to our codebase. Git enables collaborative development, efficient tracking of changes, and easy branching and merging of code.
+
+## Documentation
+*In this subsection we will explain how we intent to show all documentation*
+
+- Docusaurus
+
+    We are using Docusaurus to build and maintain our project documentation, providing a user-friendly and organized platform for all our documentation needs.
