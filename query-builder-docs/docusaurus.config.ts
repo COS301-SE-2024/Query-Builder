@@ -48,7 +48,7 @@ const config: Config = {
 
   themeConfig: {
     // Replace with your project's social card
-    image: 'img/docusaurus-social-card.jpg',
+    image: 'img/qbeeTempLogo.svg',
     navbar: {
       title: 'QBEE Docs',
       logo: {
@@ -91,7 +91,7 @@ const config: Config = {
           items: [
             {
               label: 'GitHub',
-              href: 'https://github.com/facebook/docusaurus',
+              href: 'https://github.com/COS301-SE-2024/Query-Builder',
             },
           ],
         },
