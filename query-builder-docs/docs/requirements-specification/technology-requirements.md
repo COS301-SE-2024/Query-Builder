@@ -62,6 +62,11 @@ sidebar_position: 7
 
     We will be using Git for version control to manage changes to our codebase. Git enables collaborative development, efficient tracking of changes, and easy branching and merging of code.
 
+- Github
+
+    We will use GitHub as our remote repository hosting service, enabling collaboration, code review, and project management features for our team.
+
+
 ## Documentation
 *In this subsection we will explain how we intent to show all documentation*
 
