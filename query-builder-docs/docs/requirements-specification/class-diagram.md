@@ -1,9 +1,9 @@
 ---
-sidebar_position: 3
+sidebar_position: 5
 ---
 
 # Class Diagram
 
-### A high-level class diagram of the QBEE Query Builder system
+### A high-level class diagram of the QBee Query Builder system
 
-![QBEE Class Diagram](./../../static/img/QBEEClassDiagram.svg)
+![QBee Class Diagram](./../../static/img/QBEEClassDiagram.svg)

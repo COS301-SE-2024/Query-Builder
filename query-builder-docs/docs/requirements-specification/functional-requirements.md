@@ -1,7 +1,7 @@
 ---
 title: Functional Requirements
-description: The functional requirements of the Query Builder Application
-sidebar_position: 2
+description: The functional requirements of the QBee Query Builder system
+sidebar_position: 3
 ---
 
 # Functional Requirements
@@ -69,7 +69,7 @@ sidebar_position: 2
 2. Users that have an admin role for the organisation will be able to connect a database to the organisation.
 
 3. Allow the organisation admin to add other users to the organisation
-    1. Inviting an unregistered QBEE User.
+    1. Inviting an unregistered QBee User.
     2. Existing users must be able to accept invites to an organisation.
 
 4. Admin of the organisation will be able to manage user roles for the organisation
