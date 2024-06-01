@@ -1,6 +1,6 @@
 ---
 title: User Stories
-description: The user stories of the Query Builder Application
+description: The user stories of the QBee Query Builder system
 sidebar_position: 2
 ---
 
@@ -197,20 +197,20 @@ sidebar_position: 2
          - Users receive confirmation of successful database connection.
 
 3. Add Other Users to the Organisation
-   1. As an organisation admin, I want to invite unregistered QBEE users to join the organisation, so that I can expand my team.
+   1. As an organisation admin, I want to invite unregistered QBee users to join the organisation, so that I can expand my team.
       - Acceptance Criteria:
          - Organisation admins can enter email addresses to send invitations.
          - The system sends an invitation email to the unregistered users.
-         - Invited unregistered users can register for an account on QBEE
+         - Invited unregistered users can register for an account on QBee
          - These new users can then join the organisation.
 
-   2. As an organisation admin, I want to invite registered QBEE users to join the organisation, so that I can expand my team.
+   2. As an organisation admin, I want to invite registered QBee users to join the organisation, so that I can expand my team.
       - Acceptance Criteria:
          - Organisation admins can enter email addresses to send invitations.
          - The system sends an invitation email to the registered users.
          - Invited registered users can join the organisation.
 
-   3. As an existing QBEE user, I want to accept invites to an organisation, so that I can join and contribute to the organisation.
+   3. As an existing QBee user, I want to accept invites to an organisation, so that I can join and contribute to the organisation.
       - Acceptance Criteria:
          - Users receive an invitation notification or email.
          - Users can accept the invitation to join the organisation.
@@ -887,8 +887,8 @@ sidebar_position: 2
          - 3a. Invalid connection details: If the connection details are invalid, the system notifies the admin to correct the information.
 
 ### 3. Add Other Users to the Organisation
-   1. Invite Unregistered QBEE Users
-      - __Use Case Name:__ Invite Unregistered QBEE Users
+   1. Invite Unregistered QBee Users
+      - __Use Case Name:__ Invite Unregistered QBee Users
 
       - __Actors:__ Organisation Admin, System, Invited User
 
@@ -903,15 +903,15 @@ sidebar_position: 2
          
          3. System sends invitations: The system sends invitation emails to the unregistered users.
          
-         4. Invited user registers: The unregistered users register for an account on QBEE.
+         4. Invited user registers: The unregistered users register for an account on QBee.
          
          5. Invited user joins organisation: Upon registration, the users join the organisation.
 
       - Extensions:
          - 3a. Invalid email addresses: If the entered email addresses are invalid, the system notifies the admin to correct the information.
 
-   2. Invite Registered QBEE Users
-      - __Use Case Name:__ Invite Registered QBEE Users
+   2. Invite Registered QBee Users
+      - __Use Case Name:__ Invite Registered QBee Users
 
       - __Actors:__ Organisation Admin, System, Invited User
 
