@@ -95,7 +95,8 @@ export default function Form(){
         }).then(
           function(response){
             if(response.ok){
-              return response.json();
+              console.log(response);
+              return response.body;
             }
             else{
               return ({"success" : false})
@@ -104,7 +105,7 @@ export default function Form(){
         ).then(
           function(response){
             console.log(response)
-            setOutputQuery(response)
+            // setOutputQuery(response)
           }
         )
   
