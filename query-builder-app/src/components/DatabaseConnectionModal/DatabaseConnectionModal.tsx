@@ -1,4 +1,5 @@
 "use client"
+import "../../app/globals.css"
 import React from "react";
 import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Checkbox, Input, Link} from "@nextui-org/react";
 
