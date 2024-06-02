@@ -1,5 +1,5 @@
 import { Controller, Post, Body, Injectable } from '@nestjs/common';
-import { ConnectionManagerService } from 'src/connection-manager/connection-manager.service';
+import { ConnectionManagerService } from '../connection-manager/connection-manager.service';
 
 interface DatabaseCredentials {
     host: string,
