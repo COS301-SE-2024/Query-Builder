@@ -2,7 +2,7 @@
 <div align="center" class="teamHeader"><h1><span class="teamColour">Ctrl+Alt+Elites</span></h1></div>
 
 <div align="center">
-<img alt="QBEE Logo" src="./query-builder-docs/static/img/qbeeTempLogo.svg" />
+<img alt="QBEE Logo" width="100" src="./query-builder-docs/static/img/qbeeTempLogo.svg" />
 </div>
 
 <div align="center"><h2>Project: QBee</h2></div>
