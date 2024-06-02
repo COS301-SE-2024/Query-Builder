@@ -27,10 +27,13 @@ describe('JsonConverterController', () => {
       condition: 'id = 1',
     };
 
+    const expected = 'SELECT id FROM users WHERE id = 1';
+
     const result = await controller.convert(queryParams);
 
     expect(result).toContain('SELECT');
     expect(result).toContain('FROM');
     expect(result).toContain('WHERE');
+    expect(result).toEqual(expected);
   });
 });
