@@ -82,7 +82,7 @@ export default function Form(){
         fetch("http://localhost:55555/api/convert", {
           method: "POST",
           headers: {
-            'Accept': 'application/json',
+            'Accept': 'application/text',
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
@@ -94,18 +94,21 @@ export default function Form(){
           })
         }).then(
           function(response){
-            if(response.ok){
-              console.log(response);
-              return response.body;
-            }
-            else{
-              return ({"success" : false})
-            }
+            // if(response.ok){
+            //   console.log(response);
+            //   return response.body;
+            // }
+            // else{
+            //   return ({"success" : false})
+            // }
+            return response.text();
+           
           }
-        ).then(
+        )
+        .then(
           function(response){
-            console.log(response)
-            // setOutputQuery(response)
+            alert(response);
+            setOutputQuery(response);
           }
         )
   
@@ -242,6 +245,7 @@ export default function Form(){
                     Query
                   </Button>
                 </>) :null}
+                {outputQuery == "" ? null:(<div>outputQuery</div>)}
             </CardFooter>
         </Card>
       </>

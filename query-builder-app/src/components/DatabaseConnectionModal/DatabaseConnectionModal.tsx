@@ -85,6 +85,7 @@ export default function DatabaseConnectionModal(){
           isOpen={isOpen} 
           onOpenChange={onOpenChange}
           placement="top-center"
+          className="text-black"
         >
           <ModalContent>
             {(onClose : any) => (
