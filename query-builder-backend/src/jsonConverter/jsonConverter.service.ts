@@ -5,6 +5,8 @@ export class JsonConverterService {
 
     async convertJsonToQuery(jsonData: any): Promise<string> {
         let query = '';
+        jsonData.language = jsonData.language.toLowerCase();
+        jsonData.query_type = jsonData.query_type.toLowerCase();
         if (jsonData.language === 'sql') {
             if (jsonData.query_type === 'select') {
                 if (jsonData.table === '' || jsonData.column === '') {

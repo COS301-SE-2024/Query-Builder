@@ -1,5 +1,5 @@
 import { Controller, Post, Body } from '@nestjs/common';
-import { JsonConverterService } from 'src/jsonConverter/jsonConverter.service';
+import { JsonConverterService } from './jsonConverter.service';
 
 interface QueryParams {
     language: string,
