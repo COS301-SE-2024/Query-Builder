@@ -10,6 +10,7 @@
 ![GitHub Languages](https://img.shields.io/github/languages/count/COS301-SE-2024/Query-Builder)
 ![GitHub Last Commit](https://img.shields.io/github/last-commit/COS301-SE-2024/Query-Builder)
 ![GitHub RepoSize](https://img.shields.io/github/repo-size/COS301-SE-2024/Query-Builder)
+[![Coverage Status](https://coveralls.io/repos/github/COS301-SE-2024/Query-Builder/badge.svg?branch=main)](https://coveralls.io/github/COS301-SE-2024/Query-Builder?branch=main)
 
 </div>
 
