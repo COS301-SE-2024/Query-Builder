@@ -193,8 +193,6 @@ const test_update_password = async () => {
   if (update_error) {
     await logError(update_error);
   }
-
-  console.log(update_data);
   assertEquals(update_data.data.user.email, email);
 
   // delete the user
