@@ -1,6 +1,6 @@
 
-<div align="center" class="teamHeader"><h1><span class="teamColour">Ctrl</span> Alt <span class="teamColour">Elite</span></h1></div>
-<div align="center"><h2>Project: QBEE</h2></div>
+<div align="center" class="teamHeader"><h1><span class="teamColour">Ctrl+Alt+Elites</span></h1></div>
+<div align="center"><h2>Project: QBee</h2></div>
 
 <!-- Add badges here -->
 <div align="center">
@@ -26,7 +26,7 @@
 QBee is an innovative solution that transforms how users interact with databases, regardless of their technical skill level. By replacing traditional query methods with an intuitive drag-and-drop GUI, QBee makes database manipulation effortless and enables real-time query collaboration. 
 It ensures robust data privacy and integrity, providing a secure environment for users.
 
-Beyond basic query building, QBee offers tools to convert databases between formats and visualize data through generated graphs, facilitating deeper insights, enhancing user experience and efficiency.
+Beyond basic query building, QBee offers tools to visualize data through generated graphs, facilitating deeper insights and enhancing user experience and efficiency.
 
 QBee is the ultimate tool for modern database management and analysis. 
 
@@ -36,16 +36,19 @@ QBee is the ultimate tool for modern database management and analysis.
 
 <div align="center" >
 
+[Our Documentation Website](https://cos301-se-2024.github.io/Query-Builder/)
 
 | Resource                        | Link                                       |
 |---------------------------------|--------------------------------------------|
-| Software Requirements Specification | [Our System Requirements]()            |
-| Coding Standards                | [See Coding Standards]()                   |
-| Architecture Document           | [System design overview]()                 |
-| Architecture Diagram            | [System Diagram]()                         |
-| Deployment Diagram              | [Deployment Diagram]()                     |
-| Testing Policy                  | [Testing Policy]()                         |
-| User Manual                     | [User Manual]()                            |
+| Software Requirements Specification | [See our complete SRS](https://cos301-se-2024.github.io/Query-Builder/docs/category/requirements-specification)            |
+| User Stories                    | [See User Stories](https://cos301-se-2024.github.io/Query-Builder/docs/requirements-specification/user-stories)                   |
+| Functional Requirements           | [See Functional Requirements](https://cos301-se-2024.github.io/Query-Builder/docs/requirements-specification/functional-requirements)                 |
+| Use Case Diagrams           | [See Use Case Diagrams](https://cos301-se-2024.github.io/Query-Builder/docs/requirements-specification/use-case-diagrams)                 |
+| Service Contracts            | [See Service Contracts](https://cos301-se-2024.github.io/Query-Builder/docs/requirements-specification/service-contracts)                         |
+| Class Diagram              | [See Class Diagram](https://cos301-se-2024.github.io/Query-Builder/docs/requirements-specification/class-diagram)                     |
+| Architectural Requirements                  | [See Architectural Requirements](https://cos301-se-2024.github.io/Query-Builder/docs/category/architectural-requirements)                         |
+| Technology Requirements                | [See Technology Requirements](https://cos301-se-2024.github.io/Query-Builder/docs/requirements-specification/technology-requirements)                   |
+| Coding Standards                | [See Coding Standards](https://cos301-se-2024.github.io/Query-Builder/docs/guides-and-standards/coding-standards)                   |
 | Project Board                   | [Project Tracking](https://github.com/orgs/COS301-SE-2024/projects/55)|
 
   
