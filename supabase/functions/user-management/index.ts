@@ -3,12 +3,12 @@
 // This enables autocomplete, go to definition, etc.
 
 // Setup type definitions for built-in Supabase Runtime APIs
-/// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
+/// <reference types="https://esm.sh/v135/@supabase/functions-js@2.4.1/src/edge-runtime.d.ts" />
 
 import {
   createClient,
   SupabaseClient,
-} from "https://esm.sh/@supabase/supabase-js@2";
+} from "https://esm.sh/@supabase/supabase-js@2.43.4";
 
 const corse_headers = {
   "Access-Control-Allow-Origin": "*",
@@ -20,7 +20,7 @@ const corse_headers = {
 console.log("Hello from Functions!");
 
 Deno.serve(async (req: Request) => {
-  const { url: url, method: method } = req;
+  const { url, method } = req;
 
   if (method === "OPTIONS") {
     return new Response("ok", { headers: corse_headers });
@@ -38,12 +38,14 @@ Deno.serve(async (req: Request) => {
         },
       );
 
-      const taskPath = new URLPattern("/user-management/:id");
+      const taskPath = new URLPattern({ pathname: "/user-management/:id" });
       const matchingPath = taskPath.exec(url);
-      const function_id = matchingPath ? matchingPath.pathname.groups.function_id : null;
+      const function_id = matchingPath
+        ? matchingPath.pathname.groups.function_id
+        : null;
       const body = await req.json();
 
-      if(!function_id || !body) {
+      if (function_id === null || body === null) {
         throw new Error("Invalid request");
       }
 
@@ -60,7 +62,6 @@ Deno.serve(async (req: Request) => {
           status: 200,
         },
       );
-
     } catch (error) {
       console.error(error);
       return new Response(
@@ -75,7 +76,12 @@ Deno.serve(async (req: Request) => {
     }
   }
 
-  return new Response("Invalid request", { status: 400 });
+  return new Response(
+    JSON.stringify({
+      error: "Invalid request",
+    }),
+    { status: 400 },
+  );
 });
 
 /* To invoke locally:
