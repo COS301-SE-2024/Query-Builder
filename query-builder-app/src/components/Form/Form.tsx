@@ -26,6 +26,15 @@ export default function Form(){
         [selectColumns]
     );
 
+    const handleDatabaseSelection = (keys:any) => {
+        if (keys.size === 0) {
+            setSelectedDatabase(new Set(["Select database"])); // Reset to default
+        } else {
+            setSelectedDatabase(keys);
+        }
+        setSelectedTable(new Set(["Select table"])); // Clear selected columns
+    };
+
     const handleTableSelection = (keys:any) => {
         if (keys.size === 0) {
             setSelectedTable(new Set(["Select table"])); // Reset to default
@@ -90,19 +99,19 @@ export default function Form(){
                         variant="bordered" 
                         className="capitalize"
                         >
-                        {selectedDatabaseValue}
+                        {selectedDatabaseValue || "Select database"}
                         </Button>
                     </DropdownTrigger>
                     <DropdownMenu 
                     aria-label="Dynamic Actions" 
                         items={databases}
                         variant="flat"
-                        disallowEmptySelection
+                        // disallowEmptySelection
                         selectionMode="single"
                         selectedKeys={selectedDatabase}
-                        onSelectionChange={setSelectedDatabase}
+                        onSelectionChange={handleDatabaseSelection}
                     >
-                        {(item) => (
+                        {(item:any) => (
                         <DropdownItem
                             key={item.key}
                         >
@@ -113,7 +122,9 @@ export default function Form(){
                 </Dropdown>
                 <Spacer y={2}/>
                 {/* Select columns */}
-                <div className="flex">
+                {!selectedDatabase.has("Select database") ? 
+                    (<>
+                 <div className="flex">
                     <h2>Table to query:</h2>
                 </div>
                 <Dropdown className="text-black">
@@ -133,7 +144,7 @@ export default function Form(){
                         selectedKeys={selectedTable}
                         onSelectionChange={handleTableSelection}
                     >
-                        {(item) => (
+                        {(item:any) => (
                         <DropdownItem
                             key={item.table}
                         >
@@ -143,6 +154,7 @@ export default function Form(){
                     </DropdownMenu>
                 </Dropdown>
                 <Spacer y={2}/>
+                </>) : null}
                 {/* select columns */}
                 
                 {!selectedTable.has("Select table") ? 
@@ -154,13 +166,12 @@ export default function Form(){
                             <DropdownTrigger>
                                 <Button 
                                 variant="bordered" 
-                                className="capitalize"
                                 >
-                                {selectedColValue}
+                                {selectedColValue || "No columns selected, will default to all columns selected"} 
                                 </Button>
                             </DropdownTrigger>
                             <DropdownMenu 
-                                aria-label="Multiple selection example"
+                                aria-label="Multiple column selection"
                                 variant="flat"
                                 items={tables} 
                                 closeOnSelect={false}
