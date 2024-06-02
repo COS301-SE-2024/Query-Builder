@@ -23,7 +23,7 @@ jobs:
           deno-version: 1.40.3
       - name: Run Deno Tests
         run: |
-          cd supabase/tests/
+          cd supabase/functions/tests/
           touch .env
           echo SUPABASE_URL = ${{ env.SUPABASE_URL }} >> .env
           echo SUPABASE_ANON_KEY = ${{ env.SUPABASE_ANON_KEY }} >> .env
