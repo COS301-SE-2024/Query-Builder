@@ -13,7 +13,7 @@ jobs:
         runs-on: ubuntu-latest
         defaults:
            run:
-             working-directory: ./server/
+             working-directory: ./query-builder-backend/
         steps:
             - name: Checkout
               uses: actions/checkout@v4
