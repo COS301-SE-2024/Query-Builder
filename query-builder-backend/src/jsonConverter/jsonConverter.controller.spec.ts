@@ -33,7 +33,6 @@ describe('JsonConverterController', () => {
 
     expect(result).toContain('SELECT');
     expect(result).toContain('FROM');
-    expect(result).toContain('WHERE');
     expect(result).toEqual(expected);
   });
 });
