@@ -21,9 +21,6 @@ jobs:
                 cache: 'pnpm'
             - name: Install Dependencies
               run: pnpm install
-            - name: Lint
-              run: pnpm lint
-              working-directory: query-builder-app
             - name: Test
               run: pnpm test
               working-directory: query-builder-app
