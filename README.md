@@ -1,6 +1,12 @@
 
 <div align="center" class="teamHeader"><h1><span class="teamColour">Ctrl+Alt+Elites</span></h1></div>
+
+<div align="center">
+<img alt="QBEE Logo" src="./query-builder-docs/static/img/qbeeTempLogo.svg" />
+</div>
+
 <div align="center"><h2>Project: QBee</h2></div>
+<div align="center"><h2>A Capstone Project for DNS Africa</h2></div>
 
 <!-- Add badges here -->
 <div align="center">
