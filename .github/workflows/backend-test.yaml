@@ -4,6 +4,7 @@ on:
         branches:
             - dev
             - main
+            - backendTestsActions
         paths:
             - 'query-builder-backend/**'
 jobs:
