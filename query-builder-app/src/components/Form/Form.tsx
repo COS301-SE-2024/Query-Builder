@@ -94,20 +94,13 @@ export default function Form(){
           })
         }).then(
           function(response){
-            // if(response.ok){
-            //   console.log(response);
-            //   return response.body;
-            // }
-            // else{
-            //   return ({"success" : false})
-            // }
             return response.text();
            
           }
         )
         .then(
           function(response){
-            alert(response);
+            // alert(response);
             setOutputQuery(response);
           }
         )
@@ -245,7 +238,8 @@ export default function Form(){
                     Query
                   </Button>
                 </>) :null}
-                {outputQuery == "" ? null:(<div>outputQuery</div>)}
+                <Spacer y={2}/>
+                {outputQuery == "" ? null:(<div>{outputQuery}</div>)}
             </CardFooter>
         </Card>
       </>
