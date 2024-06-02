@@ -1,0 +1,9 @@
+name: Code Coverage
+on:
+    push:
+        branches:
+            - dev
+            - main
+        paths:
+            - 'query-builder-app/**'
+jobs:

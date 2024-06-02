@@ -1,0 +1,9 @@
+name: App Deploy
+on:
+    push:
+        branches:
+            - dev
+            - main
+        paths:
+            - 'query-builder-app/**'
+jobs:
