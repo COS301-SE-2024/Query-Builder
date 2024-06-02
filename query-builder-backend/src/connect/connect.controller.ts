@@ -14,6 +14,7 @@ export class ConnectController {
 
     @Post()
     async connect(@Body() credentials: DatabaseCredentials){
+
         try{
             const result = await this.connectionManager.connectToDatabase(credentials);
             return result;
