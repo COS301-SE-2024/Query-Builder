@@ -7,7 +7,7 @@ on:
         paths:
             - 'query-builder-app/**'
 jobs:
-    test:
+    lint:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
@@ -20,7 +20,7 @@ jobs:
                 node-version: '.nvmrc'
                 cache: 'pnpm'
             - name: Install Dependencies
-              run: pnpm install
+              run: pnpm install --frozen-lockfile
             - name: Lint
               run: pnpm lint
               working-directory: query-builder-app

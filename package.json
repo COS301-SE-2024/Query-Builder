@@ -8,6 +8,7 @@
         "app-build":"cd query-builder-app && pnpm run build",
         "app-start": "cd query-builder-app && pnpm start",
         "app-test": "cd query-builder-app && pnpm test",
-        "storybook-start": "cd query-builder-app && pnpm run storybook"
+        "storybook-start": "cd query-builder-app && pnpm run storybook",
+        "install-deps": "cd query-builder-app && pnpm install --frozen-lockfile && cd ../query-builder-docs && pnpm install --frozen-lockfile"
     }
 }
