@@ -1,0 +1,33 @@
+name: Edge-Function-Tests
+run-name: ${{ github.actor }} at ${{ github.event_name }} event
+on:
+  workflow_dispatch:
+  a:
+  pull_request:
+    types:
+      - opened
+      - reopened
+    branches:
+      - main
+jobs:
+  run-ef-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+      - name: Setup Deno
+        uses: denolib/setup-deno@v2
+        with:
+          deno-version: 1.40.3
+      - name: Run Deno Tests
+        run: |
+          cd supabase/tests/
+          touch .env
+          echo SUPABASE_URL = ${{ env.SUPABASE_URL }} >> .env
+          echo SUPABASE_ANON_KEY = ${{ env.SUPABASE_ANON_KEY }} >> .env
+          echo SUPABASE_SERVICE_ROLE_KEY = ${{ env.SUPABASE_SERVICE_ROLE_KEY }} >> .env
+          cat .env
+          deno test --allow-all ./*.ts
+
