@@ -14,6 +14,8 @@ export default function Form(){
         [selectedDatabase]
     );
 
+    const [outputQuery, setOutputQuery] = useState("");
+
     const [selectedTable, setSelectedTable] = useState(new Set(["Select table"]));
     const selectedTableValue = React.useMemo(
         () => Array.from(selectedTable).join(", ").replaceAll("_", " "),
@@ -75,9 +77,38 @@ export default function Form(){
         }
     ];
 
-    const sendQuery = (query:string) => {
-        
-    }
+    const sendQuery = (language:string, queryType:string, table:string, column:string, condition:string) => {
+
+        fetch("http://localhost:55555/api/convert", {
+          method: "POST",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            "language": language,
+            "query_type": queryType,
+            "table": table,
+            "column": column,
+            "condition": ""
+          })
+        }).then(
+          function(response){
+            if(response.ok){
+              return response.json();
+            }
+            else{
+              return ({"success" : false})
+            }
+          }
+        ).then(
+          function(response){
+            console.log(response)
+            setOutputQuery(response)
+          }
+        )
+  
+      }
 
     return (
 
@@ -195,9 +226,24 @@ export default function Form(){
                                 ))}
                             </DropdownMenu>
                         </Dropdown>
+
                     </>):
-                    (<></>)}
+                    null
+                    }
             </CardBody>
+            <CardFooter>
+                {!selectedTable.has("Select table") ? 
+                (<>
+                    <Button 
+                    color="primary" 
+                    // onPress={onClose}  
+                    onClick={() => sendQuery("sql", "select", selectedTableValue, selectedColValue, "")}
+                    // isDisabled={isURLInvalid || isUsernameInvalid || isPasswordInvalid}
+                    >
+                    Query
+                  </Button>
+                </>) :null}
+            </CardFooter>
         </Card>
       </>
     )
