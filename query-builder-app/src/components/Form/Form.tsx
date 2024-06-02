@@ -235,10 +235,8 @@ export default function Form(){
                 {!selectedTable.has("Select table") ? 
                 (<>
                     <Button 
-                    color="primary" 
-                    // onPress={onClose}  
+                    color="primary"  
                     onClick={() => sendQuery("sql", "select", selectedTableValue, selectedColValue, "")}
-                    // isDisabled={isURLInvalid || isUsernameInvalid || isPasswordInvalid}
                     >
                     Query
                   </Button>
