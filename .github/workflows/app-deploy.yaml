@@ -1,0 +1,27 @@
+name: App Deploy
+on:
+    push:
+        branches:
+            - main
+        paths:
+            - 'query-builder-app/**'
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Install pnpm
+              uses: pnpm/action-setup@v4
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                node-version: '.nvmrc'
+                cache: 'pnpm'
+            - name: Install Dependencies
+              run: pnpm install --frozen-lockfile
+            - name: Build
+              run: pnpm build
+              working-directory: query-builder-app
+            - name: Deploy
+              run: echo "Deployment is not currently up, but it will be soon!"
