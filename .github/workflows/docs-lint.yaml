@@ -1,0 +1,22 @@
+name: Documentation Linting
+on:
+    push:
+        branches:
+            - dev
+            - main
+        paths:
+            -"query-builder-docs/**"
+jobs:
+    deploy:
+        permissions:
+            contents: read
+            actions: read
+        runs-on: ubuntu-latest
+        name: Docs Linting
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: markdown-lint
+              uses: articulate/actions-markdownlint@v1.1.0
+          
+
