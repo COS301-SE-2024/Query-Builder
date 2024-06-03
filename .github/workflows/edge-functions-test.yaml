@@ -1,5 +1,4 @@
 name: Edge-Function-Tests
-run-name: ${{ github.actor }} at ${{ github.event_name }} event
 on:
   workflow_dispatch:
   pull_request:
