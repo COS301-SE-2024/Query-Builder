@@ -1,14 +1,11 @@
 name: Edge-Function-Tests
 on:
   workflow_dispatch:
-  pull_request:
-    types:
-      - opened
-      - reopened
+  push:
     branches:
       - main
 jobs:
-  run-ef-tests:
+  run-of-tests:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
