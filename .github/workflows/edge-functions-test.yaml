@@ -1,4 +1,5 @@
 name: Edge Function Tests
+run-name: ${{ github.actor }} at ${{ github.event_name }} event 
 on:
   workflow_dispatch:
   push:
@@ -18,12 +19,13 @@ jobs:
         with:
           deno-version: 1.40.3
       - name: Run Deno Tests
+        
         run: |
           cd supabase/functions/tests/
           touch .env
-          echo SUPABASE_URL = ${{ env.SUPABASE_URL }} >> .env
-          echo SUPABASE_ANON_KEY = ${{ env.SUPABASE_ANON_KEY }} >> .env
-          echo SUPABASE_SERVICE_ROLE_KEY = ${{ env.SUPABASE_SERVICE_ROLE_KEY }} >> .env
+          echo SUPABASE_URL = ${{ secrets.SUPABASE_URL }} >> .env
+          echo SUPABASE_ANON_KEY = ${{ secrets.SUPABASE_ANON_KEY }} >> .env
+          echo SUPABASE_SERVICE_ROLE_KEY = ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }} >> .env
           cat .env
           deno test --allow-all ./*.ts
 
