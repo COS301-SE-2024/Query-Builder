@@ -65,7 +65,8 @@ QBee is the ultimate tool for modern database management and analysis.
 
 ### Demo 1
 [Presentation](https://universitypretoria-my.sharepoint.com/:p:/g/personal/u22699572_up_ac_za/Ed5Ju0ycZPJEhB489Y9t-NQBmRZXLNSEgkgdkAGdTnRHWA?e=71FQGs)
-[Video]([https://universitypretoria-my.sharepoint.com/:p:/g/personal/u22699572_up_ac_za/Ed5Ju0ycZPJEhB489Y9t-NQBmRZXLNSEgkgdkAGdTnRHWA?e=71FQGs](https://drive.google.com/file/d/1vwUdawGN85nuJmd0HXj29mgobARACl9i/view?usp=sharing))
+
+[Video](https://drive.google.com/file/d/1vwUdawGN85nuJmd0HXj29mgobARACl9i/view?usp=sharing)
 
 
 ## Team Members
