@@ -20,6 +20,7 @@ jobs:
               with:
                 node-version: 20
                 cache: 'pnpm'
+                cache-dependency-path: query-builder-app/pnpm-lock.yaml
             - name: Install Dependencies
               run: pnpm install --frozen-lockfile
             - name: Build
