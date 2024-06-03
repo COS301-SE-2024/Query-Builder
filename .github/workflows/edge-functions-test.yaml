@@ -1,9 +1,10 @@
-name: Edge-Function-Tests
+name: Edge Function Tests
 on:
   workflow_dispatch:
   push:
     branches:
       - main
+      - dev
 jobs:
   run-of-tests:
     runs-on: ubuntu-latest
