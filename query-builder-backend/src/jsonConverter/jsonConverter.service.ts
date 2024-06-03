@@ -11,6 +11,8 @@ export class JsonConverterService {
         if (jsonData.language === 'sql') {
             if (jsonData.query_type === 'select') {
                 if (!jsonData.table || !jsonData.column) {
+                    query = 'Invalid query';
+                    return query;
                     throw new Error('Invalid query');
                 }
                 
@@ -24,9 +26,13 @@ export class JsonConverterService {
                 
                 query = `SELECT ${select} FROM ${from}${where}`;
             } else {
+                query = 'Unsupported query type';
+                return query;
                 throw new Error('Unsupported query type');
             }
         } else {
+            query = 'Invalid language';
+            return query;
             throw new Error('Invalid language');
         }
     
