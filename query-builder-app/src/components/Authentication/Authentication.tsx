@@ -2,41 +2,15 @@
 import "../../app/globals.css"
 import "./Authentication.css"
 import React, { useState, useEffect } from "react";
-import {Button, Spacer, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Card, CardHeader, CardBody, CardFooter, Input} from "@nextui-org/react";
+import {Button, Card, CardBody, Input} from "@nextui-org/react";
+import {EyeFilledIcon} from "./EyeFilledIcon";
+import {EyeSlashFilledIcon} from "./EyeSlashFilledIcon";
 
 export default function Authentication(){
-
-    // const {isOpen, onOpen, onOpenChange} = useDisclosure();
-    // useEffect(() => {
-    //     const container = document.getElementById('authenticationContainer');
-    //     const overlayBtn = document.getElementById('overlayBtn');
-
-    //     if(container != null && overlayBtn != null)
-    //         overlayBtn.addEventListener('click', ()=>{
-    //             container.classList.toggle('right-panel-active');
-    //         });
-     
-    //     // Cleanup function
-    //     return () => {
-    //         const container = document.getElementById('authenticationContainer');
-    //         const overlayBtn = document.getElementById('overlayBtn');
-    //         if(container!= null && overlayBtn != null)
-    //         overlayBtn.removeEventListener('click', ()=>{
-    //             container.classList.toggle('right-panel-active');
-    //         });
-    //     };
-    // }, []); 
-
-    const [view, setView] = useState('');
-
-    const changeView = () => {
-        if(view == ''){
-            setView('right-panel-active');
-        }
-        else{
-            setView('');
-        }
-    }
+    const [isVisible, setIsVisible] = useState(false);
+    const toggleVisibility = () => setIsVisible(!isVisible);
+    const [isLoginVisible, setLoginIsVisible] = useState(false);
+    const toggleLoginVisibility = () => setLoginIsVisible(!isLoginVisible);
 
 
     // Sign in
@@ -93,6 +67,25 @@ export default function Authentication(){
         return false;
     }, [signUpLastName]);
 
+    const [view, setView] = useState('');
+    const changeView = () => {
+        setLoginPasswordHasBeenFocused(false); 
+        setLoginEmailHasBeenFocused(false);
+        setSignUpPasswordHasBeenFocused(false);
+        setSignUpEmailHasBeenFocused(false);
+        setSignUpFirstNameHasBeenFocused(false);
+        setSignUpLastNameHasBeenFocused(false);
+        setIsVisible(false);
+        setLoginIsVisible(false);
+
+        if(view == ''){
+            setView('right-panel-active');
+        }
+        else{
+            setView('');
+        }
+    }
+
     return (
 
         <>
@@ -107,7 +100,7 @@ export default function Authentication(){
                                 label="First Name"
                                 variant="Border"
                                 onValueChange={setSignUpFirstName}
-                                onFocus={() => {setSignUpPasswordHasBeenFocused(false); setSignUpEmailHasBeenFocused(false);setSignUpFirstNameHasBeenFocused(true);setSignUpLastNameHasBeenFocused(false);}}
+                                onFocus={() => {setSignUpPasswordHasBeenFocused(false); setSignUpEmailHasBeenFocused(false);setSignUpFirstNameHasBeenFocused(true);setSignUpLastNameHasBeenFocused(false);setLoginPasswordHasBeenFocused(false); setLoginEmailHasBeenFocused(false);}}
                                 isInvalid={isSignUpFirstNameInvalid && signUpFirstNameHasBeenFocused}
                                 color={!signUpFirstNameHasBeenFocused ? "primary" : isSignUpFirstNameInvalid ? "danger" : "success"}
                                 errorMessage="Please enter a username"
@@ -119,7 +112,7 @@ export default function Authentication(){
                                 label="Last Name"
                                 variant="Border"
                                 onValueChange={setSignUpLastName}
-                                onFocus={() => {setSignUpPasswordHasBeenFocused(false); setSignUpEmailHasBeenFocused(false);setSignUpFirstNameHasBeenFocused(false);setSignUpLastNameHasBeenFocused(true);}}
+                                onFocus={() => {setSignUpPasswordHasBeenFocused(false); setSignUpEmailHasBeenFocused(false);setSignUpFirstNameHasBeenFocused(false);setSignUpLastNameHasBeenFocused(true);setLoginPasswordHasBeenFocused(false); setLoginEmailHasBeenFocused(false);}}
                                 isInvalid={isSignUpLastNameInvalid && signUpLastNameHasBeenFocused}
                                 color={!signUpLastNameHasBeenFocused ? "primary" : isSignUpLastNameInvalid ? "danger" : "success"}
                                 errorMessage="Please enter a username"
@@ -132,7 +125,7 @@ export default function Authentication(){
                                 variant="Border"
                                 type="email"
                                 onValueChange={setSignUpEmail}
-                                onFocus={() => {setSignUpPasswordHasBeenFocused(false); setSignUpEmailHasBeenFocused(true);setSignUpFirstNameHasBeenFocused(false);setSignUpLastNameHasBeenFocused(false);}}
+                                onFocus={() => {setSignUpPasswordHasBeenFocused(false); setSignUpEmailHasBeenFocused(true);setSignUpFirstNameHasBeenFocused(false);setSignUpLastNameHasBeenFocused(false);setLoginPasswordHasBeenFocused(false); setLoginEmailHasBeenFocused(false);}}
                                 isInvalid={isSignUpEmailInvalid && signUpEmailHasBeenFocused}
                                 color={!signUpEmailHasBeenFocused ? "primary" : (isSignUpEmailInvalid && signUpEmailHasBeenFocused) ? "danger" : "success"}
                                 errorMessage="Please enter a valid email"
@@ -142,13 +135,22 @@ export default function Authentication(){
                             <Input
                                 isRequired
                                 label="Password"
-                                type="password"
                                 variant="Border"
                                 onValueChange={setSignUpPassword}
-                                onFocus={() => {setSignUpPasswordHasBeenFocused(true); setSignUpEmailHasBeenFocused(false);setSignUpFirstNameHasBeenFocused(false);setSignUpLastNameHasBeenFocused(false);}}
+                                onFocus={() => {setSignUpPasswordHasBeenFocused(true); setSignUpEmailHasBeenFocused(false);setSignUpFirstNameHasBeenFocused(false);setSignUpLastNameHasBeenFocused(false);setLoginPasswordHasBeenFocused(false); setLoginEmailHasBeenFocused(false);}}
                                 isInvalid={isSignUpPasswordInvalid && signUpPasswordBeenFocused}
                                 color={!signUpPasswordBeenFocused ? "primary" : isSignUpPasswordInvalid ? "danger" : "success"}
                                 errorMessage="Please enter a password"
+                                endContent={
+                                    <button className="focus:outline-none" type="button" id="passwordVisibility" onClick={toggleVisibility}>
+                                        {isVisible ? (
+                                            <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+                                        ) : (
+                                            <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+                                        )}
+                                    </button>
+                                }
+                                type={isVisible ? "text" : "password"}
                             />
                         </div>
                         <button id="signUpBtn">Sign Up</button>
@@ -165,7 +167,7 @@ export default function Authentication(){
                                 variant="Border"
                                 type="email"
                                 onValueChange={setLoginEmail}
-                                onFocus={() => {setLoginPasswordHasBeenFocused(false); setLoginEmailHasBeenFocused(true);}}
+                                onFocus={() => {setLoginPasswordHasBeenFocused(false); setLoginEmailHasBeenFocused(true);setSignUpPasswordHasBeenFocused(false); setSignUpEmailHasBeenFocused(false);setSignUpFirstNameHasBeenFocused(false);setSignUpLastNameHasBeenFocused(false);}}
                                 isInvalid={isLoginEmailInvalid && loginEmailHasBeenFocused}
                                 color={!loginEmailHasBeenFocused ? "primary" : (isLoginEmailInvalid && loginEmailHasBeenFocused) ? "danger" : "success"}
                                 errorMessage="Please enter a valid email"
@@ -175,13 +177,22 @@ export default function Authentication(){
                             <Input
                                 isRequired
                                 label="Password"
-                                type="password"
                                 variant="Border"
                                 onValueChange={setLoginPassword}
-                                onFocus={() => {setLoginPasswordHasBeenFocused(true); setLoginEmailHasBeenFocused(false);}}
+                                onFocus={() => {setLoginPasswordHasBeenFocused(true); setLoginEmailHasBeenFocused(false);setSignUpPasswordHasBeenFocused(false); setSignUpEmailHasBeenFocused(false);setSignUpFirstNameHasBeenFocused(false);setSignUpLastNameHasBeenFocused(false);}}
                                 isInvalid={isLoginPasswordInvalid && loginPasswordBeenFocused}
                                 color={!loginPasswordBeenFocused ? "primary" : isLoginPasswordInvalid ? "danger" : "success"}
                                 errorMessage="Please enter a password"
+                                endContent={
+                                    <button className="focus:outline-none" type="button" id="passwordVisibility" onClick={toggleLoginVisibility}>
+                                        {isLoginVisible ? (
+                                            <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+                                        ) : (
+                                            <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+                                        )}
+                                    </button>
+                                }
+                                type={isLoginVisible ? "text" : "password"}
                             />
                         </div>
                         
@@ -200,7 +211,7 @@ export default function Authentication(){
                             >
                                 Log in
                             </Button>
-                            <a  id="cancelBTN2" href="#">Cancel</a>
+                            <a  id="cancelBTN2">Cancel</a>
                         </div>
                         <div className="overlay-panel overlay-right">
                             <h1>Hello, Friend!</h1>
@@ -212,7 +223,7 @@ export default function Authentication(){
                             >
                                 Create an account
                             </Button>
-                            <a id='cancelBTN' href="#">Cancel</a>
+                            <a id='cancelBTN' href="">Cancel</a>
                         </div>
                         
                     </div>

@@ -5,11 +5,11 @@
 } */
 
 :root {
-    --linear-grad: linear-gradient(to right, #1e624b, #08553b);
+    --linear-grad: linear-gradient(to right, #1D60AC, #184d8c);
     /* --linear-grad: linear-gradient(to right, #141E30, #243B55); */
     /* --grad-clr1: #141E30; */
-    --grad-clr1: #1e624b;
-    --grad-clr2: #08553b;
+    --grad-clr1: #1D60AC;
+    --grad-clr2: #184d8c;
 }
 
 /* body {
@@ -22,19 +22,19 @@
 
 .authenticationContainer{
     position: relative;
-    width: 850px;
+    width: clamp(40rem,90vw,65rem);
     height: 650px;
     background-color: #FFF;
     box-shadow: 25px 30px 55px #5557;
     border-radius: 13px;
     overflow: hidden;
+    margin: auto;
 }
 
 .authenticationContainer .form-container{
     position: absolute;
     width: 60%;
     height: 100%;
-    padding: 0px 40px;
     transition: all 0.6s ease-in-out;
 }
 
@@ -82,6 +82,7 @@
     position: relative;
     margin: 8px 0px;
     width: 100%;
+    max-width: 50rem;
 }
 
 .authenticationContainer a{
@@ -91,7 +92,7 @@
     margin: 15px 0px;
 }
 
-.authenticationContainer button{
+.authenticationContainer button:not(#passwordVisibility){
     border-radius: 20px;
     border: 1px solid var(--grad-clr1);
     background: var(--grad-clr2);
@@ -161,8 +162,9 @@
     padding: 0px 40px;
     text-align: center;
     height: 100%;
-    width: 340px;
+    width: 40%;
     transition: 0.6s ease-in-out;
+    word-wrap: break-word;
 }
 
 .authenticationContainer .overlay-left{
@@ -191,7 +193,6 @@
     line-height: 20px;
     letter-spacing: 0.5px;
     margin: 25px 0px 35px;
-
 }
 
 .right-panel-active .overlay-container{
@@ -232,14 +233,4 @@
         opacity: 1;
         z-index: 5;
     }
-}
-
-.authenticationContainer #cancelBTN
-{
-    color:  #08553b;
-}
-
-.authenticationContainer #cancelBTN2
-{
-    color:  #1e624b;
 }
