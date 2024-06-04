@@ -110,7 +110,7 @@
 
 }
 
-.authenticationContainer .form-container button:hover{
+.form-container button:hover{
     background: #FFF;
     color: var(--grad-clr1);
 }
