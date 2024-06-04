@@ -7,89 +7,149 @@ import {Button, Spacer, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, C
 export default function Authentication(){
 
     // const {isOpen, onOpen, onOpenChange} = useDisclosure();
-    useEffect(() => {
-        const container = document.getElementById('authenticationContainer');
-        const overlayBtn = document.getElementById('overlayBtn');
+    // useEffect(() => {
+    //     const container = document.getElementById('authenticationContainer');
+    //     const overlayBtn = document.getElementById('overlayBtn');
 
-        if(container != null && overlayBtn != null)
-            overlayBtn.addEventListener('click', ()=>{
-                container.classList.toggle('right-panel-active');
-            });
+    //     if(container != null && overlayBtn != null)
+    //         overlayBtn.addEventListener('click', ()=>{
+    //             container.classList.toggle('right-panel-active');
+    //         });
      
-        // Cleanup function
-        return () => {
-            const container = document.getElementById('authenticationContainer');
-            const overlayBtn = document.getElementById('overlayBtn');
-            if(container!= null && overlayBtn != null)
-            overlayBtn.removeEventListener('click', ()=>{
-                container.classList.toggle('right-panel-active');
-            });
-        };
-    }, []); 
+    //     // Cleanup function
+    //     return () => {
+    //         const container = document.getElementById('authenticationContainer');
+    //         const overlayBtn = document.getElementById('overlayBtn');
+    //         if(container!= null && overlayBtn != null)
+    //         overlayBtn.removeEventListener('click', ()=>{
+    //             container.classList.toggle('right-panel-active');
+    //         });
+    //     };
+    // }, []); 
+
+    const [view, setView] = useState('');
+
+    const changeView = () => {
+        if(view == ''){
+            setView('right-panel-active');
+        }
+        else{
+            setView('');
+        }
+    }
+
 
     // Sign in
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [signInEmailHasBeenFocused, setSignInEmailHasBeenFocused] = useState(false);
-    const [usernameHasBeenFocused, setUsernameHasBeenFocused] = useState(false);
-    const [passwordBeenFocused, setPasswordHasBeenFocused] = useState(false);
+    const [loginEmail, setLoginEmail] = useState('');
+    const [loginPassword, setLoginPassword] = useState('');
+    const [loginEmailHasBeenFocused, setLoginEmailHasBeenFocused] = useState(false);
+    const [loginPasswordBeenFocused, setLoginPasswordHasBeenFocused] = useState(false);
 
     const validateEmail = (value:any) => value.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$/i);
 
-    const isEmailInvalid = React.useMemo(() => {
-      if (email === "") return true;
+    const isLoginEmailInvalid = React.useMemo(() => {
+      if (loginEmail === "") return true;
   
-      return validateEmail(email) ? false : true;
-    }, [email]);
+      return validateEmail(loginEmail) ? false : true;
+    }, [loginEmail]);
 
-    const isPasswordInvalid = React.useMemo(() => {
-        if (password === "") return true;
+    const isLoginPasswordInvalid = React.useMemo(() => {
+        if (loginPassword === "") return true;
     
         return false;
-    }, [password]);
+    }, [loginPassword]);
 
     // Sign Up
+    const [signUpFirstName, setSignUpFirstName] = useState('');
+    const [signUpLastName, setSignUpLastName] = useState('');
+    const [signUpEmail, setSignUpEmail] = useState('');
+    const [signUpPassword, setSignUpPassword] = useState('');
+    const [signUpFirstNameHasBeenFocused, setSignUpFirstNameHasBeenFocused] = useState(false);
+    const [signUpLastNameHasBeenFocused, setSignUpLastNameHasBeenFocused] = useState(false);
+    const [signUpEmailHasBeenFocused, setSignUpEmailHasBeenFocused] = useState(false);
+    const [signUpPasswordBeenFocused, setSignUpPasswordHasBeenFocused] = useState(false);
+
+    const isSignUpEmailInvalid = React.useMemo(() => {
+      if (signUpEmail === "") return true;
+  
+      return validateEmail(signUpEmail) ? false : true;
+    }, [signUpEmail]);
+
+    const isSignUpPasswordInvalid = React.useMemo(() => {
+        if (signUpPassword === "") return true;
+    
+        return false;
+    }, [signUpPassword]);
+
+    const isSignUpFirstNameInvalid = React.useMemo(() => {
+        if (signUpFirstName === "") return true;
+    
+        return false;
+    }, [signUpFirstName]);
+
+    const isSignUpLastNameInvalid = React.useMemo(() => {
+        if (signUpLastName === "") return true;
+    
+        return false;
+    }, [signUpLastName]);
 
     return (
 
         <>
-            <Card className="text-black"><CardBody><div className="authenticationContainer" id="authenticationContainer">
+            <Card className="text-black"><CardBody><div className={"authenticationContainer " + (view)} id="authenticationContainer">
                 <div className="form-container sign-up-container">
                     <div className="form">
                         <h1>Create Account</h1>
                         <span>Use your email for registration</span><br/>
-                        <span id="wrongInput"></span>
                         <div className="infield">
-                            <input id="signUpFName" type="text" placeholder="First Name" name="FirstName"/>
-                            <label></label>
+                            <Input
+                                isRequired
+                                label="First Name"
+                                variant="Border"
+                                onValueChange={setSignUpFirstName}
+                                onFocus={() => {setSignUpPasswordHasBeenFocused(false); setSignUpEmailHasBeenFocused(false);setSignUpFirstNameHasBeenFocused(true);setSignUpLastNameHasBeenFocused(false);}}
+                                isInvalid={isSignUpFirstNameInvalid && signUpFirstNameHasBeenFocused}
+                                color={!signUpFirstNameHasBeenFocused ? "primary" : isSignUpFirstNameInvalid ? "danger" : "success"}
+                                errorMessage="Please enter a username"
+                            />
                         </div>
                         <div className="infield">
-                            <input id="signUpLName" type="text" placeholder="Surname" name="LastName"/>
-                            <label></label>
+                            <Input
+                                isRequired
+                                label="Last Name"
+                                variant="Border"
+                                onValueChange={setSignUpLastName}
+                                onFocus={() => {setSignUpPasswordHasBeenFocused(false); setSignUpEmailHasBeenFocused(false);setSignUpFirstNameHasBeenFocused(false);setSignUpLastNameHasBeenFocused(true);}}
+                                isInvalid={isSignUpLastNameInvalid && signUpLastNameHasBeenFocused}
+                                color={!signUpLastNameHasBeenFocused ? "primary" : isSignUpLastNameInvalid ? "danger" : "success"}
+                                errorMessage="Please enter a username"
+                            />
                         </div>
                         <div className="infield">
-                            <span>Date of Birth</span>
-                            <input id="signUpDOB" type="date" value="2000-01-01" name="DOB"/>
-                            <label></label>
+                            <Input
+                                isRequired
+                                label="Email"
+                                variant="Border"
+                                type="email"
+                                onValueChange={setSignUpEmail}
+                                onFocus={() => {setSignUpPasswordHasBeenFocused(false); setSignUpEmailHasBeenFocused(true);setSignUpFirstNameHasBeenFocused(false);setSignUpLastNameHasBeenFocused(false);}}
+                                isInvalid={isSignUpEmailInvalid && signUpEmailHasBeenFocused}
+                                color={!signUpEmailHasBeenFocused ? "primary" : (isSignUpEmailInvalid && signUpEmailHasBeenFocused) ? "danger" : "success"}
+                                errorMessage="Please enter a valid email"
+                            />
                         </div>
                         <div className="infield">
-                            <input id="signUpEmail" type="email" placeholder="Email" name="Email"/>
-                            <label></label>
-                        </div>
-                        <div className="infield">
-                            <input id="signUpCountry" type="text" placeholder="Country" name="Country" list="Countries"/>
-                                <datalist id="Countries">
-                                </datalist>
-                            <label></label>
-                        </div>
-                        <div className="infield">
-                            <input id="signUpCritic" type="text" placeholder="Critic authentication code" name="critic"/>
-                            <label></label>
-                        </div>
-                        
-                        <div className="infield">
-                            <input id="signUpPassword" type="password" placeholder="Password" name="Password" />
-                            <label></label>
+                            <Input
+                                isRequired
+                                label="Password"
+                                type="password"
+                                variant="Border"
+                                onValueChange={setSignUpPassword}
+                                onFocus={() => {setSignUpPasswordHasBeenFocused(true); setSignUpEmailHasBeenFocused(false);setSignUpFirstNameHasBeenFocused(false);setSignUpLastNameHasBeenFocused(false);}}
+                                isInvalid={isSignUpPasswordInvalid && signUpPasswordBeenFocused}
+                                color={!signUpPasswordBeenFocused ? "primary" : isSignUpPasswordInvalid ? "danger" : "success"}
+                                errorMessage="Please enter a password"
+                            />
                         </div>
                         <button id="signUpBtn">Sign Up</button>
                         
@@ -104,11 +164,11 @@ export default function Authentication(){
                                 label="Email"
                                 variant="Border"
                                 type="email"
-                                onValueChange={setEmail}
-                                onFocus={() => {setPasswordHasBeenFocused(false); setSignInEmailHasBeenFocused(true);}}
-                                isInvalid={isEmailInvalid && signInEmailHasBeenFocused}
-                                color={!signInEmailHasBeenFocused ? "primary" : (isEmailInvalid && signInEmailHasBeenFocused) ? "danger" : "success"}
-                                errorMessage="Please enter a valid email/username"
+                                onValueChange={setLoginEmail}
+                                onFocus={() => {setLoginPasswordHasBeenFocused(false); setLoginEmailHasBeenFocused(true);}}
+                                isInvalid={isLoginEmailInvalid && loginEmailHasBeenFocused}
+                                color={!loginEmailHasBeenFocused ? "primary" : (isLoginEmailInvalid && loginEmailHasBeenFocused) ? "danger" : "success"}
+                                errorMessage="Please enter a valid email"
                             />
                         </div>
                         <div className="infield">
@@ -117,10 +177,10 @@ export default function Authentication(){
                                 label="Password"
                                 type="password"
                                 variant="Border"
-                                onValueChange={setPassword}
-                                onFocus={() => {setPasswordHasBeenFocused(true); setSignInEmailHasBeenFocused(false);}}
-                                isInvalid={isPasswordInvalid && passwordBeenFocused}
-                                color={!passwordBeenFocused ? "primary" : isPasswordInvalid ? "danger" : "success"}
+                                onValueChange={setLoginPassword}
+                                onFocus={() => {setLoginPasswordHasBeenFocused(true); setLoginEmailHasBeenFocused(false);}}
+                                isInvalid={isLoginPasswordInvalid && loginPasswordBeenFocused}
+                                color={!loginPasswordBeenFocused ? "primary" : isLoginPasswordInvalid ? "danger" : "success"}
                                 errorMessage="Please enter a password"
                             />
                         </div>
@@ -133,18 +193,29 @@ export default function Authentication(){
                         <div className="overlay-panel overlay-left">
                             <h1>Welcome Back!</h1>
                             <p>To keep connected with us please login with your personal info</p>
-                            <button>Sign In</button>
+                            <Button 
+                                color="primary" 
+                                onClick={() => changeView()}
+                                variant="bordered"
+                            >
+                                Log in
+                            </Button>
                             <a  id="cancelBTN2" href="#">Cancel</a>
                         </div>
                         <div className="overlay-panel overlay-right">
                             <h1>Hello, Friend!</h1>
                             <p>Enter your personal details and start the journey with us</p>
-                            <button>Sign Up</button>
+                            <Button 
+                                color="primary" 
+                                onClick={() => changeView()}
+                                variant="bordered"
+                            >
+                                Create an account
+                            </Button>
                             <a id='cancelBTN' href="#">Cancel</a>
                         </div>
                         
                     </div>
-                    <button id="overlayBtn"></button>
                 </div>
             </div></CardBody></Card>
         </>
