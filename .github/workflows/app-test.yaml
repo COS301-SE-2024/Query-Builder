@@ -1,10 +1,10 @@
 name: App Test
 on:
-    pull_request:
     push:
         branches:
             - dev
             - main
+            - feature/backendTestsActions
         paths:
             - 'query-builder-app/**'
 jobs:

@@ -3,6 +3,7 @@ on:
     push:
         branches:
             - main
+            - feature/backendTestsActions
         paths:
             - 'query-builder-docs/**'
 jobs:
