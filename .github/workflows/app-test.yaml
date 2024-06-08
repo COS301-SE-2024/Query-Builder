@@ -23,8 +23,9 @@ jobs:
             - name: Setup Node.js
               uses: actions/setup-node@v4
               with:
+                node-version: 20
                 cache: 'pnpm'
-                cache-dependency-path: './query-builder-app/pnpm-lock.yaml'
+                cache-dependency-path: query-builder-app/pnpm-lock.yaml
             - name: Install Dependencies
               run: pnpm install --frozen-lockfile
             - name: Test
