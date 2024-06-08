@@ -2,8 +2,8 @@ name: Documentation Deploy
 on:
     push:
         branches:
-            - main
             - feature/backendTestsActions
+            - main
         paths:
             - 'query-builder-docs/**'
 jobs:
