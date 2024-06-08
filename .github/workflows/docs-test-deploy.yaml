@@ -1,9 +1,6 @@
 name: Test deployment of Docusaurus site
 
 on:
-  push:
-    branches:
-        - feature/backendTestsActions
   pull_request:
     branches:
       - main
