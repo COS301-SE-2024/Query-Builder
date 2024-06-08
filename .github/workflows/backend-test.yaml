@@ -1,10 +1,9 @@
 name: Backend Test
 on:
-    push:
+    pull_request:
         branches:
             - dev
             - main
-            - feature/backendTestsActions
         paths:
             - 'query-builder-backend/**'
 jobs:
