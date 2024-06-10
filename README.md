@@ -161,12 +161,17 @@ Clone the repo
 git clone https://github.com/COS301-SE-2024/Query-Builder.git
 ```
 
-Go to the Query-Builder app directory 
-```shell
-cd query-builder-app
-```
-
 Install dependencies
 ```shell
-pnpm i
+pnpm run install-deps
+```
+
+Run the app locally
+```shell
+pnpm run app-start
+```
+
+Run the docs locally
+```shell
+pnpm run docs-start
 ```
