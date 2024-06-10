@@ -1,8 +1,8 @@
 ---
-sidebar_position: 4
+sidebar_position: 6
 ---
 
-# Constraints
+# Architectural Constraints
 
 *The client laid out the following constraints, by which QBee has to abide, in their specification.*
 
