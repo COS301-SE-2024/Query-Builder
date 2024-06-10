@@ -1,7 +1,7 @@
 ---
 title: Functional Requirements
 description: The functional requirements of the QBee Query Builder system
-sidebar_position: 3
+sidebar_position: 4
 ---
 
 # Functional Requirements

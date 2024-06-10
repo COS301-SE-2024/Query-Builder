@@ -1,7 +1,7 @@
 ---
 title: User Stories
 description: The user stories of the QBee Query Builder system
-sidebar_position: 2
+sidebar_position: 3
 ---
 
 # User Stories
