@@ -30,10 +30,10 @@ sidebar_position: 2
          - Users receive a confirmation email after successfully resetting their password.
 
 2. Provide an Interface to Edit or Change User's Information
-   1. As a user, I want to change my personal information (e.g., name, surname, email, phone number), so that my account details are up-to-date.
+   1. As a user, I want to change my personal information (e.g., first name, last name, email, phone number), so that my account details are up-to-date.
       - Acceptance Criteria:
          - Users can access an "Edit Profile" section within the application.
-         - Users can update fields such as name, surname, email, and phone number.
+         - Users can update fields such as first name, last name, email, and phone number.
          - Users must confirm changes with their password.
          - Users receive a notification email confirming the updates.
    
