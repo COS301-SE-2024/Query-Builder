@@ -1,5 +1,5 @@
 ---
-sidebar_position: 3
+sidebar_position: 5
 ---
 
 # Design Patterns
@@ -11,7 +11,7 @@ sidebar_position: 3
 
 Used for communication between the different types of inputs (colleagues) which use the QueryIntermediateForm as the mediator for their communication. Different inputs provide different interfaces that the user can use, and reflect changes that have been made to other inputs.
 
-![QBee Mediator Design Pattern](./../../../static/img/QBEEMediator.png)
+![QBee Mediator Design Pattern](./../../static/img/QBEEMediator.png)
 
 ## Singleton
 
@@ -19,7 +19,7 @@ Used for communication between the different types of inputs (colleagues) which 
 
 Singleton will be used to ensure that there is only one instance of the database ConnectionManager, and thus only one instance of a connection to a database at a time - to preserve computing resources.
 
-![QBee Singleton Design Pattern](./../../../static/img/QBEESingleton.png)
+![QBee Singleton Design Pattern](./../../static/img/QBEESingleton.png)
 
 ## Bridge
 
@@ -27,4 +27,4 @@ Singleton will be used to ensure that there is only one instance of the database
 
 Used to have different ConnectionManagers as abstractions, which can then have different QueryParsers as their implementations to generate their queries. This allows the easy addition of new ConnectionManagers and QueryParsers for new database types, as well as the reuse of QueryParsers across different ConnectionManagers, ultimately allowing for high scalability of the system.
 
-![QBee Bridge Design Pattern](./../../../static/img/QBEEBridge.png)
+![QBee Bridge Design Pattern](./../../static/img/QBEEBridge.png)
