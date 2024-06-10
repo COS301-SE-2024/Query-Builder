@@ -2,8 +2,9 @@ name: Documentation Deploy
 on:
     push:
         branches:
-            - feature/backendTestsActions
             - main
+        paths:
+            - 'query-builder-docs/**'
 jobs:
   build:
     name: Build Docusaurus
