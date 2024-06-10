@@ -9,25 +9,32 @@ jobs:
   build:
     name: Build Docusaurus
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./query-builder-docs/
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
         with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v4
+          version: '9.1.2'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: 'pnpm'
           cache-dependency-path: query-builder-docs/pnpm-lock.yaml
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
       - name: Build website
         run: pnpm build
 
       - name: Upload Build Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: build
+          path: query-builder-docs/build
 
   deploy:
     name: Deploy to GitHub Pages
