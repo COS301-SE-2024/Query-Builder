@@ -1,6 +1,6 @@
 name: Documentation Linting
 on:
-    push:
+    pull_request:
         branches:
             - dev
             - main
