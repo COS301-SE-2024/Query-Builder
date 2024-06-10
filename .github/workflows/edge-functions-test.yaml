@@ -2,7 +2,7 @@ name: Edge Function Tests
 run-name: ${{ github.actor }} at ${{ github.event_name }} event 
 on:
   workflow_dispatch:
-  push:
+  pull_request:
     branches:
       - main
       - dev
