@@ -1,4 +1,4 @@
-/node_modules
+./node_modules
 
 deno.lock
 pnpm-lock.yaml
