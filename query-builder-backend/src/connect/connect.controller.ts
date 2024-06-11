@@ -21,7 +21,7 @@ export class ConnectController {
             return result;
         }
         catch(error){
-            if(error.errorCode == "ER_ACCESS_DENIED_ERROR" || error.errorCode == "ER_NOT_SUPPORTED_AUTH_MODE"){
+            if(error.errorCode == "Access Denied"){
                 throw new UnauthorizedException("Please ensure that your database credentials are correct.");
             }
             else{
