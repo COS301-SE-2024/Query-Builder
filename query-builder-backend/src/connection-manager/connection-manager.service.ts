@@ -26,7 +26,7 @@ export class ConnectionManagerService {
           connection.connect((err) => {
             if (err) {
                 console.log(err)
-                reject({ success: false }); // Reject with an error object
+                reject({ errorCode: err.code }); // Reject with an error object
             } else {
                 resolve({ success: true, connectionID: connection.threadID }); // Resolve with connection info
             }
