@@ -179,51 +179,18 @@ pnpm run docs-start
 ## Tree Structure
 ```shell
 .
-├── LICENSE.txt
-├── README.md
-├── package.json
-├── query-builder-app
-│   ├── README.md
-│   ├── coverage
-│   ├── eslint.config.mjs
-│   ├── next-env.d.ts
-│   ├── next.config.mjs
-│   ├── node_modules
-│   ├── package.json
-│   ├── pnpm-lock.yaml
-│   ├── postcss.config.mjs
-│   ├── public
+├── query-builder-app # Frontend (Next.js)
+│   ├── public # Resources used in the frontend that require no build step
+│   └── src # Frontend logic
+├── query-builder-backend # Backend (NestJS)
+│   ├── src # Backend Logic
+│   └── test
+├── query-builder-docs # Docusaurus Documentation
+│   ├── docs # .md files and config files to determine layout for Docusaurus docs
 │   ├── src
-│   ├── supabase
-│   ├── tailwind.config.ts
-│   ├── tsconfig.json
-│   └── vitest.config.ts
-├── query-builder-backend
-│   ├── README.md
-│   ├── nest-cli.json
-│   ├── package.json
-│   ├── pnpm-lock.yaml
-│   ├── src
-│   ├── test
-│   ├── tsconfig.build.json
-│   └── tsconfig.json
-├── query-builder-docs
-│   ├── README.md
-│   ├── babel.config.js
-│   ├── build
-│   ├── docs
-│   ├── docusaurus.config.ts
-│   ├── node_modules
-│   ├── package.json
-│   ├── pnpm-lock.yaml
-│   ├── sidebars.ts
-│   ├── src
-│   ├── static
-│   └── tsconfig.json
-├── query-builder-e2e
-└── supabase
-    ├── config.toml
-    ├── functions
-    ├── migrations
-    └── seed.sql
+│   └──static # Resources used in the docs that require no build step
+├── query-builder-e2e # Folder Reserved to End to End testing
+└── supabase # Database
+    ├── functions # Edge Function Directory
+    └── migrations # Database backup files
 ```
