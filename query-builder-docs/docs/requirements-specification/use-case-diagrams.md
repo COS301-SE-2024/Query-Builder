@@ -22,6 +22,10 @@ sidebar_position: 5
 
 ![Query builder Diagram](./../../static/img/QueryBuilderLight.png)
 
+## Query Response System
+
+![Query Response System Diagram](./../../static/img/QueryResponseSystem.png)
+
 ## Reporting system
 
 ![Reporting Diagram](./../../static/img/ReportingLight.png)

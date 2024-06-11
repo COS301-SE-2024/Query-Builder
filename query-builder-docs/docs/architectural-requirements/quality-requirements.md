@@ -6,6 +6,8 @@ sidebar_position: 2
 
 Quality requirements determine the overall quality of QBee by specifying criteria that define how well the system performs or behaves.
 
+We have ranked our system's quality requirements from the most important to the least important:
+
 ## Usability
 
 *How easy it is for users to interact with the system and how much effort is required of them to learn, operate, prepare input for and interpret the output of the system.*
