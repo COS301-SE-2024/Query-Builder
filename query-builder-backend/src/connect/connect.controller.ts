@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Injectable, UnauthorizedException, ForbiddenException, HttpCode, BadRequestException, BadGatewayException } from '@nestjs/common';
+import { Controller, Post, Body, UnauthorizedException, HttpCode, BadGatewayException } from '@nestjs/common';
 import { ConnectionManagerService } from '../connection-manager/connection-manager.service';
 
 interface DatabaseCredentials {
