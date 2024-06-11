@@ -1,29 +1,15 @@
-/* * {
-    padding: 0px;
-    margin: 0px;
-    box-sizing: border-box;
-} */
+
 
 :root {
     --linear-grad: linear-gradient(to right, #1D60AC, #184d8c);
-    /* --linear-grad: linear-gradient(to right, #141E30, #243B55); */
-    /* --grad-clr1: #141E30; */
     --grad-clr1: #1D60AC;
     --grad-clr2: #184d8c;
 }
 
-/* body {
-    height: 100vh;
-    background: #f6f5f7;
-    display: grid;
-    place-content: center;
-    font-family: 'Poppins', sans-serif;
-} */
-
 .authenticationContainer{
     position: relative;
     width: clamp(40rem,90vw,65rem);
-    height: 650px;
+    height: 600px;
     background-color: #FFF;
     box-shadow: 25px 30px 55px #5557;
     border-radius: 13px;

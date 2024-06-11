@@ -2,9 +2,11 @@
 import "../../app/globals.css"
 import "./Authentication.css"
 import React, { useState, useEffect } from "react";
-import {Button, Card, CardBody, Input} from "@nextui-org/react";
+import {Button, Card, CardBody, Input, input} from "@nextui-org/react";
 import {EyeFilledIcon} from "./EyeFilledIcon";
 import {EyeSlashFilledIcon} from "./EyeSlashFilledIcon";
+import PhoneInput, { formatPhoneNumber, formatPhoneNumberIntl, isValidPhoneNumber } from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
 
 export default function Authentication(){
     const [isVisible, setIsVisible] = useState(false);
@@ -37,10 +39,12 @@ export default function Authentication(){
     const [signUpFirstName, setSignUpFirstName] = useState('');
     const [signUpLastName, setSignUpLastName] = useState('');
     const [signUpEmail, setSignUpEmail] = useState('');
+    const [signUpPhone, setSignUpPhone] = useState('');
     const [signUpPassword, setSignUpPassword] = useState('');
     const [signUpFirstNameHasBeenFocused, setSignUpFirstNameHasBeenFocused] = useState(false);
     const [signUpLastNameHasBeenFocused, setSignUpLastNameHasBeenFocused] = useState(false);
     const [signUpEmailHasBeenFocused, setSignUpEmailHasBeenFocused] = useState(false);
+    const [signUpPhoneHasBeenFocused, setSignUpPhoneHasBeenFocused] = useState(false);
     const [signUpPasswordBeenFocused, setSignUpPasswordHasBeenFocused] = useState(false);
 
     const isSignUpEmailInvalid = React.useMemo(() => {
@@ -98,9 +102,9 @@ export default function Authentication(){
                             <Input
                                 isRequired
                                 label="First Name"
-                                variant="Border"
+                                variant="bordered"
                                 onValueChange={setSignUpFirstName}
-                                onFocus={() => {setSignUpPasswordHasBeenFocused(false); setSignUpEmailHasBeenFocused(false);setSignUpFirstNameHasBeenFocused(true);setSignUpLastNameHasBeenFocused(false);setLoginPasswordHasBeenFocused(false); setLoginEmailHasBeenFocused(false);}}
+                                onFocus={() => {setSignUpPasswordHasBeenFocused(false); setSignUpEmailHasBeenFocused(false);setSignUpFirstNameHasBeenFocused(true);setSignUpLastNameHasBeenFocused(false);setLoginPasswordHasBeenFocused(false); setLoginEmailHasBeenFocused(false);setSignUpPhoneHasBeenFocused(false);}}
                                 isInvalid={isSignUpFirstNameInvalid && signUpFirstNameHasBeenFocused}
                                 color={!signUpFirstNameHasBeenFocused ? "primary" : isSignUpFirstNameInvalid ? "danger" : "success"}
                                 errorMessage="Please enter a username"
@@ -110,9 +114,9 @@ export default function Authentication(){
                             <Input
                                 isRequired
                                 label="Last Name"
-                                variant="Border"
+                                variant="bordered"
                                 onValueChange={setSignUpLastName}
-                                onFocus={() => {setSignUpPasswordHasBeenFocused(false); setSignUpEmailHasBeenFocused(false);setSignUpFirstNameHasBeenFocused(false);setSignUpLastNameHasBeenFocused(true);setLoginPasswordHasBeenFocused(false); setLoginEmailHasBeenFocused(false);}}
+                                onFocus={() => {setSignUpPasswordHasBeenFocused(false); setSignUpEmailHasBeenFocused(false);setSignUpFirstNameHasBeenFocused(false);setSignUpLastNameHasBeenFocused(true);setLoginPasswordHasBeenFocused(false); setLoginEmailHasBeenFocused(false);setSignUpPhoneHasBeenFocused(false);}}
                                 isInvalid={isSignUpLastNameInvalid && signUpLastNameHasBeenFocused}
                                 color={!signUpLastNameHasBeenFocused ? "primary" : isSignUpLastNameInvalid ? "danger" : "success"}
                                 errorMessage="Please enter a username"
@@ -122,22 +126,44 @@ export default function Authentication(){
                             <Input
                                 isRequired
                                 label="Email"
-                                variant="Border"
+                                variant="bordered"
                                 type="email"
                                 onValueChange={setSignUpEmail}
-                                onFocus={() => {setSignUpPasswordHasBeenFocused(false); setSignUpEmailHasBeenFocused(true);setSignUpFirstNameHasBeenFocused(false);setSignUpLastNameHasBeenFocused(false);setLoginPasswordHasBeenFocused(false); setLoginEmailHasBeenFocused(false);}}
+                                onFocus={() => {setSignUpPasswordHasBeenFocused(false); setSignUpEmailHasBeenFocused(true);setSignUpFirstNameHasBeenFocused(false);setSignUpLastNameHasBeenFocused(false);setLoginPasswordHasBeenFocused(false); setLoginEmailHasBeenFocused(false);setSignUpPhoneHasBeenFocused(false);}}
                                 isInvalid={isSignUpEmailInvalid && signUpEmailHasBeenFocused}
                                 color={!signUpEmailHasBeenFocused ? "primary" : (isSignUpEmailInvalid && signUpEmailHasBeenFocused) ? "danger" : "success"}
                                 errorMessage="Please enter a valid email"
                             />
                         </div>
                         <div className="infield">
+                            <PhoneInput
+                                international
+                                label="Phone Number"
+                                variant="bordered"  
+                                inputComponent={Input}
+                                isRequired
+                                value={signUpPhone}
+                                onValueChange={setSignUpPhone}
+                                onChange={setSignUpPhone}
+                                withCountryCallingCode
+                                onValueChange={setSignUpPhone}
+                                color={!signUpPhoneHasBeenFocused ? "primary" : (signUpPhone? (!isValidPhoneNumber(signUpPhone) ? "danger" : "success"):"danger")}
+                                onFocus={() => {setSignUpPasswordHasBeenFocused(false); setSignUpEmailHasBeenFocused(false);setSignUpFirstNameHasBeenFocused(false);setSignUpLastNameHasBeenFocused(false);setLoginPasswordHasBeenFocused(false); setLoginEmailHasBeenFocused(false);setSignUpPhoneHasBeenFocused(true);}}
+                                isInvalid={(signUpPhone ? (!isValidPhoneNumber(signUpPhone)) : true)&& signUpPhoneHasBeenFocused}
+                                errorMessage="Please enter a valid phone number"
+                                // onFocus={() => {setSignUpPasswordHasBeenFocused(false); setSignUpEmailHasBeenFocused(true);setSignUpFirstNameHasBeenFocused(false);setSignUpLastNameHasBeenFocused(false);setLoginPasswordHasBeenFocused(false); setLoginEmailHasBeenFocused(false);}}
+                                // isInvalid={isSignUpEmailInvalid && signUpEmailHasBeenFocused}
+                                // color={!signUpEmailHasBeenFocused ? "primary" : (isSignUpEmailInvalid && signUpEmailHasBeenFocused) ? "danger" : "success"}
+                                // errorMessage="Please enter a valid email"
+                            />
+                        </div>
+                        <div className="infield">
                             <Input
                                 isRequired
                                 label="Password"
-                                variant="Border"
+                                variant="bordered"
                                 onValueChange={setSignUpPassword}
-                                onFocus={() => {setSignUpPasswordHasBeenFocused(true); setSignUpEmailHasBeenFocused(false);setSignUpFirstNameHasBeenFocused(false);setSignUpLastNameHasBeenFocused(false);setLoginPasswordHasBeenFocused(false); setLoginEmailHasBeenFocused(false);}}
+                                onFocus={() => {setSignUpPasswordHasBeenFocused(true); setSignUpEmailHasBeenFocused(false);setSignUpFirstNameHasBeenFocused(false);setSignUpLastNameHasBeenFocused(false);setLoginPasswordHasBeenFocused(false); setLoginEmailHasBeenFocused(false);setSignUpPhoneHasBeenFocused(false);}}
                                 isInvalid={isSignUpPasswordInvalid && signUpPasswordBeenFocused}
                                 color={!signUpPasswordBeenFocused ? "primary" : isSignUpPasswordInvalid ? "danger" : "success"}
                                 errorMessage="Please enter a password"
@@ -164,10 +190,10 @@ export default function Authentication(){
                             <Input
                                 isRequired
                                 label="Email"
-                                variant="Border"
+                                variant="bordered"
                                 type="email"
                                 onValueChange={setLoginEmail}
-                                onFocus={() => {setLoginPasswordHasBeenFocused(false); setLoginEmailHasBeenFocused(true);setSignUpPasswordHasBeenFocused(false); setSignUpEmailHasBeenFocused(false);setSignUpFirstNameHasBeenFocused(false);setSignUpLastNameHasBeenFocused(false);}}
+                                onFocus={() => {setLoginPasswordHasBeenFocused(false); setLoginEmailHasBeenFocused(true);setSignUpPasswordHasBeenFocused(false); setSignUpEmailHasBeenFocused(false);setSignUpFirstNameHasBeenFocused(false);setSignUpLastNameHasBeenFocused(false);setSignUpPhoneHasBeenFocused(false);}}
                                 isInvalid={isLoginEmailInvalid && loginEmailHasBeenFocused}
                                 color={!loginEmailHasBeenFocused ? "primary" : (isLoginEmailInvalid && loginEmailHasBeenFocused) ? "danger" : "success"}
                                 errorMessage="Please enter a valid email"
@@ -177,9 +203,9 @@ export default function Authentication(){
                             <Input
                                 isRequired
                                 label="Password"
-                                variant="Border"
+                                variant="bordered"
                                 onValueChange={setLoginPassword}
-                                onFocus={() => {setLoginPasswordHasBeenFocused(true); setLoginEmailHasBeenFocused(false);setSignUpPasswordHasBeenFocused(false); setSignUpEmailHasBeenFocused(false);setSignUpFirstNameHasBeenFocused(false);setSignUpLastNameHasBeenFocused(false);}}
+                                onFocus={() => {setLoginPasswordHasBeenFocused(true); setLoginEmailHasBeenFocused(false);setSignUpPasswordHasBeenFocused(false); setSignUpEmailHasBeenFocused(false);setSignUpFirstNameHasBeenFocused(false);setSignUpLastNameHasBeenFocused(false);setSignUpPhoneHasBeenFocused(false);}}
                                 isInvalid={isLoginPasswordInvalid && loginPasswordBeenFocused}
                                 color={!loginPasswordBeenFocused ? "primary" : isLoginPasswordInvalid ? "danger" : "success"}
                                 errorMessage="Please enter a password"
