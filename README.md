@@ -155,18 +155,75 @@ QBee is the ultimate tool for modern database management and analysis.
 <br><br><br>
 
 
-### Local Setup
+## Local Setup
 Clone the repo
 ```shell
 git clone https://github.com/COS301-SE-2024/Query-Builder.git
 ```
 
-Go to the Query-Builder app directory 
-```shell
-cd query-builder-app
-```
-
 Install dependencies
 ```shell
-pnpm i
+pnpm run install-deps
+```
+
+Run the app locally
+```shell
+pnpm run app-start
+```
+
+Run the docs locally
+```shell
+pnpm run docs-start
+```
+
+## Tree Structure
+```shell
+.
+├── LICENSE.txt
+├── README.md
+├── package.json
+├── query-builder-app
+│   ├── README.md
+│   ├── coverage
+│   ├── eslint.config.mjs
+│   ├── next-env.d.ts
+│   ├── next.config.mjs
+│   ├── node_modules
+│   ├── package.json
+│   ├── pnpm-lock.yaml
+│   ├── postcss.config.mjs
+│   ├── public
+│   ├── src
+│   ├── supabase
+│   ├── tailwind.config.ts
+│   ├── tsconfig.json
+│   └── vitest.config.ts
+├── query-builder-backend
+│   ├── README.md
+│   ├── nest-cli.json
+│   ├── package.json
+│   ├── pnpm-lock.yaml
+│   ├── src
+│   ├── test
+│   ├── tsconfig.build.json
+│   └── tsconfig.json
+├── query-builder-docs
+│   ├── README.md
+│   ├── babel.config.js
+│   ├── build
+│   ├── docs
+│   ├── docusaurus.config.ts
+│   ├── node_modules
+│   ├── package.json
+│   ├── pnpm-lock.yaml
+│   ├── sidebars.ts
+│   ├── src
+│   ├── static
+│   └── tsconfig.json
+├── query-builder-e2e
+└── supabase
+    ├── config.toml
+    ├── functions
+    ├── migrations
+    └── seed.sql
 ```
