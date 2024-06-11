@@ -141,7 +141,6 @@ export default function Authentication(){
                                 label="Phone Number"
                                 variant="bordered"  
                                 inputComponent={Input}
-                                isRequired
                                 value={signUpPhone}
                                 onValueChange={setSignUpPhone}
                                 onChange={setSignUpPhone}
@@ -151,10 +150,6 @@ export default function Authentication(){
                                 onFocus={() => {setSignUpPasswordHasBeenFocused(false); setSignUpEmailHasBeenFocused(false);setSignUpFirstNameHasBeenFocused(false);setSignUpLastNameHasBeenFocused(false);setLoginPasswordHasBeenFocused(false); setLoginEmailHasBeenFocused(false);setSignUpPhoneHasBeenFocused(true);}}
                                 isInvalid={(signUpPhone ? (!isValidPhoneNumber(signUpPhone)) : true)&& signUpPhoneHasBeenFocused}
                                 errorMessage="Please enter a valid phone number"
-                                // onFocus={() => {setSignUpPasswordHasBeenFocused(false); setSignUpEmailHasBeenFocused(true);setSignUpFirstNameHasBeenFocused(false);setSignUpLastNameHasBeenFocused(false);setLoginPasswordHasBeenFocused(false); setLoginEmailHasBeenFocused(false);}}
-                                // isInvalid={isSignUpEmailInvalid && signUpEmailHasBeenFocused}
-                                // color={!signUpEmailHasBeenFocused ? "primary" : (isSignUpEmailInvalid && signUpEmailHasBeenFocused) ? "danger" : "success"}
-                                // errorMessage="Please enter a valid email"
                             />
                         </div>
                         <div className="infield">

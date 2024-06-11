@@ -11,8 +11,10 @@ export default function UserSettings(){
             <Card
             isBlurred
             fullWidth>
-                <CardHeader >Options</CardHeader>
-                <CardBody>Display</CardBody>
+                <CardHeader><div className="user-management-options"></div></CardHeader>
+                <CardBody>
+
+                </CardBody>
             </Card>
         </>
     )
