@@ -22,7 +22,7 @@ export default function Form(){
         [selectedTable]
     );
 
-    const [selectColumns, setSelectedColumns] = React.useState(new Set());
+    const [selectColumns, setSelectedColumns] = React.useState<Set<string>>(new Set<string>());
     const selectedColValue = React.useMemo(
         () => Array.from(selectColumns).join(", ").replaceAll("_", " "),
         [selectColumns]
@@ -201,7 +201,7 @@ export default function Form(){
                             <DropdownMenu 
                                 aria-label="Multiple column selection"
                                 variant="flat"
-                                items={tables} 
+                                items={tables.filter(item => item.table === selectedTableValue)[0]?.columns.map(col => ({ table: selectedTableValue, columns: [col] }))}
                                 closeOnSelect={false}
                                 // disallowEmptySelection
                                 selectionMode="multiple"

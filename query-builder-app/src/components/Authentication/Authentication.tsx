@@ -10,8 +10,8 @@ import 'react-phone-number-input/style.css';
 import { createClient } from '@supabase/supabase-js';
 
 export default function Authentication(){
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    const supabaseUrl : string = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+    const supabaseAnonKey : string = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
     const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
     const [isVisible, setIsVisible] = useState(false);
@@ -194,9 +194,8 @@ export default function Authentication(){
                                 inputComponent={Input}
                                 value={signUpPhone}
                                 onValueChange={setSignUpPhone}
-                                onChange={setSignUpPhone}
+                                onChange={(value) => setSignUpPhone((value as string))}
                                 withCountryCallingCode
-                                onValueChange={setSignUpPhone}
                                 color={!signUpPhoneHasBeenFocused ? "primary" : (signUpPhone? (!isValidPhoneNumber(signUpPhone) ? "danger" : "success"):"danger")}
                                 onFocus={() => {setSignUpPasswordHasBeenFocused(false); setSignUpEmailHasBeenFocused(false);setSignUpFirstNameHasBeenFocused(false);setSignUpLastNameHasBeenFocused(false);setLoginPasswordHasBeenFocused(false); setLoginEmailHasBeenFocused(false);setSignUpPhoneHasBeenFocused(true);}}
                                 isInvalid={(signUpPhone ? (!isValidPhoneNumber(signUpPhone)) : true)&& signUpPhoneHasBeenFocused}
