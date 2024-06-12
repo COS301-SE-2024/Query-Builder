@@ -24,7 +24,9 @@ jobs:
                 cache: 'pnpm'
                 cache-dependency-path: query-builder-app/pnpm-lock.yaml
             - name: Install Dependencies
-              run: pnpm install --frozen-lockfile
+              run: |
+                  pnpm install --frozen-lockfile
+              working-directory: query-builder-app
             - name: Coverage Test Frontend
               run: pnpm run coverage # Currently only generates reports for front-end
               working-directory: query-builder-app
