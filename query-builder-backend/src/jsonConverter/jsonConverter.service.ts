@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class JsonConverterService {
 
-    async convertJsonToQuery(jsonData: any): Promise<string> {
+    async convertJsonToQuery(jsonData: any): Promise<{ query: string, error?: string }> {
         let query = '';
         jsonData.language = jsonData.language.toLowerCase();
         jsonData.query_type = jsonData.query_type.toLowerCase();
@@ -11,9 +11,7 @@ export class JsonConverterService {
         if (jsonData.language === 'sql') {
             if (jsonData.query_type === 'select') {
                 if (!jsonData.table || !jsonData.column) {
-                    query = 'Invalid query';
-                    return query;
-                    throw new Error('Invalid query');
+                    return { query: '', error: 'Invalid query' };
                 }
                 
                 const select = jsonData.column;
@@ -26,16 +24,12 @@ export class JsonConverterService {
                 
                 query = `SELECT ${select} FROM ${from}${where}`;
             } else {
-                query = 'Unsupported query type';
-                return query;
-                throw new Error('Unsupported query type');
+                return { query: '', error: 'Unsupported query type' };
             }
         } else {
-            query = 'Invalid language';
-            return query;
-            throw new Error('Invalid language');
+            return { query: '', error: 'Invalid language' };
         }
     
-        return query;
+        return { query };
     }
 }
