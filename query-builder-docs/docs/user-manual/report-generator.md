@@ -16,5 +16,5 @@
 ## Sharing the Report
 - **Locating the Share Button**: At the bottom of the report, next to the print button, you will find a blue share button.
 - **Selecting the Share Option**: Click on the blue share button. A popup will appear with various sharing options.
-- **Choosing the Medium**: In the popup, select the medium through which you would like to share your report (e.g., email, direct link, social media).
+- **Choosing the Medium**: In the popup, select the medium through which you would like to share your report (e.g., email, social media).
 - **Sharing the Report**: Follow the prompts to complete the sharing process via the chosen medium.
