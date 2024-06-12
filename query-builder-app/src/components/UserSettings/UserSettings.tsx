@@ -19,7 +19,34 @@ const getToken = () => {
 export default function UserSettings(){
 
     // get user information with JWT token
+    const getUserInfo = () => {
 
+        fetch("http://localhost:55555/api/user-management", {
+          method: "POST",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': getToken()
+          },
+          body: JSON.stringify({
+            
+          })
+        }).then(
+          function(response){
+            if(response.ok){
+              return response.json();
+            }
+            else{
+              return ({"success" : false})
+            }
+          }
+        ).then(
+          function(response){
+            console.log(response)
+          }
+        )
+  
+      }
 
 
     const [updateFirstName, setUpdateFirstName] = useState('');
