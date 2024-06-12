@@ -6,7 +6,7 @@ sidebar_position: 3
 
 ## Usability
 
-**Interactive UI design:**Should have a easy to use interface such that a non-technical user is able to easily use the system without prior knowledge of databases and its systems. 
+**Interactive UI design:** Should have a easy to use interface such that a non-technical user is able to easily use the system without prior knowledge of databases and its systems. 
 
 _QBee will make it easy for non-technical users allowing them to easily interact with the database using a well constructed frontend. This frontend will increase usability of the system and the connected database as the users only interact with the database at a very high level_
 
