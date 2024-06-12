@@ -5,6 +5,17 @@ import {Button, Card, CardBody, CardHeader, Input, input} from "@nextui-org/reac
 import PhoneInput, { formatPhoneNumber, formatPhoneNumberIntl, isValidPhoneNumber } from 'react-phone-number-input';
 
 
+const getToken = () => {
+    const storageKey = `sb-${process.env.NEXT_PUBLIC_SUPABASE_PROJECT_ID}-auth-token`;
+    const sessionDataString = localStorage.getItem(storageKey);
+    const sessionData = JSON.parse(sessionDataString || "null");
+    const token = sessionData?.access_token;
+  
+    console.log(token)
+  
+    return token;
+};
+
 export default function UserSettings(){
 
     // get user information with JWT token
