@@ -76,7 +76,21 @@ sidebar_position: 4
 
 11. Allow Organization members to access organization queries that they have been granted access to.
 
-## 4. Reporting System
+## 4. Query Response System
+
+1. View query results: Allow users to view the results of their query in a tabular form.
+
+   1. Allow users to sort the columns of data in ascending or descending order.
+   2. Allow users to search the data in the table.
+   3. Allow users to view the summary statistics of the data in the table.
+      1. View the number of rows of data
+      2. View the maximum, minimum and mean of numerical data
+
+2. Generate Reports: Allow users to make use of the reporting system to generate a report of the data in the table.
+
+3. Requery data: Allow users to requery their database with a new query.
+
+## 5. Reporting System
 
 1. Generate Reports: Allow users to generate reports of the query data.
 
@@ -91,7 +105,7 @@ sidebar_position: 4
    2. Allow users to export the reports as a CSV.
    3. Allow users to export the reports as an Excel file.
 
-## 5. Organisation Management
+## 6. Organisation Management
 
 1. **Users**:
 
