@@ -22,7 +22,7 @@ _When the system fails QBee should disconnect from connections before breaking, 
 
 **Authentication:** Verify the identity of users accessing the system, typically through methods such as passwords, biometrics, or multi-factor authentication, to prevent unauthorized access and protect sensitive data.
 
-_All users using QBee should be logged in such that they are conforming to the roll based hierarchy._
+_All users using QBee should be authenticated in such a manner that they are conforming to the role based hierarchy._
 
 ## Scalability
 
