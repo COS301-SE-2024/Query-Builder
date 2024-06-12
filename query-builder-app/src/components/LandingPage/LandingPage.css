@@ -1,0 +1,27 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.content {
+    margin-bottom: 20px;
+}
+
+.mainTitle {
+    font-size: 7.5rem;
+    font-family: "Montserrat", sans-serif;
+    color: #184d8c;
+}
+
+.backgroundStyle {
+    background-image: url('../../images/backgroundLight.png'); /* Adjust the path if needed */
+    background-size: cover;
+    background-position: center;
+    min-height: 100vh;
+    display: flex; /* Optional: to help with centering content */
+    justify-content: center; /* Optional: to center content horizontally */
+    align-items: center; /* Optional: to center content vertically */
+}
