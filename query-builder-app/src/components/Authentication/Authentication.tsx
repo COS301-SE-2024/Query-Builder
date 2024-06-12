@@ -19,7 +19,6 @@ export default function Authentication(){
     const [isLoginVisible, setLoginIsVisible] = useState(false);
     const toggleLoginVisibility = () => setLoginIsVisible(!isLoginVisible);
 
-
     // Sign in
     const [loginEmail, setLoginEmail] = useState('');
     const [loginPassword, setLoginPassword] = useState('');
@@ -96,27 +95,51 @@ export default function Authentication(){
     }
 
     const loginUser = async (email:string, password:string) => {
-        const { user, session, error } = await supabase.auth.signIn({
-            email: email,
-            password: password,
-        })
+        try{
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password,
+            })
+
+            if (error) {
+                throw error;
+            }
+            console.log(data);
+            // add cookie here
+            // console.log(session);    
+        }
+        catch(error) {
+            console.log(error);
+        }
     }
 
     const signUpUser = async (firstName:string, lastName:string, email:string, phone:string, password:string) => {
-        const { data, error } = await supabase.auth.signUp(
-            {
-                email: email,
-                phone: phone,
-                password: password,
-                options: {
-                    data: {
-                        first_name: firstName,
-                        last_name: lastName,
-                    },
-                    channel: 'sms'
+        try {
+            const { data, error } = await supabase.auth.signUp(
+                {
+                    email: email,
+                    phone: phone,
+                    password: password,
+                    options: {
+                        data: {
+                            first_name: firstName,
+                            last_name: lastName,
+                        },
+                        channel: 'sms'
+                    }
                 }
+            )
+
+            if (error) {
+                throw error;
             }
-          )
+            console.log(data);
+            // add cookie here
+            // console.log(session);    
+        }
+        catch(error) {
+            console.log(error);
+        }
     }
 
     return (
