@@ -1,7 +1,7 @@
 "use client"
 import "../../app/globals.css"
 import React, { useState } from "react";
-import {Button, Input, Spacer, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Card, CardHeader, CardBody, CardFooter} from "@nextui-org/react";
+import {Button, Spacer, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Card, CardHeader, CardBody, CardFooter} from "@nextui-org/react";
 
 
 export default function Form(){
