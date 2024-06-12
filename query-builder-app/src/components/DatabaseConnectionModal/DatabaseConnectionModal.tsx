@@ -91,10 +91,7 @@ export default function DatabaseConnectionModal(){
     return (
 
         <>
-        <h1>{databaseConnectionStatus}</h1>
-        <Spacer y={5}/>
-        {databaseConnectionStatus == "Not connected to a database" && (<Button onPress={onOpen} color="primary">Connect to a database</Button>)}
-        {databaseConnectionStatus == "Connected to database" && (<Button onPress={()=>{}} color="success">Connected</Button>)}
+        <Button onPress={onOpen} color="primary">+ Add</Button>
         <Modal 
           isOpen={isOpen} 
           onOpenChange={onOpenChange}
