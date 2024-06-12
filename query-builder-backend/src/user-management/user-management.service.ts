@@ -27,6 +27,27 @@ export class UserManagementService {
     return { data };
   }
 
+  async getLoggedInUser() {
+    const { data, error } = await this.supabase.getClient().auth.getUser(this.supabase.getJwt());
+
+    if (error) {
+      throw new NotFoundException(error.message);
+    }
+
+    const user_id = data.user.id;
+
+    const { data: profile_data, error: profile_error } = await this.supabase.getClient()
+      .from("profiles")
+      .select()
+      .eq("user_id", user_id);
+
+    if (profile_error) {
+      throw new NotFoundException(profile_error.message);
+    }
+
+    return { profile_data };
+  }
+
   async signIn(user: Sign_In_User_Dto) {
     const { data, error } = await this.supabase.getClient().auth
       .signInWithPassword({
@@ -101,5 +122,17 @@ export class UserManagementService {
     }
 
     return { data };
+  }
+
+  async updateUserPassword(user: Update_User_Dto) {
+    return { data: "Not implemented" };
+  }
+
+  async updateUserEmail(user: Update_User_Dto) {
+    return { data: "Not implemented" };
+  }
+
+  async updateUserPhone(user: Update_User_Dto) {
+    return { data: "Not implemented" };
   }
 }

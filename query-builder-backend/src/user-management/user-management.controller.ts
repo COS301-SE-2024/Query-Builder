@@ -14,6 +14,11 @@ export class UserManagementController {
         return await this.user_management_service.getUser(user);
     }
 
+    @Put('get-logged-in-user')
+    async getLoggedInUser() {
+        return await this.user_management_service.getLoggedInUser();
+    }
+
     @Put('sign-in')
     async signIn(@Body(ValidationPipe) user: Sign_In_User_Dto) {
         return await this.user_management_service.signIn(user);
@@ -32,5 +37,20 @@ export class UserManagementController {
     @Patch('update-user')
     async updateUser(@Body(ValidationPipe) user: Update_User_Dto) {
         return await this.user_management_service.updateUser(user);
+    }
+
+    @Patch('update-user-password')
+    async updateUserPassword(@Body(ValidationPipe) user: Update_User_Dto) {
+        return await this.user_management_service.updateUserPassword(user);
+    }
+
+    @Patch('update-user-email')
+    async updateUserEmail(@Body(ValidationPipe) user: Update_User_Dto) {
+        return await this.user_management_service.updateUserEmail(user);
+    }
+
+    @Patch('update-user-phone')
+    async updateUserPhone(@Body(ValidationPipe) user: Update_User_Dto) {
+        return await this.user_management_service.updateUserPhone(user);
     }
 }
