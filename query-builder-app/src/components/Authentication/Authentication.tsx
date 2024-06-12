@@ -91,7 +91,6 @@ export default function Authentication(){
     }
 
     return (
-
         <>
             <Card className="text-black"><CardBody><div className={"authenticationContainer " + (view)} id="authenticationContainer">
                 <div className="form-container sign-up-container">
