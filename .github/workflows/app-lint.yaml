@@ -24,6 +24,7 @@ jobs:
                 cache-dependency-path: query-builder-app/pnpm-lock.yaml
             - name: Install Dependencies
               run: pnpm install --frozen-lockfile
+              working-directory: query-builder-app
             - name: Lint
               run: pnpm lint
               working-directory: query-builder-app
