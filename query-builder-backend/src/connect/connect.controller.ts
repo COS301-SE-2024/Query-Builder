@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Injectable } from '@nestjs/common';
+import { Controller, Post, Body} from '@nestjs/common';
 import { ConnectionManagerService } from '../connection-manager/connection-manager.service';
 
 interface DatabaseCredentials {

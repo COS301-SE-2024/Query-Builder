@@ -3,6 +3,19 @@ import "../../app/globals.css"
 import React, { useState } from "react";
 import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Spacer} from "@nextui-org/react";
 
+// This function gets the token from local storage.
+// Supabase stores the token in local storage so we can access it from there.
+const getToken = () => {
+  const storageKey = `sb-${process.env.NEXT_PUBLIC_SUPABASE_PROJECT_ID}-auth-token`;
+  const sessionDataString = localStorage.getItem(storageKey);
+  const sessionData = JSON.parse(sessionDataString || "null");
+  const token = sessionData?.access_token;
+
+  console.log(token)
+
+  return token;
+};
+
 export default function DatabaseConnectionModal(){
 
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
@@ -44,7 +57,8 @@ export default function DatabaseConnectionModal(){
         method: "POST",
         headers: {
           'Accept': 'application/json',
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': getToken()
         },
         body: JSON.stringify({
           host: host,
@@ -77,10 +91,7 @@ export default function DatabaseConnectionModal(){
     return (
 
         <>
-        <h1>{databaseConnectionStatus}</h1>
-        <Spacer y={5}/>
-        {databaseConnectionStatus == "Not connected to a database" && (<Button onPress={onOpen} color="primary">Connect to a database</Button>)}
-        {databaseConnectionStatus == "Connected to database" && (<Button onPress={()=>{}} color="success">Connected</Button>)}
+        <Button onPress={onOpen} color="primary">+ Add</Button>
         <Modal 
           isOpen={isOpen} 
           onOpenChange={onOpenChange}
