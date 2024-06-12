@@ -7,8 +7,13 @@ import {EyeFilledIcon} from "./EyeFilledIcon";
 import {EyeSlashFilledIcon} from "./EyeSlashFilledIcon";
 import PhoneInput, { formatPhoneNumber, formatPhoneNumberIntl, isValidPhoneNumber } from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
+import { createClient } from '@supabase/supabase-js';
 
 export default function Authentication(){
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    const supabase = createClient(supabaseUrl, supabaseAnonKey)
+
     const [isVisible, setIsVisible] = useState(false);
     const toggleVisibility = () => setIsVisible(!isVisible);
     const [isLoginVisible, setLoginIsVisible] = useState(false);
@@ -88,6 +93,30 @@ export default function Authentication(){
         else{
             setView('');
         }
+    }
+
+    const loginUser = async (email:string, password:string) => {
+        const { user, session, error } = await supabase.auth.signIn({
+            email: email,
+            password: password,
+        })
+    }
+
+    const signUpUser = async (firstName:string, lastName:string, email:string, phone:string, password:string) => {
+        const { data, error } = await supabase.auth.signUp(
+            {
+                email: email,
+                phone: phone,
+                password: password,
+                options: {
+                    data: {
+                        first_name: firstName,
+                        last_name: lastName,
+                    },
+                    channel: 'sms'
+                }
+            }
+          )
     }
 
     return (
@@ -173,7 +202,13 @@ export default function Authentication(){
                                 type={isVisible ? "text" : "password"}
                             />
                         </div>
-                        <button id="signUpBtn">Sign Up</button>
+                        <Button  
+                            onClick={() => signUpUser(signUpFirstName,signUpLastName,signUpEmail,signUpPhone,signUpPassword)}
+                            variant="bordered"
+                            isDisabled={isSignUpEmailInvalid || isSignUpFirstNameInvalid || isSignUpLastNameInvalid || isSignUpPasswordInvalid}
+                        >
+                            Sign Up
+                        </Button>
                         
                     </div>
                 </div>
@@ -216,7 +251,13 @@ export default function Authentication(){
                             />
                         </div>
                         
-                        <button id="signInBtn" type="submit" name="submit">Sign In</button>
+                        <Button  
+                            onClick={() => loginUser(loginEmail, loginPassword)}
+                            variant="bordered"
+                            isDisabled={isLoginEmailInvalid || isLoginPasswordInvalid}
+                        >
+                            Login
+                        </Button>
                     </div>
                 </div>
                 <div className="overlay-container" id="overlayCon">

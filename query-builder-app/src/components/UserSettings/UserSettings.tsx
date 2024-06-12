@@ -7,6 +7,10 @@ import PhoneInput, { formatPhoneNumber, formatPhoneNumberIntl, isValidPhoneNumbe
 
 export default function UserSettings(){
 
+    // get user information with JWT token
+
+
+
     const [updateFirstName, setUpdateFirstName] = useState('');
     const [updateLastName, setUpdateLastName] = useState('');
     const [updateEmail, setUpdateEmail] = useState('');
@@ -43,6 +47,9 @@ export default function UserSettings(){
       
           return false;
       }, [updateLastName]);
+
+
+    
 
     return (
         <>

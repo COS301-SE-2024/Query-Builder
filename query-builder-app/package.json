@@ -17,6 +17,7 @@
     "@nextui-org/react": "^2.4.0",
     "@nextui-org/system": "^2.2.1",
     "@nextui-org/theme": "^2.2.5",
+    "@supabase/supabase-js": "^2.43.4",
     "cypress": "^13.10.0",
     "framer-motion": "^11.2.6",
     "next": "14.2.3",
