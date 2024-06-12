@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - main
+      - dev
     paths:
       - 'query-builder-docs/**'
     # Review gh actions docs if you want to further define triggers, paths, etc
