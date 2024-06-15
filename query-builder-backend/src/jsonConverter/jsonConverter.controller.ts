@@ -5,7 +5,7 @@ interface QueryParams {
     language: string,
     query_type: string,
     table: string,
-    column: string,
+    columns: string[],
     condition: string
 }
 

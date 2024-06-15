@@ -12,6 +12,19 @@ export default {
 // Can have multiple different variants of a component
 export const DefaultTableResponse = {
 
-    render: () => <TableResponse/> // this function specifies how we want to render this variant of the component
+    render: () => <TableResponse query={{
+        credentials: {
+            host: "127.0.0.1",
+            user: "root",
+            password: "testPassword"
+        },
+        databaseName: "sakila",
+        queryParams: {
+            language: "sql",
+            query_type: "select",
+            table: "actor",
+            columns: ["first_name", "last_name", "last_update"],
+        }
+    }}/> // this function specifies how we want to render this variant of the component
 
 };
