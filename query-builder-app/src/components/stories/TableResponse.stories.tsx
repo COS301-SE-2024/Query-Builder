@@ -22,8 +22,8 @@ export const DefaultTableResponse = {
         queryParams: {
             language: "sql",
             query_type: "select",
-            table: "actor",
-            columns: ["first_name", "last_name", "last_update"],
+            table: "film",
+            columns: ["title", "release_year", "rating", "rental_rate", "rental_duration", "language_id"],
         }
     }}/> // this function specifies how we want to render this variant of the component
 

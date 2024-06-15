@@ -12,13 +12,19 @@ interface SortParams {
   direction?: "ascending"|"descending"
 }
 
+interface PageParams {
+  pageNumber: number,
+  rowsPerPage: number
+}
+
 interface QueryParams {
   language: string,
   query_type: string,
   table: string,
   columns: string[],
   condition?: string,
-  sortParams?: SortParams
+  sortParams?: SortParams,
+  pageParams?: PageParams
 }
 
 interface Query {
@@ -64,6 +70,8 @@ export class ConnectionManagerService {
 
       queryDatabase(query: Query): Promise<any> {
 
+        const parser = this.jsonConverterService;
+
         return new Promise(async (resolve, reject) => {
 
           console.log(query);
@@ -98,23 +106,40 @@ export class ConnectionManagerService {
             if (error) throw error;
           });
 
-          //secondly, query the database
-          const queryCommand: string = await this.jsonConverterService.convertJsonToQuery(query.queryParams);
-          console.log(queryCommand);
-          connection.query(queryCommand, function (error, results, fields) {
+          //secondly, get the number of rows of data
+          const countCommand: string = `SELECT COUNT(*) AS numRows FROM ${query.queryParams.table}`;
+          connection.query(countCommand, async function(error, results, fields){
             if (error) throw error;
 
-            //terminate the database connection
-            connection.end();
+            const numRows = results[0].numRows;
 
-            //add a unique key field to each returned row
-            for (var i = 0; i < results.length; i++) {
-              results[i].qbee_id = i; // Add "total": 2 to all objects in array
-          }
+            console.log(numRows);
 
-            resolve(results);
+            //thirdly, query the database
+            const queryCommand: string = await parser.convertJsonToQuery(query.queryParams);
+            console.log(queryCommand);
+            connection.query(queryCommand, function (error, results, fields) {
+              if (error) throw error;
 
-          });
+              //terminate the database connection
+              connection.end();
+
+              //add a unique key field to each returned row
+              for (var i = 0; i < results.length; i++) {
+                results[i].qbee_id = i; // Add "total": 2 to all objects in array
+              }
+
+              //return a response object with numRows and results
+              const response = {
+                totalNumRows: numRows,
+                data: results
+              }
+
+              resolve(response);
+
+            });
+
+          })
 
         });
 

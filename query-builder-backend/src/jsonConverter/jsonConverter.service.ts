@@ -5,13 +5,20 @@ interface SortParams {
     direction?: "ascending"|"descending"
   }
 
+  interface PageParams {
+    //note pageNumbers are indexed from 1
+    pageNumber: number,
+    rowsPerPage: number
+}
+
 interface QueryParams {
     language: string,
     query_type: string,
     table: string,
     columns: string[],
     condition?: string,
-    sortParams?: SortParams
+    sortParams?: SortParams,
+    pageParams?: PageParams
 }
 
 @Injectable()
@@ -58,8 +65,24 @@ export class JsonConverterService {
                     orderBy = ` ORDER BY ${jsonData.sortParams.column} ${sortDirection}`;
 
                 }
+
+                let limit = '';
+
+                if (jsonData.pageParams) {
+
+                    //get the page number and number of rows of data per page that we would like to return
+                    const rowsPerPage = jsonData.pageParams.rowsPerPage;
+                    const pageNumber = jsonData.pageParams.pageNumber;
+
+                    //calculate the offset into the data where we should start returning data
+                    //in SQL rows are indexed from 1 and the OFFSET is one less than the first row we want to return
+                    const offset = (pageNumber-1)*rowsPerPage;
+
+                    limit = ` LIMIT ${rowsPerPage} OFFSET ${offset}`;
+
+                }
                 
-                query = `SELECT ${select} FROM ${from}${where}${orderBy}`;
+                query = `SELECT ${select} FROM ${from}${where}${orderBy}${limit}`;
             } else {
                 query = 'Unsupported query type';
                 return query;
