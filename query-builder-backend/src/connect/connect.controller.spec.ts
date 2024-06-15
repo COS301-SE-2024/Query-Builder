@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ConnectController } from './connect.controller';
 import { ConnectionManagerService } from '../connection-manager/connection-manager.service';
 import { JsonConverterService } from './../jsonConverter/jsonConverter.service';
-import { BadGatewayException, UnauthorizedException } from '@nestjs/common';
+import { BadGatewayException, HttpException, UnauthorizedException } from '@nestjs/common';
 
 describe('ConnectController', () => {
   let controller: ConnectController;
@@ -27,7 +27,7 @@ describe('ConnectController', () => {
       password: ""
     };
 
-    await expect(controller.connect(fakeCredentials)).rejects.toThrow(UnauthorizedException || BadGatewayException);
+    await expect(controller.connect(fakeCredentials)).rejects.toThrow(HttpException);
 
   });
 
