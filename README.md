@@ -155,18 +155,42 @@ QBee is the ultimate tool for modern database management and analysis.
 <br><br><br>
 
 
-### Local Setup
+## Local Setup
 Clone the repo
 ```shell
 git clone https://github.com/COS301-SE-2024/Query-Builder.git
 ```
 
-Go to the Query-Builder app directory 
-```shell
-cd query-builder-app
-```
-
 Install dependencies
 ```shell
-pnpm i
+pnpm run install-deps
+```
+
+Run the app locally
+```shell
+pnpm run app-start
+```
+
+Run the docs locally
+```shell
+pnpm run docs-start
+```
+
+## Tree Structure
+```shell
+.
+├── query-builder-app # Frontend (Next.js)
+│   ├── public # Resources used in the frontend that require no build step
+│   └── src # Frontend logic
+├── query-builder-backend # Backend (NestJS)
+│   ├── src # Backend Logic
+│   └── test
+├── query-builder-docs # Docusaurus Documentation
+│   ├── docs # .md files and config files to determine layout for Docusaurus docs
+│   ├── src
+│   └──static # Resources used in the docs that require no build step
+├── query-builder-e2e # Folder Reserved to End to End testing
+└── supabase # Database
+    ├── functions # Edge Function Directory
+    └── migrations # Database backup files
 ```

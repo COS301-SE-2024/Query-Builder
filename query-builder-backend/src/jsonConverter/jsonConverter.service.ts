@@ -81,17 +81,14 @@ export class JsonConverterService {
                     limit = ` LIMIT ${rowsPerPage} OFFSET ${offset}`;
 
                 }
-                
                 query = `SELECT ${select} FROM ${from}${where}${orderBy}${limit}`;
             } else {
                 query = 'Unsupported query type';
                 return query;
-                throw new Error('Unsupported query type');
             }
         } else {
             query = 'Invalid language';
             return query;
-            throw new Error('Invalid language');
         }
     
         return query;

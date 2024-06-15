@@ -1,0 +1,36 @@
+name: Test deployment of Docusaurus site
+
+on:
+  pull_request:
+    branches:
+      - main
+      - dev
+    paths:
+      - 'query-builder-docs/**'
+    # Review gh actions docs if you want to further define triggers, paths, etc
+    # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#on
+
+jobs:
+  test-deploy:
+    name: Test deployment
+    runs-on: ubuntu-latest
+    defaults:
+        run:
+            working-directory: ./query-builder-docs/
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: '9.1.2'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: pnpm
+          cache-dependency-path: query-builder-docs/pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Test build website
+        run: pnpm build

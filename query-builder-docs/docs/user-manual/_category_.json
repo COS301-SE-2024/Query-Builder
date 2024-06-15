@@ -1,0 +1,8 @@
+{
+  "label": "User Manual",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "description": "A Help Centre for Qbee users."
+  }
+}
