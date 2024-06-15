@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConnectionManagerService } from './connection-manager.service';
-import { JsonConverterService } from 'src/jsonConverter/jsonConverter.service';
+import { JsonConverterService } from './../jsonConverter/jsonConverter.service';
 
 describe('ConnectionManagerService', () => {
   let service: ConnectionManagerService;

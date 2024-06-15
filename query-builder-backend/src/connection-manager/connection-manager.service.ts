@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { JsonConverterService } from 'src/jsonConverter/jsonConverter.service';
+import { JsonConverterService } from './../jsonConverter/jsonConverter.service';
 
 interface DatabaseCredentials {
     host: string,

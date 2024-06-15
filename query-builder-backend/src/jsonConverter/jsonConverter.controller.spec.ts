@@ -31,10 +31,9 @@ describe('JsonConverterController', () => {
 
     const result = await controller.convert(queryParams);
 
-    expect(result.query).toContain('SELECT');
-    expect(result.query).toContain('FROM');
-    expect(result.query).toContain('WHERE');
-    expect(result.query).toEqual(expectedQuery);
-    expect(result.error).toBeUndefined(); // Ensure no error field is present
+    expect(result).toContain('SELECT');
+    expect(result).toContain('FROM');
+    expect(result).toContain('WHERE');
+    expect(result).toEqual(expectedQuery);
   });
 });
