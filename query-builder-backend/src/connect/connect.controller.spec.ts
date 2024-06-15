@@ -1,13 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConnectController } from './connect.controller';
 import { ConnectionManagerService } from '../connection-manager/connection-manager.service';
+import { JsonConverterService } from 'src/jsonConverter/jsonConverter.service';
 
 describe('ConnectController', () => {
   let controller: ConnectController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [ConnectionManagerService],
+      providers: [ConnectionManagerService, JsonConverterService],
       controllers: [ConnectController],
     }).compile();
 

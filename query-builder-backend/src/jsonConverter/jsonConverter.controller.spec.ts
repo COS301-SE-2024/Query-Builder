@@ -23,7 +23,7 @@ describe('JsonConverterController', () => {
       language: 'SQL',
       query_type: 'SELECT',
       table: 'users',
-      column: 'id',
+      columns: ['id'],
       condition: 'id = 1',
     };
 
