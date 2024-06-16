@@ -1,4 +1,4 @@
-import { Body, Controller, Patch, Post, Put, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Put, ValidationPipe } from '@nestjs/common';
 import { UserManagementService } from './user-management.service';
 import { Get_User_Dto } from './dto/get-user.dto';
 import { Create_User_Dto } from './dto/create-user.dto';
@@ -9,14 +9,14 @@ import { Update_User_Dto } from './dto/update-user.dto';
 export class UserManagementController {
     constructor(private readonly user_management_service: UserManagementService) {}
 
+    @Get('get-user')
+    async getLoggedInUser() {
+        return await this.user_management_service.getLoggedInUser();
+    }
+
     @Put('get-user')
     async getUser(@Body(ValidationPipe) user: Get_User_Dto) {
         return await this.user_management_service.getUser(user);
-    }
-
-    @Put('get-logged-in-user')
-    async getLoggedInUser() {
-        return await this.user_management_service.getLoggedInUser();
     }
 
     @Put('sign-in')
