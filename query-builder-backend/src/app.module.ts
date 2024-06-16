@@ -10,6 +10,7 @@ import { JsonConverterModule } from "./jsonConverter/jsonConverter.module";
 import { SupabaseGuard, SupabaseModule } from "./supabase";
 import { APP_GUARD } from "@nestjs/core";
 import { UserManagementModule } from './user-management/user-management.module';
+import { OrgManagementModule } from './org-management/org-management.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { UserManagementModule } from './user-management/user-management.module';
     JsonConverterModule,
     SupabaseModule,
     UserManagementModule,
+    OrgManagementModule,
   ],
   controllers: [AppController],
   providers: [AppService, {
