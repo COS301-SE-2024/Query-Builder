@@ -47,46 +47,38 @@ export class OrgManagementController {
 
   @Post("add-db")
   async addDb(@Body(ValidationPipe) add_db_dto: Add_Db_Dto) {
-    // TODO: Implement this
-    return {};
+    return this.org_management_service.addDb(add_db_dto);
   }
 
   @Patch("update-org")
   async updateOrg(@Body(ValidationPipe) update_org_dto: Update_Org_Dto) {
-    // TODO: Implement this
-    return {};
+    return this.org_management_service.updateOrg(update_org_dto);
   }
 
   @Patch("update-member")
   async updateMember(
     @Body(ValidationPipe) update_member_dto: Update_Member_Dto) {
-    // TODO: Implement this
-    return {};
+    return this.org_management_service.updateMember(update_member_dto);
   }
 
   @Patch("update-db")
   async updateDb(@Body(ValidationPipe) update_db_dto: Update_Db_Dto) {
-    // TODO: Implement this
-    return {};
+    return this.org_management_service.updateDb(update_db_dto);
   }
 
   @Delete("remove-org")
   async removeOrg(@Body(ValidationPipe) remove_org_dto: Remove_Org_Dto) {
-    // TODO: Implement this
-    return {};
+    return this.org_management_service.removeOrg(remove_org_dto);
   }
 
   @Delete("remove-member")
   async removeMember(
-    @Body(ValidationPipe) remove_member_dto: Remove_Member_Dto,
-  ) {
-    // TODO: Implement this
-    return {};
+    @Body(ValidationPipe) remove_member_dto: Remove_Member_Dto) {
+    return this.org_management_service.removeMember(remove_member_dto);
   }
 
   @Delete("remove-db")
   async removeDb(@Body(ValidationPipe) remove_db_dto: Remove_Db_Dto) {
-    // TODO: Implement this
-    return {};
+    return this.org_management_service.removeDb(remove_db_dto);
   }
 }
