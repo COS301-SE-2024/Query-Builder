@@ -75,5 +75,40 @@ While Supabase offers significant benefits, we had to consider potential drawbac
 
 - **Maturity**: As a relatively young platform, Supabase might have a smaller community and less extensive documentation compared to more established solutions.
 
+### Alternative User Authorization and Data Storage Solutions
+
+While Supabase offers a compelling set of features, we did consider other options. Below are two of our considerations with their own advantages and disadvantages:
+
+#### **Firebase**:
+
+A popular backend-as-a-service (BaaS) platform from Google, Firebase provides user authentication, data storage (Cloud Firestore), real-time capabilities, and serverless functions.
+
+Pros:
+
+- Extensive Feature Set: Firebase offers a comprehensive suite of tools beyond user authorization and storage.
+- Deep Integration with Google Services: Easy integration with Google products like Google Sign-In and Cloud Functions.
+- Mature Platform: Firebase is a well-established platform with a large community and extensive documentation.
+
+Cons:
+
+- Vendor Lock-in: Similar to Supabase, Firebase locks you into Google's infrastructure.
+- Pricing: Firebase's free tier has limitations, and pay-as-you-go pricing can become expensive for data-intensive apps, such as QBee.
+- Complexity: Firebase's vast feature set can lead to a steeper learning curve compared to Supabase.
+
+#### Backend for Frontend (BFF) with Separate Database:
+
+This approach involves building a custom backend API specifically for QBee's frontend needs. We could have used databases like PostgreSQL or MongoDB for data storage.
+
+Pros:
+
+- Maximum Control and Flexibility: We would have complete control over user authorization flows, data schema, and security.
+- Database Choice: Select the database that best suits our data model and performance requirements.
+
+Cons:
+
+- Increased Development Time: Building and maintaining a custom backend requires significant development resources.
+- Complexity Management: Managing user authentication, authorization logic, and security can become complex for large-scale projects.
+
 ### Conclusion
+
 In summary, Supabase is a strong choice for user authorization and data storage in our project. Its ease of use, and robust feature set align well with QBEE's requirements. While we had to consider potential drawbacks, the benefits of using Supabase outweighed these concerns.
