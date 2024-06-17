@@ -1,6 +1,6 @@
-import Authentication from "@/components/Authentication/Authentication";
+'use client';
+import LandingPage from '@/components/LandingPage/LandingPage';
 
-export default function Auth()
-{
-    return <Authentication/>
+export default function Auth() {
+  return <LandingPage />;
 }

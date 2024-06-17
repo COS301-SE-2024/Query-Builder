@@ -1,5 +1,6 @@
-import LandingPage from '@/components/LandingPage/LandingPage';
+'use client';
+import SignedInHomePage from '@/components/SignedInHomePage/SignedInHomePage';
 
 export default function Page() {
-  return <LandingPage/>
+  return <SignedInHomePage />;
 }

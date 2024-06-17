@@ -11,14 +11,9 @@ import PhoneInput, {
   isValidPhoneNumber,
 } from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
-// import { createClient } from '@supabase/supabase-js';
 import {login, signup} from '@/app/authentication/actions'
 
 export default function Authentication() {
-  // const supabaseUrl: string = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  // const supabaseAnonKey: string =
-  //   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-  // const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
   const [isVisible, setIsVisible] = useState(false);
   const toggleVisibility = () => setIsVisible(!isVisible);
