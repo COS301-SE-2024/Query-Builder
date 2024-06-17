@@ -1,10 +1,10 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { UserManagementController } from './user-management.controller';
-import { UserManagementService } from './user-management.service';
-import { ConfigService } from '@nestjs/config';
-import { Supabase } from '../supabase';
+import { Test, TestingModule } from "@nestjs/testing";
+import { UserManagementController } from "./user-management.controller";
+import { UserManagementService } from "./user-management.service";
+import { ConfigService } from "@nestjs/config";
+import { Supabase } from "../supabase";
 
-describe('UserManagementController', () => {
+describe("UserManagementController", () => {
   let controller: UserManagementController;
 
   beforeEach(async () => {
@@ -16,7 +16,7 @@ describe('UserManagementController', () => {
     controller = module.get<UserManagementController>(UserManagementController);
   });
 
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(controller).toBeDefined();
   });
 });
