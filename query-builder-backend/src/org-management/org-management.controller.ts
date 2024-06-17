@@ -42,7 +42,7 @@ export class OrgManagementController {
 
   @Post("add-member")
   async addMember(@Body(ValidationPipe) add_member_dto: Add_Member_Dto) {
-    return this.addMember(add_member_dto);
+    return this.org_management_service.addMember(add_member_dto);
   }
 
   @Post("add-db")
@@ -59,8 +59,7 @@ export class OrgManagementController {
 
   @Patch("update-member")
   async updateMember(
-    @Body(ValidationPipe) update_member_dto: Update_Member_Dto,
-  ) {
+    @Body(ValidationPipe) update_member_dto: Update_Member_Dto) {
     // TODO: Implement this
     return {};
   }
