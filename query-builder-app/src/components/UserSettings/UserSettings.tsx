@@ -77,23 +77,17 @@ export default function UserSettings(){
         return validateEmail(updateEmail) ? false : true;
       }, [updateEmail]);
   
-      const isUpdatePasswordInvalid = React.useMemo(() => {
-          if (updatePassword === "") return true;
-      
-          return false;
-      }, [updatePassword]);
-  
-      const isUpdateFirstNameInvalid = React.useMemo(() => {
-          if (updateFirstName === "") return true;
-      
-          return false;
-      }, [updateFirstName]);
-  
-      const isUpdateLastNameInvalid = React.useMemo(() => {
-          if (updateLastName === "") return true;
-      
-          return false;
-      }, [updateLastName]);
+    const isUpdateFirstNameInvalid = React.useMemo(() => {
+        if (updateFirstName === "") return true;
+    
+        return false;
+    }, [updateFirstName]);
+
+    const isUpdateLastNameInvalid = React.useMemo(() => {
+        if (updateLastName === "") return true;
+    
+        return false;
+    }, [updateLastName]);
 
 
     
@@ -110,7 +104,7 @@ export default function UserSettings(){
                                 label="First Name"
                                 variant="bordered"
                                 onValueChange={setUpdateFirstName}
-                                onFocus={() => {setUpdateEmailHasBeenFocused(false);setUpdateFirstNameHasBeenFocused(true);setUpdateLastNameHasBeenFocused(false);}}
+                                onFocus={() => {setUpdateEmailHasBeenFocused(false);setUpdateFirstNameHasBeenFocused(true);setUpdateLastNameHasBeenFocused(false);setUpdatePhoneHasBeenFocused(false)}}
                                 isInvalid={isUpdateFirstNameInvalid && updateFirstNameHasBeenFocused}
                                 color={!updateFirstNameHasBeenFocused ? "primary" : isUpdateFirstNameInvalid ? "danger" : "success"}
                                 errorMessage="Please enter a username"
@@ -122,7 +116,7 @@ export default function UserSettings(){
                                 label="Last Name"
                                 variant="bordered"
                                 onValueChange={setUpdateLastName}
-                                onFocus={() => {setUpdateEmailHasBeenFocused(false);setUpdateFirstNameHasBeenFocused(false);setUpdateLastNameHasBeenFocused(true);}}
+                                onFocus={() => {setUpdateEmailHasBeenFocused(false);setUpdateFirstNameHasBeenFocused(false);setUpdateLastNameHasBeenFocused(true);setUpdatePhoneHasBeenFocused(false)}}
                                 isInvalid={isUpdateLastNameInvalid && updateLastNameHasBeenFocused}
                                 color={!updateLastNameHasBeenFocused ? "primary" : isUpdateLastNameInvalid ? "danger" : "success"}
                                 errorMessage="Please enter a username"
@@ -135,7 +129,7 @@ export default function UserSettings(){
                                 variant="bordered"
                                 type="email"
                                 onValueChange={setUpdateEmail}
-                                onFocus={() => {setUpdatePasswordHasBeenFocused(false); setUpdateEmailHasBeenFocused(true);setUpdateFirstNameHasBeenFocused(false);setUpdateLastNameHasBeenFocused(false);setLoginPasswordHasBeenFocused(false); setLoginEmailHasBeenFocused(false);setUpdatePhoneHasBeenFocused(false);}}
+                                onFocus={() => {setUpdateEmailHasBeenFocused(true);setUpdateFirstNameHasBeenFocused(false);setUpdateLastNameHasBeenFocused(false);setUpdatePhoneHasBeenFocused(false);}}
                                 isInvalid={isUpdateEmailInvalid && updateEmailHasBeenFocused}
                                 color={!updateEmailHasBeenFocused ? "primary" : (isUpdateEmailInvalid && updateEmailHasBeenFocused) ? "danger" : "success"}
                                 errorMessage="Please enter a valid email"
@@ -152,7 +146,7 @@ export default function UserSettings(){
                                 onChange={(value) => setUpdatePhone((value as string))}
                                 withCountryCallingCode
                                 color={!updatePhoneHasBeenFocused ? "primary" : (updatePhone? (!isValidPhoneNumber(updatePhone) ? "danger" : "success"):"danger")}
-                                onFocus={() => {setUpdatePasswordHasBeenFocused(false); setUpdateEmailHasBeenFocused(false);setUpdateFirstNameHasBeenFocused(false);setUpdateLastNameHasBeenFocused(false);setLoginPasswordHasBeenFocused(false); setLoginEmailHasBeenFocused(false);setUpdatePhoneHasBeenFocused(true);}}
+                                onFocus={() => {setUpdateEmailHasBeenFocused(false);setUpdateFirstNameHasBeenFocused(false);setUpdateLastNameHasBeenFocused(false);setUpdatePhoneHasBeenFocused(true);}}
                                 isInvalid={(updatePhone ? (!isValidPhoneNumber(updatePhone)) : true)&& updatePhoneHasBeenFocused}
                                 errorMessage="Please enter a valid phone number"
                             />
