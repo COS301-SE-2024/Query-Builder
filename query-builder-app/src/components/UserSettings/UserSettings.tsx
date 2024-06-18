@@ -96,7 +96,7 @@ export default function UserSettings(){
         <>
             <Card
             fullWidth>
-                <CardHeader><div className="user-management-options">Options</div></CardHeader>
+                <CardHeader><div className="user-management-options">Change User Details</div></CardHeader>
                 <CardBody>
                         <div className="infield">
                             <Input
@@ -107,7 +107,7 @@ export default function UserSettings(){
                                 onFocus={() => {setUpdateEmailHasBeenFocused(false);setUpdateFirstNameHasBeenFocused(true);setUpdateLastNameHasBeenFocused(false);setUpdatePhoneHasBeenFocused(false)}}
                                 isInvalid={isUpdateFirstNameInvalid && updateFirstNameHasBeenFocused}
                                 color={!updateFirstNameHasBeenFocused ? "primary" : isUpdateFirstNameInvalid ? "danger" : "success"}
-                                errorMessage="Please enter a username"
+                                errorMessage="Please enter a first name"
                             />
                         </div>
                         <div className="infield">
@@ -119,7 +119,7 @@ export default function UserSettings(){
                                 onFocus={() => {setUpdateEmailHasBeenFocused(false);setUpdateFirstNameHasBeenFocused(false);setUpdateLastNameHasBeenFocused(true);setUpdatePhoneHasBeenFocused(false)}}
                                 isInvalid={isUpdateLastNameInvalid && updateLastNameHasBeenFocused}
                                 color={!updateLastNameHasBeenFocused ? "primary" : isUpdateLastNameInvalid ? "danger" : "success"}
-                                errorMessage="Please enter a username"
+                                errorMessage="Please enter a last name"
                             />
                         </div>
                         <div className="infield">
