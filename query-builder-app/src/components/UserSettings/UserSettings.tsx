@@ -19,7 +19,7 @@ const getToken = () => {
 export default function UserSettings(){
 
     // get user information with JWT token
-    const getUserInfo = () => {
+    const getUserInfo = async () => {
 
         fetch("http://localhost:55555/api/user-management", {
           method: "POST",
@@ -46,19 +46,28 @@ export default function UserSettings(){
           }
         )
   
-      }
+    }
 
+    // Initial Info
+    const [initialFirstName, setInitialFirstName] = useState('');
+    const [initialLastName, setInitialLastName] = useState('');
+    const [initialEmail, setInitialEmail] = useState('');
+    const [initialPhone, setInitialPhone] = useState('');
+    // const [initialPassword, setInitialPassword] = useState('');
 
-    const [updateFirstName, setUpdateFirstName] = useState('');
-    const [updateLastName, setUpdateLastName] = useState('');
-    const [updateEmail, setUpdateEmail] = useState('');
-    const [updatePhone, setUpdatePhone] = useState('');
-    const [updatePassword, setUpdatePassword] = useState('');
+    getUserInfo();
+
+    // Updated fields
+    const [updateFirstName, setUpdateFirstName] = useState(initialFirstName);
+    const [updateLastName, setUpdateLastName] = useState(initialLastName);
+    const [updateEmail, setUpdateEmail] = useState(initialEmail);
+    const [updatePhone, setUpdatePhone] = useState(initialPhone);
+    // const [updatePassword, setUpdatePassword] = useState(initialPassword);
     const [updateFirstNameHasBeenFocused, setUpdateFirstNameHasBeenFocused] = useState(false);
     const [updateLastNameHasBeenFocused, setUpdateLastNameHasBeenFocused] = useState(false);
     const [updateEmailHasBeenFocused, setUpdateEmailHasBeenFocused] = useState(false);
     const [updatePhoneHasBeenFocused, setUpdatePhoneHasBeenFocused] = useState(false);
-    const [updatePasswordBeenFocused, setUpdatePasswordHasBeenFocused] = useState(false);
+    // const [updatePasswordBeenFocused, setUpdatePasswordHasBeenFocused] = useState(false);
 
     const validateEmail = (value:any) => value.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$/i);
 
@@ -101,7 +110,7 @@ export default function UserSettings(){
                                 label="First Name"
                                 variant="bordered"
                                 onValueChange={setUpdateFirstName}
-                                onFocus={() => {setUpdatePasswordHasBeenFocused(false); setUpdateEmailHasBeenFocused(false);setUpdateFirstNameHasBeenFocused(true);setUpdateLastNameHasBeenFocused(false);setLoginPasswordHasBeenFocused(false); setLoginEmailHasBeenFocused(false);setUpdatePhoneHasBeenFocused(false);}}
+                                onFocus={() => {setUpdateEmailHasBeenFocused(false);setUpdateFirstNameHasBeenFocused(true);setUpdateLastNameHasBeenFocused(false);}}
                                 isInvalid={isUpdateFirstNameInvalid && updateFirstNameHasBeenFocused}
                                 color={!updateFirstNameHasBeenFocused ? "primary" : isUpdateFirstNameInvalid ? "danger" : "success"}
                                 errorMessage="Please enter a username"
@@ -113,7 +122,7 @@ export default function UserSettings(){
                                 label="Last Name"
                                 variant="bordered"
                                 onValueChange={setUpdateLastName}
-                                onFocus={() => {setUpdatePasswordHasBeenFocused(false); setUpdateEmailHasBeenFocused(false);setUpdateFirstNameHasBeenFocused(false);setUpdateLastNameHasBeenFocused(true);setLoginPasswordHasBeenFocused(false); setLoginEmailHasBeenFocused(false);setUpdatePhoneHasBeenFocused(false);}}
+                                onFocus={() => {setUpdateEmailHasBeenFocused(false);setUpdateFirstNameHasBeenFocused(false);setUpdateLastNameHasBeenFocused(true);}}
                                 isInvalid={isUpdateLastNameInvalid && updateLastNameHasBeenFocused}
                                 color={!updateLastNameHasBeenFocused ? "primary" : isUpdateLastNameInvalid ? "danger" : "success"}
                                 errorMessage="Please enter a username"
