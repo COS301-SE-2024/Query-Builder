@@ -61,7 +61,6 @@ describe('DatabaseConnectionModal modal popup tests', () => {
     //click the button to add a database
     await user.click(button);
 
-    //get the screen text that should be displayed on the modal and assert that it is in the document
     const urlField = screen.getByLabelText("URL or Host")
     expect(urlField).toBeInTheDocument();
 
@@ -81,7 +80,6 @@ describe('DatabaseConnectionModal modal popup tests', () => {
     //click the button to add a database
     await user.click(button);
 
-    //get the screen text that should be displayed on the modal and assert that it is in the document
     const usernameField = screen.getByLabelText("Username")
     expect(usernameField).toBeInTheDocument();
 
@@ -101,7 +99,6 @@ describe('DatabaseConnectionModal modal popup tests', () => {
     //click the button to add a database
     await user.click(button);
 
-    //get the screen text that should be displayed on the modal and assert that it is in the document
     const passwordField = screen.getByLabelText("Password")
     expect(passwordField).toBeInTheDocument();
 
