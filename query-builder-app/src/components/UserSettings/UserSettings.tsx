@@ -102,9 +102,8 @@ export default function UserSettings(){
                                 inputComponent={Input}
                                 value={updatePhone}
                                 onValueChange={setUpdatePhone}
-                                onChange={setUpdatePhone}
+                                onChange={(value) => setUpdatePhone((value as string))}
                                 withCountryCallingCode
-                                onValueChange={setUpdatePhone}
                                 color={!updatePhoneHasBeenFocused ? "primary" : (updatePhone? (!isValidPhoneNumber(updatePhone) ? "danger" : "success"):"danger")}
                                 onFocus={() => {setUpdatePasswordHasBeenFocused(false); setUpdateEmailHasBeenFocused(false);setUpdateFirstNameHasBeenFocused(false);setUpdateLastNameHasBeenFocused(false);setLoginPasswordHasBeenFocused(false); setLoginEmailHasBeenFocused(false);setUpdatePhoneHasBeenFocused(true);}}
                                 isInvalid={(updatePhone ? (!isValidPhoneNumber(updatePhone)) : true)&& updatePhoneHasBeenFocused}
