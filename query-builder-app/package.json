@@ -18,6 +18,7 @@
     "@nextui-org/system": "^2.2.1",
     "@nextui-org/theme": "^2.2.5",
     "@react-stately/data": "^3.11.4",
+    "@supabase/ssr": "^0.3.0",
     "@supabase/supabase-js": "^2.43.4",
     "cypress": "^13.10.0",
     "framer-motion": "^11.2.6",

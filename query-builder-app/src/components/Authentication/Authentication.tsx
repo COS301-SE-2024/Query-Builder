@@ -11,13 +11,9 @@ import PhoneInput, {
   isValidPhoneNumber,
 } from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
-import { createClient } from '@supabase/supabase-js';
+import {login, signup} from '@/app/authentication/actions'
 
 export default function Authentication() {
-  const supabaseUrl: string = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
-  const supabaseAnonKey: string =
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '';
-  const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
   const [isVisible, setIsVisible] = useState(false);
   const toggleVisibility = () => setIsVisible(!isVisible);
@@ -107,22 +103,25 @@ export default function Authentication() {
   };
 
   const loginUser = async (email: string, password: string) => {
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: password,
-      });
+    
+    login(email, password);
+    
+      // try {
+      // const { data, error } = await supabase.auth.signInWithPassword({
+      //   email: email,
+      //   password: password,
+      // });
 
-      if (error) {
-        throw error;
-      }
-      console.log(data);
+      // if (error) {
+      //   throw error;
+      // }
+
       // add cookie here
       // console.log(session);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+      //   } catch (error) {
+      //     console.log(error);
+      //   }
+      };
 
   const signUpUser = async (
     firstName: string,
@@ -131,29 +130,32 @@ export default function Authentication() {
     phone: string,
     password: string,
   ) => {
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email: email,
-        phone: phone,
-        password: password,
-        options: {
-          data: {
-            first_name: firstName,
-            last_name: lastName,
-          },
-          channel: 'sms',
-        },
-      });
 
-      if (error) {
-        throw error;
-      }
-      console.log(data);
+    signup(firstName, lastName, email, phone, password);
+
+    // try {
+    //   const { data, error } = await supabase.auth.signUp({
+    //     email: email,
+    //     phone: phone,
+    //     password: password,
+    //     options: {
+    //       data: {
+    //         first_name: firstName,
+    //         last_name: lastName,
+    //       },
+    //       channel: 'sms',
+    //     },
+    //   });
+
+    //   if (error) {
+    //     throw error;
+    //   }
+      // console.log(data);
       // add cookie here
       // console.log(session);
-    } catch (error) {
-      console.log(error);
-    }
+    // } catch (error) {
+    //   console.log(error);
+    // }
   };
 
   return (

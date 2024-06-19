@@ -11,5 +11,7 @@
         "app-test": "cd query-builder-app && pnpm test",
         "storybook-start": "cd query-builder-app && pnpm run storybook",
         "install-deps": "cd query-builder-app && pnpm install && cd ../query-builder-docs && pnpm install"
+    },
+    "dependencies": {
     }
 }
