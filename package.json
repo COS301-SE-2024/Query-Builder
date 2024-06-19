@@ -13,6 +13,5 @@
         "install-deps": "cd query-builder-app && pnpm install && cd ../query-builder-docs && pnpm install"
     },
     "dependencies": {
-        "@supabase/ssr": "^0.3.0"
     }
 }
