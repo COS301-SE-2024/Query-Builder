@@ -58,7 +58,7 @@ export default function DatabaseConnectionModal(){
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
-          'Authorization': getToken()
+          'Authorization': 'Bearer ' + getToken()
         },
         body: JSON.stringify({
           host: host,

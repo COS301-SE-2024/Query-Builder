@@ -47,6 +47,17 @@ export interface TableResponseProps{
 
 } 
 
+// This function gets the token from local storage.
+// Supabase stores the token in local storage so we can access it from there.
+const getToken = () => {
+  const storageKey = `sb-${process.env.NEXT_PUBLIC_SUPABASE_PROJECT_ID}-auth-token`;
+  const sessionDataString = localStorage.getItem(storageKey);
+  const sessionData = JSON.parse(sessionDataString || "null");
+  const token = sessionData?.access_token;
+
+  return token;
+};
+
 export default function TableResponse(props: TableResponseProps){
 
   //dynamically create an array of column objects from the props
@@ -55,8 +66,6 @@ export default function TableResponse(props: TableResponseProps){
   for(const columnName of columnNames){
     columns.push({key: columnName, label: columnName});
   }
-
-  console.log(columns);
 
   //A page state holding the page number of the query data that we are currently viewing
   const [pageNumber, setPageNumber] = useState(1);
@@ -75,8 +84,6 @@ export default function TableResponse(props: TableResponseProps){
     
     //function that loads the data asynchronously - an optional sortDescriptor can be passed in
     async load({sortDescriptor}){
-
-      console.log("LOADING DATA");
 
       //the data is being loaded
       setLoading(true);
@@ -103,7 +110,8 @@ export default function TableResponse(props: TableResponseProps){
         method: "POST",
         headers: {
           'Accept': 'application/json',
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + getToken()
         },
         body: JSON.stringify(props.query)
       })
@@ -160,7 +168,6 @@ export default function TableResponse(props: TableResponseProps){
           total={totalPages}
           variant="light"
           onChange={(pageNumber)=>{
-            console.log("PAGE NUMBER: " + pageNumber);
             setPageNumber(pageNumber);
           }}
         />
