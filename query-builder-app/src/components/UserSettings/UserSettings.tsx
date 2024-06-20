@@ -5,22 +5,69 @@ import {Button, Card, CardBody, CardHeader, Input, input} from "@nextui-org/reac
 import PhoneInput, { formatPhoneNumber, formatPhoneNumberIntl, isValidPhoneNumber } from 'react-phone-number-input';
 
 
+const getToken = () => {
+    const storageKey = `sb-${process.env.NEXT_PUBLIC_SUPABASE_PROJECT_ID}-auth-token`;
+    const sessionDataString = localStorage.getItem(storageKey);
+    const sessionData = JSON.parse(sessionDataString || "null");
+    const token = sessionData?.access_token;
+  
+    console.log(token)
+  
+    return token;
+};
+
 export default function UserSettings(){
 
     // get user information with JWT token
+    const getUserInfo = async () => {
 
+        fetch("http://localhost:55555/api/user-management", {
+          method: "POST",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': getToken()
+          },
+          body: JSON.stringify({
+            
+          })
+        }).then(
+          function(response){
+            if(response.ok){
+              return response.json();
+            }
+            else{
+              return ({"success" : false})
+            }
+          }
+        ).then(
+          function(response){
+            console.log(response)
+          }
+        )
+  
+    }
 
+    // Initial Info
+    const [initialFirstName, setInitialFirstName] = useState('');
+    const [initialLastName, setInitialLastName] = useState('');
+    const [initialEmail, setInitialEmail] = useState('');
+    const [initialPhone, setInitialPhone] = useState('');
+    // const [initialPassword, setInitialPassword] = useState('');
 
-    const [updateFirstName, setUpdateFirstName] = useState('');
-    const [updateLastName, setUpdateLastName] = useState('');
-    const [updateEmail, setUpdateEmail] = useState('');
-    const [updatePhone, setUpdatePhone] = useState('');
-    const [updatePassword, setUpdatePassword] = useState('');
+    getUserInfo();
+
+    // Updated fields
+    const [updateFirstName, setUpdateFirstName] = useState(initialFirstName);
+    const [updateLastName, setUpdateLastName] = useState(initialLastName);
+    const [updateEmail, setUpdateEmail] = useState(initialEmail);
+    const [updatePhone, setUpdatePhone] = useState(initialPhone);
+    // const [updatePassword, setUpdatePassword] = useState(initialPassword);
     const [updateFirstNameHasBeenFocused, setUpdateFirstNameHasBeenFocused] = useState(false);
     const [updateLastNameHasBeenFocused, setUpdateLastNameHasBeenFocused] = useState(false);
     const [updateEmailHasBeenFocused, setUpdateEmailHasBeenFocused] = useState(false);
     const [updatePhoneHasBeenFocused, setUpdatePhoneHasBeenFocused] = useState(false);
-    const [updatePasswordBeenFocused, setUpdatePasswordHasBeenFocused] = useState(false);
+    // const [updatePasswordBeenFocused, setUpdatePasswordHasBeenFocused] = useState(false);
 
     const validateEmail = (value:any) => value.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$/i);
 
@@ -30,23 +77,17 @@ export default function UserSettings(){
         return validateEmail(updateEmail) ? false : true;
       }, [updateEmail]);
   
-      const isUpdatePasswordInvalid = React.useMemo(() => {
-          if (updatePassword === "") return true;
-      
-          return false;
-      }, [updatePassword]);
-  
-      const isUpdateFirstNameInvalid = React.useMemo(() => {
-          if (updateFirstName === "") return true;
-      
-          return false;
-      }, [updateFirstName]);
-  
-      const isUpdateLastNameInvalid = React.useMemo(() => {
-          if (updateLastName === "") return true;
-      
-          return false;
-      }, [updateLastName]);
+    const isUpdateFirstNameInvalid = React.useMemo(() => {
+        if (updateFirstName === "") return true;
+    
+        return false;
+    }, [updateFirstName]);
+
+    const isUpdateLastNameInvalid = React.useMemo(() => {
+        if (updateLastName === "") return true;
+    
+        return false;
+    }, [updateLastName]);
 
 
     
@@ -55,7 +96,7 @@ export default function UserSettings(){
         <>
             <Card
             fullWidth>
-                <CardHeader><div className="user-management-options">Options</div></CardHeader>
+                <CardHeader><div className="user-management-options">Change User Details</div></CardHeader>
                 <CardBody>
                         <div className="infield">
                             <Input
@@ -63,10 +104,10 @@ export default function UserSettings(){
                                 label="First Name"
                                 variant="bordered"
                                 onValueChange={setUpdateFirstName}
-                                onFocus={() => {setUpdatePasswordHasBeenFocused(false); setUpdateEmailHasBeenFocused(false);setUpdateFirstNameHasBeenFocused(true);setUpdateLastNameHasBeenFocused(false);setLoginPasswordHasBeenFocused(false); setLoginEmailHasBeenFocused(false);setUpdatePhoneHasBeenFocused(false);}}
+                                onFocus={() => {setUpdateEmailHasBeenFocused(false);setUpdateFirstNameHasBeenFocused(true);setUpdateLastNameHasBeenFocused(false);setUpdatePhoneHasBeenFocused(false)}}
                                 isInvalid={isUpdateFirstNameInvalid && updateFirstNameHasBeenFocused}
                                 color={!updateFirstNameHasBeenFocused ? "primary" : isUpdateFirstNameInvalid ? "danger" : "success"}
-                                errorMessage="Please enter a username"
+                                errorMessage="Please enter a first name"
                             />
                         </div>
                         <div className="infield">
@@ -75,10 +116,10 @@ export default function UserSettings(){
                                 label="Last Name"
                                 variant="bordered"
                                 onValueChange={setUpdateLastName}
-                                onFocus={() => {setUpdatePasswordHasBeenFocused(false); setUpdateEmailHasBeenFocused(false);setUpdateFirstNameHasBeenFocused(false);setUpdateLastNameHasBeenFocused(true);setLoginPasswordHasBeenFocused(false); setLoginEmailHasBeenFocused(false);setUpdatePhoneHasBeenFocused(false);}}
+                                onFocus={() => {setUpdateEmailHasBeenFocused(false);setUpdateFirstNameHasBeenFocused(false);setUpdateLastNameHasBeenFocused(true);setUpdatePhoneHasBeenFocused(false)}}
                                 isInvalid={isUpdateLastNameInvalid && updateLastNameHasBeenFocused}
                                 color={!updateLastNameHasBeenFocused ? "primary" : isUpdateLastNameInvalid ? "danger" : "success"}
-                                errorMessage="Please enter a username"
+                                errorMessage="Please enter a last name"
                             />
                         </div>
                         <div className="infield">
@@ -88,7 +129,7 @@ export default function UserSettings(){
                                 variant="bordered"
                                 type="email"
                                 onValueChange={setUpdateEmail}
-                                onFocus={() => {setUpdatePasswordHasBeenFocused(false); setUpdateEmailHasBeenFocused(true);setUpdateFirstNameHasBeenFocused(false);setUpdateLastNameHasBeenFocused(false);setLoginPasswordHasBeenFocused(false); setLoginEmailHasBeenFocused(false);setUpdatePhoneHasBeenFocused(false);}}
+                                onFocus={() => {setUpdateEmailHasBeenFocused(true);setUpdateFirstNameHasBeenFocused(false);setUpdateLastNameHasBeenFocused(false);setUpdatePhoneHasBeenFocused(false);}}
                                 isInvalid={isUpdateEmailInvalid && updateEmailHasBeenFocused}
                                 color={!updateEmailHasBeenFocused ? "primary" : (isUpdateEmailInvalid && updateEmailHasBeenFocused) ? "danger" : "success"}
                                 errorMessage="Please enter a valid email"
@@ -105,7 +146,7 @@ export default function UserSettings(){
                                 onChange={(value) => setUpdatePhone((value as string))}
                                 withCountryCallingCode
                                 color={!updatePhoneHasBeenFocused ? "primary" : (updatePhone? (!isValidPhoneNumber(updatePhone) ? "danger" : "success"):"danger")}
-                                onFocus={() => {setUpdatePasswordHasBeenFocused(false); setUpdateEmailHasBeenFocused(false);setUpdateFirstNameHasBeenFocused(false);setUpdateLastNameHasBeenFocused(false);setLoginPasswordHasBeenFocused(false); setLoginEmailHasBeenFocused(false);setUpdatePhoneHasBeenFocused(true);}}
+                                onFocus={() => {setUpdateEmailHasBeenFocused(false);setUpdateFirstNameHasBeenFocused(false);setUpdateLastNameHasBeenFocused(false);setUpdatePhoneHasBeenFocused(true);}}
                                 isInvalid={(updatePhone ? (!isValidPhoneNumber(updatePhone)) : true)&& updatePhoneHasBeenFocused}
                                 errorMessage="Please enter a valid phone number"
                             />

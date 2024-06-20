@@ -112,3 +112,97 @@ Cons:
 ### Conclusion
 
 In summary, Supabase is a strong choice for user authorization and data storage in our project. Its ease of use, and robust feature set align well with QBEE's requirements. While we had to consider potential drawbacks, the benefits of using Supabase outweighed these concerns.
+
+
+## Our Frontend
+
+### NextJS
+ 
+_Next.js is a powerful React framework developed by Vercel, designed to facilitate the development of server-rendered React applications. It is known for its ability to generate static websites, offering features like server-side rendering (SSR), static site generation (SSG), and incremental static regeneration (ISR), which enhance performance and SEO._
+
+#### Key Features of NextJS:
+
+- **Server-Side Rendering (SSR):** Allows pages to be rendered on the server on each request, improving performance and SEO.
+
+- **Static Site Generation (SSG):** Pre-renders pages at build time, which can be served as static files, providing better performance and lower server costs.
+
+- **Incremental Static Regeneration (ISR):** Enables static pages to be regenerated incrementally after the initial build, combining the benefits of SSG and dynamic content updates.
+
+- **File-based Routing:** Simplifies route management by mapping files in the pages directory to corresponding routes.
+
+- **Automatic Code Splitting:** Automatically splits the code for each page, reducing the initial load time and improving performance.
+
+**Pros:**
+
+- **Improved Performance:** Thanks to SSR, SSG, and ISR, Next.js can deliver high-performance applications.
+
+- **SEO-Friendly:** Built-in SSR improves SEO by enabling search engines to crawl content more effectively.
+- **Developer Experience:** Next.js provides a smooth developer experience with features like file-based routing, built-in CSS and Sass support, and API routes.
+- **Scalability:** Next.js is suitable for large-scale applications due to its ability to handle complex routing and data fetching.
+- **Community and Ecosystem:** Strong community support and integration with the React ecosystem provide access to a wealth of resources and tools.
+
+**Cons:**
+
+- **Build Times:** For large applications, build times can become long, although ISR helps mitigate this.
+
+- **Server-Side Costs:** SSR can increase server costs due to the need to render pages on the server.
+
+### Frontend Trade-offs
+
+#### 1. **NextJS vs. ReactJS**
+
+**Pros of NextJS:**
+
+- Server-Side Rendering (SSR): Next.js offers built-in support for SSR, which can improve SEO and initial page load times.
+
+- Static Site Generation (SSG): Next.js allows for static generation of pages at build time, which can improve performance.
+
+- Automatic Code Splitting: Next.js automatically splits code, leading to better performance and faster load times.
+
+- File-based Routing: Next.js uses a file-based routing system, making it easier to manage routes compared to React's dynamic routing.
+
+- Incremental Static Regeneration (ISR): Allows pages to be statically generated and updated incrementally, improving performance and reducing build times.
+
+**Cons of NextJS:**
+
+- Learning Curve: There is a steeper learning curve compared to using plain React for the QBEE team.
+
+- Build Times: For very large sites, build times can become long, although ISR helps mitigate this.
+
+#### 2. **NextJS vs. Angular**
+
+**Pros of NextJS:**
+
+- Performance: NextJS typically offers better performance due to SSR and SSG capabilities.
+
+- Simplicity: NextJS has a simpler and more flexible architecture compared to Angular's more rigid structure.
+
+- SEO-Friendly: SSR in Next.js makes it more SEO-friendly compared to Angular, which traditionally requires additional configurations for SSR.
+
+- Modern JavaScript: Next.js is built on top of React, leveraging modern JavaScript features and a vast ecosystem.
+
+**Cons of NextJS:**
+
+- Ecosystem: Angular has a more mature and extensive ecosystem with a larger number of built-in features.
+
+- Complex Applications: Angular might be a better fit for very complex enterprise-level applications due to its built-in features like dependency injection, form handling, and state management.
+
+#### 3. **NextJS vs. Flutter**
+
+**Pros of NextJS:**
+
+- Web Optimization: Next.js is optimized for building web applications, offering SSR, SSG, and ISR, which Flutter does not natively support.
+
+- SEO-Friendly: Next.js's SSR and SSG capabilities make it more suitable for SEO than Flutter, which is primarily used for mobile apps.
+
+- Ecosystem: Leveraging the React ecosystem, Next.js benefits from a vast array of libraries and tools.
+
+**Cons of NextJS:**
+
+- Mobile Development: Flutter excels in mobile app development, offering a rich set of widgets and a unified codebase for both iOS and Android.
+
+- UI Consistency: Flutter provides consistent UI across platforms, while Next.js relies on web standards, which might not offer the same level of consistency across different devices.
+
+### Conclusion
+
+In summary, NextJS is a strong choice for our application as it allows us to build a  high-performance, SEO-friendly web application. It offers a balance of simplicity and advanced features, which makes it suitable for our application without having to over complicate our system. This also allows us to leverage the React ecosystem and provide modern development features.
