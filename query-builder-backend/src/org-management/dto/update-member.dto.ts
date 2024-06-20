@@ -9,7 +9,9 @@ export class Update_Member_Dto {
     @IsNotEmpty()
     user_id: string;
 
-    @IsEnum(["admin", "member"])
+    @IsEnum(["admin", "member"], {
+        message: "User role must be either 'admin' or 'member'"
+    })
     @IsNotEmpty()
     user_role: string;
 }
