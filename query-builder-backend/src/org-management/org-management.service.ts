@@ -126,7 +126,7 @@ export class OrgManagementService {
 
     const { data, error } = await this.supabase.getClient()
       .from("org_dbs")
-      .select("org_id, db_id, db_envs(created_at, name, type)")
+      .select("org_id, db_id, db_envs(created_at, name, type, db_info)")
       .match({ ...get_dbs_dto })
 
     if (error) {
