@@ -9,8 +9,8 @@ import { ConnectionManagerModule } from "./connection-manager/connection-manager
 import { JsonConverterModule } from "./jsonConverter/jsonConverter.module";
 import { SupabaseGuard, SupabaseModule } from "./supabase";
 import { APP_GUARD } from "@nestjs/core";
-import { UserManagementModule } from './user-management/user-management.module';
-import { OrgManagementModule } from './org-management/org-management.module';
+import { UserManagementModule } from "./user-management/user-management.module";
+import { OrgManagementModule } from "./org-management/org-management.module";
 
 @Module({
   imports: [
@@ -24,9 +24,13 @@ import { OrgManagementModule } from './org-management/org-management.module';
     OrgManagementModule,
   ],
   controllers: [AppController],
-  providers: [AppService, {
-    provide: APP_GUARD,
-    useClass: SupabaseGuard,
-  }],
+  providers: [AppService],
 })
 export class AppModule {}
+
+/*
+{
+    provide: APP_GUARD,
+    useClass: SupabaseGuard,
+  }
+*/
