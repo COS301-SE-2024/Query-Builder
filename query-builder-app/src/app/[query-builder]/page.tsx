@@ -2,6 +2,8 @@
 import Form from "@/components/Form/Form";
 import TableResponse from "@/components/TableResponse/TableResponse";
 import { useState } from "react";
+import Sidebar from "../../components/SideBar/SideBar";
+
 
 interface DatabaseCredentials {
     host: string,
@@ -38,5 +40,10 @@ interface DatabaseCredentials {
 export default function QueryBuilder() {
     const [query, setQuery] = useState<Query | undefined>(undefined);
 
-    return <Form/>
+    return(
+      <div className="full-application">
+        <Sidebar/>
+        <Form/>
+      </div>
+    ) ;
 }

@@ -5,8 +5,6 @@ import {LogoIcon} from "./Logo";
 
 const Sidebar = () => {
   // State to manage the open/close state of the sidebar
-  const [isOpen, setIsOpen] = useState(false);
-
   return (
     <>
         <div className="sidebar-container">

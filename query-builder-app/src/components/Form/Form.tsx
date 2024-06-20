@@ -113,6 +113,7 @@ export default function Form(){
     return (
 
         <>
+        <div className="app">
         <Card>
             <CardHeader>
                 <div className="flex">
@@ -248,6 +249,7 @@ export default function Form(){
                 {outputQuery == "" ? null:(<div>{outputQuery}</div>)}
             </CardFooter>
         </Card>
+        </div>
       </>
     )
 
