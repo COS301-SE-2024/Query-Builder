@@ -51,38 +51,22 @@ export default function DatabaseConnectionModal(){
       return false;
     }, [username]);
 
-    const connectToDatabase = (host:string, user:string, password:string) => {
+    const addDatabase = (host:string, user:string, password:string) => {
 
-      fetch("http://localhost:55555/api/connect", {
+      //First make the user an owner of an organisation
+      fetch("http://localhost:55555/api/org-management/create-org", {
         method: "POST",
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
-          'Authorization': getToken()
+          'Authorization': 'Bearer ' + getToken()
         },
         body: JSON.stringify({
-          host: host,
-          user: user,
-          password: password
+            name: "Org 0"
         })
       }).then(
         function(response){
-          if(response.ok){
-            return response.json();
-          }
-          else{
-            return ({"success" : false})
-          }
-        }
-      ).then(
-        function(response){
-          console.log(response)
-          if(response.success == true){
-            setDatabaseConnectionStatus("Connected to database")
-          }
-          else{
-            setDatabaseConnectionStatus("Not connected to a database")
-          }
+          console.log(response);
         }
       )
 
@@ -142,7 +126,7 @@ export default function DatabaseConnectionModal(){
                   <Button 
                     color="primary" 
                     onPress={onClose}  
-                    onClick={() => connectToDatabase(url, username, password)}
+                    onClick={() => addDatabase(url, username, password)}
                     isDisabled={isURLInvalid || isUsernameInvalid || isPasswordInvalid}
                     >
                     Connect
