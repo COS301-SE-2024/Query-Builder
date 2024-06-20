@@ -117,7 +117,7 @@ export class ConnectController {
                 table: "schemata",
                 columns: ["schema_name"],
                 condition:
-                    `schema_name not in ('information_schema', 'mysql', 'sys', 'performance_schema')`,
+                    `schema_name NOT IN ('information_schema', 'mysql', 'sys', 'performance_schema')`,
                 sortParams: {
                     column: "schema_name",
                 },
