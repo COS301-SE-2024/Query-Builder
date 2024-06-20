@@ -24,9 +24,6 @@ import { OrgManagementModule } from './org-management/org-management.module';
     OrgManagementModule,
   ],
   controllers: [AppController],
-  providers: [AppService, {
-    provide: APP_GUARD,
-    useClass: SupabaseGuard,
-  }],
+  providers: [AppService],
 })
 export class AppModule {}
