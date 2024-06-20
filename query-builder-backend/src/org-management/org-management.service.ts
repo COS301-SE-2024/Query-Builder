@@ -46,7 +46,7 @@ export class OrgManagementService {
 
     const { data: org_data, error: org_error } = await this.supabase.getClient()
       .from("organisations")
-      .select("org_id, created_at, name, logo, org_members(*)")
+      .select("org_id, created_at, name, logo, org_members(*), db_envs(*)")
       .eq("owner_id", user_id);
 
     if (org_error) {
