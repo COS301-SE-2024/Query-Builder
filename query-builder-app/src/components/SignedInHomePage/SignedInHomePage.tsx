@@ -4,7 +4,7 @@ import DatabaseConnectionModal from "../DatabaseConnectionModal/DatabaseConnecti
 import React from "react";
 import { EditIcon } from "./EditIcon";
 import { DeleteIcon } from "./DeleteIcon";
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "./../../utils/supabase/client";
 import { useRouter } from "next/navigation";
 
 interface Database {

@@ -2,7 +2,7 @@
 import "../../app/globals.css"
 import React, { useState } from "react";
 import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Spacer} from "@nextui-org/react";
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "./../../utils/supabase/client";
 import jwt from "jsonwebtoken"
 
 require("dotenv").config();
