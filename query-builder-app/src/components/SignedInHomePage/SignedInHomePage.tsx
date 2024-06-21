@@ -5,7 +5,6 @@ import React from "react";
 import { EditIcon } from "./EditIcon";
 import { DeleteIcon } from "./DeleteIcon";
 import { createClient } from "./../../utils/supabase/client";
-import { useRouter } from "next/navigation";
 
 interface Database {
     created_at: String,
@@ -69,9 +68,6 @@ export default function SignedInHomePage(){
         fetchOrgs();
 
     },[])
-
-    //create a NEXT router to navigate to individual database pages
-    const router = useRouter();
 
     return (
 
