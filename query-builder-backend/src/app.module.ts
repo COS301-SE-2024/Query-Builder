@@ -24,6 +24,6 @@ import { OrgManagementModule } from './org-management/org-management.module';
     OrgManagementModule,
   ],
   controllers: [AppController],
-  providers: [AppService,],
+  providers: [AppService]
 })
 export class AppModule {}
