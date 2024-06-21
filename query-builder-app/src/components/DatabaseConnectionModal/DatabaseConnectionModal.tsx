@@ -116,29 +116,29 @@ export default function DatabaseConnectionModal(props: DatabaseConnectionModalPr
           <ModalContent>
             {(onClose : any) => (
               <>
-                <ModalHeader className="flex flex-col gap-1">Connect to a database</ModalHeader>
+                <ModalHeader className="flex flex-col gap-1">Connect a new database server</ModalHeader>
                 <ModalBody>
                   <Input
                     isRequired
-                    label="Database Name"
-                    placeholder="Enter a name to remember your database by"
+                    label="Database Server Name"
+                    placeholder="Enter a name to remember your database server by"
                     variant="bordered"
                     onValueChange={setDbName}
                     onFocus={() => setDbNameHasBeenFocused(true)}
                     isInvalid={isDbNameInvalid && dbNameBeenFocused}
                     color={!dbNameBeenFocused ? "primary" : isDbNameInvalid ? "danger" : "success"}
-                    errorMessage="Please enter a name for your database"
+                    errorMessage="Please enter a name for your database server"
                   />
                   <Input
                     isRequired
                     label="URL or Host"
-                    placeholder="Enter the database URL or Host"
+                    placeholder="Enter the database server URL or Host"
                     variant="bordered"
                     onValueChange={setUrl}
                     onFocus={() => setURLHasBeenFocused(true)}
                     isInvalid={isURLInvalid && urlHasBeenFocused}
                     color={!urlHasBeenFocused ? "primary" : isURLInvalid ? "danger" : "success"}
-                    errorMessage="Please enter a valid database URL or Host"
+                    errorMessage="Please enter a valid database server URL or Host"
                   />
                   <Input
                     isRequired

@@ -10,7 +10,7 @@ import { user } from '@nextui-org/theme';
 //basic component rendering tests
 describe('DatabaseConnectionModal basic rendering tests', () => {
   it('should render successfully', () => {
-    const { baseElement } = render(<DatabaseConnectionModal/>);
+    const { baseElement } = render(<DatabaseConnectionModal org_id={"1234"} on_add={()=>{}}/>);
     expect(baseElement).toBeTruthy();
   });
 });
@@ -18,7 +18,7 @@ describe('DatabaseConnectionModal basic rendering tests', () => {
 //button should say + Add
 describe('DatabaseConnectionModal initial tests', () => {
   it('should display the button to Add a new database', () => {
-    render(<DatabaseConnectionModal/>);
+    render(<DatabaseConnectionModal org_id={"1234"} on_add={()=>{}}/>);
     const text = screen.getByText("+ Add");
     expect(text).toBeInTheDocument();
   });
@@ -33,7 +33,7 @@ describe('DatabaseConnectionModal modal popup tests', () => {
     const user = userEvent.setup()
 
     //render the component
-    render(<DatabaseConnectionModal/>);
+    render(<DatabaseConnectionModal org_id={"1234"} on_add={()=>{}}/>);
 
     //get the button to add a database
     const button = screen.getByText("+ Add");
@@ -42,7 +42,7 @@ describe('DatabaseConnectionModal modal popup tests', () => {
     await user.click(button);
 
     //get the screen text that should be displayed on the modal and assert that it is in the document
-    const text = screen.getByText("Connect to a database");
+    const text = screen.getByText("Connect a new database server");
     expect(text).toBeInTheDocument();
 
   });
@@ -53,7 +53,7 @@ describe('DatabaseConnectionModal modal popup tests', () => {
     const user = userEvent.setup()
 
     //render the component
-    render(<DatabaseConnectionModal/>);
+    render(<DatabaseConnectionModal org_id={"1234"} on_add={()=>{}}/>);
 
     //get the button to add a database
     const button = screen.getByText("+ Add");
@@ -72,7 +72,7 @@ describe('DatabaseConnectionModal modal popup tests', () => {
     const user = userEvent.setup()
 
     //render the component
-    render(<DatabaseConnectionModal/>);
+    render(<DatabaseConnectionModal org_id={"1234"} on_add={()=>{}}/>);
 
     //get the button to add a database
     const button = screen.getByText("+ Add");
@@ -91,7 +91,7 @@ describe('DatabaseConnectionModal modal popup tests', () => {
     const user = userEvent.setup()
 
     //render the component
-    render(<DatabaseConnectionModal/>);
+    render(<DatabaseConnectionModal org_id={"1234"} on_add={()=>{}}/>);
 
     //get the button to add a database
     const button = screen.getByText("+ Add");
