@@ -1,10 +1,11 @@
 "use client"
-import { Chip, Spacer, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, getKeyValue} from "@nextui-org/react"
+import { Chip, Spacer, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Link} from "@nextui-org/react"
 import DatabaseConnectionModal from "../DatabaseConnectionModal/DatabaseConnectionModal"
 import React from "react";
 import { EditIcon } from "./EditIcon";
 import { DeleteIcon } from "./DeleteIcon";
 import { createClient } from "@/utils/supabase/client";
+import { useRouter } from "next/navigation";
 
 interface Database {
     created_at: String,
@@ -69,6 +70,9 @@ export default function SignedInHomePage(){
 
     },[])
 
+    //create a NEXT router to navigate to individual database pages
+    const router = useRouter();
+
     return (
 
         <div className="p-5">
@@ -90,7 +94,7 @@ export default function SignedInHomePage(){
                         {org.db_envs.map((db: Database) => 
                             (
                             <TableRow>
-                                <TableCell>{db.name}</TableCell>
+                                <TableCell><Link href={"/"+db.db_id}>{db.name}</Link></TableCell>
                             </TableRow>
                             )
                         )}
