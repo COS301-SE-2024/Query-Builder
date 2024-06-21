@@ -27,18 +27,6 @@ const Sidebar = () => {
                             <span className="sidebar-item-title">Home</span>
                         </a>
                     </div>
-                    <div className="sidebar-item">
-                        <a href="">
-                            <span className="sidebar-item-icon"></span>
-                            <span className="sidebar-item-title">Home</span>
-                        </a>
-                    </div>
-                    <div className="sidebar-item">
-                        <a href="">
-                            <span className="sidebar-item-icon"></span>
-                            <span className="sidebar-item-title">Home</span>
-                        </a>
-                    </div>
                 </nav>
             </div>
 
