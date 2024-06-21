@@ -10,5 +10,5 @@ export default {
 
 // Can have multiple different variants of a component
 export const DefaultReport = {
-    render: () => <Report/>
+    render: () => <Report tableData={undefined}/>
 };
