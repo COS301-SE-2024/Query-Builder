@@ -8,6 +8,7 @@ import { createClient } from "@/utils/supabase/client";
 
 interface Database {
     created_at: String,
+    name: String,
     db_id: any,
     db_info: any,
     type: String
@@ -70,12 +71,12 @@ export default function SignedInHomePage(){
 
     return (
 
-        <>
+        <div className="p-5">
         {organisations.map((org: Organisation) => (
             <>
                 <div className="flex justify-between">
                     <h1 className="text-4xl">{org.name}</h1>
-                    <DatabaseConnectionModal/>
+                    <DatabaseConnectionModal org_id={org.org_id} on_add={fetchOrgs}/>
                 </div>
 
                 <Spacer y={5}/>
@@ -89,7 +90,7 @@ export default function SignedInHomePage(){
                         {org.db_envs.map((db: Database) => 
                             (
                             <TableRow>
-                                <TableCell>{db.type + " at " + db.db_info.host}</TableCell>
+                                <TableCell>{db.name}</TableCell>
                             </TableRow>
                             )
                         )}
@@ -98,7 +99,7 @@ export default function SignedInHomePage(){
                 <Spacer y={5}/>
             </>
         ))}
-        </>
+        </div>
 
 )
 
