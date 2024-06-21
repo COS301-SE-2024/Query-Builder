@@ -1,12 +1,45 @@
 "use client"
 import "../../app/globals.css"
-import React, { useState } from "react";
-import {Button, Spacer, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Card, CardHeader, CardBody, CardFooter} from "@nextui-org/react";
-import { useRouter } from "next/navigation";
+import React, { useState} from "react";
+import {Button, Spacer, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Card, CardHeader, CardBody, CardFooter, useDisclosure, ModalContent, Modal, ModalHeader} from "@nextui-org/react";
+import TableResponse from "../TableResponse/TableResponse";
+
+interface DatabaseCredentials {
+    host: string,
+    user: string,
+    password: string
+  }
+  
+  interface SortParams {
+    column: string,
+    direction?: "ascending"|"descending"
+  }
+  
+  interface PageParams {
+    pageNumber: number,
+    rowsPerPage: number
+  }
+  
+  interface QueryParams {
+    language: string,
+    query_type: string,
+    table: string,
+    columns: string[],
+    condition?: string,
+    sortParams?: SortParams,
+    pageParams?: PageParams
+  }
+  
+  interface Query {
+  credentials: DatabaseCredentials,
+  databaseName: string,
+  queryParams: QueryParams
+  }
 
 export default function Form(){
 
-    // const {isOpen, onOpen, onOpenChange} = useDisclosure();
+    //React hook for results modal
+    const {isOpen, onOpen, onOpenChange} = useDisclosure();
 
     const [selectedDatabase, setSelectedDatabase] = useState(new Set(["Select database"]));
     const selectedDatabaseValue = React.useMemo(
@@ -24,7 +57,7 @@ export default function Form(){
 
     const [selectColumns, setSelectedColumns] = React.useState<Set<string>>(new Set<string>());
     const selectedColValue = React.useMemo(
-        () => Array.from(selectColumns).join(", ").replaceAll("_", " "),
+        () => Array.from(selectColumns).join(", "),
         [selectColumns]
     );
 
@@ -73,9 +106,30 @@ export default function Form(){
         },
         {
             table: "actor",
-            columns: ["Month","Total","Average"],
+            columns: ["actor_id","first_name","last_name", "last_update"],
         }
     ];
+
+    function createQuery() : Query{
+
+        const query: Query = {
+            credentials: {
+                host: "127.0.0.1",
+                user: "root",
+                password: "testPassword"
+            },
+            databaseName: selectedDatabaseValue,
+            queryParams: {
+                language: "sql",
+                query_type: "select",
+                table: selectedTableValue,
+                columns: selectedColValue.split(", ")
+            }
+        }
+
+        return query;
+
+    }
 
     const sendQuery = (language:string, queryType:string, table:string, column:string, condition:string) => {
 
@@ -105,10 +159,7 @@ export default function Form(){
           }
         )
   
-      }
-
-    //create a NEXT router to navigate to individual database pages
-    const router = useRouter();
+    }
 
     return (
 
@@ -235,14 +286,26 @@ export default function Form(){
                 {!selectedTable.has("Select table") ? 
                 (<>
                     <Button 
-                    color="primary"  
-                    onClick={() => {
-                        
-                        sendQuery("sql", "select", selectedTableValue, selectedColValue, "");
-                    }}
+                        onPress={onOpen} 
+                        color="primary"  
                     >
                     Query
                   </Button>
+                  <Modal 
+                        isOpen={isOpen} 
+                        onOpenChange={onOpenChange}
+                        placement="top-center"
+                        className="text-black h-100vh"
+                        size="full">
+                        <ModalContent>
+                            {(onClose : any) => (
+                                <>
+                                    <ModalHeader className="flex flex-col gap-1">Query Results</ModalHeader>
+                                    <TableResponse query={createQuery()} />
+                                </>
+                            )}
+                        </ModalContent>
+                   </Modal>
                 </>) :null}
                 <Spacer y={2}/>
                 {outputQuery == "" ? null:(<div>{outputQuery}</div>)}
