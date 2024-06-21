@@ -61,25 +61,25 @@ export default function Form(){
 
     const databases = [
         {
-          key: "My_Company_database",
-          label: "My Company Database",
+          key: "sakila",
+          label: "Sakila",
         }
     ];
 
     const tables = [
         {
-            table: "Users",
-            columns: ["Name","Surname","Email"],
+            table: "film",
+            columns: ["title", "release_year", "rating", "rental_rate", "rental_duration", "language_id"],
         },
         {
-            table: "Finance",
+            table: "actor",
             columns: ["Month","Total","Average"],
         }
     ];
 
     const sendQuery = (language:string, queryType:string, table:string, column:string, condition:string) => {
 
-        fetch("http://localhost:55555/api/convert", {
+        fetch("http://localhost:55555/api/query", {
           method: "POST",
           headers: {
             'Accept': 'application/text',
