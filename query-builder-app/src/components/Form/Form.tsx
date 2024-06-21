@@ -2,7 +2,7 @@
 import "../../app/globals.css"
 import React, { useState } from "react";
 import {Button, Spacer, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Card, CardHeader, CardBody, CardFooter} from "@nextui-org/react";
-
+import { useRouter } from "next/navigation";
 
 export default function Form(){
 
@@ -106,6 +106,9 @@ export default function Form(){
         )
   
       }
+
+    //create a NEXT router to navigate to individual database pages
+    const router = useRouter();
 
     return (
 
@@ -233,7 +236,10 @@ export default function Form(){
                 (<>
                     <Button 
                     color="primary"  
-                    onClick={() => sendQuery("sql", "select", selectedTableValue, selectedColValue, "")}
+                    onClick={() => {
+                        
+                        sendQuery("sql", "select", selectedTableValue, selectedColValue, "");
+                    }}
                     >
                     Query
                   </Button>

@@ -1,5 +1,4 @@
 "use client"
-import Form from "@/components/Form/Form";
 import TableResponse from "@/components/TableResponse/TableResponse";
 import { useState } from "react";
 
@@ -35,8 +34,8 @@ interface DatabaseCredentials {
   queryParams: QueryParams
   }
 
-export default function QueryBuilder() {
-    const [query, setQuery] = useState<Query | undefined>(undefined);
+export default function ResultsPage() {
 
-    return <Form/>
+  
+
 }
