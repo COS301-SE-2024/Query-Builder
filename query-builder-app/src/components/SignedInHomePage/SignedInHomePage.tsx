@@ -89,7 +89,7 @@ export default function SignedInHomePage(){
                     <TableBody>
                         {org.db_envs.map((db: Database) => 
                             (
-                            <TableRow>
+                            <TableRow key={db.db_id}>
                                 <TableCell><Link href={"/"+db.db_id}>{db.name}</Link></TableCell>
                             </TableRow>
                             )
