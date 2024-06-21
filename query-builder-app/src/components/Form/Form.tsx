@@ -1,8 +1,8 @@
 "use client"
 import "../../app/globals.css"
 import React, { useState } from "react";
-import {Button, Input, Spacer, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Card, CardHeader, CardBody, CardFooter} from "@nextui-org/react";
-
+import {Button, Spacer, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Card, CardHeader, CardBody, CardFooter} from "@nextui-org/react";
+import { useRouter } from "next/navigation";
 
 export default function Form(){
 
@@ -22,7 +22,7 @@ export default function Form(){
         [selectedTable]
     );
 
-    const [selectColumns, setSelectedColumns] = React.useState(new Set());
+    const [selectColumns, setSelectedColumns] = React.useState<Set<string>>(new Set<string>());
     const selectedColValue = React.useMemo(
         () => Array.from(selectColumns).join(", ").replaceAll("_", " "),
         [selectColumns]
@@ -61,25 +61,25 @@ export default function Form(){
 
     const databases = [
         {
-          key: "My_Company_database",
-          label: "My Company Database",
+          key: "sakila",
+          label: "Sakila",
         }
     ];
 
     const tables = [
         {
-            table: "Users",
-            columns: ["Name","Surname","Email"],
+            table: "film",
+            columns: ["title", "release_year", "rating", "rental_rate", "rental_duration", "language_id"],
         },
         {
-            table: "Finance",
+            table: "actor",
             columns: ["Month","Total","Average"],
         }
     ];
 
     const sendQuery = (language:string, queryType:string, table:string, column:string, condition:string) => {
 
-        fetch("http://localhost:55555/api/convert", {
+        fetch("http://localhost:55555/api/query", {
           method: "POST",
           headers: {
             'Accept': 'application/text',
@@ -107,9 +107,13 @@ export default function Form(){
   
       }
 
+    //create a NEXT router to navigate to individual database pages
+    const router = useRouter();
+
     return (
 
         <>
+        <div className="app">
         <Card>
             <CardHeader>
                 <div className="flex">
@@ -201,7 +205,7 @@ export default function Form(){
                             <DropdownMenu 
                                 aria-label="Multiple column selection"
                                 variant="flat"
-                                items={tables} 
+                                items={tables.filter(item => item.table === selectedTableValue)[0]?.columns.map(col => ({ table: selectedTableValue, columns: [col] }))}
                                 closeOnSelect={false}
                                 // disallowEmptySelection
                                 selectionMode="multiple"
@@ -233,7 +237,10 @@ export default function Form(){
                 (<>
                     <Button 
                     color="primary"  
-                    onClick={() => sendQuery("sql", "select", selectedTableValue, selectedColValue, "")}
+                    onClick={() => {
+                        
+                        sendQuery("sql", "select", selectedTableValue, selectedColValue, "");
+                    }}
                     >
                     Query
                   </Button>
@@ -242,6 +249,7 @@ export default function Form(){
                 {outputQuery == "" ? null:(<div>{outputQuery}</div>)}
             </CardFooter>
         </Card>
+        </div>
       </>
     )
 

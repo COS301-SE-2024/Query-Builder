@@ -1,7 +1,7 @@
 ---
 title: Use Case Diagrams
 description: The high level use case diagrams of the QBee Query Builder system
-sidebar_position: 8
+sidebar_position: 5
 ---
 
 # Use Case Diagrams
@@ -21,6 +21,10 @@ sidebar_position: 8
 ## Query Builder
 
 ![Query builder Diagram](./../../static/img/QueryBuilderLight.png)
+
+## Query Response System
+
+![Query Response System Diagram](./../../static/img/QueryResponseSystem.png)
 
 ## Reporting system
 

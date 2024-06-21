@@ -5,10 +5,13 @@
         "docs-build": "cd query-builder-docs && pnpm build",
         "docs-start": "cd query-builder-docs && pnpm start",
         "app-lint": "cd query-builder-app && pnpm run lint --fix",
-        "app-build":"cd query-builder-app && pnpm run build",
+        "app-build": "cd query-builder-app && pnpm run build",
         "app-start": "cd query-builder-app && pnpm start",
+        "app-dev": "cd query-builder-app && pnpm run dev",
         "app-test": "cd query-builder-app && pnpm test",
         "storybook-start": "cd query-builder-app && pnpm run storybook",
-        "install-deps": "cd query-builder-app && pnpm install --frozen-lockfile && cd ../query-builder-docs && pnpm install --frozen-lockfile"
+        "install-deps": "cd query-builder-app && pnpm install && cd ../query-builder-docs && pnpm install"
+    },
+    "dependencies": {
     }
 }

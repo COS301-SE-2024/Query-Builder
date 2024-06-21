@@ -77,7 +77,7 @@ const config: Config = {
           items: [
             {
               label: 'Requirements Specification',
-              to: '/docs/category/requirements-specification',
+              to: '/docs/category/software-requirements-specification',
             },
           ],
         },

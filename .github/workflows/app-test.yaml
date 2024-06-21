@@ -1,6 +1,6 @@
 name: App Test
 on:
-    push:
+    pull_request:
         branches:
             - dev
             - main
@@ -9,6 +9,9 @@ on:
 jobs:
     test:
         runs-on: ubuntu-latest
+        defaults:
+           run:
+             working-directory: ./query-builder-app/
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -24,6 +27,7 @@ jobs:
                 cache-dependency-path: query-builder-app/pnpm-lock.yaml
             - name: Install Dependencies
               run: pnpm install --frozen-lockfile
+              working-directory: query-builder-app
             - name: Test
               run: pnpm test
               working-directory: query-builder-app

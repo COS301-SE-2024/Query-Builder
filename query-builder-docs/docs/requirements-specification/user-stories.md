@@ -1,7 +1,7 @@
 ---
 title: User Stories
 description: The user stories of the QBee Query Builder system
-sidebar_position: 2
+sidebar_position: 3
 ---
 
 # User Stories
@@ -30,10 +30,10 @@ sidebar_position: 2
          - Users receive a confirmation email after successfully resetting their password.
 
 2. Provide an Interface to Edit or Change User's Information
-   1. As a user, I want to change my personal information (e.g., name, surname, email, phone number), so that my account details are up-to-date.
+   1. As a user, I want to change my personal information (e.g., first name, last name, email, phone number), so that my account details are up-to-date.
       - Acceptance Criteria:
          - Users can access an "Edit Profile" section within the application.
-         - Users can update fields such as name, surname, email, and phone number.
+         - Users can update fields such as first name, last name, email, and phone number.
          - Users must confirm changes with their password.
          - Users receive a notification email confirming the updates.
    
@@ -124,6 +124,40 @@ sidebar_position: 2
          - Users can save the current state of their query.
          - Saved queries are accessible from a query library or saved queries list.
          - Users can name and describe their saved queries for easy identification.
+
+## Query Response System
+
+1. View query results
+   1. As a user, I want to be able to view the results of my query in a table, in an intuitive manner.
+      - Acceptance Criteria:
+         - A table of query results is populated for the user.
+
+      1. As a user, I want to be able to sort the data in the table so that I can view the data in an meaningful manner.
+         - Acceptance Criteria:
+            - Users can sort each column in ascending order.
+            - Users can sort each column in descending order.
+
+      2. As a user, I want to be able to search the data in the table so that I can find values that I particularly would like to see.
+         - Acceptance Criteria:
+            - Users can type a word into a search bar
+            - Only rows with that word appear in the table of query results
+
+      3. As a user, I want to be able to view summary statistics of the query results
+         - Acceptance Criteria:
+            - Users can view the number of rows of data returned
+            - Users can view the maximum values of numeric data
+            - Users can view the minimum values of numeric data
+            - Users can view the mean value of numeric data      
+
+2. Generate Reports
+   1. As a user, I want to generate reports of the query data, so that I can analyze and present the data effectively.
+      - Acceptance Criteria:
+         - Users can initiate report generation from the query results, by opening the Reporting subsystem
+      
+3. Requery the database
+   1. As a user who is unhappy with the results in the table, I would like to be able to requery the database
+      - Acceptance Criteria:
+         - Users can initiate a new query of the database, which will populate the data with new, updated results
 
 ## Reporting subsystem
 1. Generate Reports
