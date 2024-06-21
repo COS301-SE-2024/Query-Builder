@@ -143,7 +143,7 @@ export class ConnectController {
                 query_type: "select",
                 table: "tables",
                 columns: ["table_name"],
-                condition: `table_schema=${tableQuery.schema}`,
+                condition: `table_schema="${tableQuery.schema}"`,
                 sortParams: {
                     column: "table_name",
                 },
