@@ -71,7 +71,7 @@ export default function SignedInHomePage(){
 
     return (
 
-        <div className="p-5">
+        <div className="p-5 app">
         {organisations.map((org: Organisation) => (
             <>
                 <div className="flex justify-between">

@@ -37,3 +37,12 @@ body {
     text-wrap: balance;
   }
 }
+
+.full-application {
+  display: flex;
+  flex-direction: row;
+}
+
+.app {
+  width: 100%;
+}
