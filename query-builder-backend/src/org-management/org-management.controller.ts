@@ -20,6 +20,8 @@ import { Remove_Db_Dto } from "./dto/remove-db.dto";
 import { Remove_Org_Dto } from "./dto/remove-org.dto";
 import { Remove_Member_Dto } from "./dto/remove-member.dto";
 import { OrgManagementService } from "./org-management.service";
+import { Get_Members_Dto } from "./dto/get-members.dto";
+import { Get_Dbs_Dto } from "./dto/get-dbs.dto";
 
 @Controller("org-management")
 export class OrgManagementController {
@@ -33,6 +35,16 @@ export class OrgManagementController {
   @Put("get-org")
   async getOrg(@Body(ValidationPipe) get_org_dto: Get_Org_Dto) {
     return this.org_management_service.getOrg(get_org_dto);
+  }
+
+  @Put("get-members")
+  async getMembers(@Body(ValidationPipe) get_members_dto: Get_Members_Dto) {
+    return this.org_management_service.getMembers(get_members_dto);
+  }
+
+  @Put("get-dbs")
+  async getDbs(@Body(ValidationPipe) get_dbs_dto: Get_Dbs_Dto) {
+    return this.org_management_service.getDbs(get_dbs_dto);
   }
 
   @Post("create-org")
