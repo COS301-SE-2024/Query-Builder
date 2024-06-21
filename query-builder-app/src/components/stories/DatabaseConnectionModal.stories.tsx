@@ -12,6 +12,6 @@ export default {
 // Can have multiple different variants of a component
 export const DefaultDatabaseConnectionModal = {
 
-    render: () => <DatabaseConnectionModal/> // this function specifies how we want to render this variant of the component
+    render: () => <DatabaseConnectionModal org_id={"1234"} on_add={()=>{}}/> // this function specifies how we want to render this variant of the component
 
 };

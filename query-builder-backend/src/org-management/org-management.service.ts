@@ -54,7 +54,7 @@ export class OrgManagementService {
 
     const { data: org_data, error: org_error } = await this.supabase.getClient()
       .from("organisations")
-      .select("org_id, created_at, name, logo, org_members(*)")
+      .select("org_id, created_at, name, logo, org_members(*), db_envs(*)")
       .eq("owner_id", user_id);
 
     if (org_error) {
@@ -214,7 +214,12 @@ export class OrgManagementService {
     const { data: owner_data, error: owner_error } = await this.supabase
       .getClient().auth.getUser(this.supabase.getJwt());
 
+    if(owner_data){
+      console.log(owner_data);
+    }
+
     if (owner_error) {
+      console.log(owner_error.message);
       throw new InternalServerErrorException(owner_error.message);
     }
 
@@ -234,16 +239,16 @@ export class OrgManagementService {
       );
     }
 
-    const jwt = require("jsonwebtoken");
-    const db_info = jwt.verify(
-      add_db_dto.db_info,
-      this.configService.get("SUPABASE_JWT_SECRET"),
-    );
+    // const jwt = require("jsonwebtoken");
+    // const db_info = jwt.verify(
+    //   add_db_dto.db_info,
+    //   this.configService.get("SUPABASE_JWT_SECRET"),
+    // );
 
     const db_fields = {
       name: add_db_dto.name,
       type: add_db_dto.type,
-      db_info: db_info,
+      db_info: add_db_dto.db_info,
     };
 
     const { data: db_data, error: db_error } = await this.supabase.getClient()

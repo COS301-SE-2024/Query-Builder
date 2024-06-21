@@ -2,21 +2,31 @@
 import "../../app/globals.css"
 import React, { useState } from "react";
 import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Spacer} from "@nextui-org/react";
+import { createClient } from "./../../utils/supabase/client";
+import jwt from "jsonwebtoken"
+
+require("dotenv").config();
+
+//interface for the props to DatabaseConnectionModal
+
+interface DatabaseConnectionModalProps {
+  org_id: String,
+  on_add: () => void
+}
 
 // This function gets the token from local storage.
 // Supabase stores the token in local storage so we can access it from there.
-const getToken = () => {
-  const storageKey = `sb-${process.env.NEXT_PUBLIC_SUPABASE_PROJECT_ID}-auth-token`;
-  const sessionDataString = localStorage.getItem(storageKey);
-  const sessionData = JSON.parse(sessionDataString || "null");
-  const token = sessionData?.access_token;
+const getToken = async () => {
+
+  const supabase = createClient();
+  const token = (await supabase.auth.getSession()).data.session?.access_token
 
   console.log(token)
 
   return token;
 };
 
-export default function DatabaseConnectionModal(){
+export default function DatabaseConnectionModal(props: DatabaseConnectionModalProps){
 
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
 
@@ -25,10 +35,12 @@ export default function DatabaseConnectionModal(){
     const [url, setUrl] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [dbName, setDbName] = useState('');
 
     const [urlHasBeenFocused, setURLHasBeenFocused] = useState(false);
     const [usernameHasBeenFocused, setUsernameHasBeenFocused] = useState(false);
     const [passwordBeenFocused, setPasswordHasBeenFocused] = useState(false);
+    const [dbNameBeenFocused, setDbNameHasBeenFocused] = useState(false);
 
     //form validation
     const validateURL = (value: string) => value.match(/^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$|(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/i);
@@ -51,40 +63,43 @@ export default function DatabaseConnectionModal(){
       return false;
     }, [username]);
 
-    const connectToDatabase = (host:string, user:string, password:string) => {
+    const isDbNameInvalid = React.useMemo(() => {
+      if (dbName === "") return true;
+  
+      return false;
+    }, [dbName]);
 
-      fetch("http://localhost:55555/api/connect", {
+    async function addDatabase(name: String, host:String, user:String, password:String){
+
+      //create a db_info object
+      const db_info = {
+        host: host,
+        user: user,
+        password: password
+      }
+
+      //stringify and base64 encode it
+      const db_info_string = btoa(JSON.stringify(db_info));     
+
+      //call the add-db API endpoint
+      let response = await fetch("http://localhost:55555/api/org-management/add-db", {
         method: "POST",
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + getToken()
+          'Authorization': 'Bearer ' + await getToken()
         },
         body: JSON.stringify({
-          host: host,
-          user: user,
-          password: password
+            org_id: props.org_id,
+            name: name,
+            type: "mysql",
+            db_info: db_info_string
         })
-      }).then(
-        function(response){
-          if(response.ok){
-            return response.json();
-          }
-          else{
-            return ({"success" : false})
-          }
-        }
-      ).then(
-        function(response){
-          console.log(response)
-          if(response.success == true){
-            setDatabaseConnectionStatus("Connected to database")
-          }
-          else{
-            setDatabaseConnectionStatus("Not connected to a database")
-          }
-        }
-      )
+      })
+
+      console.log("ADD DB RESPONSE " + response)
+
+      props.on_add();
 
     }
 
@@ -101,18 +116,29 @@ export default function DatabaseConnectionModal(){
           <ModalContent>
             {(onClose : any) => (
               <>
-                <ModalHeader className="flex flex-col gap-1">Connect to a database</ModalHeader>
+                <ModalHeader className="flex flex-col gap-1">Connect a new database server</ModalHeader>
                 <ModalBody>
                   <Input
                     isRequired
+                    label="Database Server Name"
+                    placeholder="Enter a name to remember your database server by"
+                    variant="bordered"
+                    onValueChange={setDbName}
+                    onFocus={() => setDbNameHasBeenFocused(true)}
+                    isInvalid={isDbNameInvalid && dbNameBeenFocused}
+                    color={!dbNameBeenFocused ? "primary" : isDbNameInvalid ? "danger" : "success"}
+                    errorMessage="Please enter a name for your database server"
+                  />
+                  <Input
+                    isRequired
                     label="URL or Host"
-                    placeholder="Enter the database URL or Host"
+                    placeholder="Enter the database server URL or Host"
                     variant="bordered"
                     onValueChange={setUrl}
                     onFocus={() => setURLHasBeenFocused(true)}
                     isInvalid={isURLInvalid && urlHasBeenFocused}
                     color={!urlHasBeenFocused ? "primary" : isURLInvalid ? "danger" : "success"}
-                    errorMessage="Please enter a valid database URL or Host"
+                    errorMessage="Please enter a valid database server URL or Host"
                   />
                   <Input
                     isRequired
@@ -142,8 +168,8 @@ export default function DatabaseConnectionModal(){
                   <Button 
                     color="primary" 
                     onPress={onClose}  
-                    onClick={() => connectToDatabase(url, username, password)}
-                    isDisabled={isURLInvalid || isUsernameInvalid || isPasswordInvalid}
+                    onClick={() => addDatabase(dbName, url, username, password)}
+                    isDisabled={isURLInvalid || isUsernameInvalid || isPasswordInvalid || isDbNameInvalid}
                     >
                     Connect
                   </Button>

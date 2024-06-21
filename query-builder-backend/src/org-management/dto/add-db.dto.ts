@@ -15,7 +15,6 @@ export class Add_Db_Dto {
     @IsNotEmpty()
     type: string;
 
-    @IsJWT()
     @IsNotEmpty()
     db_info: string
 }
