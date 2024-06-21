@@ -65,13 +65,21 @@ const styles = StyleSheet.create({
   },
 });
 
-const tableCol = (numCols: number) => ({
-  width: `${100 / numCols}%`,
-  borderStyle: 'solid',
-  borderWidth: 1,
-  borderLeftWidth: 0,
-  borderTopWidth: 0,
-});
+interface ChartData{
+    labels: (any)[];
+    datasets: {
+        label: string;
+        data: (any)[];
+        backgroundColor: string;
+        borderColor: string;
+        borderWidth: number;
+    }[];
+}
+
+interface ChartImage {
+  image: string;
+  label: string;
+}
 
 const data = [
   {
@@ -174,11 +182,17 @@ const data = [
   },
 ];
 
-function MyDocument() {}
+const tableCol = (numCols: number) => ({
+  width: `${100 / numCols}%`,
+  borderStyle: 'solid' as 'solid',
+  borderWidth: 1,
+  borderLeftWidth: 0,
+  borderTopWidth: 0,
+});
 
 export default function Report() {
-  const [chartImages, setChartImages] = useState<Object[]>([]);
-  const [chartsData, setChartsData] = useState<Object[]>([]);
+  const [chartsData, setChartsData] = useState<ChartData[]>([]);
+  const [chartImages, setChartImages] = useState<ChartImage[]>([]);
 
   useEffect(() => {
     const headings = Object.keys(data[0]) as (keyof (typeof data)[0])[]; // stores the headings of each column (can be used to reference)
@@ -190,7 +204,7 @@ export default function Report() {
     // We want to create a graph of every numeric value(y) against the first column(x)
     integerColumns.forEach((column, index) => {
       if (column) {
-        const currentChart = {
+        const currentChart : ChartData = {
           labels: firstKey,
           datasets: [
             {
@@ -204,7 +218,7 @@ export default function Report() {
         };
 
         // adding the current chart to the chart array
-        setChartsData((prev) => [...prev, { currentChart }]);
+        setChartsData((prev) => [...prev, currentChart]);
 
         setTimeout(() => {
           const chartRef = document.createElement('canvas');
@@ -215,7 +229,7 @@ export default function Report() {
               plugins: {
                 title: {
                   display: true,
-                  text: `Plot of ${headings[0]} against ${headings[index]}`,
+                  text: `Plot of ${headings[index]} against ${headings[0]}`,
                 },
               },
               responsive: true,
@@ -225,7 +239,10 @@ export default function Report() {
 
           setTimeout(() => {
             const image = chartRef.toDataURL();
-            setChartImages(prev => [...prev, { image, label: headings[index] }]);
+            setChartImages((prev) => [
+              ...prev,
+              { image, label: headings[index] },
+            ]);
             chart.destroy();
           }, 500);
         }, 500);
@@ -233,86 +250,110 @@ export default function Report() {
     });
   }, []);
 
-    const buttonStyle = {
+  //! the images are not being returned
+
+  const buttonStyle = {
     marginLeft: 10,
-    backgroundColor: "blue",
-    color: "white",
-    padding: "8px 16px",
-    border: "none",
-    cursor: "pointer"
+    backgroundColor: 'blue',
+    color: 'white',
+    padding: '8px 16px',
+    border: 'none',
+    cursor: 'pointer',
   };
 
-  return <></>;
+  return (
+    <div
+      style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+    >
+      <PDFViewer width="800" height="600" style={{ marginBottom: 20 }}>
+        <MyDocument tableData={data} chartImages={chartImages} />
+      </PDFViewer>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{ marginLeft: 20 }}>
+          <PDFDownloadLink
+            document={<MyDocument tableData={data} chartImages={chartImages} />}
+            fileName="report.pdf"
+          >
+            {({ loading }) => (
+              <span
+                style={{
+                  ...buttonStyle,
+                  backgroundColor: loading ? '#999' : 'blue',
+                }}
+              >
+                {loading ? 'Loading document...' : 'Download PDF'}
+              </span>
+            )}
+          </PDFDownloadLink>
+        </div>
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'center',
+          marginTop: 20,
+        }}
+      >
+        {chartsData.map((chart, index) => (
+          <div key={index} style={{ margin: 10 }}>
+            <Bar
+              data={chart}
+              options={{
+                maintainAspectRatio: false,
+                plugins: { title: { display: true, text: chart.labels } },
+              }}
+              width={200}
+              height={200}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
-// const Report = () => {
+const MyDocument = ({
+  tableData,
+  chartImages,
+}: {
+  tableData:any[];
+  chartImages: ChartImage[];
+}) => {
+  const headers = Object.keys(tableData[0]) as (keyof (typeof data)[0])[];
+  const numCols = headers.length;
 
-
-
-//   return (
-//     <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-//       <PDFViewer width="800" height="600" style={{ marginBottom: 20 }}>
-//         <MyDocument tableData={dummyData} chartImages={chartImages} />
-//       </PDFViewer>
-//       <div style={{ display: "flex", alignItems: "center" }}>
-//         <div style={{ marginLeft: 20 }}>
-//           <PDFDownloadLink document={<MyDocument tableData={dummyData} chartImages={chartImages} />} fileName="report.pdf">
-//             {({ loading }) => (
-//               <span style={{ ...buttonStyle, backgroundColor: loading ? "#999" : "blue" }}>
-//                 {loading ? 'Loading document...' : 'Download PDF'}
-//               </span>
-//             )}
-//           </PDFDownloadLink>
-//         </div>
-//       </div>
-//       <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", marginTop: 20 }}>
-//         {chartsData.map((chart, index) => (
-//           <div key={index} style={{ margin: 10 }}>
-//             <Bar data={chart.chartData} options={{ maintainAspectRatio: false, plugins: { title: { display: true, text: chart.label } } }} width={200} height={200} />
-//           </div>
-//         ))}
-//       </div>
-//     </div>
-//   );
-// };
-
-// const MyDocument = ({ tableData, chartImages }: { tableData: JSON[], chartImages: string[] }) => {
-//   const headers = Object.keys(tableData[0]);
-//   const numCols = headers.length;
-
-//   return (
-//     <Document>
-//       <Page size="A4" style={styles.page}>
-//         <View style={styles.section}>
-//           <Text style={styles.title}>QBEE INITIAL REPORT</Text>
-//           <Text>Employee financial data</Text>
-//           {
-//             chartImages.map((item : string, index : number) => (
-//               <Image key={index} src={item} style={styles.chart} />
-//             ))
-//           }
-//           <View style={styles.table}>
-//             <View style={styles.tableRow}>
-//               {headers.map((header, index) => (
-//                 <View key={index} style={tableCol(numCols)}>
-//                   <Text style={styles.tableCell}>{header}</Text>
-//                 </View>
-//               ))}
-//             </View>
-//             {tableData.map((row, rowIndex) => (
-//               <View key={rowIndex} style={styles.tableRow}>
-//                 {headers.map((header, cellIndex) => (
-//                   <View key={cellIndex} style={tableCol(numCols)}>
-//                     <Text style={styles.tableCell}>{row[header]}</Text>
-//                   </View>
-//                 ))}
-//               </View>
-//             ))}
-//           </View>
-//         </View>
-//       </Page>
-//     </Document>
-//   );
-// };
-
-// export default Report;
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        <View style={styles.section}>
+          <Text style={styles.title}>QBEE INITIAL REPORT</Text>
+          <Text>Employee financial data</Text>
+          {
+            // chartImages.map((item : string, index : number) => (
+            //   <Image key={index} src={item} style={styles.chart} />
+            // ))
+          }
+          <View style={styles.table}>
+            <View style={styles.tableRow}>
+              {headers.map((header, index) => (
+                <View key={index} style={tableCol(numCols)}>
+                  <Text style={styles.tableCell}>{header}</Text>
+                </View>
+              ))}
+            </View>
+            {tableData.map((row, rowIndex) => (
+              <View key={rowIndex} style={styles.tableRow}>
+                {headers.map((header, cellIndex) => (
+                  <View key={cellIndex} style={tableCol(numCols)}>
+                    <Text style={styles.tableCell}>{row[header]}</Text>
+                  </View>
+                ))}
+              </View>
+            ))}
+          </View>
+        </View>
+      </Page>
+    </Document>
+  );
+};
