@@ -250,8 +250,6 @@ export default function Report() {
     });
   }, []);
 
-  //! the images are not being returned
-
   const buttonStyle = {
     marginLeft: 10,
     backgroundColor: 'blue',
@@ -330,8 +328,9 @@ const MyDocument = ({
           <Text style={styles.title}>QBEE INITIAL REPORT</Text>
           <Text>Employee financial data</Text>
           {
-            // chartImages.map((item : string, index : number) => (
-            //   <Image key={index} src={item} style={styles.chart} />
+            // chartImages.map((image : ChartImage, index : number) => (
+              // todo - get the image into base64 format
+              // <Image key={index} src=`data:image/png;base64, ${/* Base64 stuff */}` style={styles.chart} />
             // ))
           }
           <View style={styles.table}>
