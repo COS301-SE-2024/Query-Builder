@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import "./SideBar.css";
 import {LogoIcon} from "./Logo";
+import Link from 'next/link'
 
 
 const Sidebar = () => {
@@ -22,10 +23,10 @@ const Sidebar = () => {
             <div className="sidebar-nav">
                 <nav className="nav-links">
                     <div className="sidebar-item">
-                        <a href="">
+                        <Link href="/">
                             <span className="sidebar-item-icon"></span>
                             <span className="sidebar-item-title">Home</span>
-                        </a>
+                        </Link>
                     </div>
                 </nav>
             </div>
@@ -36,10 +37,10 @@ const Sidebar = () => {
                 <nav className="nav-links">
 
                     <div className="sidebar-item">
-                        <a href="">
+                        <Link href="/settings">
                             <span className="sidebar-item-icon"></span>
                             <span className="sidebar-item-title">Settings</span>
-                        </a>
+                        </Link>
                     </div>
                     <div className="sidebar-item">
                         <a href="">
