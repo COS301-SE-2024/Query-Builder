@@ -37,8 +37,20 @@ export class JsonConverterService {
                     throw new Error('Invalid query');
                 }
                 
-                //concatenate the column strings together
-                const select = jsonData.columns.join(", ");
+                let select = '';
+
+                //if the columns array is empty return all the columns
+                if(jsonData.columns.length == 0){
+                    select = "*";
+                }
+                //otherwise concatenate the column strings together
+                else{
+                    //first add tick symbols around each column name to deal with names with spaces
+                    for(let columnIndex = 0; columnIndex < jsonData.columns.length-1; columnIndex++){
+                        select += '`' + jsonData.columns[columnIndex] + '`,'
+                    }
+                    select += '`' + jsonData.columns[jsonData.columns.length-1] + '`';
+                }
 
                 const from = jsonData.table;
                 let where = '';

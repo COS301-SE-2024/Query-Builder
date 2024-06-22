@@ -1,16 +1,135 @@
 "use client"
 import "../../app/globals.css"
-import React, { useState } from "react";
-import {Button, Spacer, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Card, CardHeader, CardBody, CardFooter} from "@nextui-org/react";
-import { useRouter } from "next/navigation";
+import React, { useState} from "react";
+import {Button, Spacer, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Card, CardHeader, CardBody, CardFooter, useDisclosure, ModalContent, Modal, ModalHeader} from "@nextui-org/react";
+import TableResponse from "../TableResponse/TableResponse";
+import { createClient } from "./../../utils/supabase/client";
+
+interface DatabaseCredentials {
+    host: string,
+    user: string,
+    password: string
+  }
+  
+  interface SortParams {
+    column: string,
+    direction?: "ascending"|"descending"
+  }
+  
+  interface PageParams {
+    pageNumber: number,
+    rowsPerPage: number
+  }
+  
+  interface QueryParams {
+    language: string,
+    query_type: string,
+    table: string,
+    columns: string[],
+    condition?: string,
+    sortParams?: SortParams,
+    pageParams?: PageParams
+  }
+  
+  interface Query {
+  credentials: DatabaseCredentials,
+  databaseName: string,
+  queryParams: QueryParams
+  }
+
+  interface Database {
+    key: string,
+    label: string
+  }
+
+  interface Table {
+    table: string,
+    columns: string[]
+  }
+
+// This function gets the token from local storage.
+// Supabase stores the token in local storage so we can access it from there.
+const getToken = async () => {
+
+    const supabase = createClient();
+    const token = (await supabase.auth.getSession()).data.session?.access_token
+  
+    console.log(token)
+  
+    return token;
+};
 
 export default function Form(){
 
-    // const {isOpen, onOpen, onOpenChange} = useDisclosure();
+    //async function to fetch the database server's databases
+    async function fetchDatabases() {
+    
+        //Get the orgs of the logged-in user
+        let response = await fetch("http://localhost:55555/api/schema", {
+            method: "PUT",
+            headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + await getToken()
+            },
+            body: JSON.stringify({
+                host: "127.0.0.1",
+                user: "root",
+                password: "testPassword"
+            })
+        });
+
+        let json = await response.json();
+
+        console.log(json);
+
+        //set the databases hook
+        setDatabases(json);
+
+    }
+
+    //async function to fetch the database server's tables
+    async function fetchTables(database: string) {
+
+        //Get the orgs of the logged-in user
+        let response = await fetch("http://localhost:55555/api/table", {
+            method: "PUT",
+            headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + await getToken()
+            },
+            body: JSON.stringify({
+                credentials: {
+                    host: "127.0.0.1",
+                    user: "root",
+                    password: "testPassword"
+                },
+                schema: database
+            })
+        });
+
+        let json = await response.json();
+
+        console.log(json);
+
+        //set the tables hook
+        setTables(json);
+
+    }
+
+    //React hook for results modal
+    const {isOpen, onOpen, onOpenChange} = useDisclosure();
+
+    //React hook for all the databases in the database server
+    const [databases, setDatabases] = useState<Database[]>([{key: "Select database", label: "Select database"}]);
+
+    //React hook for all the tables in the database
+    const [tables, setTables] = useState<Table[]>([{table: "Select table", columns: ["Select column"]}]);
 
     const [selectedDatabase, setSelectedDatabase] = useState(new Set(["Select database"]));
     const selectedDatabaseValue = React.useMemo(
-        () => Array.from(selectedDatabase).join(", ").replaceAll("_", " "),
+        () => Array.from(selectedDatabase).join(", "),
         [selectedDatabase]
     );
 
@@ -18,15 +137,29 @@ export default function Form(){
 
     const [selectedTable, setSelectedTable] = useState(new Set(["Select table"]));
     const selectedTableValue = React.useMemo(
-        () => Array.from(selectedTable).join(", ").replaceAll("_", " "),
+        () => Array.from(selectedTable).join(", "),
         [selectedTable]
     );
 
     const [selectColumns, setSelectedColumns] = React.useState<Set<string>>(new Set<string>());
     const selectedColValue = React.useMemo(
-        () => Array.from(selectColumns).join(", ").replaceAll("_", " "),
+        () => Array.from(selectColumns).join(", "),
         [selectColumns]
     );
+
+    //React hook to fetch the database server's databases upon rerender of the Form
+    React.useEffect(() => {
+
+        fetchDatabases();
+
+    },[])
+
+    //React hook to fetch the database's tables upon selection of the database
+    React.useEffect(() => {
+
+        fetchTables(selectedDatabaseValue);
+
+    },[selectedDatabaseValue])
 
     const handleDatabaseSelection = (keys:any) => {
         if (keys.size === 0) {
@@ -59,56 +192,37 @@ export default function Form(){
         }
     };
 
-    const databases = [
-        {
-          key: "sakila",
-          label: "Sakila",
+    function createQuery() : Query{
+
+        let columns = Array.from(selectColumns);
+
+        //if columns is empty, query all the columns of the selected table
+        if(columns.length == 0){
+            for(let table of tables){
+                if(table.table == selectedTableValue){
+                    columns = table.columns;
+                }
+            }
         }
-    ];
 
-    const tables = [
-        {
-            table: "film",
-            columns: ["title", "release_year", "rating", "rental_rate", "rental_duration", "language_id"],
-        },
-        {
-            table: "actor",
-            columns: ["Month","Total","Average"],
+        const query: Query = {
+            credentials: {
+                host: "127.0.0.1",
+                user: "root",
+                password: "testPassword"
+            },
+            databaseName: selectedDatabaseValue,
+            queryParams: {
+                language: "sql",
+                query_type: "select",
+                table: selectedTableValue,
+                columns: columns
+            }
         }
-    ];
 
-    const sendQuery = (language:string, queryType:string, table:string, column:string, condition:string) => {
+        return query;
 
-        fetch("http://localhost:55555/api/query", {
-          method: "POST",
-          headers: {
-            'Accept': 'application/text',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            "language": language,
-            "query_type": queryType,
-            "table": table,
-            "column": column,
-            "condition": ""
-          })
-        }).then(
-          function(response){
-            return response.text();
-           
-          }
-        )
-        .then(
-          function(response){
-            // alert(response);
-            setOutputQuery(response);
-          }
-        )
-  
-      }
-
-    //create a NEXT router to navigate to individual database pages
-    const router = useRouter();
+    }
 
     return (
 
@@ -135,7 +249,8 @@ export default function Form(){
                         </Button>
                     </DropdownTrigger>
                     <DropdownMenu 
-                    aria-label="Dynamic Actions" 
+                        className="max-h-[50vh] overflow-y-auto"
+                        aria-label="Dynamic Actions" 
                         items={databases}
                         variant="flat"
                         // disallowEmptySelection
@@ -169,6 +284,7 @@ export default function Form(){
                         </Button>
                     </DropdownTrigger>
                     <DropdownMenu 
+                        className="max-h-[50vh] overflow-y-auto"
                         aria-label="Dynamic Actions" 
                         items={tables} 
                         variant="flat"
@@ -202,7 +318,8 @@ export default function Form(){
                                 {selectedColValue || "No columns selected, will default to all columns selected"} 
                                 </Button>
                             </DropdownTrigger>
-                            <DropdownMenu 
+                            <DropdownMenu
+                                className="max-h-[50vh] overflow-y-auto"
                                 aria-label="Multiple column selection"
                                 variant="flat"
                                 items={tables.filter(item => item.table === selectedTableValue)[0]?.columns.map(col => ({ table: selectedTableValue, columns: [col] }))}
@@ -236,14 +353,26 @@ export default function Form(){
                 {!selectedTable.has("Select table") ? 
                 (<>
                     <Button 
-                    color="primary"  
-                    onClick={() => {
-                        
-                        sendQuery("sql", "select", selectedTableValue, selectedColValue, "");
-                    }}
+                        onPress={onOpen} 
+                        color="primary"  
                     >
                     Query
                   </Button>
+                  <Modal 
+                        isOpen={isOpen} 
+                        onOpenChange={onOpenChange}
+                        placement="top-center"
+                        className="text-black h-100vh"
+                        size="full">
+                        <ModalContent>
+                            {(onClose : any) => (
+                                <>
+                                    <ModalHeader className="flex flex-col gap-1">Query Results</ModalHeader>
+                                    <TableResponse query={createQuery()} />
+                                </>
+                            )}
+                        </ModalContent>
+                   </Modal>
                 </>) :null}
                 <Spacer y={2}/>
                 {outputQuery == "" ? null:(<div>{outputQuery}</div>)}
