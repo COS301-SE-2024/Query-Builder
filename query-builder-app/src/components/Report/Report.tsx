@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Page,
   Text,
@@ -41,8 +41,13 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   title: {
-    fontSize: 24,
+    fontSize: 32,
     textAlign: 'center',
+    marginBottom: 20,
+  },
+  header: {
+    fontSize: 24,
+    textAlign: 'left',
     marginBottom: 20,
   },
   table: {
@@ -74,11 +79,6 @@ interface ChartData {
     borderColor: string;
     borderWidth: number;
   }[];
-}
-
-interface ChartImage {
-  image: string;
-  label: string;
 }
 
 const data = [
@@ -192,7 +192,6 @@ const tableCol = (numCols: number) => ({
 
 export default function Report() {
   const [chartsData, setChartsData] = useState<ChartData[]>([]);
-  const [chartImages, setChartImages] = useState<ChartImage[]>([]);
 
   useEffect(() => {
     const headings = Object.keys(data[0]) as (keyof (typeof data)[0])[]; // stores the headings of each column (can be used to reference)
@@ -219,33 +218,6 @@ export default function Report() {
 
         // adding the current chart to the chart array
         setChartsData((prev) => [...prev, currentChart]);
-
-        (async () => {
-          const chartRef = document.createElement('canvas');
-          const chart = new ChartJS(chartRef, {
-            type: 'bar',
-            data: currentChart,
-            options: {
-              plugins: {
-                title: {
-                  display: true,
-                  text: `Plot of ${headings[index]} against ${headings[0]}`,
-                },
-              },
-              responsive: true,
-              maintainAspectRatio: false,
-            },
-          });
-
-          (async () => {
-            const image = chartRef.toDataURL();
-            setChartImages((prev) => [
-              ...prev,
-              { image, label: headings[index] },
-            ]);
-            chart.destroy();
-          })();
-        })();
       }
     });
   }, []);
@@ -264,12 +236,12 @@ export default function Report() {
       style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
     >
       <PDFViewer width="800" height="600" style={{ marginBottom: 20 }}>
-        <MyDocument tableData={data} chartImages={chartImages} />
+        <MyDocument tableData={data} chartData={chartsData}/>
       </PDFViewer>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <div style={{ marginLeft: 20 }}>
           <PDFDownloadLink
-            document={<MyDocument tableData={data} chartImages={chartImages} />}
+            document={<MyDocument tableData={data} chartData={chartsData}/>}
             fileName="report.pdf"
           >
             {({ loading }) => (
@@ -294,21 +266,21 @@ export default function Report() {
         }}
       >
         {chartsData.map((chart, index) => (
-          <div key = {index} style = {{margin: 10}}>
-          <Bar
-            data={chart}
-            options={{
-              maintainAspectRatio: false,
-              plugins: {
-                title: {
-                  display: true,
-                  text: chart.datasets[0].label
-                 }
-              },
-            }}
-            width = {200}
-            height= {200}
-          />
+          <div key={index} style={{ margin: 10 }}>
+            <Bar
+              data={chart}
+              options={{
+                maintainAspectRatio: false,
+                plugins: {
+                  title: {
+                    display: true,
+                    text: chart.datasets[0].label,
+                  },
+                },
+              }}
+              width={200}
+              height={200}
+            />
           </div>
         ))}
       </div>
@@ -316,48 +288,66 @@ export default function Report() {
   );
 }
 
-const MyDocument = ({
-  tableData,
-  chartImages,
-}: {
+type MyDocumentProps = {
   tableData: any[];
-  chartImages: ChartImage[];
-}) => {
+  chartData: ChartData[];
+};
+
+function MyDocument({ tableData, chartData }: MyDocumentProps) {
   const headers = Object.keys(tableData[0]) as (keyof (typeof data)[0])[];
   const numCols = headers.length;
 
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        <View style={styles.section}>
+        <View>
           <Text style={styles.title}>QBEE INITIAL REPORT</Text>
-          <Text>Employee financial data</Text>
-          {
-            // chartImages.map((image : ChartImage, index : number) => (
-            // todo - get the image into base64 format
-            // <Image key={index} src=`data:image/png;base64, ${/* Base64 stuff */}` style={styles.chart} />
-            // ))
-          }
-          <View style={styles.table}>
-            <View style={styles.tableRow}>
-              {headers.map((header, index) => (
-                <View key={index} style={tableCol(numCols)}>
-                  <Text style={styles.tableCell}>{header}</Text>
-                </View>
-              ))}
-            </View>
-            {tableData.map((row, rowIndex) => (
-              <View key={rowIndex} style={styles.tableRow}>
-                {headers.map((header, cellIndex) => (
-                  <View key={cellIndex} style={tableCol(numCols)}>
-                    <Text style={styles.tableCell}>{row[header]}</Text>
+          <View style={styles.section}>
+            <Text style={styles.header}>Results</Text>
+            <View style={styles.table}>
+              <View style={styles.tableRow}>
+                {headers.map((header, index) => (
+                  <View key={index} style={tableCol(numCols)}>
+                    <Text style={styles.tableCell}>{header}</Text>
                   </View>
                 ))}
               </View>
+              {tableData.map((row, rowIndex) => (
+                <View key={rowIndex} style={styles.tableRow}>
+                  {headers.map((header, cellIndex) => (
+                    <View key={cellIndex} style={tableCol(numCols)}>
+                      <Text style={styles.tableCell}>{row[header]}</Text>
+                    </View>
+                  ))}
+                </View>
+              ))}
+            </View>
+          </View>
+          <View style={styles.section} break>
+            <Text style={styles.header}>Graphs</Text>
+            {chartData.map((data, index: number) => (
+              <Image
+                key={index}
+                src={(async () => {
+                  const ChartJsImage = require('chartjs-to-image');
+
+                  const myChart = new ChartJsImage();
+                  myChart.setConfig({
+                    type: 'bar',
+                    data: {
+                      labels: ['Hello world', 'Foo bar'],
+                      datasets: [{ label: 'Foo', data: [1, 2] }],
+                    },
+                  });
+
+                  return await myChart.toDataUrl();
+                })()}
+                style={styles.chart}
+              />
             ))}
           </View>
         </View>
       </Page>
     </Document>
   );
-};
+}
