@@ -65,15 +65,15 @@ const styles = StyleSheet.create({
   },
 });
 
-interface ChartData{
-    labels: (any)[];
-    datasets: {
-        label: string;
-        data: (any)[];
-        backgroundColor: string;
-        borderColor: string;
-        borderWidth: number;
-    }[];
+interface ChartData {
+  labels: any[];
+  datasets: {
+    label: string;
+    data: any[];
+    backgroundColor: string;
+    borderColor: string;
+    borderWidth: number;
+  }[];
 }
 
 interface ChartImage {
@@ -196,15 +196,15 @@ export default function Report() {
 
   useEffect(() => {
     const headings = Object.keys(data[0]) as (keyof (typeof data)[0])[]; // stores the headings of each column (can be used to reference)
-    const integerColumns: boolean[] = Object.values(data[0]).map(
+    const numberColumns: boolean[] = Object.values(data[0]).map(
       (value) => typeof value === 'number',
     ); // stores the types of each column in the dataset
-    const firstKey = data.map((row) => row[headings[0]]); // getting all of the classes
+    const firstKey: string[] = data.map((row) => row[headings[0]] as string); // getting all of the classes
 
     // We want to create a graph of every numeric value(y) against the first column(x)
-    integerColumns.forEach((column, index) => {
+    numberColumns.forEach((column, index) => {
       if (column) {
-        const currentChart : ChartData = {
+        const currentChart: ChartData = {
           labels: firstKey,
           datasets: [
             {
@@ -220,7 +220,7 @@ export default function Report() {
         // adding the current chart to the chart array
         setChartsData((prev) => [...prev, currentChart]);
 
-        setTimeout(() => {
+        (async () => {
           const chartRef = document.createElement('canvas');
           const chart = new ChartJS(chartRef, {
             type: 'bar',
@@ -237,15 +237,15 @@ export default function Report() {
             },
           });
 
-          setTimeout(() => {
+          (async () => {
             const image = chartRef.toDataURL();
             setChartImages((prev) => [
               ...prev,
               { image, label: headings[index] },
             ]);
             chart.destroy();
-          }, 500);
-        }, 500);
+          })();
+        })();
       }
     });
   }, []);
@@ -294,16 +294,21 @@ export default function Report() {
         }}
       >
         {chartsData.map((chart, index) => (
-          <div key={index} style={{ margin: 10 }}>
-            <Bar
-              data={chart}
-              options={{
-                maintainAspectRatio: false,
-                plugins: { title: { display: true, text: chart.labels } },
-              }}
-              width={200}
-              height={200}
-            />
+          <div key = {index} style = {{margin: 10}}>
+          <Bar
+            data={chart}
+            options={{
+              maintainAspectRatio: false,
+              plugins: {
+                title: {
+                  display: true,
+                  text: chart.datasets[0].label
+                 }
+              },
+            }}
+            width = {200}
+            height= {200}
+          />
           </div>
         ))}
       </div>
@@ -315,7 +320,7 @@ const MyDocument = ({
   tableData,
   chartImages,
 }: {
-  tableData:any[];
+  tableData: any[];
   chartImages: ChartImage[];
 }) => {
   const headers = Object.keys(tableData[0]) as (keyof (typeof data)[0])[];
@@ -329,8 +334,8 @@ const MyDocument = ({
           <Text>Employee financial data</Text>
           {
             // chartImages.map((image : ChartImage, index : number) => (
-              // todo - get the image into base64 format
-              // <Image key={index} src=`data:image/png;base64, ${/* Base64 stuff */}` style={styles.chart} />
+            // todo - get the image into base64 format
+            // <Image key={index} src=`data:image/png;base64, ${/* Base64 stuff */}` style={styles.chart} />
             // ))
           }
           <View style={styles.table}>
