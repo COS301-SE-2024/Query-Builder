@@ -151,7 +151,7 @@ export default function TableResponse(props: TableResponseProps){
           {(item) => (
             //@ts-ignore
             <TableRow key={item.qbee_id}>
-              {(columnKey) => <TableCell>{getKeyValue(item, columnKey)}</TableCell>}
+              {(columnKey) => <TableCell>{typeof getKeyValue(item, columnKey) === 'object' ? JSON.stringify(getKeyValue(item, columnKey)) :  getKeyValue(item, columnKey)}</TableCell>}
             </TableRow>
           )}
         </TableBody>
