@@ -70,8 +70,8 @@ export default function TableResponse(props: TableResponseProps){
   //A page state holding the page number of the query data that we are currently viewing
   const [pageNumber, setPageNumber] = useState(1);
 
-  //A state holding the number of rows of query data that we would like to view per page (default = 10)
-  const [rowsPerPage, setRowsPerPage] = useState(10)
+  //A state holding the number of rows of query data that we would like to view per page (default = 20)
+  const [rowsPerPage, setRowsPerPage] = useState(20)
 
   //A state holding the total number of pages that the data can fill
   const [totalPages, setTotalPages] = useState(1);
@@ -175,6 +175,7 @@ export default function TableResponse(props: TableResponseProps){
           Rows per page:
           <select
             className="bg-transparent outline-none text-default-400 text-small"
+            defaultValue={20}
             onChange={(rowsPerPage)=>{
               setRowsPerPage(Number(rowsPerPage.target.value));
               setPageNumber(1);
