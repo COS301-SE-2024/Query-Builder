@@ -3,6 +3,7 @@ import "../../app/globals.css"
 import React, { useEffect, useState } from "react";
 import {Table, TableHeader, TableBody, TableColumn, TableRow, TableCell, getKeyValue, Spinner, Pagination, Button, useDisclosure, Modal, ModalContent, ModalHeader} from "@nextui-org/react";
 import {useAsyncList} from "@react-stately/data";
+import csvDownload from 'json-to-csv-export'
 
 interface DatabaseCredentials {
   host: string,
@@ -81,6 +82,48 @@ export default function TableResponse(props: TableResponseProps){
 
   //A loading state that will initially be true and later false once data has been loaded
   const [loading, setLoading] = useState(true);
+
+  async function downloadCSV(){
+
+    let data = await getAllData();
+
+    console.log(data);
+
+    const dataProperties = {
+      data: data,
+      delimiter: ',',
+    }
+
+    console.log(dataProperties);
+
+    csvDownload(dataProperties);
+
+  }
+
+  async function getAllData() {
+    
+    //fetch the data from the endpoint
+    let response = await fetch("http://localhost:55555/api/query", {
+      method: "POST",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + getToken()
+      },
+      body: JSON.stringify(props.query)
+    })
+
+    let json = (await response.json()).data;
+
+    //remove qbee_id
+    json.map(function(item: any) { 
+      delete item.qbee_id; 
+      return item; 
+    });
+
+    return json;
+
+  }
 
   //Create an async list that will hold the query response data upon load
   let tableData = useAsyncList({
@@ -192,7 +235,7 @@ export default function TableResponse(props: TableResponseProps){
           </label>
         </div>
         <div></div>
-        <Button color="primary" className="mx-1">Export Data</Button>
+        <Button color="primary" className="mx-1" onClick={() => {downloadCSV()}}>Export Data</Button>
         <Button onPress={onOpen} color="primary" className="mx-1">Generate Report</Button>
         <Modal 
           isOpen={isOpen} 
