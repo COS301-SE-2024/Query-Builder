@@ -335,8 +335,8 @@ function MyDocument({ tableData, chartData }: MyDocumentProps) {
                   myChart.setConfig({
                     type: 'bar',
                     data: {
-                      labels: ['Hello world', 'Foo bar'],
-                      datasets: [{ label: 'Foo', data: [1, 2] }],
+                      labels: data.labels,
+                      datasets: data.datasets,
                     },
                   });
 
