@@ -81,106 +81,7 @@ interface ChartData {
   }[];
 }
 
-const data = [
-  {
-    companyName: 'Tech Innovators',
-    numberOfEmployees: 120,
-    netWorth: 5000000,
-    annualRevenue: 2000000,
-    profitMargin: 0.4,
-  },
-  {
-    companyName: 'Creative Solutions',
-    numberOfEmployees: 85,
-    netWorth: 3500000,
-    annualRevenue: 1500000,
-    profitMargin: 0.3,
-  },
-  {
-    companyName: 'Future Enterprises',
-    numberOfEmployees: 200,
-    netWorth: 7500000,
-    annualRevenue: 3000000,
-    profitMargin: 0.35,
-  },
-  {
-    companyName: 'Smart Industries',
-    numberOfEmployees: 150,
-    netWorth: 6200000,
-    annualRevenue: 2500000,
-    profitMargin: 0.38,
-  },
-  {
-    companyName: 'Green Tech',
-    numberOfEmployees: 95,
-    netWorth: 4000000,
-    annualRevenue: 1800000,
-    profitMargin: 0.45,
-  },
-  {
-    companyName: 'NextGen Labs',
-    numberOfEmployees: 170,
-    netWorth: 6800000,
-    annualRevenue: 2700000,
-    profitMargin: 0.42,
-  },
-  {
-    companyName: 'Innovatech',
-    numberOfEmployees: 110,
-    netWorth: 5200000,
-    annualRevenue: 2200000,
-    profitMargin: 0.36,
-  },
-  {
-    companyName: 'Visionary Solutions',
-    numberOfEmployees: 130,
-    netWorth: 5700000,
-    annualRevenue: 2400000,
-    profitMargin: 0.39,
-  },
-  {
-    companyName: 'Digital Ventures',
-    numberOfEmployees: 140,
-    netWorth: 6000000,
-    annualRevenue: 2600000,
-    profitMargin: 0.41,
-  },
-  {
-    companyName: 'Eco Enterprises',
-    numberOfEmployees: 90,
-    netWorth: 3800000,
-    annualRevenue: 1700000,
-    profitMargin: 0.32,
-  },
-  {
-    companyName: 'Tech Pioneers',
-    numberOfEmployees: 160,
-    netWorth: 6500000,
-    annualRevenue: 2800000,
-    profitMargin: 0.37,
-  },
-  {
-    companyName: 'Smart Solutions',
-    numberOfEmployees: 105,
-    netWorth: 4900000,
-    annualRevenue: 2100000,
-    profitMargin: 0.34,
-  },
-  {
-    companyName: 'Green Ventures',
-    numberOfEmployees: 80,
-    netWorth: 3300000,
-    annualRevenue: 1600000,
-    profitMargin: 0.31,
-  },
-  {
-    companyName: 'Future Innovations',
-    numberOfEmployees: 125,
-    netWorth: 5400000,
-    annualRevenue: 2300000,
-    profitMargin: 0.33,
-  },
-];
+
 
 const tableCol = (numCols: number) => ({
   width: `${100 / numCols}%`,
@@ -190,10 +91,87 @@ const tableCol = (numCols: number) => ({
   borderTopWidth: 0,
 });
 
-export default function Report() {
+interface DatabaseCredentials {
+  host: string,
+  user: string,
+  password: string
+}
+
+interface SortParams {
+  column: string,
+  direction?: "ascending"|"descending"
+}
+
+interface PageParams {
+  pageNumber: number,
+  rowsPerPage: number
+}
+
+interface QueryParams {
+  language: string,
+  query_type: string,
+  table: string,
+  columns: string[],
+  condition?: string,
+  sortParams?: SortParams,
+  pageParams?: PageParams
+}
+
+interface Query {
+credentials: DatabaseCredentials,
+databaseName: string,
+queryParams: QueryParams
+}
+
+interface Column {
+  key: string,
+  label: string
+}
+
+export interface reportProps{
+
+  query: Query
+
+} 
+
+// This function gets the token from local storage.
+// Supabase stores the token in local storage so we can access it from there.
+const getToken = () => {
+  const storageKey = `sb-${process.env.NEXT_PUBLIC_SUPABASE_PROJECT_ID}-auth-token`;
+  const sessionDataString = localStorage.getItem(storageKey);
+  const sessionData = JSON.parse(sessionDataString || "null");
+  const token = sessionData?.access_token;
+
+  return token;
+};
+
+async function getData(props: reportProps) 
+{
+  let response = await fetch("http://localhost:3000/api/query", {
+    method: "POST",
+    headers: {
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+      "Authorization": 'Bearer ' + getToken()	
+    },
+    body: JSON.stringify(props.query)
+  })
+
+  let data = await response.json();
+  return data;
+}
+
+export default function Report(props: reportProps){
   const [chartsData, setChartsData] = useState<ChartData[]>([]);
+  const [data, setData] = useState([]);
 
   useEffect(() => {
+    const fetchData = async () => {
+      const result = await getData(props);
+      setData(result);
+    };
+  
+    
     const headings = Object.keys(data[0]) as (keyof (typeof data)[0])[]; // stores the headings of each column (can be used to reference)
     const numberColumns: boolean[] = Object.values(data[0]).map(
       (value) => typeof value === 'number',
@@ -207,7 +185,7 @@ export default function Report() {
           labels: firstKey,
           datasets: [
             {
-              label: headings[index],
+              label: String(headings[index]),
               data: data.map((item) => item[headings[index]]),
               backgroundColor: `rgba(${index * 50}, 162, 235, 0.2)`,
               borderColor: `rgba(${index * 50}, 162, 235, 1)`,
@@ -294,7 +272,7 @@ type MyDocumentProps = {
 };
 
 function MyDocument({ tableData, chartData }: MyDocumentProps) {
-  const headers = Object.keys(tableData[0]) as (keyof (typeof data)[0])[];
+  const headers = Object.keys(tableData[0]) as (keyof (typeof tableData)[0])[];
   const numCols = headers.length;
 
   return (
@@ -308,7 +286,7 @@ function MyDocument({ tableData, chartData }: MyDocumentProps) {
               <View style={styles.tableRow}>
                 {headers.map((header, index) => (
                   <View key={index} style={tableCol(numCols)}>
-                    <Text style={styles.tableCell}>{header}</Text>
+                    <Text style={styles.tableCell}>{String(header)}</Text>
                   </View>
                 ))}
               </View>
