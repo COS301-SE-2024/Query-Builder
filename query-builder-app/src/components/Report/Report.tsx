@@ -82,15 +82,23 @@ interface ChartData {
 }
 
 const data = [
-  {
-    store: 'Woodridge,Australia',
-    total_sales: 33726.77,
-  },
-  {
-    store: 'Lethbridge,Canada',
-    total_sales: 33679.79,
-  },
-];
+{ category: 'Sports', total_sales: 5314.21 },
+{ category: 'Sci-Fi', total_sales: 4756.98 },
+{ category: 'Animation', total_sales: 4656.3 },
+{ category: 'Drama', total_sales: 4587.39 },
+{ category: 'Comedy', total_sales: 4383.58 },
+{ category: 'Action', total_sales: 4375.85 },
+{ category: 'New', total_sales: 4351.62 },
+{ category: 'Games', total_sales: 4281.33 },
+{ category: 'Foreign', total_sales: 4270.67 },
+{ category: 'Family', total_sales: 4226.07 },
+{ category: 'Documentary', total_sales: 4217.52 },
+{ category: 'Horror', total_sales: 3722.54 },
+{ category: 'Children', total_sales: 3655.55 },
+{ category: 'Classics', total_sales: 3639.59 },
+{ category: 'Travel', total_sales: 3549.64 },
+{ category: 'Music', total_sales: 3417.72 }
+]
 
 const tableCol = (numCols: number) => ({
   width: `${100 / numCols}%`,
