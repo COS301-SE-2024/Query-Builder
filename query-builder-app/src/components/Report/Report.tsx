@@ -89,110 +89,10 @@ const tableCol = (numCols: number) => ({
   borderTopWidth: 0,
 });
 
-
-
-
-interface DatabaseCredentials {
-  host: string,
-  user: string,
-  password: string
-}
-
-interface SortParams {
-  column: string,
-  direction?: "ascending" | "descending"
-}
-
-interface PageParams {
-  pageNumber: number,
-  rowsPerPage: number
-}
-
-interface QueryParams {
-  language: string,
-  query_type: string,
-  table: string,
-  columns: string[],
-  condition?: string,
-  sortParams?: SortParams,
-  pageParams?: PageParams
-}
-
-interface Query {
-  credentials: DatabaseCredentials,
-  databaseName: string,
-  queryParams: QueryParams
-}
-
-
-export interface reportInput {
-
-  query: Query
-
-}
-
-const getToken = () => {
-  const storageKey = `sb-${process.env.NEXT_PUBLIC_SUPABASE_PROJECT_ID}-auth-token`;
-  const sessionDataString = localStorage.getItem(storageKey);
-  const sessionData = JSON.parse(sessionDataString || "null");
-  const token = sessionData?.access_token;
-
-  return token;
-};
-
-const myData = {
-  query: {
-    "credentials": {
-      "host": "127.0.0.1",
-      "user": "root",
-      "password": "testPassword"
-    },
-    "databaseName": "sakila",
-    "queryParams": {
-      "language": "sql",
-      "query_type": "select",
-      "table": "film",
-      "columns": [],
-    }
-  }
-}
-
-async function getAllData(props: reportInput) {
-
-  let response = await fetch("http://localhost:55555/api/query", {
-    method: "POST",
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + getToken()
-    },
-    body: JSON.stringify(myData.query)
-  })
-
-  let json = await response.json();
-  console.log("my response: " + (json as JSON));
-  return json.data;
-
-}
-
-
-
-
-export default function Report(props: reportInput) {
+export default function Report({ data }: { data: JSON[] }) {
   const [chartsData, setChartsData] = useState<ChartData[]>([]);
-  const [data, setData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-
-    const fetchData = async () => {
-      setLoading(true);
-      let data = await getAllData(props);
-      setData(data);
-    };
-
-    fetchData();
-
     const headings = Object.keys(data[0]) as (keyof (typeof data)[0])[]; // stores the headings of each column (can be used to reference)
     const numberColumns: boolean[] = Object.values(data[0]).map(
       (value) => typeof value === 'number',
@@ -206,7 +106,7 @@ export default function Report(props: reportInput) {
           labels: firstKey,
           datasets: [
             {
-              label: String(headings[index]),                                                                                //changed this to always exoect string is that fine?
+              label: String(headings[index]),
               data: data.map((item) => item[headings[index]]),
               backgroundColor: `rgba(${index * 50}, 162, 235, 0.2)`,
               borderColor: `rgba(${index * 50}, 162, 235, 1)`,
@@ -219,7 +119,6 @@ export default function Report(props: reportInput) {
         setChartsData((prev) => [...prev, currentChart]);
       }
     });
-    setLoading(false);
   }, []);
 
   const buttonStyle = {
@@ -231,22 +130,17 @@ export default function Report(props: reportInput) {
     cursor: 'pointer',
   };
 
-  if(loading){
-    <div>Loading...</div>
-  }
-  
   return (
-    
     <div
       style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
     >
       <PDFViewer width="800" height="600" style={{ marginBottom: 20 }}>
-        <MyDocument tableData={data} chartData={chartsData} data={data} />
+        <MyDocument tableData={data} chartData={chartsData}/>
       </PDFViewer>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <div style={{ marginLeft: 20 }}>
           <PDFDownloadLink
-            document={<MyDocument tableData={data} chartData={chartsData} data={data} />}
+            document={<MyDocument tableData={data} chartData={chartsData}/>}
             fileName="report.pdf"
           >
             {({ loading }) => (
@@ -296,11 +190,10 @@ export default function Report(props: reportInput) {
 type MyDocumentProps = {
   tableData: any[];
   chartData: ChartData[];
-  data: any[];
 };
 
-function MyDocument({ tableData, chartData, data }: MyDocumentProps) {
-  const headers = Object.keys(tableData[0]) as (keyof (typeof data)[0])[];//changed but should it not maybe be tableData[0] instead of data[0]? Or remove it maybe?
+function MyDocument({ tableData, chartData }: MyDocumentProps) {
+  const headers = Object.keys(tableData[0]) as (keyof (typeof tableData)[0])[];
   const numCols = headers.length;
 
   return (

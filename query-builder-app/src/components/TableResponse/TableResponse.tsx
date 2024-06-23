@@ -205,7 +205,7 @@ export default function TableResponse(props: TableResponseProps){
               {(onClose : any) => (
                   <>
                       <ModalHeader className="flex flex-col gap-1">Query Report</ModalHeader>
-                      <Report query={props.query}></Report>
+                      <Report data={tableData.items as JSON[]} />
                   </>
               )}
           </ModalContent>
