@@ -11,7 +11,10 @@ export class AppService {
 
   signJWT(data: {}): string {
     const jwt = require('jsonwebtoken');
-    const token = jwt.sign(JSON.stringify(data), this.configService.get("SUPABASE_JWT_SECRET"));
+    const token = jwt.sign(
+      JSON.stringify(data),
+      this.configService.get('SUPABASE_JWT_SECRET')
+    );
 
     return token;
   }

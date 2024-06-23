@@ -7,7 +7,7 @@ describe('ConnectionManagerService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [ConnectionManagerService, JsonConverterService],
+      providers: [ConnectionManagerService, JsonConverterService]
     }).compile();
 
     service = module.get<ConnectionManagerService>(ConnectionManagerService);

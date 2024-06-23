@@ -8,6 +8,6 @@ import { Supabase } from './supabase';
 @Module({
   imports: [ConfigModule],
   providers: [Supabase, SupabaseStrategy, SupabaseGuard, ConfigService],
-  exports: [Supabase, SupabaseStrategy, SupabaseGuard, ConfigService],
+  exports: [Supabase, SupabaseStrategy, SupabaseGuard, ConfigService]
 })
 export class SupabaseModule {}

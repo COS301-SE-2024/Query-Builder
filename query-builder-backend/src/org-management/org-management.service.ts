@@ -3,34 +3,35 @@ import {
   InternalServerErrorException,
   NotFoundException,
   Put,
-  UnauthorizedException,
-} from "@nestjs/common";
-import { Supabase } from "../supabase";
-import { Get_Org_Dto } from "./dto/get-org.dto";
-import { Create_Org_Dto } from "./dto/create-org.dto";
-import { Add_Member_Dto } from "./dto/add-member.dto";
-import { Add_Db_Dto } from "./dto/add-db.dto";
-import { Update_Org_Dto } from "./dto/update-org.dto";
-import { Update_Member_Dto } from "./dto/update-member.dto";
-import { Update_Db_Dto } from "./dto/update-db.dto";
-import { Remove_Db_Dto } from "./dto/remove-db.dto";
-import { Remove_Member_Dto } from "./dto/remove-member.dto";
-import { Remove_Org_Dto } from "./dto/remove-org.dto";
-import jwt from "jsonwebtoken";
-import { ConfigService } from "@nestjs/config";
-import { Get_Members_Dto } from "./dto/get-members.dto";
-import { Get_Dbs_Dto } from "./dto/get-dbs.dto";
+  UnauthorizedException
+} from '@nestjs/common';
+import { Supabase } from '../supabase';
+import { Get_Org_Dto } from './dto/get-org.dto';
+import { Create_Org_Dto } from './dto/create-org.dto';
+import { Add_Member_Dto } from './dto/add-member.dto';
+import { Add_Db_Dto } from './dto/add-db.dto';
+import { Update_Org_Dto } from './dto/update-org.dto';
+import { Update_Member_Dto } from './dto/update-member.dto';
+import { Update_Db_Dto } from './dto/update-db.dto';
+import { Remove_Db_Dto } from './dto/remove-db.dto';
+import { Remove_Member_Dto } from './dto/remove-member.dto';
+import { Remove_Org_Dto } from './dto/remove-org.dto';
+import jwt from 'jsonwebtoken';
+import { ConfigService } from '@nestjs/config';
+import { Get_Members_Dto } from './dto/get-members.dto';
+import { Get_Dbs_Dto } from './dto/get-dbs.dto';
 
 @Injectable()
 export class OrgManagementService {
   constructor(
     private readonly supabase: Supabase,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService
   ) {}
 
   async getOrg(org: Get_Org_Dto) {
-    const { data, error } = await this.supabase.getClient()
-      .from("organisations")
+    const { data, error } = await this.supabase
+      .getClient()
+      .from('organisations')
       .select(`org_id, created_at, name, logo, org_members(*)`)
       .match({ ...org });
 
@@ -38,45 +39,56 @@ export class OrgManagementService {
       throw new NotFoundException(error.message);
     }
 
+    if(data.length === 0) {
+      throw new NotFoundException('No User Found');
+    }
+
     return { data };
   }
 
   async getOrgLoggedIn() {
-    const { data, error } = await this.supabase.getClient().auth.getUser(
-      this.supabase.getJwt(),
-    );
+    const { data: user_data, error } = await this.supabase
+      .getClient()
+      .auth.getUser(this.supabase.getJwt());
 
     if (error) {
       throw new NotFoundException(error.message);
     }
 
-    const user_id = data.user.id;
+    const user_id = user_data.user.id;
 
-    const { data: org_data, error: org_error } = await this.supabase.getClient()
-      .from("organisations")
-      .select("org_id, created_at, name, logo, org_members(*), db_envs(*)")
-      .eq("owner_id", user_id);
+    const { data, error: org_error } = await this.supabase
+      .getClient()
+      .from('organisations')
+      .select('org_id, created_at, name, logo, org_members(*), db_envs(*)')
+      .eq('owner_id', user_id);
 
     if (org_error) {
       throw new NotFoundException(org_error.message);
     }
 
-    return { org_data };
+    if(data.length === 0) {
+      throw new NotFoundException('No User Found');
+    }
+
+    return { data };
   }
 
   async getMembers(get_members_dto: Get_Members_Dto) {
     const { data: owner_data, error: owner_error } = await this.supabase
-      .getClient().auth.getUser(this.supabase.getJwt());
+      .getClient()
+      .auth.getUser(this.supabase.getJwt());
 
     if (owner_error) {
       throw new InternalServerErrorException(owner_error.message);
     }
 
-    const { data: org_data, error: org_error } = await this.supabase.getClient()
-      .from("organisations")
+    const { data: org_data, error: org_error } = await this.supabase
+      .getClient()
+      .from('organisations')
       .select()
-      .eq("owner_id", owner_data.user.id)
-      .eq("org_id", get_members_dto.org_id);
+      .eq('owner_id', owner_data.user.id)
+      .eq('org_id', get_members_dto.org_id);
 
     if (org_error) {
       throw new UnauthorizedException(org_error.message);
@@ -84,17 +96,22 @@ export class OrgManagementService {
 
     if (org_data.length === 0) {
       throw new UnauthorizedException(
-        "You are not the owner of this organisation",
+        'You are not the owner of this organisation'
       );
     }
 
-    const { data, error } = await this.supabase.getClient()
-      .from("org_members")
-      .select("org_id, user_role, profiles(*)")
-      .match({ ...get_members_dto })
+    const { data, error } = await this.supabase
+      .getClient()
+      .from('org_members')
+      .select('org_id, user_role, profiles(*)')
+      .match({ ...get_members_dto });
 
     if (error) {
       throw new InternalServerErrorException(error.message);
+    }
+
+    if(data.length === 0) {
+      throw new NotFoundException('No members found');
     }
 
     return { data };
@@ -102,17 +119,19 @@ export class OrgManagementService {
 
   async getDbs(get_dbs_dto: Get_Dbs_Dto) {
     const { data: owner_data, error: owner_error } = await this.supabase
-      .getClient().auth.getUser(this.supabase.getJwt());
+      .getClient()
+      .auth.getUser(this.supabase.getJwt());
 
     if (owner_error) {
       throw new InternalServerErrorException(owner_error.message);
     }
 
-    const { data: org_data, error: org_error } = await this.supabase.getClient()
-      .from("organisations")
+    const { data: org_data, error: org_error } = await this.supabase
+      .getClient()
+      .from('organisations')
       .select()
-      .eq("owner_id", owner_data.user.id)
-      .eq("org_id", get_dbs_dto.org_id);
+      .eq('owner_id', owner_data.user.id)
+      .eq('org_id', get_dbs_dto.org_id);
 
     if (org_error) {
       throw new UnauthorizedException(org_error.message);
@@ -120,14 +139,15 @@ export class OrgManagementService {
 
     if (org_data.length === 0) {
       throw new UnauthorizedException(
-        "You are not the owner of this organisation",
+        'You are not the owner of this organisation'
       );
     }
 
-    const { data, error } = await this.supabase.getClient()
-      .from("org_dbs")
-      .select("org_id, db_id, db_envs(created_at, name, type, db_info)")
-      .match({ ...get_dbs_dto })
+    const { data, error } = await this.supabase
+      .getClient()
+      .from('org_dbs')
+      .select('org_id, db_id, db_envs(created_at, name, type, db_info)')
+      .match({ ...get_dbs_dto });
 
     if (error) {
       throw new InternalServerErrorException(error.message);
@@ -139,7 +159,8 @@ export class OrgManagementService {
   async createOrg(create_org_dto: Create_Org_Dto) {
     if (create_org_dto.owner_id === undefined) {
       const { data: org_owner, error: org_owner_error } = await this.supabase
-        .getClient().auth.getUser(this.supabase.getJwt());
+        .getClient()
+        .auth.getUser(this.supabase.getJwt());
 
       if (org_owner_error) {
         throw new InternalServerErrorException(org_owner_error.message);
@@ -149,8 +170,9 @@ export class OrgManagementService {
       create_org_dto.owner_id = owner_id;
     }
 
-    const { data, error } = await this.supabase.getClient()
-      .from("organisations")
+    const { data, error } = await this.supabase
+      .getClient()
+      .from('organisations')
       .insert({ ...create_org_dto })
       .select();
 
@@ -158,13 +180,11 @@ export class OrgManagementService {
       throw new InternalServerErrorException(error.message);
     }
 
-    const { data: org_member_data, error: org_member_error } = await this
-      .supabase.getClient()
-      .from("org_members")
-      .insert({
+    const { data: org_member_data, error: org_member_error } =
+      await this.supabase.getClient().from('org_members').insert({
         org_id: data[0].org_id,
         user_id: create_org_dto.owner_id,
-        user_role: "owner",
+        user_role: 'owner'
       });
 
     if (org_member_error) {
@@ -176,17 +196,19 @@ export class OrgManagementService {
 
   async addMember(add_member_dto: Add_Member_Dto) {
     const { data: owner_data, error: owner_error } = await this.supabase
-      .getClient().auth.getUser(this.supabase.getJwt());
+      .getClient()
+      .auth.getUser(this.supabase.getJwt());
 
     if (owner_error) {
       throw new InternalServerErrorException(owner_error.message);
     }
 
-    const { data: org_data, error: org_error } = await this.supabase.getClient()
-      .from("organisations")
+    const { data: org_data, error: org_error } = await this.supabase
+      .getClient()
+      .from('organisations')
       .select()
-      .eq("owner_id", owner_data.user.id)
-      .eq("org_id", add_member_dto.org_id);
+      .eq('owner_id', owner_data.user.id)
+      .eq('org_id', add_member_dto.org_id);
 
     if (org_error) {
       throw new UnauthorizedException(org_error.message);
@@ -194,12 +216,13 @@ export class OrgManagementService {
 
     if (org_data.length === 0) {
       throw new UnauthorizedException(
-        "You are not the owner of this organisation",
+        'You are not the owner of this organisation'
       );
     }
 
-    const { data, error } = await this.supabase.getClient()
-      .from("org_members")
+    const { data, error } = await this.supabase
+      .getClient()
+      .from('org_members')
       .insert({ ...add_member_dto })
       .select();
 
@@ -212,9 +235,10 @@ export class OrgManagementService {
 
   async addDb(add_db_dto: Add_Db_Dto) {
     const { data: owner_data, error: owner_error } = await this.supabase
-      .getClient().auth.getUser(this.supabase.getJwt());
+      .getClient()
+      .auth.getUser(this.supabase.getJwt());
 
-    if(owner_data){
+    if (owner_data) {
       console.log(owner_data);
     }
 
@@ -223,11 +247,12 @@ export class OrgManagementService {
       throw new InternalServerErrorException(owner_error.message);
     }
 
-    const { data: org_data, error: org_error } = await this.supabase.getClient()
-      .from("organisations")
+    const { data: org_data, error: org_error } = await this.supabase
+      .getClient()
+      .from('organisations')
       .select()
-      .eq("owner_id", owner_data.user.id)
-      .eq("org_id", add_db_dto.org_id);
+      .eq('owner_id', owner_data.user.id)
+      .eq('org_id', add_db_dto.org_id);
 
     if (org_error) {
       throw new UnauthorizedException(org_error.message);
@@ -235,7 +260,7 @@ export class OrgManagementService {
 
     if (org_data.length === 0) {
       throw new UnauthorizedException(
-        "You are not the owner of this organisation",
+        'You are not the owner of this organisation'
       );
     }
 
@@ -248,11 +273,12 @@ export class OrgManagementService {
     const db_fields = {
       name: add_db_dto.name,
       type: add_db_dto.type,
-      db_info: add_db_dto.db_info,
+      db_info: add_db_dto.db_info
     };
 
-    const { data: db_data, error: db_error } = await this.supabase.getClient()
-      .from("db_envs")
+    const { data: db_data, error: db_error } = await this.supabase
+      .getClient()
+      .from('db_envs')
       .insert({ ...db_fields })
       .select();
 
@@ -260,8 +286,9 @@ export class OrgManagementService {
       throw new InternalServerErrorException(db_error.message);
     }
 
-    const { data, error } = await this.supabase.getClient()
-      .from("org_dbs")
+    const { data, error } = await this.supabase
+      .getClient()
+      .from('org_dbs')
       .insert({ org_id: add_db_dto.org_id, db_id: db_data[0].db_id })
       .select();
 
@@ -274,17 +301,19 @@ export class OrgManagementService {
 
   async updateOrg(update_org_dto: Update_Org_Dto) {
     const { data: owner_data, error: owner_error } = await this.supabase
-      .getClient().auth.getUser(this.supabase.getJwt());
+      .getClient()
+      .auth.getUser(this.supabase.getJwt());
 
     if (owner_error) {
       throw new InternalServerErrorException(owner_error.message);
     }
 
-    const { data: org_data, error: org_error } = await this.supabase.getClient()
-      .from("organisations")
+    const { data: org_data, error: org_error } = await this.supabase
+      .getClient()
+      .from('organisations')
       .select()
-      .eq("owner_id", owner_data.user.id)
-      .eq("org_id", update_org_dto.org_id);
+      .eq('owner_id', owner_data.user.id)
+      .eq('org_id', update_org_dto.org_id);
 
     if (org_error) {
       throw new UnauthorizedException(org_error.message);
@@ -292,14 +321,15 @@ export class OrgManagementService {
 
     if (org_data.length === 0) {
       throw new UnauthorizedException(
-        "You are not the owner of this organisation",
+        'You are not the owner of this organisation'
       );
     }
 
-    const { data, error } = await this.supabase.getClient()
-      .from("organisations")
+    const { data, error } = await this.supabase
+      .getClient()
+      .from('organisations')
       .update({ ...update_org_dto })
-      .eq("org_id", update_org_dto.org_id)
+      .eq('org_id', update_org_dto.org_id)
       .select();
 
     if (error) {
@@ -311,17 +341,19 @@ export class OrgManagementService {
 
   async updateMember(update_member_dto: Update_Member_Dto) {
     const { data: owner_data, error: owner_error } = await this.supabase
-      .getClient().auth.getUser(this.supabase.getJwt());
+      .getClient()
+      .auth.getUser(this.supabase.getJwt());
 
     if (owner_error) {
       throw new InternalServerErrorException(owner_error.message);
     }
 
-    const { data: org_data, error: org_error } = await this.supabase.getClient()
-      .from("organisations")
+    const { data: org_data, error: org_error } = await this.supabase
+      .getClient()
+      .from('organisations')
       .select()
-      .eq("owner_id", owner_data.user.id)
-      .eq("org_id", update_member_dto.org_id);
+      .eq('owner_id', owner_data.user.id)
+      .eq('org_id', update_member_dto.org_id);
 
     if (org_error) {
       throw new UnauthorizedException(org_error.message);
@@ -329,15 +361,16 @@ export class OrgManagementService {
 
     if (org_data.length === 0) {
       throw new UnauthorizedException(
-        "You are not the owner of this organisation",
+        'You are not the owner of this organisation'
       );
     }
 
-    const { data, error } = await this.supabase.getClient()
-      .from("org_members")
+    const { data, error } = await this.supabase
+      .getClient()
+      .from('org_members')
       .update({ ...update_member_dto })
-      .eq("org_id", update_member_dto.org_id)
-      .eq("user_id", update_member_dto.user_id)
+      .eq('org_id', update_member_dto.org_id)
+      .eq('user_id', update_member_dto.user_id)
       .select();
 
     if (error) {
@@ -349,17 +382,19 @@ export class OrgManagementService {
 
   async updateDb(update_db_dto: Update_Db_Dto) {
     const { data: owner_data, error: owner_error } = await this.supabase
-      .getClient().auth.getUser(this.supabase.getJwt());
+      .getClient()
+      .auth.getUser(this.supabase.getJwt());
 
     if (owner_error) {
       throw new InternalServerErrorException(owner_error.message);
     }
 
-    const { data: org_data, error: org_error } = await this.supabase.getClient()
-      .from("organisations")
+    const { data: org_data, error: org_error } = await this.supabase
+      .getClient()
+      .from('organisations')
       .select()
-      .eq("owner_id", owner_data.user.id)
-      .eq("org_id", update_db_dto.org_id);
+      .eq('owner_id', owner_data.user.id)
+      .eq('org_id', update_db_dto.org_id);
 
     if (org_error) {
       throw new UnauthorizedException(org_error.message);
@@ -367,7 +402,7 @@ export class OrgManagementService {
 
     if (org_data.length === 0) {
       throw new UnauthorizedException(
-        "You are not the owner of this organisation",
+        'You are not the owner of this organisation'
       );
     }
 
@@ -375,24 +410,25 @@ export class OrgManagementService {
     if (update_db_dto.db_info === undefined) {
       db_fields = {
         name: update_db_dto.name,
-        type: update_db_dto.type,
+        type: update_db_dto.type
       };
     } else {
-      const jwt = require("jsonwebtoken");
+      const jwt = require('jsonwebtoken');
       const db_info = jwt.verify(
         update_db_dto.db_info,
-        this.configService.get("SUPABASE_JWT_SECRET"),
+        this.configService.get('SUPABASE_JWT_SECRET')
       );
 
       db_fields = {
         name: update_db_dto.name,
         type: update_db_dto.type,
-        db_info: db_info,
+        db_info: db_info
       };
     }
 
-    const { data: db_data, error: db_error } = await this.supabase.getClient()
-      .from("db_envs")
+    const { data: db_data, error: db_error } = await this.supabase
+      .getClient()
+      .from('db_envs')
       .update({ ...db_fields })
       .match({ db_id: update_db_dto.db_id })
       .select();
@@ -406,17 +442,19 @@ export class OrgManagementService {
 
   async removeOrg(remove_org_dto: Remove_Org_Dto) {
     const { data: owner_data, error: owner_error } = await this.supabase
-      .getClient().auth.getUser(this.supabase.getJwt());
+      .getClient()
+      .auth.getUser(this.supabase.getJwt());
 
     if (owner_error) {
       throw new InternalServerErrorException(owner_error.message);
     }
 
-    const { data: org_data, error: org_error } = await this.supabase.getClient()
-      .from("organisations")
+    const { data: org_data, error: org_error } = await this.supabase
+      .getClient()
+      .from('organisations')
       .select()
-      .eq("owner_id", owner_data.user.id)
-      .eq("org_id", remove_org_dto.org_id);
+      .eq('owner_id', owner_data.user.id)
+      .eq('org_id', remove_org_dto.org_id);
 
     if (org_error) {
       throw new UnauthorizedException(org_error.message);
@@ -424,14 +462,15 @@ export class OrgManagementService {
 
     if (org_data.length === 0) {
       throw new UnauthorizedException(
-        "You are not the owner of this organisation",
+        'You are not the owner of this organisation'
       );
     }
 
-    const { data, error } = await this.supabase.getClient()
-      .from("organisations")
+    const { data, error } = await this.supabase
+      .getClient()
+      .from('organisations')
       .delete()
-      .eq("org_id", remove_org_dto.org_id)
+      .eq('org_id', remove_org_dto.org_id)
       .select();
 
     if (error) {
@@ -443,17 +482,19 @@ export class OrgManagementService {
 
   async removeMember(remove_member_dto: Remove_Member_Dto) {
     const { data: owner_data, error: owner_error } = await this.supabase
-      .getClient().auth.getUser(this.supabase.getJwt());
+      .getClient()
+      .auth.getUser(this.supabase.getJwt());
 
     if (owner_error) {
       throw new InternalServerErrorException(owner_error.message);
     }
 
-    const { data: org_data, error: org_error } = await this.supabase.getClient()
-      .from("organisations")
+    const { data: org_data, error: org_error } = await this.supabase
+      .getClient()
+      .from('organisations')
       .select()
-      .eq("org_id", remove_member_dto.org_id)
-      .eq("owner_id", owner_data.user.id);
+      .eq('org_id', remove_member_dto.org_id)
+      .eq('owner_id', owner_data.user.id);
 
     if (org_error) {
       throw new UnauthorizedException(org_error.message);
@@ -461,15 +502,16 @@ export class OrgManagementService {
 
     if (org_data.length === 0) {
       throw new UnauthorizedException(
-        "You are not the owner of this organisation",
+        'You are not the owner of this organisation'
       );
     }
 
-    const { data, error } = await this.supabase.getClient()
-      .from("org_members")
+    const { data, error } = await this.supabase
+      .getClient()
+      .from('org_members')
       .delete()
-      .eq("org_id", remove_member_dto.org_id)
-      .eq("user_id", remove_member_dto.user_id)
+      .eq('org_id', remove_member_dto.org_id)
+      .eq('user_id', remove_member_dto.user_id)
       .select();
 
     if (error) {
@@ -481,26 +523,29 @@ export class OrgManagementService {
 
   async removeDb(remove_db_dto: Remove_Db_Dto) {
     const { data: owner_data, error: owner_error } = await this.supabase
-      .getClient().auth.getUser(this.supabase.getJwt());
+      .getClient()
+      .auth.getUser(this.supabase.getJwt());
 
     if (owner_error) {
       throw new InternalServerErrorException(owner_error.message);
     }
 
-    const { data: org_data, error: org_error } = await this.supabase.getClient()
-      .from("organisations")
+    const { data: org_data, error: org_error } = await this.supabase
+      .getClient()
+      .from('organisations')
       .select()
-      .eq("owner_id", owner_data.user.id)
-      .eq("org_id", remove_db_dto.org_id);
+      .eq('owner_id', owner_data.user.id)
+      .eq('org_id', remove_db_dto.org_id);
 
     if (org_error) {
       throw new UnauthorizedException(org_error.message);
     }
 
-    const { data, error } = await this.supabase.getClient()
-      .from("db_envs")
+    const { data, error } = await this.supabase
+      .getClient()
+      .from('db_envs')
       .delete()
-      .eq("db_id", remove_db_dto.db_id)
+      .eq('db_id', remove_db_dto.db_id)
       .select();
 
     if (error) {

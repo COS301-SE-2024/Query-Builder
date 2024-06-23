@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString, IsUUID } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class Get_Org_Dto {
   @IsOptional()

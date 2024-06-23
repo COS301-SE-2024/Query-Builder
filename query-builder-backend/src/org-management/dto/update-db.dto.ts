@@ -1,28 +1,35 @@
-import { IsUUID, IsNotEmpty, IsString, IsJWT, IsOptional, IsEnum } from "class-validator";
+import {
+  IsUUID,
+  IsNotEmpty,
+  IsString,
+  IsJWT,
+  IsOptional,
+  IsEnum
+} from 'class-validator';
 
 export class Update_Db_Dto {
-    @IsUUID()
-    @IsNotEmpty()
-    db_id: string;
+  @IsUUID()
+  @IsNotEmpty()
+  db_id: string;
 
-    @IsUUID()
-    @IsNotEmpty()
-    org_id: string;
+  @IsUUID()
+  @IsNotEmpty()
+  org_id: string;
 
-    @IsOptional()
-    @IsString()
-    @IsNotEmpty()
-    name?: string;
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  name?: string;
 
-    @IsOptional()
-    @IsEnum(['mysql', 'mongodb', 'postgresql'], {
-        message: "Database type must be either 'mysql', 'mongodb' or 'postgresql'"
-    })
-    @IsNotEmpty()
-    type?: string;
+  @IsOptional()
+  @IsEnum(['mysql', 'mongodb', 'postgresql'], {
+    message: "Database type must be either 'mysql', 'mongodb' or 'postgresql'"
+  })
+  @IsNotEmpty()
+  type?: string;
 
-    @IsOptional()
-    @IsJWT()
-    @IsNotEmpty()
-    db_info?: string
+  @IsOptional()
+  @IsJWT()
+  @IsNotEmpty()
+  db_info?: string;
 }

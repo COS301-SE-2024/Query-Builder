@@ -1,8 +1,8 @@
-import { ExtractJwt, Strategy } from "passport-jwt";
-import { PassportStrategy } from "@nestjs/passport";
-import { Injectable, Logger } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { AuthUser } from "@supabase/supabase-js";
+import { ExtractJwt, Strategy } from 'passport-jwt';
+import { PassportStrategy } from '@nestjs/passport';
+import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { AuthUser } from '@supabase/supabase-js';
 
 @Injectable()
 export class SupabaseStrategy extends PassportStrategy(Strategy) {
@@ -10,11 +10,11 @@ export class SupabaseStrategy extends PassportStrategy(Strategy) {
 
   constructor(private readonly configService: ConfigService) {
     super({
-      supabaseUrl: configService.get("SUPABASE_URL"),
-      supabaseKey: configService.get("SUPABASE_KEY"),
+      supabaseUrl: configService.get('SUPABASE_URL'),
+      supabaseKey: configService.get('SUPABASE_KEY'),
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get("SUPABASE_JWT_SECRET"),
+      secretOrKey: configService.get('SUPABASE_JWT_SECRET')
     });
   }
 

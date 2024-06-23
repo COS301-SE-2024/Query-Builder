@@ -8,7 +8,7 @@ describe('JsonConverterController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [JsonConverterController],
-      providers: [JsonConverterService],
+      providers: [JsonConverterService]
     }).compile();
 
     controller = module.get<JsonConverterController>(JsonConverterController);
@@ -24,7 +24,7 @@ describe('JsonConverterController', () => {
       query_type: 'SELECT',
       table: 'users',
       columns: ['id'],
-      condition: 'id = 1',
+      condition: 'id = 1'
     };
 
     const expectedQuery = 'SELECT `id` FROM users WHERE id = 1';
