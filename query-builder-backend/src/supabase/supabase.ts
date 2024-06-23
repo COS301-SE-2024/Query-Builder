@@ -1,11 +1,11 @@
-import { Inject, Injectable, Logger, Scope } from "@nestjs/common";
-import { Request } from "express";
-import { REQUEST } from "@nestjs/core";
-import { ConfigService } from "@nestjs/config";
+import { Inject, Injectable, Logger, Scope } from '@nestjs/common';
+import { Request } from 'express';
+import { REQUEST } from '@nestjs/core';
+import { ConfigService } from '@nestjs/config';
 
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-import { ExtractJwt } from "passport-jwt";
+import { ExtractJwt } from 'passport-jwt';
 
 @Injectable({ scope: Scope.REQUEST })
 export class Supabase {
@@ -13,7 +13,7 @@ export class Supabase {
 
   constructor(
     @Inject(REQUEST) private readonly request: Request,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService
   ) {}
 
   getClient() {
@@ -22,17 +22,19 @@ export class Supabase {
     }
 
     this.clientInstance = createClient(
-      this.configService.get("SUPABASE_URL"),
-      this.configService.get("SUPABASE_KEY"),
+      this.configService.get('SUPABASE_URL'),
+      this.configService.get('SUPABASE_KEY'),
       {
         auth: {
           autoRefreshToken: true,
-          detectSessionInUrl: false,
+          detectSessionInUrl: false
         },
         global: {
-          headers: { Authorization: `Bearer ${ExtractJwt.fromAuthHeaderAsBearerToken()(this.request)}`}
+          headers: {
+            Authorization: `Bearer ${ExtractJwt.fromAuthHeaderAsBearerToken()(this.request)}`
+          }
         }
-      },
+      }
     );
 
     return this.clientInstance;
