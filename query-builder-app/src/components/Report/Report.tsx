@@ -81,8 +81,6 @@ interface ChartData {
   }[];
 }
 
-
-
 const tableCol = (numCols: number) => ({
   width: `${100 / numCols}%`,
   borderStyle: 'solid' as 'solid',
@@ -90,6 +88,9 @@ const tableCol = (numCols: number) => ({
   borderLeftWidth: 0,
   borderTopWidth: 0,
 });
+
+
+
 
 interface DatabaseCredentials {
   host: string,
@@ -123,19 +124,13 @@ databaseName: string,
 queryParams: QueryParams
 }
 
-interface Column {
-  key: string,
-  label: string
-}
 
-export interface reportProps{
+export interface reportInput{
 
   query: Query
 
 } 
 
-// This function gets the token from local storage.
-// Supabase stores the token in local storage so we can access it from there.
 const getToken = () => {
   const storageKey = `sb-${process.env.NEXT_PUBLIC_SUPABASE_PROJECT_ID}-auth-token`;
   const sessionDataString = localStorage.getItem(storageKey);
@@ -145,41 +140,56 @@ const getToken = () => {
   return token;
 };
 
-async function getData(props: reportProps) 
-{
-  let response = await fetch("http://localhost:3000/api/query", {
-    method: "POST",
-    headers: {
-      "Accept": "application/json",
-      "Content-Type": "application/json",
-      "Authorization": 'Bearer ' + getToken()	
+const myData = {
+  "query": {
+    "credentials": {
+      "host": "127.0.0.1",
+      "user": "root",
+      "password": "testPassword"
     },
-    body: JSON.stringify(props.query)
-  })
-
-  let data = await response.json();
-  return data;
+    "databaseName": "sakila",
+    "queryParams": {
+      "language": "sql",
+      "query_type": "select",
+      "table": "film",
+      "columns": [],
+    }
+  }
 }
 
-export default function Report(props: reportProps){
+async function getAllData(props: reportInput) {
+
+  let response = await fetch("http://localhost:55555/api/query", {
+    method: "POST",
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + getToken()
+    },
+    body: JSON.stringify(myData)
+  })
+
+  let json = await response.json();
+  return json.data;
+  
+}
+
+
+
+
+export default function Report(props : reportInput) {
   const [chartsData, setChartsData] = useState<ChartData[]>([]);
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<any[]>([]);
 
   useEffect(() => {
+
     const fetchData = async () => {
-      try {
-        const result = await getData(props);
-        setData(result);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
+      let data = await getAllData(props);
+      setData(data);
     };
 
     fetchData();
-  }, [props]);
 
-  useEffect(() => {
-    
     const headings = Object.keys(data[0]) as (keyof (typeof data)[0])[]; // stores the headings of each column (can be used to reference)
     const numberColumns: boolean[] = Object.values(data[0]).map(
       (value) => typeof value === 'number',
@@ -193,7 +203,7 @@ export default function Report(props: reportProps){
           labels: firstKey,
           datasets: [
             {
-              label: String(headings[index]),
+              label: String(headings[index]),                                                                                //changed this to always exoect string is that fine?
               data: data.map((item) => item[headings[index]]),
               backgroundColor: `rgba(${index * 50}, 162, 235, 0.2)`,
               borderColor: `rgba(${index * 50}, 162, 235, 1)`,
@@ -206,7 +216,7 @@ export default function Report(props: reportProps){
         setChartsData((prev) => [...prev, currentChart]);
       }
     });
-  }, [data]);
+  }, []);
 
   const buttonStyle = {
     marginLeft: 10,
@@ -222,12 +232,12 @@ export default function Report(props: reportProps){
       style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
     >
       <PDFViewer width="800" height="600" style={{ marginBottom: 20 }}>
-        <MyDocument tableData={data} chartData={chartsData}/>
+        <MyDocument tableData={data} chartData={chartsData} data={data}/>
       </PDFViewer>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <div style={{ marginLeft: 20 }}>
           <PDFDownloadLink
-            document={<MyDocument tableData={data} chartData={chartsData}/>}
+            document={<MyDocument tableData={data} chartData={chartsData} data={data}/>}
             fileName="report.pdf"
           >
             {({ loading }) => (
@@ -277,10 +287,11 @@ export default function Report(props: reportProps){
 type MyDocumentProps = {
   tableData: any[];
   chartData: ChartData[];
+  data: any[];
 };
 
-function MyDocument({ tableData, chartData }: MyDocumentProps) {
-  const headers = Object.keys(tableData[0]) as (keyof (typeof tableData)[0])[];
+function MyDocument({ tableData, chartData, data }: MyDocumentProps) {        
+  const headers = Object.keys(tableData[0]) as (keyof (typeof data)[0])[];//changed but should it not maybe be tableData[0] instead of data[0]? Or remove it maybe?
   const numCols = headers.length;
 
   return (
@@ -294,7 +305,7 @@ function MyDocument({ tableData, chartData }: MyDocumentProps) {
               <View style={styles.tableRow}>
                 {headers.map((header, index) => (
                   <View key={index} style={tableCol(numCols)}>
-                    <Text style={styles.tableCell}>{String(header)}</Text>
+                    <Text style={styles.tableCell}>{String(header)}</Text> 
                   </View>
                 ))}
               </View>
