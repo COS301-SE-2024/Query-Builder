@@ -1,3 +1,7 @@
+---
+sidebar_position: 3
+---
+
 # Query Builder
 Once a database has been selected to be queried and a successful connection has been established, you will be able to query the database using either a ***form*** or ***drag and drop*** system.
 

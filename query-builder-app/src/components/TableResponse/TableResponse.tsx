@@ -1,8 +1,10 @@
 "use client"
 import "../../app/globals.css"
 import React, { useEffect, useState } from "react";
-import {Table, TableHeader, TableBody, TableColumn, TableRow, TableCell, getKeyValue, Spinner, Pagination} from "@nextui-org/react";
+import {Table, TableHeader, TableBody, TableColumn, TableRow, TableCell, getKeyValue, Spinner, Pagination, Button, useDisclosure, Modal, ModalContent, ModalHeader} from "@nextui-org/react";
 import {useAsyncList} from "@react-stately/data";
+import Report from "../Report/Report";
+import csvDownload from 'json-to-csv-export'
 
 interface DatabaseCredentials {
   host: string,
@@ -67,17 +69,62 @@ export default function TableResponse(props: TableResponseProps){
     columns.push({key: columnName, label: columnName});
   }
 
+  //React hook for report modal
+  const {isOpen, onOpen, onOpenChange} = useDisclosure();
+
   //A page state holding the page number of the query data that we are currently viewing
   const [pageNumber, setPageNumber] = useState(1);
 
-  //A state holding the number of rows of query data that we would like to view per page (default = 10)
-  const [rowsPerPage, setRowsPerPage] = useState(10)
+  //A state holding the number of rows of query data that we would like to view per page (default = 20)
+  const [rowsPerPage, setRowsPerPage] = useState(20)
 
   //A state holding the total number of pages that the data can fill
   const [totalPages, setTotalPages] = useState(1);
 
   //A loading state that will initially be true and later false once data has been loaded
   const [loading, setLoading] = useState(true);
+
+  async function downloadCSV(){
+
+    let data = await getAllData();
+
+    console.log(data);
+
+    const dataProperties = {
+      data: data,
+      delimiter: ',',
+    }
+
+    console.log(dataProperties);
+
+    csvDownload(dataProperties);
+
+  }
+
+  async function getAllData() {
+    
+    //fetch the data from the endpoint
+    let response = await fetch("http://localhost:55555/api/query", {
+      method: "POST",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + getToken()
+      },
+      body: JSON.stringify(props.query)
+    })
+
+    let json = (await response.json()).data;
+
+    //remove qbee_id
+    json.map(function(item: any) { 
+      delete item.qbee_id; 
+      return item; 
+    });
+
+    return json;
+
+  }
 
   //Create an async list that will hold the query response data upon load
   let tableData = useAsyncList({
@@ -151,40 +198,61 @@ export default function TableResponse(props: TableResponseProps){
           {(item) => (
             //@ts-ignore
             <TableRow key={item.qbee_id}>
-              {(columnKey) => <TableCell>{getKeyValue(item, columnKey)}</TableCell>}
+              {(columnKey) => <TableCell>{typeof getKeyValue(item, columnKey) === 'object' ? JSON.stringify(getKeyValue(item, columnKey)) :  getKeyValue(item, columnKey)}</TableCell>}
             </TableRow>
           )}
         </TableBody>
       </Table>
 
-      <div className="flex w-full justify-center" style={{position: "absolute", bottom: "0", backgroundColor: "white", padding:"30px"}}>
-        <Pagination
-          showControls
-          classNames={{
-            cursor: "bg-foreground text-background",
-          }}
-          color="default"
-          page={pageNumber}
-          total={totalPages}
-          variant="light"
-          onChange={(pageNumber)=>{
-            setPageNumber(pageNumber);
-          }}
-        />
-        <label className="flex items-center text-default-400 text-small">
-          Rows per page:
-          <select
-            className="bg-transparent outline-none text-default-400 text-small"
-            onChange={(rowsPerPage)=>{
-              setRowsPerPage(Number(rowsPerPage.target.value));
-              setPageNumber(1);
+      <div className="flex w-full justify-between" style={{position: "absolute", bottom: "0", backgroundColor: "white", padding:"30px"}}>
+        <div className="flex w-full justify-center">
+          <Pagination
+            showControls
+            classNames={{
+              cursor: "bg-foreground text-background",
             }}
-          >
-            <option value="10">10</option>
-            <option value="20">20</option>
-            <option value="40">40</option>
-          </select>
-        </label>
+            color="default"
+            page={pageNumber}
+            total={totalPages}
+            variant="light"
+            onChange={(pageNumber)=>{
+              setPageNumber(pageNumber);
+            }}
+          />
+          <label className="flex items-center text-default-400 text-small">
+            Rows per page:
+            <select
+              className="bg-transparent outline-none text-default-400 text-small"
+              defaultValue={20}
+              onChange={(rowsPerPage)=>{
+                setRowsPerPage(Number(rowsPerPage.target.value));
+                setPageNumber(1);
+              }}
+            >
+              <option value="10">10</option>
+              <option value="20">20</option>
+              <option value="40">40</option>
+            </select>
+          </label>
+        </div>
+        <div></div>
+        <Button color="primary" className="mx-1" onClick={() => {downloadCSV()}}>Export Data</Button>
+        <Button onPress={onOpen} color="primary" className="mx-1">Generate Report</Button>
+        <Modal 
+          isOpen={isOpen} 
+          onOpenChange={onOpenChange}
+          placement="top-center"
+          className="text-black h-100vh"
+          size="full">
+          <ModalContent>
+              {(onClose : any) => (
+                  <>
+                      <ModalHeader className="flex flex-col gap-1">Query Report</ModalHeader>
+                      <Report data={tableData.items as JSON[]} />
+                  </>
+              )}
+          </ModalContent>
+        </Modal>
       </div>
     </div>
 

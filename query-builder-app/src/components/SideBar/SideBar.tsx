@@ -1,10 +1,22 @@
 import React, { useState } from 'react';
 import "./SideBar.css";
 import {LogoIcon} from "./Logo";
-
+import Link from 'next/link';
+import { createClient } from "./../../utils/supabase/client";
+import {Button, useRadioGroup} from "@nextui-org/react";
+import { useRouter } from 'next/navigation'
 
 const Sidebar = () => {
   // State to manage the open/close state of the sidebar
+  const supabase = createClient();
+  const router = useRouter();
+    
+    const signOut = async () => {
+        const { error } = await supabase.auth.signOut();
+        console.log(error);
+        router.push("/");
+    }
+
   return (
     <>
         <div className="sidebar-container">
@@ -22,22 +34,10 @@ const Sidebar = () => {
             <div className="sidebar-nav">
                 <nav className="nav-links">
                     <div className="sidebar-item">
-                        <a href="">
+                        <Link href="/">
                             <span className="sidebar-item-icon"></span>
                             <span className="sidebar-item-title">Home</span>
-                        </a>
-                    </div>
-                    <div className="sidebar-item">
-                        <a href="">
-                            <span className="sidebar-item-icon"></span>
-                            <span className="sidebar-item-title">Home</span>
-                        </a>
-                    </div>
-                    <div className="sidebar-item">
-                        <a href="">
-                            <span className="sidebar-item-icon"></span>
-                            <span className="sidebar-item-title">Home</span>
-                        </a>
+                        </Link>
                     </div>
                 </nav>
             </div>
@@ -48,16 +48,22 @@ const Sidebar = () => {
                 <nav className="nav-links">
 
                     <div className="sidebar-item">
-                        <a href="">
+                        <Link href="/settings">
                             <span className="sidebar-item-icon"></span>
                             <span className="sidebar-item-title">Settings</span>
+                        </Link>
+                    </div>
+                    <div className="sidebar-item">
+                        <a target="_blank" href="https://cos301-se-2024.github.io/Query-Builder/docs/category/user-manual">
+                            <span className="sidebar-item-icon"></span>
+                            <span className="sidebar-item-title">Help</span>
                         </a>
                     </div>
                     <div className="sidebar-item">
-                        <a href="">
-                            <span className="sidebar-item-icon"></span>
-                            <span className="sidebar-item-title">Log out</span>
-                        </a>
+                        <Button
+                         onClick={() => signOut()}>
+                            Log out
+                        </Button>
                     </div>
                 </nav>
             </div>
