@@ -109,7 +109,7 @@ export default function UserSettings(){
                                 isRequired
                                 label="First Name"
                                 variant="bordered"
-                                defaultValue={initialFirstName}
+                                placeholder={initialFirstName}
                                 onValueChange={setUpdateFirstName}
                                 onFocus={() => {setUpdateFirstNameHasBeenFocused(true);setUpdateLastNameHasBeenFocused(false);setUpdatePhoneHasBeenFocused(false)}}
                                 isInvalid={isUpdateFirstNameInvalid && updateFirstNameHasBeenFocused}
@@ -122,7 +122,7 @@ export default function UserSettings(){
                                 isRequired
                                 label="Last Name"
                                 variant="bordered"
-                                defaultValue={initialLastName}
+                                placeholder={initialLastName}
                                 onValueChange={setUpdateLastName}
                                 onFocus={() => {setUpdateFirstNameHasBeenFocused(false);setUpdateLastNameHasBeenFocused(true);setUpdatePhoneHasBeenFocused(false)}}
                                 isInvalid={isUpdateLastNameInvalid && updateLastNameHasBeenFocused}

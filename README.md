@@ -47,14 +47,9 @@ QBee is the ultimate tool for modern database management and analysis.
 
 | Resource                        | Link                                       |
 |---------------------------------|--------------------------------------------|
-| Software Requirements Specification | [See our complete SRS](https://cos301-se-2024.github.io/Query-Builder/docs/category/requirements-specification)            |
-| User Stories                    | [See User Stories](https://cos301-se-2024.github.io/Query-Builder/docs/requirements-specification/user-stories)                   |
-| Functional Requirements           | [See Functional Requirements](https://cos301-se-2024.github.io/Query-Builder/docs/requirements-specification/functional-requirements)                 |
-| Use Case Diagrams           | [See Use Case Diagrams](https://cos301-se-2024.github.io/Query-Builder/docs/requirements-specification/use-case-diagrams)                 |
-| Service Contracts            | [See Service Contracts](https://cos301-se-2024.github.io/Query-Builder/docs/requirements-specification/service-contracts)                         |
-| Class Diagram              | [See Class Diagram](https://cos301-se-2024.github.io/Query-Builder/docs/requirements-specification/class-diagram)                     |
-| Architectural Requirements                  | [See Architectural Requirements](https://cos301-se-2024.github.io/Query-Builder/docs/category/architectural-requirements)                         |
-| Technology Requirements                | [See Technology Requirements](https://cos301-se-2024.github.io/Query-Builder/docs/requirements-specification/technology-requirements)                   |
+| Software Requirements Specification | [See our complete SRS](https://cos301-se-2024.github.io/Query-Builder/docs/category/software-requirements-specification)            |
+| Architectural Requirements Document                    | [See our architecture document](https://cos301-se-2024.github.io/Query-Builder/docs/category/architectural-requirements-document)                   |
+| User Manual/Help Centre           | [Help for QBee Users](https://cos301-se-2024.github.io/Query-Builder/docs/category/user-manual)                 |
 | Coding Standards                | [See Coding Standards](https://cos301-se-2024.github.io/Query-Builder/docs/guides-and-standards/coding-standards)                   |
 | Project Board                   | [Project Tracking](https://github.com/orgs/COS301-SE-2024/projects/55)|
 
@@ -67,6 +62,10 @@ QBee is the ultimate tool for modern database management and analysis.
 [Presentation](https://universitypretoria-my.sharepoint.com/:p:/g/personal/u22699572_up_ac_za/Ed5Ju0ycZPJEhB489Y9t-NQBmRZXLNSEgkgdkAGdTnRHWA?e=71FQGs)
 
 [Video](https://drive.google.com/file/d/1vwUdawGN85nuJmd0HXj29mgobARACl9i/view?usp=sharing)
+
+### Demo 2
+
+[Video](https://drive.google.com/file/d/1BnZVrjiJBmh-6tELQpVp3tIR9sDfyqD-/view?usp=sharing)
 
 
 ## Team Members
