@@ -27,7 +27,7 @@ describe('JsonConverterController', () => {
       condition: 'id = 1'
     };
 
-    const expectedQuery = 'SELECT `id` FROM users WHERE id = 1';
+    const expectedQuery = 'SELECT id FROM users WHERE id = 1';
 
     const result = await controller.convert(queryParams);
 

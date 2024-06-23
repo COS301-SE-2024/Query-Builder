@@ -22,7 +22,7 @@ columns: string[]
 interface DatabaseCredentials {
   host: string;
   user: string;
-  paszsword: string;
+  password: string;
 }
 
 interface SortParams {
