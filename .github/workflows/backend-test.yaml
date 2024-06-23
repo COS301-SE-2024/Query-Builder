@@ -26,6 +26,15 @@ jobs:
                 cache-dependency-path: './query-builder-backend/pnpm-lock.yaml'
             - name: Install Dependencies
               run: pnpm install --frozen-lockfile
+            - name: Make env file
+              run: |
+                cd query-builder-backend
+                touch .env
+                echo SUPABASE_URL = ${{ env.SUPABASE_URL }} >> .env
+                echo SUPABASE_KEY = ${{ env.SUPABASE_ANON_KEY }} >> .env
+                echo SUPABASE_SERVICE_KEY = ${{ env.SUPABASE_SERVICE_ROLE_KEY}} >> .env
+                echo SUPABASE_JWT_SECRET = ${{ env.SUPABASE_JWT_SECRET }} >> .env
+                cat .env
             - name: Test
               run: pnpm test
               working-directory: query-builder-backend
