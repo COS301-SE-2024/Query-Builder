@@ -167,10 +167,18 @@ export default function Report(props: reportProps){
 
   useEffect(() => {
     const fetchData = async () => {
-      const result = await getData(props);
-      setData(result);
+      try {
+        const result = await getData(props);
+        setData(result);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
     };
-  
+
+    fetchData();
+  }, [props]);
+
+  useEffect(() => {
     
     const headings = Object.keys(data[0]) as (keyof (typeof data)[0])[]; // stores the headings of each column (can be used to reference)
     const numberColumns: boolean[] = Object.values(data[0]).map(
@@ -198,7 +206,7 @@ export default function Report(props: reportProps){
         setChartsData((prev) => [...prev, currentChart]);
       }
     });
-  }, []);
+  }, [data]);
 
   const buttonStyle = {
     marginLeft: 10,
