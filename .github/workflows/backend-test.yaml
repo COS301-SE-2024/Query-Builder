@@ -27,8 +27,8 @@ jobs:
             - name: Install Dependencies
               run: pnpm install --frozen-lockfile
             - name: Make env file
+              working-directory: query-builder-backend
               run: |
-                cd query-builder-backend
                 touch .env
                 echo SUPABASE_URL = ${{ env.SUPABASE_URL }} >> .env
                 echo SUPABASE_KEY = ${{ env.SUPABASE_ANON_KEY }} >> .env
