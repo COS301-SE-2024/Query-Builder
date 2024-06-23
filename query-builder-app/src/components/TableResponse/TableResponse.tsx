@@ -3,6 +3,7 @@ import "../../app/globals.css"
 import React, { useEffect, useState } from "react";
 import {Table, TableHeader, TableBody, TableColumn, TableRow, TableCell, getKeyValue, Spinner, Pagination, Button, useDisclosure, Modal, ModalContent, ModalHeader} from "@nextui-org/react";
 import {useAsyncList} from "@react-stately/data";
+import Report from "../Report/Report";
 
 interface DatabaseCredentials {
   host: string,
@@ -204,7 +205,7 @@ export default function TableResponse(props: TableResponseProps){
               {(onClose : any) => (
                   <>
                       <ModalHeader className="flex flex-col gap-1">Query Report</ModalHeader>
-                      {/* <Report query={props.query}> */}
+                      <Report/>
                   </>
               )}
           </ModalContent>
