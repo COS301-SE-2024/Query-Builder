@@ -100,7 +100,7 @@ interface DatabaseCredentials {
 
 interface SortParams {
   column: string,
-  direction?: "ascending"|"descending"
+  direction?: "ascending" | "descending"
 }
 
 interface PageParams {
@@ -119,17 +119,17 @@ interface QueryParams {
 }
 
 interface Query {
-credentials: DatabaseCredentials,
-databaseName: string,
-queryParams: QueryParams
+  credentials: DatabaseCredentials,
+  databaseName: string,
+  queryParams: QueryParams
 }
 
 
-export interface reportInput{
+export interface reportInput {
 
   query: Query
 
-} 
+}
 
 const getToken = () => {
   const storageKey = `sb-${process.env.NEXT_PUBLIC_SUPABASE_PROJECT_ID}-auth-token`;
@@ -141,7 +141,7 @@ const getToken = () => {
 };
 
 const myData = {
-  "query": {
+  query: {
     "credentials": {
       "host": "127.0.0.1",
       "user": "root",
@@ -166,24 +166,27 @@ async function getAllData(props: reportInput) {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + getToken()
     },
-    body: JSON.stringify(myData)
+    body: JSON.stringify(myData.query)
   })
 
   let json = await response.json();
+  console.log("my response: " + (json as JSON));
   return json.data;
-  
+
 }
 
 
 
 
-export default function Report(props : reportInput) {
+export default function Report(props: reportInput) {
   const [chartsData, setChartsData] = useState<ChartData[]>([]);
   const [data, setData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
 
     const fetchData = async () => {
+      setLoading(true);
       let data = await getAllData(props);
       setData(data);
     };
@@ -216,6 +219,7 @@ export default function Report(props : reportInput) {
         setChartsData((prev) => [...prev, currentChart]);
       }
     });
+    setLoading(false);
   }, []);
 
   const buttonStyle = {
@@ -227,17 +231,22 @@ export default function Report(props : reportInput) {
     cursor: 'pointer',
   };
 
+  if(loading){
+    <div>Loading...</div>
+  }
+  
   return (
+    
     <div
       style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
     >
       <PDFViewer width="800" height="600" style={{ marginBottom: 20 }}>
-        <MyDocument tableData={data} chartData={chartsData} data={data}/>
+        <MyDocument tableData={data} chartData={chartsData} data={data} />
       </PDFViewer>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <div style={{ marginLeft: 20 }}>
           <PDFDownloadLink
-            document={<MyDocument tableData={data} chartData={chartsData} data={data}/>}
+            document={<MyDocument tableData={data} chartData={chartsData} data={data} />}
             fileName="report.pdf"
           >
             {({ loading }) => (
@@ -290,7 +299,7 @@ type MyDocumentProps = {
   data: any[];
 };
 
-function MyDocument({ tableData, chartData, data }: MyDocumentProps) {        
+function MyDocument({ tableData, chartData, data }: MyDocumentProps) {
   const headers = Object.keys(tableData[0]) as (keyof (typeof data)[0])[];//changed but should it not maybe be tableData[0] instead of data[0]? Or remove it maybe?
   const numCols = headers.length;
 
@@ -305,7 +314,7 @@ function MyDocument({ tableData, chartData, data }: MyDocumentProps) {
               <View style={styles.tableRow}>
                 {headers.map((header, index) => (
                   <View key={index} style={tableCol(numCols)}>
-                    <Text style={styles.tableCell}>{String(header)}</Text> 
+                    <Text style={styles.tableCell}>{String(header)}</Text>
                   </View>
                 ))}
               </View>
