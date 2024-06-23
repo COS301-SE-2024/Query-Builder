@@ -81,17 +81,6 @@ interface ChartData {
   }[];
 }
 
-const data = [
-  {
-    store: 'Woodridge,Australia',
-    total_sales: 33726.77,
-  },
-  {
-    store: 'Lethbridge,Canada',
-    total_sales: 33679.79,
-  },
-];
-
 const tableCol = (numCols: number) => ({
   width: `${100 / numCols}%`,
   borderStyle: 'solid' as 'solid',
@@ -100,7 +89,7 @@ const tableCol = (numCols: number) => ({
   borderTopWidth: 0,
 });
 
-export default function Report() {
+export default function Report({ data }: { data: JSON[] }) {
   const [chartsData, setChartsData] = useState<ChartData[]>([]);
 
   useEffect(() => {
@@ -117,7 +106,7 @@ export default function Report() {
           labels: firstKey,
           datasets: [
             {
-              label: headings[index],
+              label: String(headings[index]),
               data: data.map((item) => item[headings[index]]),
               backgroundColor: `rgba(${index * 50}, 162, 235, 0.2)`,
               borderColor: `rgba(${index * 50}, 162, 235, 1)`,
@@ -204,7 +193,7 @@ type MyDocumentProps = {
 };
 
 function MyDocument({ tableData, chartData }: MyDocumentProps) {
-  const headers = Object.keys(tableData[0]) as (keyof (typeof data)[0])[];
+  const headers = Object.keys(tableData[0]) as (keyof (typeof tableData)[0])[];
   const numCols = headers.length;
 
   return (
@@ -218,7 +207,7 @@ function MyDocument({ tableData, chartData }: MyDocumentProps) {
               <View style={styles.tableRow}>
                 {headers.map((header, index) => (
                   <View key={index} style={tableCol(numCols)}>
-                    <Text style={styles.tableCell}>{header}</Text>
+                    <Text style={styles.tableCell}>{String(header)}</Text>
                   </View>
                 ))}
               </View>
