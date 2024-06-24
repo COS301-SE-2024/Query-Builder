@@ -20,26 +20,34 @@ export default function UserSettings(){
     // const [initialPhone, setInitialPhone] = useState('');
     // get user information with JWT token
     const getUserInfo = async () => {
-        let response = await fetch("http://localhost:55555/api/user-management/get-user", {
-            credentials: "include",
-            method: "GET",
-            headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + await getToken()
-            },
-        })
-          
-        //   console.log((await response.json()));
-          let json = await response.json();
-          console.log(json.profile_data[0]);
-          setInitialFirstName(json.profile_data[0].first_name);
-          setInitialLastName(json.profile_data[0].last_name);
-          console.log(initialFirstName);
-          console.log(initialLastName);
+
+        try {
+            let response = await fetch("http://localhost:55555/api/user-management/get-user", {
+                method: "GET",
+                headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + await getToken()
+                },
+            })
+            
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+
+            //   console.log((await response.json()));
+            let json = await response.json();
+            console.log(json.profile_data[0]);
+            setInitialFirstName(json.profile_data[0].first_name);
+            setInitialLastName(json.profile_data[0].last_name);
+        } catch (error) {
+            console.error("Failed to fetch user info:", error);
+        }
     }
 
-    getUserInfo();
+    useEffect(() => {
+        getUserInfo();
+    }, []);
 
     // Updated fields
     const [updateFirstName, setUpdateFirstName] = useState(initialFirstName);
