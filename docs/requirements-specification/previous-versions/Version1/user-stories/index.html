@@ -1,0 +1,2134 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-requirements-specification/previous-versions/Version1/user-stories" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.3.2">
+<title data-rh="true">User Stories | QBEE Query Builder</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://COS301-SE-2024.github.io/Query-Builder/img/qbeeTempLogo.svg"><meta data-rh="true" name="twitter:image" content="https://COS301-SE-2024.github.io/Query-Builder/img/qbeeTempLogo.svg"><meta data-rh="true" property="og:url" content="https://COS301-SE-2024.github.io/Query-Builder/docs/requirements-specification/previous-versions/Version1/user-stories"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="User Stories | QBEE Query Builder"><meta data-rh="true" name="description" content="The user stories of the QBee Query Builder system"><meta data-rh="true" property="og:description" content="The user stories of the QBee Query Builder system"><link data-rh="true" rel="icon" href="/Query-Builder/./static/img/qbeeTempLogo.svg"><link data-rh="true" rel="canonical" href="https://COS301-SE-2024.github.io/Query-Builder/docs/requirements-specification/previous-versions/Version1/user-stories"><link data-rh="true" rel="alternate" href="https://COS301-SE-2024.github.io/Query-Builder/docs/requirements-specification/previous-versions/Version1/user-stories" hreflang="en"><link data-rh="true" rel="alternate" href="https://COS301-SE-2024.github.io/Query-Builder/docs/requirements-specification/previous-versions/Version1/user-stories" hreflang="x-default"><link rel="stylesheet" href="/Query-Builder/assets/css/styles.72815040.css">
+<script src="/Query-Builder/assets/js/runtime~main.fbf2b66e.js" defer="defer"></script>
+<script src="/Query-Builder/assets/js/main.9549f66c.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<script>!function(){function t(t){document.documentElement.setAttribute("data-theme",t)}var e=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return localStorage.getItem("theme")}catch(t){}}();t(null!==e?e:"light")}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_jbc7" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="navbar navbar--fixed-top"><div class="navbar__inner"><div class="navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/Query-Builder/"><div class="navbar__logo"><img src="/Query-Builder/img/qbeeTempLogo.svg" alt="QBEE Logo" class="themedComponent_ePPg themedComponent--light_A2Ez"><img src="/Query-Builder/img/qbeeTempLogo.svg" alt="QBEE Logo" class="themedComponent_ePPg themedComponent--dark_Hian"></div><b class="navbar__title text--truncate">QBEE Docs</b></a><a aria-current="page" class="navbar__item navbar__link navbar__link--active" href="/Query-Builder/docs/category/software-requirements-specification">Documentation</a></div><div class="navbar__items navbar__items--right"><a href="https://github.com/COS301-SE-2024/Query-Builder" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">GitHub<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_Vr67"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></a><div class="toggle_A1OD colorModeToggle_TtGU"><button class="clean-btn toggleButton_jZOP toggleButtonDisabled_wX2k" type="button" disabled="" title="Switch between dark and light mode (currently light mode)" aria-label="Switch between dark and light mode (currently light mode)" aria-live="polite"><svg viewBox="0 0 24 24" width="24" height="24" class="lightToggleIcon_L53i"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" class="darkToggleIcon_XC85"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg></button></div><div class="navbarSearchContainer_X3KU"></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="main-wrapper mainWrapper_ipJE"><div class="docsWrapper_tJXm"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_EI3Z" type="button"></button><div class="docRoot_nQHt"><aside class="theme-doc-sidebar-container docSidebarContainer_VOCk"><div class="sidebarViewport__EWU"><div class="sidebar_uYTU"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_BbW3"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--active" href="/Query-Builder/docs/category/software-requirements-specification">Software Requirements Specification</a><button aria-label="Collapse sidebar category &#x27;Software Requirements Specification&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul style="display:block;overflow:visible;height:auto" class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/Query-Builder/docs/requirements-specification/introduction">Introduction</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/Query-Builder/docs/requirements-specification/user-characteristics">User Characteristics</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/Query-Builder/docs/requirements-specification/user-stories">User Stories</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/Query-Builder/docs/requirements-specification/functional-requirements">Functional Requirements</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/Query-Builder/docs/requirements-specification/use-case-diagrams">Use Case Diagrams</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/Query-Builder/docs/requirements-specification/service-contracts">Service Contracts</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/Query-Builder/docs/requirements-specification/class-diagram">Class Diagram</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/Query-Builder/docs/requirements-specification/technology-requirements">Technology Requirements</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--active" tabindex="0" href="/Query-Builder/docs/category/previous-versions">Previous versions</a><button aria-label="Collapse sidebar category &#x27;Previous versions&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul style="display:block;overflow:visible;height:auto" class="menu__list"><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-3 menu__list-item"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--active" tabindex="0" href="/Query-Builder/docs/category/version-1">Version 1</a><button aria-label="Collapse sidebar category &#x27;Version 1&#x27;" aria-expanded="true" type="button" class="clean-btn menu__caret"></button></div><ul style="display:block;overflow:visible;height:auto" class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-4 menu__list-item"><a class="menu__link" tabindex="0" href="/Query-Builder/docs/requirements-specification/previous-versions/Version1/introduction">Introduction</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-4 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/Query-Builder/docs/requirements-specification/previous-versions/Version1/user-stories">User Stories</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-4 menu__list-item"><a class="menu__link" tabindex="0" href="/Query-Builder/docs/requirements-specification/previous-versions/Version1/functional-requirements">Functional Requirements</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-4 menu__list-item"><a class="menu__link" tabindex="0" href="/Query-Builder/docs/requirements-specification/previous-versions/Version1/service-contracts">Service Contracts</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-4 menu__list-item"><a class="menu__link" tabindex="0" href="/Query-Builder/docs/requirements-specification/previous-versions/Version1/class-diagram">Class Diagram</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-4 menu__list-item"><a class="menu__link" tabindex="0" href="/Query-Builder/docs/requirements-specification/previous-versions/Version1/technology-requirements">Technology Requirements</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-4 menu__list-item"><a class="menu__link" tabindex="0" href="/Query-Builder/docs/requirements-specification/previous-versions/Version1/use-case-diagrams">Use Case Diagrams</a></li></ul></li></ul></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist" href="/Query-Builder/docs/category/architectural-requirements-document">Architectural Requirements Document</a><button aria-label="Expand sidebar category &#x27;Architectural Requirements Document&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist" href="/Query-Builder/docs/category/guides-and-standards">Guides and Standards</a><button aria-label="Expand sidebar category &#x27;Guides and Standards&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist" href="/Query-Builder/docs/category/user-manual">User Manual</a><button aria-label="Expand sidebar category &#x27;User Manual&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist" href="/Query-Builder/docs/category/project-management">Project Management</a><button aria-label="Expand sidebar category &#x27;Project Management&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li></ul></nav></div></div></aside><main class="docMainContainer_P1CA"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_kOE3"><div class="docItemContainer_Xik3"><article><nav class="theme-doc-breadcrumbs breadcrumbsContainer_WyRE" aria-label="Breadcrumbs"><ul class="breadcrumbs" itemscope="" itemtype="https://schema.org/BreadcrumbList"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/Query-Builder/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_Bf33"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li itemscope="" itemprop="itemListElement" itemtype="https://schema.org/ListItem" class="breadcrumbs__item"><a class="breadcrumbs__link" itemprop="item" href="/Query-Builder/docs/category/software-requirements-specification"><span itemprop="name">Software Requirements Specification</span></a><meta itemprop="position" content="1"></li><li itemscope="" itemprop="itemListElement" itemtype="https://schema.org/ListItem" class="breadcrumbs__item"><a class="breadcrumbs__link" itemprop="item" href="/Query-Builder/docs/category/previous-versions"><span itemprop="name">Previous versions</span></a><meta itemprop="position" content="2"></li><li itemscope="" itemprop="itemListElement" itemtype="https://schema.org/ListItem" class="breadcrumbs__item"><a class="breadcrumbs__link" itemprop="item" href="/Query-Builder/docs/category/version-1"><span itemprop="name">Version 1</span></a><meta itemprop="position" content="3"></li><li itemscope="" itemprop="itemListElement" itemtype="https://schema.org/ListItem" class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link" itemprop="name">User Stories</span><meta itemprop="position" content="4"></li></ul></nav><div class="tocCollapsible_aCxs theme-doc-toc-mobile tocMobile_tngT"><button type="button" class="clean-btn tocCollapsibleButton_wG4g">On this page</button></div><div class="theme-doc-markdown markdown"><h1>User Stories</h1>
+<h2 class="anchor anchorWithStickyNavbar_iXBG" id="user-management-subsystem">User Management Subsystem<a href="#user-management-subsystem" class="hash-link" aria-label="Direct link to User Management Subsystem" title="Direct link to User Management Subsystem">​</a></h2>
+<ol>
+<li>
+<p>Provide a Secure Authentication Process to Users</p>
+<ol>
+<li>
+<p>As a new user, I want to register on the application through an onboarding process involving a one-time pin, so that I can securely create my account.</p>
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>Users can enter their email to receive a one-time pin (OTP).</li>
+<li>Users receive an OTP via email.</li>
+<li>Users can enter the OTP to verify their identity.</li>
+<li>Users can set their password after OTP verification.</li>
+<li>Users receive a confirmation email after successful registration.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>As a user, I want to log into the system with my credentials, so that I can access my account.</p>
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>Users can enter their registered email and password.</li>
+<li>The system authenticates the credentials and grants access if valid.</li>
+<li>Users are notified of unsuccessful login attempts.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>As a user, I want to reset my password if I have forgotten it, so that I can regain access to my account.</p>
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>Users can initiate the password reset process by entering their registered email.</li>
+<li>Users receive a password reset link or OTP via email.</li>
+<li>Users can create a new password using the link or OTP.</li>
+<li>Users receive a confirmation email after successfully resetting their password.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>
+<p>Provide an Interface to Edit or Change User&#x27;s Information</p>
+<ol>
+<li>As a user, I want to change my personal information (e.g., name, surname, email, phone number), so that my account details are up-to-date.<!-- -->
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>Users can access an &quot;Edit Profile&quot; section within the application.</li>
+<li>Users can update fields such as name, surname, email, and phone number.</li>
+<li>Users must confirm changes with their password.</li>
+<li>Users receive a notification email confirming the updates.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>
+<p>Allow Users to Set Personal Preferences</p>
+<ol>
+<li>As a user, I want to set personal preferences, so that the application is tailored to my needs and preferences.<!-- -->
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>Users can access a &quot;Preferences&quot; section within the application.</li>
+<li>Users can update settings such as notification preferences, and appearance settings.</li>
+<li>Users can save changes their updated preferences.</li>
+<li>Users will receive a toast notification in the application.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+</ol>
+<h2 class="anchor anchorWithStickyNavbar_iXBG" id="database-system-manager-subsystem">Database System Manager Subsystem<a href="#database-system-manager-subsystem" class="hash-link" aria-label="Direct link to Database System Manager Subsystem" title="Direct link to Database System Manager Subsystem">​</a></h2>
+<ol>
+<li>
+<p>Allow Users to Connect to External Databases</p>
+<ol>
+<li>As a user, I want to connect to external databases and store the database environment for interaction purposes, so that I can manage and interact with multiple databases.<!-- -->
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>Users can enter connection details (e.g., database URL, host, Database Anonymous key, username, password).</li>
+<li>The system validates the connection details and establishes a connection to the external database.</li>
+<li>Users can save the connection settings for future use.</li>
+<li>Users receive a toast notification of confirmation of successful connection and storage.</li>
+<li>Users will receive a toast notification of an unsuccessful connenction, if anything goes wrong.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>
+<p>Allow Users to Update Database Connection Details</p>
+<ol>
+<li>As a user, I want to update the database connection details, so that I can ensure my connection settings remain current and correct.<!-- -->
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>Users can access and edit saved database connection details (e.g., host, port, username, password).</li>
+<li>The system validates the updated details before saving them.</li>
+<li>Users receive a toast notification of confirmation of successful updates to the connection details.</li>
+<li>Users will receive a toast notification of an unsuccessful update, if anything goes wrong.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>
+<p>Schema Management</p>
+<ol>
+<li>As a user, I want to extract the metadata from the database schema, so that I can understand the structure and properties of the database.<!-- -->
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>Users can request metadata extraction for a connected database.</li>
+<li>The system retrieves and displays the metadata (e.g., tables, columns, data types, constraints).</li>
+<li>Users can view the extracted metadata in a structured format.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>
+<p>Query Execution</p>
+<ol>
+<li>As a user, I want to execute a specific query on the database, so that I can retrieve the necessary data.<!-- -->
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>Users can select a pre-saved or a specific created query.</li>
+<li>The system translates the query to the specific database language.</li>
+<li>The translated query is executed on the connected database.</li>
+<li>Users are notified of the execution status (success or failure).</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>As a user, I want to be able to see the results from the database after executing a query, so that I can view and analyze the retrieved data.<!-- -->
+<ul>
+<li>Acceptance criteria:<!-- -->
+<ul>
+<li>The system retrieves the results of the executed query from the database.</li>
+<li>The results are displayed to the user in a readable and organized format.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+</ol>
+<h2 class="anchor anchorWithStickyNavbar_iXBG" id="query-builder-subsystem">Query Builder Subsystem<a href="#query-builder-subsystem" class="hash-link" aria-label="Direct link to Query Builder Subsystem" title="Direct link to Query Builder Subsystem">​</a></h2>
+<ol>
+<li>
+<p>Choose Database to Query</p>
+<ol>
+<li>As a user, I want to choose a database to query, so that I can specify which database I want to run my queries against.<!-- -->
+<ul>
+<li>Acceptance criteria:<!-- -->
+<ul>
+<li>Users can view a list of connected databases.</li>
+<li>Users can select a database from the list.</li>
+<li>The system confirms the selected database for the query session.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>
+<p>Create a Query</p>
+<ol>
+<li>
+<p>As a user, I want to use a drag and drop UI to create a query, so that I can build queries intuitively without writing code.</p>
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>Users can drag and drop database elements (e.g., tables, columns) to construct a query.</li>
+<li>The system visually represents the query structure.</li>
+<li>Users can run and modify the query within the drag and drop interface.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>As a user, I want to create a query via a form, so that I can build queries by filling out structured input fields.</p>
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>Users can access a form-based interface to input query parameters.</li>
+<li>The form allows selection of tables, columns, and conditions.</li>
+<li>Users can submit the form to generate and run the query.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>
+<p>Toggle between views</p>
+<ol>
+<li>As a user, I want to toggle between different views of the query building process, so that I can switch between visual and form-based query creation.<!-- -->
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>Users can switch between the drag and drop interface and the form interface.</li>
+<li>The system maintains the query state when switching views.</li>
+<li>Users are notified of any changes or discrepancies when switching views.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>
+<p>View Query Results Summary</p>
+<ol>
+<li>As a user, I want to view a summary of the results of the query, so that I can quickly understand the outcome of my query.<!-- -->
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>The system displays a summary of the query results, including key statistics (e.g., row count).</li>
+<li>Users can view a preview of the result set.</li>
+<li>Users can access detailed results if needed.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>
+<p>Save Queries</p>
+<ol>
+<li>As a user, I want to save queries that I have created, so that I can reuse or modify them later.</li>
+</ol>
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>Users can save the current state of their query.</li>
+<li>Saved queries are accessible from a query library or saved queries list.</li>
+<li>Users can name and describe their saved queries for easy identification.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h2 class="anchor anchorWithStickyNavbar_iXBG" id="reporting-subsystem">Reporting subsystem<a href="#reporting-subsystem" class="hash-link" aria-label="Direct link to Reporting subsystem" title="Direct link to Reporting subsystem">​</a></h2>
+<ol>
+<li>
+<p>Generate Reports</p>
+<ol>
+<li>As a user, I want to generate reports of the query data, so that I can analyze and present the data effectively.<!-- -->
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>
+<p>Users can initiate report generation from the query results.</p>
+</li>
+<li>
+<p>The system processes the data and generates the report.</p>
+</li>
+<li>
+<p>Users can choose the type of report to generate (graph or table).</p>
+</li>
+</ul>
+</li>
+</ul>
+<ol>
+<li>As a user, I want to generate graph reports of the query data, so that I can visualize the data in graphical format.<!-- -->
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>Users can select graph types (e.g., bar, line, pie).</li>
+<li>The system generates the graph based on the query data.</li>
+<li>Users can customize graph settings and labels.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>As a user, I want to generate table reports of the query data, so that I can view the data in a structured tabular format.<!-- -->
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>Users can select columns and apply sorting or filtering options.</li>
+<li>The system generates a table with the query data.</li>
+<li>Users can adjust the table layout and formatting.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>
+<p>Share Reports</p>
+<ol>
+<li>As a user, I want to share the reports generated within the system, so that I can collaborate with others.<!-- -->
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>Users can select a report to share.</li>
+<li>Users can choose recipients (individual users or organizations) from a list.</li>
+<li>The system sends the report and notifies the recipients.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>As a user, I want to share an exported report with other users, so that they can access and review the data.<!-- -->
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>Users can select individual users to share the report with.</li>
+<li>Shared users receive a copy of the exported file/data.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>
+<p>Export Reports</p>
+<ol>
+<li>As a user, I want to export the reports generated, so that I can use the data outside the system.<!-- -->
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>
+<p>Users can choose the export format (PDF, CSV, Excel).</p>
+</li>
+<li>
+<p>The system generates the report in the selected format.</p>
+</li>
+<li>
+<p>Users can download or receive the exported report via email.</p>
+</li>
+</ul>
+</li>
+</ul>
+<ol>
+<li>As a user, I want to export reports as a PDF, so that I can share and print the report in a standard document format.<!-- -->
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>Users can initiate export as a PDF.</li>
+<li>The system generates a PDF file of the report.</li>
+<li>Users can download or print the PDF.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>As a user, I want to export reports as a CSV, so that I can analyze the data using spreadsheet software.<!-- -->
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>Users can initiate export as a CSV.</li>
+<li>The system generates a CSV file of the report data.</li>
+<li>Users can download the CSV file.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>As a user, I want to export reports as an Excel file, so that I can use the data in Excel for further analysis and reporting.<!-- -->
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>Users can initiate export as an Excel file.</li>
+<li>The system generates an Excel file of the report data.</li>
+<li>Users can download the Excel file.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<h2 class="anchor anchorWithStickyNavbar_iXBG" id="organisation-subsystem">Organisation subsystem<a href="#organisation-subsystem" class="hash-link" aria-label="Direct link to Organisation subsystem" title="Direct link to Organisation subsystem">​</a></h2>
+<ol>
+<li>
+<p>Create an Organisation</p>
+<ol>
+<li>As a user, I want to create an organisation, so that I can manage resources and users within my organisation.<!-- -->
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>Users can enter organisation details (e.g., name, address).</li>
+<li>The system assigns the user creating the organisation as the organisation admin.</li>
+<li>Users receive confirmation of successful organisation creation.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>
+<p>Connect a Database to the Organisation</p>
+<ol>
+<li>As an organisation admin, I want to connect a database to the organisation, so that the organisation can use it for queries and reporting.<!-- -->
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>Organisation admins can enter database connection details (e.g., type, host, port, username, password).</li>
+<li>The system validates and establishes the database connection.</li>
+<li>Users receive confirmation of successful database connection.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>
+<p>Add Other Users to the Organisation</p>
+<ol>
+<li>
+<p>As an organisation admin, I want to invite unregistered QBee users to join the organisation, so that I can expand my team.</p>
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>Organisation admins can enter email addresses to send invitations.</li>
+<li>The system sends an invitation email to the unregistered users.</li>
+<li>Invited unregistered users can register for an account on QBee</li>
+<li>These new users can then join the organisation.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>As an organisation admin, I want to invite registered QBee users to join the organisation, so that I can expand my team.</p>
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>Organisation admins can enter email addresses to send invitations.</li>
+<li>The system sends an invitation email to the registered users.</li>
+<li>Invited registered users can join the organisation.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>As an existing QBee user, I want to accept invites to an organisation, so that I can join and contribute to the organisation.</p>
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>Users receive an invitation notification or email.</li>
+<li>Users can accept the invitation to join the organisation.</li>
+<li>The system adds the user to the organisation upon acceptance.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>
+<p>Manage User Roles</p>
+<ol>
+<li>
+<p>As an organisation admin, I want to assign roles to users in the organisation, so that I can define their permissions and responsibilities.</p>
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>Organisation admins can view a list of users in the organisation.</li>
+<li>Organisation admins can assign predefined roles to each user.</li>
+<li>Users receive notifications of their assigned roles.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>As an organisation admin, I want to manage the authorization and access of each role, so that I can control what users can do within the organisation.</p>
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>Organisation admins can define and modify permissions for each role.</li>
+<li>The system enforces role-based access control.</li>
+<li>Users can only access features and data permitted by their roles.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>As an organisation admin, I want to define a new role for the organisation, so that I can create custom roles tailored to the organisation’s needs.</p>
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>Organisation admins can access a role management interface.</li>
+<li>Organisation admins can create a new role by specifying its name and permissions.</li>
+<li>The system saves the new role and makes it available for assignment.</li>
+<li>Organisation admins can assign the new role to users in the organisation.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>
+<p>Leave the organisation</p>
+<ol>
+<li>As a user, I want to leave the organisation, so that I am no longer associated with it.<!-- -->
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>Users can initiate the process to leave the organisation.</li>
+<li>The system confirms the user’s decision to leave.</li>
+<li>The system removes the user from the organisation and updates their status.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>
+<p>Remove Users from the Organisation</p>
+<ol>
+<li>As an organisation admin, I want to remove users from the organisation, so that I can maintain the desired team composition and security.<!-- -->
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>Organisation Admins can view a list of users in the organisation.</li>
+<li>Organisation Admins can select and remove users, except other organisation admins.</li>
+<li>Removed users receive a notification of their removal.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>
+<p>Access Organisation Saved Queries</p>
+<ol>
+<li>As a user in the organisation, I want to access organisation saved queries, so that I can utilize existing queries for my tasks.<!-- -->
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>Users can view a list of saved queries within the organisation, based on their role.</li>
+<li>Users can run and modify the saved queries based on their permissions.</li>
+<li>The system ensures access control based on user roles.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>
+<p>Save queries for the organisation</p>
+<ol>
+<li>As a user, I want to add a saved query to the organisation based on my role, so that I can share useful queries with my team.<!-- -->
+<ul>
+<li>Acceptance Criteria:<!-- -->
+<ul>
+<li>Users with appropriate permissions can save their queries to the organisation&#x27;s repository.</li>
+<li>Users can add descriptions and tags to the saved queries for easier retrieval.</li>
+<li>The system validates and saves the query to the organisation&#x27;s repository.</li>
+<li>The saved query becomes accessible to other users in the organisation based on their roles and permissions.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+</ol>
+<h1>Use Cases</h1>
+<h2 class="anchor anchorWithStickyNavbar_iXBG" id="use-cases-for-user-management-subsystem">Use Cases for User Management Subsystem<a href="#use-cases-for-user-management-subsystem" class="hash-link" aria-label="Direct link to Use Cases for User Management Subsystem" title="Direct link to Use Cases for User Management Subsystem">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_iXBG" id="1-provide-a-secure-authentication-process-to-users">1. Provide a Secure Authentication Process to Users<a href="#1-provide-a-secure-authentication-process-to-users" class="hash-link" aria-label="Direct link to 1. Provide a Secure Authentication Process to Users" title="Direct link to 1. Provide a Secure Authentication Process to Users">​</a></h3>
+<ol>
+<li>
+<p>User Registration with One-Time Pin</p>
+<ul>
+<li>
+<p><strong>Use Case Name:</strong> User Registration with One-Time Pin</p>
+</li>
+<li>
+<p><strong>Actors:</strong> New User, System</p>
+</li>
+<li>
+<p><strong>Preconditions:</strong> The user has not registered on the application before.</p>
+</li>
+<li>
+<p><strong>Postconditions:</strong> The user is successfully registered and can log in to the system.</p>
+</li>
+<li>
+<p>Main Success Scenario:</p>
+<ol>
+<li>
+<p>User initiates registration: The new user accesses the registration page.</p>
+</li>
+<li>
+<p>User enters email: The user enters their email address and submits the registration form.</p>
+</li>
+<li>
+<p>System sends OTP: The system generates a one-time pin (OTP) and sends it to the user&#x27;s email.</p>
+</li>
+<li>
+<p>User enters OTP: The user receives the OTP and enters it into the registration form.</p>
+</li>
+<li>
+<p>System verifies OTP: The system verifies the OTP.</p>
+</li>
+<li>
+<p>User sets password: Upon successful OTP verification, the user is prompted to set a password.</p>
+</li>
+<li>
+<p>System confirms registration: The system saves the user&#x27;s credentials and sends a confirmation email.</p>
+</li>
+<li>
+<p>User receives confirmation: The user receives a confirmation email indicating successful registration.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Extensions:</p>
+<ul>
+<li>
+<p>3a. Invalid email: If the email is invalid, the system prompts the user to enter a valid email.</p>
+</li>
+<li>
+<p>4a. OTP not received: If the user does not receive the OTP, they can request a new one.</p>
+</li>
+<li>
+<p>5a. Invalid OTP: If the OTP is invalid, the system prompts the user to enter the correct OTP.</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>User Login</p>
+<ul>
+<li>
+<p><strong>Use Case Name:</strong> User Login</p>
+</li>
+<li>
+<p><strong>Actors:</strong> User, System</p>
+</li>
+<li>
+<p><strong>Preconditions:</strong> The user has already registered on the application.</p>
+</li>
+<li>
+<p><strong>Postconditions:</strong> The user is successfully logged in and can access their account.</p>
+</li>
+<li>
+<p>Main Success Scenario:</p>
+<ol>
+<li>
+<p>User initiates login: The user accesses the login page.</p>
+</li>
+<li>
+<p>User enters credentials: The user enters their registered email and password.</p>
+</li>
+<li>
+<p>System authenticates credentials: The system checks the credentials.</p>
+</li>
+<li>
+<p>System grants access: If the credentials are valid, the system grants access to the user’s account.</p>
+</li>
+<li>
+<p>User accesses account: The user is redirected to their account dashboard.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Extensions:</p>
+<ul>
+<li>3a. Invalid credentials: If the credentials are invalid, the system notifies the user of the unsuccessful login attempt.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Password Reset</p>
+<ul>
+<li>
+<p><strong>Use Case Name:</strong> Password Reset</p>
+</li>
+<li>
+<p><strong>Actors:</strong> User, System</p>
+</li>
+<li>
+<p><strong>Preconditions:</strong> The user has a registered account and has forgotten their password.</p>
+</li>
+<li>
+<p><strong>Postconditions:</strong> The user has successfully reset their password and can log in with the new password.</p>
+</li>
+<li>
+<p>Main Success Scenario:</p>
+<ol>
+<li>
+<p>User initiates password reset: The user accesses the password reset page.</p>
+</li>
+<li>
+<p>User enters email: The user enters their registered email address.</p>
+</li>
+<li>
+<p>System sends reset link/OTP: The system sends a password reset link or OTP to the user&#x27;s email.</p>
+</li>
+<li>
+<p>User receives reset link/OTP: The user receives the password reset link or OTP.</p>
+</li>
+<li>
+<p>User resets password: The user clicks the reset link or enters the OTP, then creates a new password.</p>
+</li>
+<li>
+<p>System confirms password reset: The system updates the user&#x27;s password and sends a confirmation email.</p>
+</li>
+<li>
+<p>User receives confirmation: The user receives a confirmation email indicating the password reset was successful.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Extensions:</p>
+<ul>
+<li>
+<p>3a. Invalid email: If the email is not registered, the system notifies the user to enter a valid registered email.</p>
+</li>
+<li>
+<p>5b. Expired link/OTP: If the reset link or OTP has expired, the system prompts the user to request a new one.</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_iXBG" id="2-provide-an-interface-to-edit-or-change-users-information">2. Provide an Interface to Edit or Change User&#x27;s Information<a href="#2-provide-an-interface-to-edit-or-change-users-information" class="hash-link" aria-label="Direct link to 2. Provide an Interface to Edit or Change User&#x27;s Information" title="Direct link to 2. Provide an Interface to Edit or Change User&#x27;s Information">​</a></h3>
+<ol>
+<li>Edit Personal Information<!-- -->
+<ul>
+<li>
+<p><strong>Use Case Name:</strong> Edit Personal Information</p>
+</li>
+<li>
+<p><strong>Actors:</strong> User, System</p>
+</li>
+<li>
+<p><strong>Preconditions:</strong> The user is logged into the application.</p>
+</li>
+<li>
+<p><strong>Postconditions:</strong> The user&#x27;s personal information is successfully updated in the system.</p>
+</li>
+<li>
+<p>Main Success Scenario:</p>
+<ol>
+<li>
+<p>User accesses profile: The user navigates to the &quot;Edit Profile&quot; section within the application.</p>
+</li>
+<li>
+<p>User updates information: The user edits their personal information fields such as name, surname, email, and phone number.</p>
+</li>
+<li>
+<p>User confirms changes: The user confirms the updates by entering their password.</p>
+</li>
+<li>
+<p>System validates changes: The system validates the new information and password.</p>
+</li>
+<li>
+<p>System saves changes: The system updates the user&#x27;s information in the database.</p>
+</li>
+<li>
+<p>System sends notification: The system sends a toast notification, within the application, to the user confirming the updates.</p>
+</li>
+<li>
+<p>User receives confirmation: The user receives a confirmation toast notification, within the application, indicating their personal information has been successfully updated.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Extensions:</p>
+<ul>
+<li>
+<p>3a. Incorrect password: If the entered password is incorrect, the system notifies the user and prompts them to enter the correct password.</p>
+</li>
+<li>
+<p>4a. Invalid information: If any updated information is invalid (e.g., incorrect email format), the system prompts the user to correct the information.</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Set Personal Preferences<!-- -->
+<ul>
+<li>
+<p><strong>Use Case Name:</strong> Set Personal Preferences</p>
+</li>
+<li>
+<p><strong>Actors:</strong> User, System</p>
+</li>
+<li>
+<p><strong>Preconditions:</strong> The user is logged into the application.</p>
+</li>
+<li>
+<p><strong>Postconditions:</strong> The user&#x27;s personal preferences are successfully updated and applied in the system.</p>
+</li>
+<li>
+<p>Main Success Scenario:</p>
+<ol>
+<li>
+<p>User accesses preferences: The user navigates to the &quot;Preferences&quot; section within the application.</p>
+</li>
+<li>
+<p>User updates settings: The user updates various settings such as notification preferences and appearance settings.</p>
+</li>
+<li>
+<p>User saves changes: The user saves their updated preferences.</p>
+</li>
+<li>
+<p>System validates changes: The system validates the new preferences.</p>
+</li>
+<li>
+<p>System saves changes: The system updates the user&#x27;s preferences in the database.</p>
+</li>
+<li>
+<p>System displays notification: The system displays a toast notification within the application indicating that the preferences have been successfully updated.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Extensions:</p>
+<ul>
+<li>2a. Invalid preferences: If any updated preference is invalid or unsupported, the system prompts the user to correct the preference settings.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h2 class="anchor anchorWithStickyNavbar_iXBG" id="use-cases-for-database-systems-manager-subsystems">Use Cases for Database Systems Manager Subsystems<a href="#use-cases-for-database-systems-manager-subsystems" class="hash-link" aria-label="Direct link to Use Cases for Database Systems Manager Subsystems" title="Direct link to Use Cases for Database Systems Manager Subsystems">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_iXBG" id="1-allow-users-to-connect-to-external-databases">1. Allow Users to Connect to External Databases<a href="#1-allow-users-to-connect-to-external-databases" class="hash-link" aria-label="Direct link to 1. Allow Users to Connect to External Databases" title="Direct link to 1. Allow Users to Connect to External Databases">​</a></h3>
+<ol>
+<li>Connect to External Databases<!-- -->
+<ul>
+<li>
+<p><strong>Use Case Name:</strong> Connect to External Databases</p>
+</li>
+<li>
+<p><strong>Actors:</strong> User, System</p>
+</li>
+<li>
+<p><strong>Preconditions:</strong> The user is logged into the application.</p>
+</li>
+<li>
+<p><strong>Postconditions:</strong> The user successfully connects to an external database and saves the connection details for future use.</p>
+</li>
+<li>
+<p>Main Success Scenario:</p>
+<ol>
+<li>
+<p>User initiates connection: The user navigates to the &quot;Connect to Database&quot; section within the application.</p>
+</li>
+<li>
+<p>User enters connection details: The user enters the required connection details (e.g., database URL, host, Database Anonymous key, username, password).</p>
+</li>
+<li>
+<p>System validates details: The system validates the connection details provided by the user.</p>
+</li>
+<li>
+<p>System establishes connection: If the details are valid, the system establishes a connection to the external database.</p>
+</li>
+<li>
+<p>User saves connection settings: The user saves the connection settings for future use.</p>
+</li>
+<li>
+<p>System confirms connection: The system stores the connection settings and displays a toast notification confirming the successful connection and storage.</p>
+</li>
+<li>
+<p>User receives confirmation: The user sees the toast notification indicating a successful connection.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Extensions:</p>
+<ul>
+<li>
+<p>3a. Invalid details: If the connection details are invalid, the system displays a toast notification indicating an unsuccessful connection and prompts the user to correct the details.</p>
+</li>
+<li>
+<p>4a. Connection failure: If the system cannot establish a connection, it displays a toast notification indicating an unsuccessful connection and provides troubleshooting options.</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_iXBG" id="2-allow-users-to-update-database-connection-details">2. Allow Users to Update Database Connection Details<a href="#2-allow-users-to-update-database-connection-details" class="hash-link" aria-label="Direct link to 2. Allow Users to Update Database Connection Details" title="Direct link to 2. Allow Users to Update Database Connection Details">​</a></h3>
+<ol>
+<li>Update Database Connection Details<!-- -->
+<ul>
+<li>
+<p><strong>Use Case Name:</strong> Update Database Connection Details</p>
+</li>
+<li>
+<p><strong>Actors:</strong> User, System</p>
+</li>
+<li>
+<p><strong>Preconditions:</strong> The user has previously saved database connection details.</p>
+</li>
+<li>
+<p><strong>Postconditions:</strong> The user&#x27;s updated database connection details are successfully saved and validated.</p>
+</li>
+<li>
+<p>Main Success Scenario:</p>
+<ol>
+<li>
+<p>User accesses connection settings: The user navigates to the &quot;Manage Database Connections&quot; section within the application.</p>
+</li>
+<li>
+<p>User selects a connection: The user selects the saved database connection they wish to update.</p>
+</li>
+<li>
+<p>User updates connection details: The user updates the necessary connection details (e.g.Database URL, Anonymous key, host, username, password).</p>
+</li>
+<li>
+<p>System validates details: The system validates the updated connection details.</p>
+</li>
+<li>
+<p>System saves updates: If the details are valid, the system saves the updated connection settings.</p>
+</li>
+<li>
+<p>System confirms update: The system displays a toast notification confirming the successful update of the connection details.</p>
+</li>
+<li>
+<p>User receives confirmation: The user sees the toast notification indicating a successful update.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Extensions:</p>
+<ul>
+<li>
+<p>4a. Invalid details: If the updated connection details are invalid, the system displays a toast notification indicating an unsuccessful update and prompts the user to correct the details.</p>
+</li>
+<li>
+<p>5a. Update failure: If the system cannot save the updated details, it displays a toast notification indicating an unsuccessful update and provides troubleshooting options.</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_iXBG" id="3-extract-metadata-from-database-schema">3. Extract Metadata from Database Schema<a href="#3-extract-metadata-from-database-schema" class="hash-link" aria-label="Direct link to 3. Extract Metadata from Database Schema" title="Direct link to 3. Extract Metadata from Database Schema">​</a></h3>
+<ol>
+<li>Extract Metadata from Database Schema<!-- -->
+<ul>
+<li>
+<p><strong>Use Case Name:</strong> Extract Metadata from Database Schema</p>
+</li>
+<li>
+<p><strong>Actors:</strong> User, System</p>
+</li>
+<li>
+<p><strong>Preconditions:</strong> The user is logged into the application and connected to an external database.</p>
+</li>
+<li>
+<p><strong>Postconditions:</strong> The user successfully extracts and views the summary of the metadata of the database schema.</p>
+</li>
+<li>
+<p>Main Success Scenario:</p>
+<ol>
+<li>
+<p>User requests metadata extraction: The user navigates to the &quot;Database Metadata&quot; section within the application and requests metadata extraction for the connected database.</p>
+</li>
+<li>
+<p>System retrieves metadata: The system retrieves the metadata from the connected database, including tables, columns, data types, and constraints.</p>
+</li>
+<li>
+<p>System displays metadata: The system displays the extracted metadata to the user in a structured format.</p>
+</li>
+<li>
+<p>User views metadata: The user reviews the displayed metadata to understand the structure and properties of the database.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Extensions:</p>
+<ul>
+<li>
+<p>2a. Connection failure: If the system cannot connect to the database, it displays an error message and prompts the user to check the connection settings.</p>
+</li>
+<li>
+<p>2b. Metadata retrieval failure: If the system encounters an error while retrieving metadata, it displays an error message and suggests possible troubleshooting steps.</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_iXBG" id="4-query-execution">4. Query Execution<a href="#4-query-execution" class="hash-link" aria-label="Direct link to 4. Query Execution" title="Direct link to 4. Query Execution">​</a></h3>
+<ol>
+<li>Execute a Specific Query on the Database<!-- -->
+<ul>
+<li>
+<p><strong>Use Case Name:</strong> Execute a Specific Query on the Database</p>
+</li>
+<li>
+<p><strong>Actors:</strong> User, System</p>
+</li>
+<li>
+<p><strong>Preconditions:</strong> The user is logged into the application and connected to an external database.</p>
+</li>
+<li>
+<p><strong>Postconditions:</strong> The user&#x27;s query is successfully executed on the database, and the user is notified of the execution status.</p>
+</li>
+<li>
+<p>Main Success Scenario:</p>
+<ol>
+<li>
+<p>User selects a query: The user selects a pre-saved query or creates a new query within the application.</p>
+</li>
+<li>
+<p>System translates the query: The system translates the query into the specific language of the connected database.</p>
+</li>
+<li>
+<p>System executes the query: The system executes the translated query on the connected database.</p>
+</li>
+<li>
+<p>System notifies execution status: The system notifies the user of the execution status, indicating success or failure.</p>
+</li>
+<li>
+<p>User receives notification: The user receives a notification of the query execution status.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Extensions:</p>
+<ul>
+<li>
+<p>2a. Invalid query: If the query is invalid or contains errors, the system notifies the user and prompts them to correct the query.</p>
+</li>
+<li>
+<p>3a. Execution failure: If the system encounters an error during query execution, it displays an error message and suggests possible troubleshooting steps.</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>View Results from Executed Query<!-- -->
+<ul>
+<li>
+<p><strong>Use Case Name:</strong> View Results from Executed Query</p>
+</li>
+<li>
+<p><strong>Actors:</strong> User, System</p>
+</li>
+<li>
+<p><strong>Preconditions:</strong> The user has successfully executed a query on the connected database.</p>
+</li>
+<li>
+<p><strong>Postconditions:</strong> The user successfully views the results of the executed query in a readable and organized format.</p>
+</li>
+<li>
+<p>Main Success Scenario:</p>
+<ol>
+<li>
+<p>System retrieves results: The system retrieves the results of the executed query from the connected database.</p>
+</li>
+<li>
+<p>System displays results: The system displays the query results to the user in a readable and organized format.</p>
+</li>
+<li>
+<p>User views results: The user reviews the displayed results for analysis.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Extensions:</p>
+<ul>
+<li>
+<p>1a. No results found: If the query returns no results, the system notifies the user that no data was found.</p>
+</li>
+<li>
+<p>1b. Result retrieval failure: If the system encounters an error while retrieving results, it displays an error message and suggests possible troubleshooting steps.</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h2 class="anchor anchorWithStickyNavbar_iXBG" id="use-cases-for-the-query-builder-subsystem">Use Cases for the Query Builder Subsystem<a href="#use-cases-for-the-query-builder-subsystem" class="hash-link" aria-label="Direct link to Use Cases for the Query Builder Subsystem" title="Direct link to Use Cases for the Query Builder Subsystem">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_iXBG" id="1-choose-database-to-query">1. Choose Database to Query<a href="#1-choose-database-to-query" class="hash-link" aria-label="Direct link to 1. Choose Database to Query" title="Direct link to 1. Choose Database to Query">​</a></h3>
+<ol>
+<li>Choose Database to Query<!-- -->
+<ul>
+<li>
+<p><strong>Use Case Name:</strong> Choose Database to Query</p>
+</li>
+<li>
+<p><strong>Actors:</strong> User, System</p>
+</li>
+<li>
+<p><strong>Preconditions:</strong> The user is logged into the application and has connected databases.</p>
+</li>
+<li>
+<p><strong>Postconditions:</strong> The user successfully selects a database to run their queries against.</p>
+</li>
+<li>
+<p>Main Success Scenario:</p>
+<ol>
+<li>
+<p>User views database list: The user navigates to the query builder section and views a list of connected databases.</p>
+</li>
+<li>
+<p>User selects a database: The user selects a database from the list.</p>
+</li>
+<li>
+<p>System confirms selection: The system confirms the selected database for the query session.</p>
+</li>
+<li>
+<p>User proceeds with query creation: The user begins creating a query against the selected database.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Extensions:</p>
+<ul>
+<li>2a. No databases connected: If no databases are connected, the system notifies the user and provides an option to connect a database.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_iXBG" id="2-create-a-query">2. Create a Query<a href="#2-create-a-query" class="hash-link" aria-label="Direct link to 2. Create a Query" title="Direct link to 2. Create a Query">​</a></h3>
+<ol>
+<li>Create a Query Using Drag and Drop UI<!-- -->
+<ul>
+<li>
+<p><strong>Use Case Name:</strong> Create a Query Using Drag and Drop UI</p>
+</li>
+<li>
+<p><strong>Actors:</strong> User, System</p>
+</li>
+<li>
+<p><strong>Preconditions:</strong> The user is logged into the application and has selected a database to query.</p>
+</li>
+<li>
+<p><strong>Postconditions:</strong> The user successfully creates and runs a query using the drag and drop interface.</p>
+</li>
+<li>
+<p>Main Success Scenario:</p>
+<ol>
+<li>
+<p>User accesses drag and drop UI: The user navigates to the drag and drop query builder interface.</p>
+</li>
+<li>
+<p>User constructs query: The user drags and drops database elements (e.g., tables, columns) to construct a query.</p>
+</li>
+<li>
+<p>System visualizes query: The system visually represents the query structure as the user builds it.</p>
+</li>
+<li>
+<p>User modifies query: The user can modify the query by adjusting the elements within the drag and drop interface.</p>
+</li>
+<li>
+<p>User runs query: The user runs the constructed query.</p>
+</li>
+<li>
+<p>System executes query: The system executes the query against the selected database and displays the results.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Extensions:</p>
+<ul>
+<li>5a. Query error: If there is an error in the query, the system notifies the user.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Create a Query Using a Form<!-- -->
+<ul>
+<li>
+<p><strong>Use Case Name:</strong> Create a Query Using a Form</p>
+</li>
+<li>
+<p><strong>Actors:</strong> User, System</p>
+</li>
+<li>
+<p><strong>Preconditions:</strong> The user is logged into the application and has selected a database to query.</p>
+</li>
+<li>
+<p><strong>Postconditions:</strong> The user successfully creates and runs a query using the form-based interface.</p>
+</li>
+<li>
+<p>Main Success Scenario:</p>
+<ol>
+<li>
+<p>User accesses form interface: The user navigates to the form-based query builder interface.</p>
+</li>
+<li>
+<p>User inputs query parameters: The user fills out the form with query parameters, selecting tables, columns, and conditions.</p>
+</li>
+<li>
+<p>System generates query: The system generates the query based on the input parameters.</p>
+</li>
+<li>
+<p>User submits form: The user submits the form to run the query.</p>
+</li>
+<li>
+<p>System executes query: The system executes the generated query against the selected database and displays the results.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Extensions:</p>
+<ul>
+<li>3a. Invalid input: If any input is invalid, the system notifies the user and prompts them to correct the input.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_iXBG" id="3-toggle-between-views">3. Toggle Between Views<a href="#3-toggle-between-views" class="hash-link" aria-label="Direct link to 3. Toggle Between Views" title="Direct link to 3. Toggle Between Views">​</a></h3>
+<ol>
+<li>Toggle Between Views of the Query Building Process<!-- -->
+<ul>
+<li>
+<p><strong>Use Case Name:</strong> Toggle Between Views of the Query Building Process</p>
+</li>
+<li>
+<p><strong>Actors:</strong> User, System</p>
+</li>
+<li>
+<p><strong>Preconditions:</strong> The user is logged into the application and is in the process of creating a query.</p>
+</li>
+<li>
+<p><strong>Postconditions:</strong> The user successfully toggles between the drag and drop interface and the form interface without losing the query state.</p>
+</li>
+<li>
+<p>Main Success Scenario:</p>
+<ol>
+<li>
+<p>User initiates toggle: The user selects an option to switch between the drag and drop interface and the form interface.</p>
+</li>
+<li>
+<p>System maintains query state: The system maintains the current query state and converts it appropriately between the two interfaces.</p>
+</li>
+<li>
+<p>User continues query creation: The user continues building the query in the new interface.</p>
+</li>
+<li>
+<p>System notifies user: The system notifies the user of any changes or discrepancies that may arise from switching views.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Extensions:</p>
+<ul>
+<li>2a. Conversion error: If there is an error in converting the query state, the system notifies the user and provides options to resolve the discrepancies.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_iXBG" id="4-view-query-results-summary">4. View Query Results Summary<a href="#4-view-query-results-summary" class="hash-link" aria-label="Direct link to 4. View Query Results Summary" title="Direct link to 4. View Query Results Summary">​</a></h3>
+<ol>
+<li>View Summary of Query Results<!-- -->
+<ul>
+<li>
+<p><strong>Use Case Name:</strong> View Summary of Query Results</p>
+</li>
+<li>
+<p><strong>Actors:</strong> User, System</p>
+</li>
+<li>
+<p><strong>Preconditions:</strong> The user has successfully executed a query.</p>
+</li>
+<li>
+<p><strong>Postconditions:</strong> The user views a summary of the query results, including key statistics and a preview of the result set.</p>
+</li>
+<li>
+<p>Main Success Scenario:</p>
+<ol>
+<li>
+<p>System displays summary: The system displays a summary of the query results, including key statistics such as row count.</p>
+</li>
+<li>
+<p>User views summary: The user reviews the summary to quickly understand the outcome of the query.</p>
+</li>
+<li>
+<p>System provides preview: The system provides a preview of the result set.</p>
+</li>
+<li>
+<p>User accesses detailed results: The user can access detailed results if needed for further analysis.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Extensions:</p>
+<ul>
+<li>1a. No results found: If the query returns no results, the system notifies the user that no data was found.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_iXBG" id="5-save-queries">5. Save Queries<a href="#5-save-queries" class="hash-link" aria-label="Direct link to 5. Save Queries" title="Direct link to 5. Save Queries">​</a></h3>
+<ol>
+<li>Save Queries<!-- -->
+<ul>
+<li>
+<p><strong>Use Case Name:</strong> Save Queries</p>
+</li>
+<li>
+<p><strong>Actors:</strong> User, System</p>
+</li>
+<li>
+<p><strong>Preconditions:</strong> The user has created a query using either the drag and drop interface or the form interface.</p>
+</li>
+<li>
+<p><strong>Postconditions:</strong> The user successfully saves the query for future use.</p>
+</li>
+<li>
+<p>Main Success Scenario:</p>
+<ol>
+<li>
+<p>User initiates save: The user selects an option to save the current query.</p>
+</li>
+<li>
+<p>User names query: The user provides a name and optional description for the query.</p>
+</li>
+<li>
+<p>System saves query: The system saves the query to the user&#x27;s query library or saved queries list.</p>
+</li>
+<li>
+<p>System confirms save: The system confirms the successful save with a notification.</p>
+</li>
+<li>
+<p>User accesses saved queries: The user can access and manage saved queries from the query library or saved queries list.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Extensions:</p>
+<ul>
+<li>3a. Save failure: If the system encounters an error while saving the query, it notifies the user and provides options to retry or resolve the issue.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h2 class="anchor anchorWithStickyNavbar_iXBG" id="use-cases-for-the-reporting-subsystem">Use Cases for the Reporting subsystem<a href="#use-cases-for-the-reporting-subsystem" class="hash-link" aria-label="Direct link to Use Cases for the Reporting subsystem" title="Direct link to Use Cases for the Reporting subsystem">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_iXBG" id="1-generate-reports">1. Generate Reports<a href="#1-generate-reports" class="hash-link" aria-label="Direct link to 1. Generate Reports" title="Direct link to 1. Generate Reports">​</a></h3>
+<ol>
+<li>Generate Reports of the Query Data<!-- -->
+<ul>
+<li>
+<p><strong>Use Case Name:</strong> Generate Reports of the Query Data</p>
+</li>
+<li>
+<p><strong>Actors:</strong> User, System</p>
+</li>
+<li>
+<p><strong>Preconditions:</strong> The user has executed a query and has query results available.</p>
+</li>
+<li>
+<p><strong>Postconditions:</strong> The user successfully generates a report based on the query data.</p>
+</li>
+<li>
+<p>Main Success Scenario:</p>
+<ol>
+<li>
+<p>User initiates report generation: The user selects an option to generate a report from the query results.</p>
+</li>
+<li>
+<p>System processes data: The system processes the query data.</p>
+</li>
+<li>
+<p>User selects report type: The user chooses the type of report to generate (graph or table).</p>
+</li>
+<li>
+<p>System generates report: The system generates the selected type of report.</p>
+</li>
+<li>
+<p>User views report: The user reviews the generated report.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Extensions:</p>
+<ul>
+<li>4a. Invalid data for report type: If the query data is not suitable for the selected report type, the system notifies the user and suggests alternatives.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Generate Graph Reports<!-- -->
+<ul>
+<li>
+<p><strong>Use Case Name:</strong> Generate Graph Reports</p>
+</li>
+<li>
+<p><strong>Actors:</strong> User, System</p>
+</li>
+<li>
+<p><strong>Preconditions:</strong> The user has executed a query and has query results available.</p>
+</li>
+<li>
+<p><strong>Postconditions:</strong> The user successfully generates a graph report based on the query data.</p>
+</li>
+<li>
+<p>Main Success Scenario:</p>
+<ol>
+<li>
+<p>User selects graph report type: The user chooses to generate a graph report.</p>
+</li>
+<li>
+<p>User selects graph type: The user selects the type of graph (e.g., bar, line, pie).</p>
+</li>
+<li>
+<p>System generates graph: The system generates the graph based on the query data.</p>
+</li>
+<li>
+<p>User customizes graph: The user customizes graph settings and labels.</p>
+</li>
+<li>
+<p>System updates graph: The system updates the graph based on the user&#x27;s customizations.</p>
+</li>
+<li>
+<p>User views graph report: The user reviews the generated graph report.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Extensions:</p>
+<ul>
+<li>3a. Invalid graph type selection: If the selected graph type is not compatible with the data, the system notifies the user and suggests alternatives.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Generate Table Reports<!-- -->
+<ul>
+<li>
+<p><strong>Use Case Name:</strong> Generate Table Reports</p>
+</li>
+<li>
+<p><strong>Actors:</strong> User, System</p>
+</li>
+<li>
+<p><strong>Preconditions:</strong> The user has executed a query and has query results available.</p>
+</li>
+<li>
+<p><strong>Postconditions:</strong> The user successfully generates a table report based on the query data.</p>
+</li>
+<li>
+<p>Main Success Scenario:</p>
+<ol>
+<li>
+<p>User selects table report type: The user chooses to generate a table report.</p>
+</li>
+<li>
+<p>User selects columns and options: The user selects which columns to include and applies sorting or filtering options.</p>
+</li>
+<li>
+<p>System generates table: The system generates a table with the query data.</p>
+</li>
+<li>
+<p>User adjusts layout: The user adjusts the table layout and formatting.</p>
+</li>
+<li>
+<p>System updates table: The system updates the table based on the user&#x27;s adjustments.</p>
+</li>
+<li>
+<p>User views table report: The user reviews the generated table report.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Extensions:</p>
+<ul>
+<li>2a. Invalid column selection: If the selected columns are not available, the system notifies the user and suggests alternatives.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_iXBG" id="2-share-reports">2. Share Reports<a href="#2-share-reports" class="hash-link" aria-label="Direct link to 2. Share Reports" title="Direct link to 2. Share Reports">​</a></h3>
+<ol>
+<li>Share Exported Reports with Other Users.<!-- -->
+<ul>
+<li>
+<p><strong>Use Case Name:</strong> Share Exported Reports with Other Users</p>
+</li>
+<li>
+<p><strong>Actors:</strong> User, System, Recipient</p>
+</li>
+<li>
+<p><strong>Preconditions:</strong> The user has generated a report.</p>
+</li>
+<li>
+<p><strong>Postconditions:</strong> The report is successfully shared with selected recipients.</p>
+</li>
+<li>
+<p>Main Success Scenario:</p>
+<ol>
+<li>
+<p>User selects report to share: The user selects an exported report to share.</p>
+</li>
+<li>
+<p>User chooses recipients: The user selects individual users to share the report with.</p>
+</li>
+<li>
+<p>System sends report: The system sends the report to the selected recipients.</p>
+</li>
+<li>
+<p>Recipients receive report: The recipients receive a copy of the exported report.</p>
+</li>
+<li>
+<p>System notifies recipients: The system notifies the recipients that a report has been shared with them.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Extensions</p>
+<ul>
+<li>3a. Recipient email invalid: If a recipient&#x27;s email is invalid, the system notifies the user and prompts for a valid email.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_iXBG" id="3-export-reports">3. Export Reports<a href="#3-export-reports" class="hash-link" aria-label="Direct link to 3. Export Reports" title="Direct link to 3. Export Reports">​</a></h3>
+<ol>
+<li>
+<p>Export Reports as PDF</p>
+<ul>
+<li>
+<p><strong>Use Case Name:</strong> Export Reports as PDF</p>
+</li>
+<li>
+<p><strong>Actors:</strong> User, System</p>
+</li>
+<li>
+<p><strong>Preconditions:</strong> The user has generated a report.</p>
+</li>
+<li>
+<p><strong>Postconditions:</strong> The user successfully exports the report as a PDF.</p>
+</li>
+<li>
+<p>Main Success Scenario:</p>
+<ol>
+<li>
+<p>User selects PDF export: The user initiates export as a PDF.</p>
+</li>
+<li>
+<p>System generates PDF: The system generates a PDF file of the report.</p>
+</li>
+<li>
+<p>User downloads PDF: The user downloads or prints the PDF file.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Extensions:</p>
+<ul>
+<li>2a. PDF generation error: If an error occurs during PDF generation, the system notifies the user and provides options to retry or contact support.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Export Reports as CSV</p>
+<ul>
+<li>
+<p><strong>Use Case Name:</strong> Export Reports as CSV</p>
+</li>
+<li>
+<p><strong>Actors:</strong> User, System</p>
+</li>
+<li>
+<p><strong>Preconditions:</strong> The user has generated a report.</p>
+</li>
+<li>
+<p><strong>Postconditions:</strong> The user successfully exports the report as a CSV.</p>
+</li>
+<li>
+<p>Main Success Scenario:</p>
+<ol>
+<li>
+<p>User selects CSV export: The user initiates export as a CSV.</p>
+</li>
+<li>
+<p>System generates CSV: The system generates a CSV file of the report data.</p>
+</li>
+<li>
+<p>User downloads CSV: The user downloads the CSV file.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Extensions:</p>
+<ul>
+<li>2a. CSV generation error: If an error occurs during CSV generation, the system notifies the user and provides options to retry or contact support.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Export Reports as Excel</p>
+<ul>
+<li>
+<p><strong>Use Case Name:</strong> Export Reports as Excel</p>
+</li>
+<li>
+<p><strong>Actors:</strong> User, System</p>
+</li>
+<li>
+<p><strong>Preconditions:</strong> The user has generated a report.</p>
+</li>
+<li>
+<p><strong>Postconditions:</strong> The user successfully exports the report as an Excel file.</p>
+</li>
+<li>
+<p>Main Success Scenario:</p>
+<ol>
+<li>
+<p>User selects Excel export: The user initiates export as an Excel file.</p>
+</li>
+<li>
+<p>System generates Excel: The system generates an Excel file of the report data.</p>
+</li>
+<li>
+<p>User downloads Excel: The user downloads the Excel file.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Extensions:</p>
+<ul>
+<li>2a. Excel generation error: If an error occurs during Excel generation, the system notifies the user and provides options to retry or contact support.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h2 class="anchor anchorWithStickyNavbar_iXBG" id="use-cases-for-the-organisation-subsystem">Use Cases for the Organisation subsystem<a href="#use-cases-for-the-organisation-subsystem" class="hash-link" aria-label="Direct link to Use Cases for the Organisation subsystem" title="Direct link to Use Cases for the Organisation subsystem">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_iXBG" id="1-create-an-organisation">1. Create an Organisation<a href="#1-create-an-organisation" class="hash-link" aria-label="Direct link to 1. Create an Organisation" title="Direct link to 1. Create an Organisation">​</a></h3>
+<ol>
+<li>Create an Organisation<!-- -->
+<ul>
+<li>
+<p><strong>Use Case Name:</strong> Generate Reports of the Query Data</p>
+</li>
+<li>
+<p><strong>Actors:</strong> User, System</p>
+</li>
+<li>
+<p><strong>Preconditions:</strong> The user is logged into the system.</p>
+</li>
+<li>
+<p><strong>Postconditions:</strong> The organisation is created, and the user is assigned as the organisation admin.</p>
+</li>
+<li>
+<p>Main Success Scenario:</p>
+<ol>
+<li>
+<p>User initiates organisation creation: The user selects the option to create an organisation.</p>
+</li>
+<li>
+<p>User enters organisation details: The user enters the organisation&#x27;s details (e.g., name, address).</p>
+</li>
+<li>
+<p>System validates details: The system validates the entered details.</p>
+</li>
+<li>
+<p>System creates organisation: The system creates the organisation and assigns the user as the organisation admin.</p>
+</li>
+<li>
+<p>System confirms creation: The system sends a confirmation to the user about the successful creation of the organisation.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Extensions:</p>
+<ul>
+<li>3a. Invalid details: If the entered details are invalid, the system notifies the user to correct the information.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_iXBG" id="2-connect-a-database-to-the-organisation">2. Connect a Database to the Organisation<a href="#2-connect-a-database-to-the-organisation" class="hash-link" aria-label="Direct link to 2. Connect a Database to the Organisation" title="Direct link to 2. Connect a Database to the Organisation">​</a></h3>
+<ol>
+<li>Connect a Database to the Organisation<!-- -->
+<ul>
+<li>
+<p><strong>Use Case Name:</strong> Connect a Database to the Organisation</p>
+</li>
+<li>
+<p><strong>Actors:</strong> Organisation Admin, System</p>
+</li>
+<li>
+<p><strong>Preconditions:</strong> The user is an organisation admin and is logged into the system.</p>
+</li>
+<li>
+<p><strong>Postconditions:</strong> The database is connected to the organisation.</p>
+</li>
+<li>
+<p>Main Success Scenario:</p>
+<ol>
+<li>
+<p>Admin initiates database connection: The organisation admin selects the option to connect a database.</p>
+</li>
+<li>
+<p>Admin enters connection details: The admin enters the database connection details (e.g., type, host, port, username, password).</p>
+</li>
+<li>
+<p>System validates details: The system validates the entered connection details.</p>
+</li>
+<li>
+<p>System establishes connection: The system establishes the connection to the database.</p>
+</li>
+<li>
+<p>System confirms connection: The system sends a confirmation to the admin about the successful database connection.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Extensions:</p>
+<ul>
+<li>3a. Invalid connection details: If the connection details are invalid, the system notifies the admin to correct the information.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_iXBG" id="3-add-other-users-to-the-organisation">3. Add Other Users to the Organisation<a href="#3-add-other-users-to-the-organisation" class="hash-link" aria-label="Direct link to 3. Add Other Users to the Organisation" title="Direct link to 3. Add Other Users to the Organisation">​</a></h3>
+<ol>
+<li>
+<p>Invite Unregistered QBee Users</p>
+<ul>
+<li>
+<p><strong>Use Case Name:</strong> Invite Unregistered QBee Users</p>
+</li>
+<li>
+<p><strong>Actors:</strong> Organisation Admin, System, Invited User</p>
+</li>
+<li>
+<p><strong>Preconditions:</strong> The user is an organisation admin and is logged into the system.</p>
+</li>
+<li>
+<p><strong>Postconditions:</strong> The unregistered user is invited to join the organisation.</p>
+</li>
+<li>
+<p>Main Success Scenario:</p>
+<ol>
+<li>
+<p>Admin initiates invitation: The organisation admin selects the option to invite users.</p>
+</li>
+<li>
+<p>Admin enters email addresses: The admin enters the email addresses of the unregistered users.</p>
+</li>
+<li>
+<p>System sends invitations: The system sends invitation emails to the unregistered users.</p>
+</li>
+<li>
+<p>Invited user registers: The unregistered users register for an account on QBee.</p>
+</li>
+<li>
+<p>Invited user joins organisation: Upon registration, the users join the organisation.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Extensions:</p>
+<ul>
+<li>3a. Invalid email addresses: If the entered email addresses are invalid, the system notifies the admin to correct the information.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Invite Registered QBee Users</p>
+<ul>
+<li>
+<p><strong>Use Case Name:</strong> Invite Registered QBee Users</p>
+</li>
+<li>
+<p><strong>Actors:</strong> Organisation Admin, System, Invited User</p>
+</li>
+<li>
+<p><strong>Preconditions:</strong> The user is an organisation admin and is logged into the system.</p>
+</li>
+<li>
+<p><strong>Postconditions:</strong> The registered user is invited to join the organisation.</p>
+</li>
+<li>
+<p>Main Success Scenario:</p>
+<ol>
+<li>
+<p>Admin initiates invitation: The organisation admin selects the option to invite users.</p>
+</li>
+<li>
+<p>Admin enters email addresses: The admin enters the email addresses of the registered users.</p>
+</li>
+<li>
+<p>System sends invitations: The system sends invitation emails to the registered users.</p>
+</li>
+<li>
+<p>Invited user accepts invitation: The registered users accept the invitation to join the organisation.</p>
+</li>
+<li>
+<p>System adds users to organisation: The system adds the users to the organisation upon acceptance.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Extensions:</p>
+<ul>
+<li>3a. Invalid email addresses: If the entered email addresses are invalid, the system notifies the admin to correct the information.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_iXBG" id="4-manage-user-roles">4. Manage User Roles<a href="#4-manage-user-roles" class="hash-link" aria-label="Direct link to 4. Manage User Roles" title="Direct link to 4. Manage User Roles">​</a></h3>
+<ol>
+<li>
+<p>IAssign Roles to Users</p>
+<ul>
+<li>
+<p><strong>Use Case Name:</strong> Assign Roles to Users</p>
+</li>
+<li>
+<p><strong>Actors:</strong> Organisation Admin, System</p>
+</li>
+<li>
+<p><strong>Preconditions:</strong> The user is an organisation admin and is logged into the system.</p>
+</li>
+<li>
+<p><strong>Postconditions:</strong> Roles are assigned to users in the organisation.</p>
+</li>
+<li>
+<p>Main Success Scenario:</p>
+<ol>
+<li>
+<p>Admin views user list: The organisation admin views the list of users in the organisation.</p>
+</li>
+<li>
+<p>Admin assigns roles: The admin assigns predefined roles to each user.</p>
+</li>
+<li>
+<p>System updates roles: The system updates the users&#x27; roles.</p>
+</li>
+<li>
+<p>System notifies users: The system sends notifications to the users about their assigned roles.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Extensions:</p>
+<ul>
+<li>3a. Role assignment error: If there is an error in assigning roles, the system notifies the admin and suggests corrective actions.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Manage Authorization and Access</p>
+<ul>
+<li>
+<p><strong>Use Case Name:</strong> Manage Authorization and Access</p>
+</li>
+<li>
+<p><strong>Actors:</strong> Organisation Admin, System</p>
+</li>
+<li>
+<p><strong>Preconditions:</strong> The user is an organisation admin and is logged into the system.</p>
+</li>
+<li>
+<p><strong>Postconditions:</strong> The permissions and access levels for each role are managed.</p>
+</li>
+<li>
+<p>Main Success Scenario:</p>
+<ol>
+<li>
+<p>Admin accesses role management: The organisation admin accesses the role management interface.</p>
+</li>
+<li>
+<p>Admin modifies permissions: The admin defines or modifies permissions for each role.</p>
+</li>
+<li>
+<p>System enforces access control: The system enforces role-based access control based on the defined permissions.</p>
+</li>
+<li>
+<p>Users access features: Users access features and data as permitted by their roles.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Extensions:</p>
+<ul>
+<li>3a. Permission conflict: If there is a conflict in permissions, the system notifies the admin to resolve it.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Define a New Role</p>
+<ul>
+<li>
+<p><strong>Use Case Name:</strong> Define a New Role</p>
+</li>
+<li>
+<p><strong>Actors:</strong> Organisation Admin, System</p>
+</li>
+<li>
+<p><strong>Preconditions:</strong> The user is an organisation admin and is logged into the system.</p>
+</li>
+<li>
+<p><strong>Postconditions:</strong> A new role is defined and available for assignment.</p>
+</li>
+<li>
+<p>Main Success Scenario:</p>
+<ol>
+<li>
+<p>Admin accesses role management: The organisation admin accesses the role management interface.</p>
+</li>
+<li>
+<p>Admin creates new role: The admin creates a new role by specifying its name and permissions.</p>
+</li>
+<li>
+<p>System saves new role: The system saves the new role and makes it available for assignment.</p>
+</li>
+<li>
+<p>Admin assigns new role: The admin assigns the new role to users in the organisation.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Extensions:</p>
+<ul>
+<li>3a. Role creation error: If there is an error in creating the role, the system notifies the admin and suggests corrective actions.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_iXBG" id="5-leave-the-organisation">5. Leave the Organisation<a href="#5-leave-the-organisation" class="hash-link" aria-label="Direct link to 5. Leave the Organisation" title="Direct link to 5. Leave the Organisation">​</a></h3>
+<ol>
+<li>Leave the Organisation<!-- -->
+<ul>
+<li>
+<p><strong>Use Case Name:</strong> Leave the Organisation</p>
+</li>
+<li>
+<p><strong>Actors:</strong> User, System</p>
+</li>
+<li>
+<p><strong>Preconditions:</strong> The user is logged into the system and is a member of an organisation.</p>
+</li>
+<li>
+<p><strong>Postconditions:</strong> The user is no longer associated with the organisation.</p>
+</li>
+<li>
+<p>Main Success Scenario:</p>
+<ol>
+<li>
+<p>User initiates leave process: The user selects the option to leave the organisation.</p>
+</li>
+<li>
+<p>System confirms decision: The system confirms the user&#x27;s decision to leave.</p>
+</li>
+<li>
+<p>System removes user: The system removes the user from the organisation.</p>
+</li>
+<li>
+<p>System updates status: The system updates the user&#x27;s status to reflect they are no longer part of the organisation.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Extensions:</p>
+<ul>
+<li>2a. Leave cancellation: If the user cancels the leave process, the system retains the user&#x27;s membership in the organisation.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_iXBG" id="6-remove-users-from-the-organisation">6. Remove Users from the Organisation<a href="#6-remove-users-from-the-organisation" class="hash-link" aria-label="Direct link to 6. Remove Users from the Organisation" title="Direct link to 6. Remove Users from the Organisation">​</a></h3>
+<ol>
+<li>Remove Users from the Organisation<!-- -->
+<ul>
+<li>
+<p><strong>Use Case Name:</strong> Remove Users from the Organisation</p>
+</li>
+<li>
+<p><strong>Actors:</strong> Organisation Admin, System</p>
+</li>
+<li>
+<p><strong>Preconditions:</strong> The user is an organisation admin and is logged into the system.</p>
+</li>
+<li>
+<p><strong>Postconditions:</strong> The selected users are removed from the organisation.</p>
+</li>
+<li>
+<p>Main Success Scenario:</p>
+<ol>
+<li>
+<p>Admin views user list: The organisation admin views the list of users in the organisation.</p>
+</li>
+<li>
+<p>Admin selects users to remove: The admin selects the users to remove from the organisation, excluding other admins.</p>
+</li>
+<li>
+<p>System removes users: The system removes the selected users from the organisation.</p>
+</li>
+<li>
+<p>System notifies removed users: The system sends notifications to the removed users about their removal.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Extensions:</p>
+<ul>
+<li>3a. Error in removal: If there is an error in removing users, the system notifies the admin and suggests corrective actions.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_iXBG" id="7-access-organisation-saved-queries">7. Access Organisation Saved Queries<a href="#7-access-organisation-saved-queries" class="hash-link" aria-label="Direct link to 7. Access Organisation Saved Queries" title="Direct link to 7. Access Organisation Saved Queries">​</a></h3>
+<ol>
+<li>Access Organisation Saved Queries<!-- -->
+<ul>
+<li>
+<p><strong>Use Case Name:</strong> Access Organisation Saved Queries</p>
+</li>
+<li>
+<p><strong>Actors:</strong> User, System</p>
+</li>
+<li>
+<p><strong>Preconditions:</strong> The user is a member of the organisation and is logged into the system.</p>
+</li>
+<li>
+<p><strong>Postconditions:</strong> The user accesses and possibly runs or modifies saved queries.</p>
+</li>
+<li>
+<p>Main Success Scenario:</p>
+<ol>
+<li>
+<p>User views saved queries: The user views a list of saved queries within the organisation.</p>
+</li>
+<li>
+<p>User selects a query: The user selects a saved query from the list.</p>
+</li>
+<li>
+<p>System checks permissions: The system checks the user&#x27;s permissions to ensure access.</p>
+</li>
+<li>
+<p>User runs or modifies query: The user runs or modifies the saved query based on their permissions.</p>
+</li>
+<li>
+<p>System executes query: The system executes the query and displays the results to the user.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Extensions:</p>
+<ul>
+<li>3a. Access denied: If the user does not have the necessary permissions, the system denies access and notifies the user.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 class="anchor anchorWithStickyNavbar_iXBG" id="8-save-queries-for-the-organisation">8. Save Queries for the Organisation<a href="#8-save-queries-for-the-organisation" class="hash-link" aria-label="Direct link to 8. Save Queries for the Organisation" title="Direct link to 8. Save Queries for the Organisation">​</a></h3>
+<ol>
+<li>Save Queries for the Organisation<!-- -->
+<ul>
+<li>
+<p><strong>Use Case Name:</strong> Save Queries for the Organisation</p>
+</li>
+<li>
+<p><strong>Actors:</strong> User, System</p>
+</li>
+<li>
+<p><strong>Preconditions:</strong> The user is a member of the organisation with the appropriate permissions and is logged into the system.</p>
+</li>
+<li>
+<p><strong>Postconditions:</strong> The query is saved to the organisation&#x27;s repository.</p>
+</li>
+<li>
+<p>Main Success Scenario:</p>
+<ol>
+<li>
+<p>User initiates save query: The user selects the option to save a query to the organisation&#x27;s repository.</p>
+</li>
+<li>
+<p>User adds descriptions and tags: The user adds descriptions and tags to the query for easier retrieval.</p>
+</li>
+<li>
+<p>System validates query: The system validates the query and the user&#x27;s permissions.</p>
+</li>
+<li>
+<p>System saves query: The system saves the query to the organisation&#x27;s repository.</p>
+</li>
+<li>
+<p>System confirms save: The system confirms that the query has been saved and is accessible to other users based on their roles and permissions.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Extensions for;</p>
+<ul>
+<li>3a. Validation error: If the query or user permissions are invalid, the system notifies the user and suggests corrective actions.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol></div></article><nav class="pagination-nav docusaurus-mt-lg" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/Query-Builder/docs/requirements-specification/previous-versions/Version1/introduction"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Introduction</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/Query-Builder/docs/requirements-specification/previous-versions/Version1/functional-requirements"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Functional Requirements</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_neeK thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#user-management-subsystem" class="table-of-contents__link toc-highlight">User Management Subsystem</a></li><li><a href="#database-system-manager-subsystem" class="table-of-contents__link toc-highlight">Database System Manager Subsystem</a></li><li><a href="#query-builder-subsystem" class="table-of-contents__link toc-highlight">Query Builder Subsystem</a></li><li><a href="#reporting-subsystem" class="table-of-contents__link toc-highlight">Reporting subsystem</a></li><li><a href="#organisation-subsystem" class="table-of-contents__link toc-highlight">Organisation subsystem</a></li><li><a href="#use-cases-for-user-management-subsystem" class="table-of-contents__link toc-highlight">Use Cases for User Management Subsystem</a><ul><li><a href="#1-provide-a-secure-authentication-process-to-users" class="table-of-contents__link toc-highlight">1. Provide a Secure Authentication Process to Users</a></li><li><a href="#2-provide-an-interface-to-edit-or-change-users-information" class="table-of-contents__link toc-highlight">2. Provide an Interface to Edit or Change User&#39;s Information</a></li></ul></li><li><a href="#use-cases-for-database-systems-manager-subsystems" class="table-of-contents__link toc-highlight">Use Cases for Database Systems Manager Subsystems</a><ul><li><a href="#1-allow-users-to-connect-to-external-databases" class="table-of-contents__link toc-highlight">1. Allow Users to Connect to External Databases</a></li><li><a href="#2-allow-users-to-update-database-connection-details" class="table-of-contents__link toc-highlight">2. Allow Users to Update Database Connection Details</a></li><li><a href="#3-extract-metadata-from-database-schema" class="table-of-contents__link toc-highlight">3. Extract Metadata from Database Schema</a></li><li><a href="#4-query-execution" class="table-of-contents__link toc-highlight">4. Query Execution</a></li></ul></li><li><a href="#use-cases-for-the-query-builder-subsystem" class="table-of-contents__link toc-highlight">Use Cases for the Query Builder Subsystem</a><ul><li><a href="#1-choose-database-to-query" class="table-of-contents__link toc-highlight">1. Choose Database to Query</a></li><li><a href="#2-create-a-query" class="table-of-contents__link toc-highlight">2. Create a Query</a></li><li><a href="#3-toggle-between-views" class="table-of-contents__link toc-highlight">3. Toggle Between Views</a></li><li><a href="#4-view-query-results-summary" class="table-of-contents__link toc-highlight">4. View Query Results Summary</a></li><li><a href="#5-save-queries" class="table-of-contents__link toc-highlight">5. Save Queries</a></li></ul></li><li><a href="#use-cases-for-the-reporting-subsystem" class="table-of-contents__link toc-highlight">Use Cases for the Reporting subsystem</a><ul><li><a href="#1-generate-reports" class="table-of-contents__link toc-highlight">1. Generate Reports</a></li><li><a href="#2-share-reports" class="table-of-contents__link toc-highlight">2. Share Reports</a></li><li><a href="#3-export-reports" class="table-of-contents__link toc-highlight">3. Export Reports</a></li></ul></li><li><a href="#use-cases-for-the-organisation-subsystem" class="table-of-contents__link toc-highlight">Use Cases for the Organisation subsystem</a><ul><li><a href="#1-create-an-organisation" class="table-of-contents__link toc-highlight">1. Create an Organisation</a></li><li><a href="#2-connect-a-database-to-the-organisation" class="table-of-contents__link toc-highlight">2. Connect a Database to the Organisation</a></li><li><a href="#3-add-other-users-to-the-organisation" class="table-of-contents__link toc-highlight">3. Add Other Users to the Organisation</a></li><li><a href="#4-manage-user-roles" class="table-of-contents__link toc-highlight">4. Manage User Roles</a></li><li><a href="#5-leave-the-organisation" class="table-of-contents__link toc-highlight">5. Leave the Organisation</a></li><li><a href="#6-remove-users-from-the-organisation" class="table-of-contents__link toc-highlight">6. Remove Users from the Organisation</a></li><li><a href="#7-access-organisation-saved-queries" class="table-of-contents__link toc-highlight">7. Access Organisation Saved Queries</a></li><li><a href="#8-save-queries-for-the-organisation" class="table-of-contents__link toc-highlight">8. Save Queries for the Organisation</a></li></ul></li></ul></div></div></div></div></main></div></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="col footer__col"><div class="footer__title">Docs</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/Query-Builder/docs/category/software-requirements-specification">Requirements Specification</a></li></ul></div><div class="col footer__col"><div class="footer__title">Community</div><ul class="footer__items clean-list"></ul></div><div class="col footer__col"><div class="footer__title">More</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/COS301-SE-2024/Query-Builder" target="_blank" rel="noopener noreferrer" class="footer__link-item">GitHub<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_Vr67"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></a></li></ul></div></div><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2024 QBEE Built with Docusaurus.</div></div></div></footer></div>
+</body>
+</html>
