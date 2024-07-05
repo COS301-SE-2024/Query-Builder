@@ -14,11 +14,70 @@ interface SortParams {
 interface QueryParams {
     language: string,
     query_type: string,
-    table: string,
-    columns: string[],
-    condition?: string,
+    table: table[],
+    columns: column[],
+    join?: join,
+    condition?: condition,
     sortParams?: SortParams,
     pageParams?: PageParams
+}
+
+interface table {
+    name: string,
+}
+
+interface column {
+    name: string,
+    aggregation? : AggregateFunction,
+    alias?: string,
+}
+
+interface join {
+    matchingColumns: matchingColumns
+}
+
+interface matchingColumns {
+    tableColumns: column[],
+    operator: ComparisonOperator
+}
+
+interface condition {
+}
+
+interface compoundCondition extends condition{
+    conditions: condition[],
+    operator: LogicalOperator,
+}
+
+interface primitiveCondition extends condition{
+    value: string | number | boolean,
+    column: string,
+    operator: ComparisonOperator,
+    aggregate?: AggregateFunction
+}
+
+export enum AggregateFunction {
+    "COUNT",
+    "SUM",
+    "AVG",
+    "MIN",
+    "MAX",
+}
+
+export enum LogicalOperator {
+    "AND",
+    "OR",
+    "NOT",
+}
+
+export enum ComparisonOperator {
+    "=",
+    "<",
+    ">",
+    "<=",
+    ">=",
+    "<>",
+    "LIKE",
 }
 
 @Injectable()
