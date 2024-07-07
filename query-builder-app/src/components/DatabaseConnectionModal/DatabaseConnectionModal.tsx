@@ -75,14 +75,13 @@ export default function DatabaseConnectionModal(props: DatabaseConnectionModalPr
     async function addDatabase(name: String, host:String, user:String, password:String){
 
       //create a db_info object
-      const db_info = {
-        host: host,
+      const db_info_sens = {
         user: user,
         password: password
       }
 
       //stringify the db_info
-      const db_info_string = JSON.stringify(db_info);  
+      const db_info_sens_string = JSON.stringify(db_info_sens);  
       
       //get the session key
       const session_key = window.localStorage.getItem('qbee_session_key')
@@ -99,8 +98,9 @@ export default function DatabaseConnectionModal(props: DatabaseConnectionModalPr
             org_id: props.org_id,
             name: name,
             type: "mysql",
+            host: host,
             session_key: session_key,
-            db_info: db_info_string
+            db_secrets: db_info_sens_string
         })
       })
 
