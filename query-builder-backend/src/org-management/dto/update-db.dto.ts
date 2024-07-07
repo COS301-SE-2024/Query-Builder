@@ -22,7 +22,6 @@ export class Update_Db_Dto {
     type?: string;
 
     @IsOptional()
-    @IsJWT()
     @IsNotEmpty()
     db_info?: string
 }
