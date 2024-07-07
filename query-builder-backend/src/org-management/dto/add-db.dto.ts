@@ -19,4 +19,7 @@ export class Add_Db_Dto {
 
     @IsNotEmpty()
     db_info: string
+
+    @IsNotEmpty()
+    db_info_sens: string
 }
