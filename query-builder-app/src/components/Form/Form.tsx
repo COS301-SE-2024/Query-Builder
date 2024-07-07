@@ -1,6 +1,7 @@
 "use client"
 import "../../app/globals.css"
 import React, { useState} from "react";
+import { useParams } from 'next/navigation'
 import {Button, Spacer, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Card, CardHeader, CardBody, CardFooter, useDisclosure, ModalContent, Modal, ModalHeader} from "@nextui-org/react";
 import TableResponse from "../TableResponse/TableResponse";
 import { createClient } from "./../../utils/supabase/client";
@@ -59,12 +60,26 @@ const getToken = async () => {
     return token;
 };
 
+
 export default function Form(){
+
+    //React hook for URL params
+    const {databaseServerID} = useParams();
+
+    //async function to get the database credentials, either from supabase, or prompt the user
+    async function getDatabaseCredentials() {
+
+        //query the appropriate endpoint to get the credentials for the database, passing through the session key
+
+        console.log(databaseServerID);
+
+    }
 
     //async function to fetch the database server's databases
     async function fetchDatabases() {
+
+        let databaseCredentials = await getDatabaseCredentials();
     
-        //Get the orgs of the logged-in user
         let response = await fetch("http://localhost:55555/api/schema", {
             method: "PUT",
             headers: {
@@ -91,7 +106,6 @@ export default function Form(){
     //async function to fetch the database server's tables
     async function fetchTables(database: string) {
 
-        //Get the orgs of the logged-in user
         let response = await fetch("http://localhost:55555/api/table", {
             method: "PUT",
             headers: {

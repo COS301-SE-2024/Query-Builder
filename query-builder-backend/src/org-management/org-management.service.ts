@@ -5,6 +5,7 @@ import {
   Put,
   UnauthorizedException,
 } from "@nestjs/common";
+import { createCipheriv, randomBytes} from 'crypto';
 import { Supabase } from "../supabase";
 import { Get_Org_Dto } from "./dto/get-org.dto";
 import { Create_Org_Dto } from "./dto/create-org.dto";
@@ -245,10 +246,22 @@ export class OrgManagementService {
     //   this.configService.get("SUPABASE_JWT_SECRET"),
     // );
 
+    //use the session key to encrypt the database info
+    const iv = randomBytes(16);
+    const key = Buffer.from(add_db_dto.session_key, 'base64');
+    console.log(key);
+    console.log("second key length" + key.length);
+    const cipher = createCipheriv('aes-256-ctr', key, iv);
+    const textToEncrypt = add_db_dto.db_info;
+    const encryptedText = Buffer.concat([
+      cipher.update(textToEncrypt),
+      cipher.final(),
+    ]);
+
     const db_fields = {
       name: add_db_dto.name,
       type: add_db_dto.type,
-      db_info: add_db_dto.db_info,
+      db_info: encryptedText.toString("base64"),
     };
 
     const { data: db_data, error: db_error } = await this.supabase.getClient()

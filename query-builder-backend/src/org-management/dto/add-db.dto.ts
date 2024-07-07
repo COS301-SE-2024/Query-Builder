@@ -15,6 +15,8 @@ export class Add_Db_Dto {
     @IsNotEmpty()
     type: string;
 
+    session_key: string;
+
     @IsNotEmpty()
     db_info: string
 }
