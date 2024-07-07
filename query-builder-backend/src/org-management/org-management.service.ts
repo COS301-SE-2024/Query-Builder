@@ -249,8 +249,8 @@ export class OrgManagementService {
     //use the session key to encrypt the database info
     const iv = randomBytes(16);
     const key = Buffer.from(add_db_dto.session_key, 'base64');
-    console.log(key);
-    console.log("second key length" + key.length);
+    // console.log(key);
+    // console.log("second key length" + key.length);
     const cipher = createCipheriv('aes-256-ctr', key, iv);
     const textToEncrypt = add_db_dto.db_info;
     const encryptedText = Buffer.concat([

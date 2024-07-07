@@ -63,12 +63,11 @@ export class UserManagementService {
     }
 
     //generate a session key using a key derivation function
-    const iv = randomBytes(16);
     // The key length is dependent on the algorithm.
     // In this case for aes256, it is 32 bytes.
     const key = (await promisify(scrypt)(user.password, 'salt', 32)) as Buffer;    
-    console.log(key);
-    console.log("first key length" + key.length);
+    // console.log(key);
+    // console.log("first key length" + key.length);
 
     return { data, sessionKey: key.toString('base64') };
   }
