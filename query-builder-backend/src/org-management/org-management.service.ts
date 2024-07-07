@@ -282,7 +282,7 @@ export class OrgManagementService {
       );
     }
 
-    // TODO: DECRYPT db_info_sens
+    // TODO: ENCRYPT db_info_sens
 
     const db_fields = {
       name: add_db_dto.name,

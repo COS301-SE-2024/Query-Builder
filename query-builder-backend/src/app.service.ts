@@ -24,32 +24,10 @@ export class AppService {
     return token;
   }
 
-  encrypt_VK(data: string): string {
-    const key = this.configService.get('VK_ENCRYPTION_KEY');
+  encrypt(data: string, key: string): string {
     const iv = randomBytes(16); // Generate random Initialization Vector (IV)
     const cipher = createCipheriv('aes-256-cbc', key, iv);
     let encrypted = cipher.update(data);
-    encrypted = Buffer.concat([encrypted, cipher.final()]);
-    return iv.toString('hex') + encrypted.toString('hex');
-  }
-
-  // Decryption function
-  decrypt_VK(encryptedData: string): string {
-    const key = this.configService.get('VK_ENCRYPTION_KEY');
-    const iv = Buffer.from(encryptedData.substring(0, 32), 'hex');
-    encryptedData = encryptedData.substring(32);
-    const decipher = createDecipheriv('aes-256-cbc', key, iv);
-    let decrypted = decipher.update(Buffer.from(encryptedData, 'hex'));
-    decrypted = Buffer.concat([decrypted, decipher.final()]);
-    return decrypted.toString();
-  }
-
-  encrypt(data: string, key: string): string {
-    const temp_enc = this.encrypt_VK(data);
-
-    const iv = randomBytes(16); // Generate random Initialization Vector (IV)
-    const cipher = createCipheriv('aes-256-cbc', key, iv);
-    let encrypted = cipher.update(temp_enc);
     encrypted = Buffer.concat([encrypted, cipher.final()]);
     return iv.toString('hex') + encrypted.toString('hex');
   }
@@ -61,8 +39,6 @@ export class AppService {
     const decipher = createDecipheriv('aes-256-cbc', key, iv);
     let decrypted = decipher.update(Buffer.from(encryptedData, 'hex'));
     decrypted = Buffer.concat([decrypted, decipher.final()]);
-
-    const decrypted_vk = this.decrypt_VK(decrypted.toString());
-    return decrypted_vk.toString();
+    return decrypted.toString();
   }
 }
