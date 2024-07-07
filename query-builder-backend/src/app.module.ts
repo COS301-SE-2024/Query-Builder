@@ -11,6 +11,8 @@ import { SupabaseGuard, SupabaseModule } from "./supabase";
 import { APP_GUARD } from "@nestjs/core";
 import { UserManagementModule } from "./user-management/user-management.module";
 import { OrgManagementModule } from "./org-management/org-management.module";
+import { QueryHandlerModule } from './query-handler/query-handler.module';
+import { DbMetadataHandlerModule } from './db-metadata-handler/db-metadata-handler.module';
 
 @Module({
   imports: [
@@ -22,6 +24,8 @@ import { OrgManagementModule } from "./org-management/org-management.module";
     SupabaseModule,
     UserManagementModule,
     OrgManagementModule,
+    QueryHandlerModule,
+    DbMetadataHandlerModule,
   ],
   controllers: [AppController],
   providers: [AppService]})
