@@ -4,7 +4,6 @@ import { ConfigModule } from "@nestjs/config";
 
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
-import { ConnectModule } from "./connect/connect.module";
 import { ConnectionManagerModule } from "./connection-manager/connection-manager.module";
 import { JsonConverterModule } from "./jsonConverter/jsonConverter.module";
 import { SupabaseGuard, SupabaseModule } from "./supabase";
@@ -18,7 +17,6 @@ import { DbMetadataHandlerModule } from './db-metadata-handler/db-metadata-handl
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     PassportModule,
-    ConnectModule,
     ConnectionManagerModule,
     JsonConverterModule,
     SupabaseModule,

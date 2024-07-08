@@ -80,7 +80,7 @@ export default function Form(){
 
         let databaseCredentials = await getDatabaseCredentials();
     
-        let response = await fetch("http://localhost:55555/api/schema", {
+        let response = await fetch("http://localhost:55555/api/metadata/schemas", {
             method: "PUT",
             headers: {
             'Accept': 'application/json',
@@ -106,7 +106,7 @@ export default function Form(){
     //async function to fetch the database server's tables
     async function fetchTables(database: string) {
 
-        let response = await fetch("http://localhost:55555/api/table", {
+        let response = await fetch("http://localhost:55555/api/metadata/tables", {
             method: "PUT",
             headers: {
             'Accept': 'application/json',
