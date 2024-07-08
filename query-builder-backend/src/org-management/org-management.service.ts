@@ -20,7 +20,7 @@ import { Remove_Org_Dto } from "./dto/remove-org.dto";
 import { ConfigService } from "@nestjs/config";
 import { Get_Members_Dto } from "./dto/get-members.dto";
 import { Get_Dbs_Dto } from "./dto/get-dbs.dto";
-import { AppService } from "src/app.service";
+import { AppService } from "../app.service";
 
 @Injectable()
 export class OrgManagementService {

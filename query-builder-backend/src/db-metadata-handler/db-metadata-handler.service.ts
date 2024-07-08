@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { QueryHandlerService } from 'src/query-handler/query-handler.service';
+import { QueryHandlerService } from '../query-handler/query-handler.service';
 
 interface DatabaseCredentials {
     host: string;
