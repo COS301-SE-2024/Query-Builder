@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadGatewayException, Injectable, UnauthorizedException } from '@nestjs/common';
 
 interface DatabaseCredentials {
     host: string,
@@ -27,10 +27,10 @@ export class ConnectionManagerService {
             if (err) {
                 console.log(err)
                 if(err.code == "ER_ACCESS_DENIED_ERROR" || err.code == "ER_NOT_SUPPORTED_AUTH_MODE"){
-                  reject({ errorCode: "Access Denied" }); // Reject with an error object
+                  reject(new UnauthorizedException("Please ensure that your database credentials are correct."));
                 }
                 else{
-                  reject({ errorCode: "Could not Connect" }); // Reject with an error object
+                  reject(new BadGatewayException("Could not connect to the external database - are the host and port correct?"));
                 }
             } else {
                 resolve({ success: true, connectionID: connection.threadID }); // Resolve with connection info

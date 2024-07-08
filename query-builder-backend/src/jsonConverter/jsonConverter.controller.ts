@@ -16,13 +16,7 @@ export class JsonConverterController {
 
     @Post()
     async convert(@Body() queryParams: QueryParams){
-        try{
-            const result = await this.jsonConverterService.convertJsonToQuery(queryParams);
-            return result;
-        }
-        catch(error){
-            return error;
-        }
+        return this.jsonConverterService.convertJsonToQuery(queryParams);
     }
 
 }

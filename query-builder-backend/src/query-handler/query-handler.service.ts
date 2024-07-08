@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadGatewayException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JsonConverterService } from './../jsonConverter/jsonConverter.service';
 
 interface DatabaseCredentials {
@@ -58,58 +58,59 @@ export class QueryHandlerService {
             if (err) {
                 console.log(err)
                 if(err.code == "ER_ACCESS_DENIED_ERROR" || err.code == "ER_NOT_SUPPORTED_AUTH_MODE"){
-                  reject({ errorCode: "Access Denied" }); // Reject with an error object
+                  reject(new UnauthorizedException("Please ensure that your database credentials are correct.")); // Reject with an error object
                 }
                 else{
-                  reject({ errorCode: "Could not Connect" }); // Reject with an error object
+                  reject(new BadGatewayException("Could not connect to the external database - are the host and port correct?")); // Reject with an error object
                 }
             }
+            else{
+              //query the connected database if the connection is successful
+
+              //first, use the correct database as specified in query
+              const databaseToQuery: string = query.databaseName;
+              const useCommand: string = "USE " + databaseToQuery + ";";
+
+              connection.query(useCommand, function (error, results, fields) {
+                if (error) throw error;
+              });
+
+              //secondly, get the number of rows of data
+              const countCommand: string = `SELECT COUNT(*) AS numRows FROM ${query.queryParams.table}`;
+              connection.query(countCommand, async function(error, results, fields){
+                if (error) throw error;
+
+                const numRows = results[0].numRows;
+
+                console.log(numRows);
+
+                //thirdly, query the database
+                const queryCommand: string = await parser.convertJsonToQuery(query.queryParams);
+                console.log(queryCommand);
+                connection.query(queryCommand, function (error, results, fields) {
+                  if (error) throw error;
+
+                  //terminate the database connection
+                  connection.end();
+
+                  //add a unique key field to each returned row
+                  for (var i = 0; i < results.length; i++) {
+                    results[i].qbee_id = i; // Add "total": 2 to all objects in array
+                  }
+
+                  //return a response object with numRows and results
+                  const response = {
+                    totalNumRows: numRows,
+                    data: results
+                  }
+
+                  resolve(response);
+
+                });
+
+              })
+            }
           });
-
-          //query the connected database if the connection is successful
-
-          //first, use the correct database as specified in query
-          const databaseToQuery: string = query.databaseName;
-          const useCommand: string = "USE " + databaseToQuery + ";";
-
-          connection.query(useCommand, function (error, results, fields) {
-            if (error) throw error;
-          });
-
-          //secondly, get the number of rows of data
-          const countCommand: string = `SELECT COUNT(*) AS numRows FROM ${query.queryParams.table}`;
-          connection.query(countCommand, async function(error, results, fields){
-            if (error) throw error;
-
-            const numRows = results[0].numRows;
-
-            console.log(numRows);
-
-            //thirdly, query the database
-            const queryCommand: string = await parser.convertJsonToQuery(query.queryParams);
-            console.log(queryCommand);
-            connection.query(queryCommand, function (error, results, fields) {
-              if (error) throw error;
-
-              //terminate the database connection
-              connection.end();
-
-              //add a unique key field to each returned row
-              for (var i = 0; i < results.length; i++) {
-                results[i].qbee_id = i; // Add "total": 2 to all objects in array
-              }
-
-              //return a response object with numRows and results
-              const response = {
-                totalNumRows: numRows,
-                data: results
-              }
-
-              resolve(response);
-
-            });
-
-          })
 
         });
 

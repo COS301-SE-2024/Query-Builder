@@ -1,4 +1,4 @@
-import { BadGatewayException, Body, Controller, HttpCode, Post, UnauthorizedException } from '@nestjs/common';
+import {Body, Controller, HttpCode, Post} from '@nestjs/common';
 import { QueryHandlerService } from './query-handler.service';
 
 interface DatabaseCredentials {
@@ -42,21 +42,7 @@ export class QueryHandlerController {
     @HttpCode(200)
     @Post()
     async query(@Body() query: Query) {
-        try {
-            const result = await this.queryHandlerService.queryDatabase(query);
-            return result;
-        } catch (error) {
-            if (error.errorCode == "Access Denied") {
-                throw new UnauthorizedException(
-                    "Please ensure that your database credentials are correct.",
-                );
-            } else {
-                console.log(error);
-                throw new BadGatewayException(
-                    "Could not connect to the external database - are the host and port correct?",
-                );
-            }
-        }
+        return this.queryHandlerService.queryDatabase(query);
     }
 
 }
