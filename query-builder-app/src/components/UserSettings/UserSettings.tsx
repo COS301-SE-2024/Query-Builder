@@ -3,6 +3,7 @@ import "../Authentication/Authentication.css"
 import React, { useState, useEffect } from "react";
 import {Button, Card, CardBody, CardHeader, Input, input} from "@nextui-org/react";
 import PhoneInput, { formatPhoneNumber, formatPhoneNumberIntl, isValidPhoneNumber } from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
 import { createClient } from "./../../utils/supabase/client";
 
 const getToken = async () => {
@@ -16,8 +17,8 @@ const getToken = async () => {
 export default function UserSettings(){
     const [initialFirstName, setInitialFirstName] = useState('');
     const [initialLastName, setInitialLastName] = useState('');
-    // const [initialEmail, setInitialEmail] = useState('');
-    // const [initialPhone, setInitialPhone] = useState('');
+    const [initialEmail, setInitialEmail] = useState('');
+    const [initialPhone, setInitialPhone] = useState('');
     // get user information with JWT token
     const getUserInfo = async () => {
 
@@ -40,6 +41,8 @@ export default function UserSettings(){
             console.log(json.profile_data[0]);
             setInitialFirstName(json.profile_data[0].first_name);
             setInitialLastName(json.profile_data[0].last_name);
+            setInitialPhone(json.profile_data[0].phone);
+            setInitialEmail(json.profile_data[0].email);
         } catch (error) {
             console.error("Failed to fetch user info:", error);
         }
@@ -52,9 +55,13 @@ export default function UserSettings(){
     // Updated fields
     const [updateFirstName, setUpdateFirstName] = useState(initialFirstName);
     const [updateLastName, setUpdateLastName] = useState(initialLastName);
+    const [updatePhone, setUpdatePhone] = useState(initialPhone);
+    const [updateEmail, setUpdateEmail] = useState(initialEmail);
+
     const [updateFirstNameHasBeenFocused, setUpdateFirstNameHasBeenFocused] = useState(false);
     const [updateLastNameHasBeenFocused, setUpdateLastNameHasBeenFocused] = useState(false);
     const [updatePhoneHasBeenFocused, setUpdatePhoneHasBeenFocused] = useState(false);
+    const [updateEmailHasBeenFocused, setUpdateEmailHasBeenFocused] = useState(false);
     // const [updatePasswordBeenFocused, setUpdatePasswordHasBeenFocused] = useState(false);
 
   
@@ -108,16 +115,84 @@ export default function UserSettings(){
         console.log(response)
     };
 
+    const updateEmailCall = async() => {
+        let email;
+        
+        if (updateEmail == initialEmail){
+            email = initialEmail;
+        }
+        else {
+            email = updateEmail;
+        }
+
+
+        let updatedDetails = {
+            email: updateEmail
+        };
+
+        console.log(updatedDetails);
+
+        let response = await fetch("http://localhost:55555/api/user-management/update-user-phone", {
+            method: "PATCH",
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + await getToken()
+            },
+            body: JSON.stringify(updatedDetails)
+        })
+        console.log(response)
+    };
+
+    const updatePhoneNumber = async() => {
+        let phoneNumber;
+        
+        if (updatePhone == initialPhone){
+            phoneNumber = initialPhone;
+        }
+        else {
+            phoneNumber = updatePhone;
+        }
+
+
+        let updatedDetails = {
+            phone: phoneNumber
+        };
+
+        console.log(updatedDetails);
+
+        let response = await fetch("http://localhost:55555/api/user-management/update-user-email", {
+            method: "PATCH",
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + await getToken()
+            },
+            body: JSON.stringify(updatedDetails)
+        })
+        console.log(response)
+    };
+
+    const validateEmail = (value: any) =>
+        value.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$/i);
+
+    const isUpdateEmailInvalid = React.useMemo(() => {
+        if (updateEmail === '') return true;
+    
+        return validateEmail(updateEmail) ? false : true;
+    }, [updateEmail]);
+
     return (
         <>
             <Card
             fullWidth>
-                <CardHeader><div className="user-management-options">Change User Details</div></CardHeader>
+                <CardHeader><div className="user-management-options">Change User's Personal Details</div></CardHeader>
                 <CardBody>
                         <div className="infield">
                             <Input
-                                isRequired
+                                // isRequired
                                 label="First Name"
+                                defaultValue={initialFirstName}
                                 variant="bordered"
                                 placeholder={initialFirstName}
                                 onValueChange={setUpdateFirstName}
@@ -132,7 +207,7 @@ export default function UserSettings(){
                                 isRequired
                                 label="Last Name"
                                 variant="bordered"
-                                placeholder={initialLastName}
+                                defaultValue={initialLastName}
                                 onValueChange={setUpdateLastName}
                                 onFocus={() => {setUpdateFirstNameHasBeenFocused(false);setUpdateLastNameHasBeenFocused(true);setUpdatePhoneHasBeenFocused(false)}}
                                 isInvalid={isUpdateLastNameInvalid && updateLastNameHasBeenFocused}
@@ -143,6 +218,84 @@ export default function UserSettings(){
                         <Button 
                             color="primary"  
                             onClick={() => updateQuery()}
+                        >
+                            Update
+                        </Button>
+                </CardBody>
+            </Card>
+
+            <Card
+            fullWidth>
+                <CardHeader><div className="user-management-options">Change User's Contact Details</div></CardHeader>
+                <CardBody>
+                    <div className="infield">
+                        <PhoneInput
+                            international
+                            label="Phone Number"
+                            variant="bordered"
+                            inputComponent={Input}
+                            value={initialPhone}
+                            onValueChange={setUpdatePhone}
+                            onChange={(value) => setUpdatePhone(value as string)}
+                            withCountryCallingCode
+                            color={
+                            !updatePhoneHasBeenFocused
+                                ? 'primary'
+                                : updatePhone
+                                ? !isValidPhoneNumber(updatePhone)
+                                    ? 'danger'
+                                    : 'success'
+                                : 'danger'
+                            }
+                            onFocus={() => {
+                            setUpdatePhoneHasBeenFocused(true);
+                            }}
+                            isInvalid={
+                            (updatePhone ? !isValidPhoneNumber(updatePhone) : true) &&
+                            updatePhoneHasBeenFocused
+                            }
+                            errorMessage="Please enter a valid phone number"
+                        />
+                    </div>
+                        <Button 
+                            color="primary"  
+                            onClick={() => updatePhoneNumber()}
+                        >
+                            Update
+                        </Button>
+                </CardBody>
+            </Card>
+
+            <Card
+            fullWidth>
+                <CardHeader><div className="user-management-options">Change User's Email</div></CardHeader>
+                <CardBody>
+                    <div className="infield">
+                    <Input
+                        isRequired
+                        label="Email"
+                        variant="bordered"
+                        type="email"
+                        onValueChange={setUpdateEmail}
+                        onFocus={() => {
+                            setUpdateEmailHasBeenFocused(true);
+                        }}
+                        isInvalid={
+                        isUpdateEmailInvalid && updateEmailHasBeenFocused
+                        }
+                        color={
+                        !updateEmailHasBeenFocused
+                            ? 'primary'
+                            : isUpdateEmailInvalid && updateEmailHasBeenFocused
+                            ? 'danger'
+                            : 'success'
+                        }
+                        errorMessage="Please enter a valid email"
+                    />
+                    </div>
+                        <Button 
+                            color="primary"  
+                            onClick={() => updateEmailCall()}
                         >
                             Update
                         </Button>
