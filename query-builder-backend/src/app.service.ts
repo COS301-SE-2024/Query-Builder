@@ -26,18 +26,19 @@ export class AppService {
 
   encrypt(data: string, key: string): string {
     const iv = randomBytes(16); // Generate random Initialization Vector (IV)
-    const cipher = createCipheriv('aes-256-cbc', key, iv);
+    const key_buffer = Buffer.from(key, 'base64');
+    const cipher = createCipheriv('aes-256-cbc', key_buffer, iv);
     let encrypted = cipher.update(data);
     encrypted = Buffer.concat([encrypted, cipher.final()]);
-    return iv.toString('hex') + encrypted.toString('hex');
+    return iv.toString('base64') + encrypted.toString('base64');
   }
 
   // Decryption function
   decrypt(encryptedData: string, key: string): string {
-    const iv = Buffer.from(encryptedData.substring(0, 32), 'hex');
+    const iv = Buffer.from(encryptedData.substring(0, 32), 'base64');
     encryptedData = encryptedData.substring(32);
     const decipher = createDecipheriv('aes-256-cbc', key, iv);
-    let decrypted = decipher.update(Buffer.from(encryptedData, 'hex'));
+    let decrypted = decipher.update(Buffer.from(encryptedData, 'base64'));
     decrypted = Buffer.concat([decrypted, decipher.final()]);
     return decrypted.toString();
   }

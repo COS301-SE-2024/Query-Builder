@@ -3,12 +3,15 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
-} from '@nestjs/common';
-import { Get_User_Dto } from './dto/get-user.dto';
-import { Supabase } from '../supabase';
-import { Create_User_Dto } from './dto/create-user.dto';
-import { Sign_In_User_Dto } from './dto/sign-in-user.dto';
-import { Update_User_Dto } from './dto/update-user.dto';
+  Session,
+} from "@nestjs/common";
+import { createCipheriv, randomBytes, scrypt } from 'crypto';
+import { promisify } from 'util';
+import { Get_User_Dto } from "./dto/get-user.dto";
+import { Supabase } from "../supabase";
+import { Create_User_Dto } from "./dto/create-user.dto";
+import { Sign_In_User_Dto } from "./dto/sign-in-user.dto";
+import { Update_User_Dto } from "./dto/update-user.dto";
 import { AuthApiError, PostgrestError } from '@supabase/supabase-js';
 
 @Injectable()
@@ -74,7 +77,14 @@ export class UserManagementService {
       throw error;
     }
 
-    return { data };
+    //generate a session key using a key derivation function
+    // The key length is dependent on the algorithm.
+    // In this case for aes256, it is 32 bytes.
+    const key = (await promisify(scrypt)(user.password, 'salt', 32)) as Buffer;    
+    console.log(key);
+    console.log("first key length" + key.length);
+
+    return { data, sessionKey: key.toString('base64') };
   }
 
   async signUp(user: Create_User_Dto) {

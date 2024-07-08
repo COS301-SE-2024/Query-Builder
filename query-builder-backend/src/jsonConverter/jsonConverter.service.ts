@@ -15,7 +15,6 @@ export class JsonConverterService {
                 if (!jsonData.table || !jsonData.table.columns) {
                     query = 'Invalid query';
                     return query;
-                    throw new Error('Invalid query');
                 }
                 
                 let select = '';

@@ -1,14 +1,18 @@
-import {
-    BadGatewayException,
-    Body,
-    Controller,
-    HttpCode,
-    Post,
-    Put,
-    UnauthorizedException,
-} from "@nestjs/common";
-import { ConnectionManagerService } from "../connection-manager/connection-manager.service";
+import { Injectable } from '@nestjs/common';
+import { QueryHandlerService } from '../query-handler/query-handler.service';
 import { QueryParams } from '../interfaces/intermediateJSON';
+
+interface DatabaseCredentials {
+    host: string;
+    user: string;
+    password: string;
+}
+  
+interface Query {
+    credentials: DatabaseCredentials,
+    databaseName: string,
+    queryParams: QueryParams
+}
 
 interface Database {
     key: string,
@@ -16,20 +20,8 @@ interface Database {
 }
 
 interface Table {
-table: string,
-columns: string[]
-}
-
-interface DatabaseCredentials {
-    host: string;
-    user: string;
-    password: string;
-}
-
-interface Query {
-    credentials: DatabaseCredentials;
-    databaseName: string;
-    queryParams: QueryParams;
+    table: string,
+    columns: string[]
 }
 
 interface TableQuery {
@@ -43,56 +35,13 @@ interface FieldQuery {
     table: string;
 }
 
-@Controller()
-export class ConnectController {
-    constructor(private readonly connectionManager: ConnectionManagerService) {}
+@Injectable()
+export class DbMetadataHandlerService {
 
-    //end point to test connection to the database server
-    @HttpCode(200)
-    @Post("connect")
-    async connect(@Body() credentials: DatabaseCredentials) {
-        try {
-            const result = await this.connectionManager.connectToDatabase(
-                credentials,
-            );
-            return result;
-        } catch (error) {
-            if (error.errorCode == "Access Denied") {
-                throw new UnauthorizedException(
-                    "Please ensure that your database credentials are correct.",
-                );
-            } else {
-                console.log(error);
-                throw new BadGatewayException(
-                    "Could not connect to the external database - are the host and port correct?",
-                );
-            }
-        }
-    }
+    constructor(private readonly queryHandlerService: QueryHandlerService) {}
 
-    //end point to execute a query on a selected database
-    @HttpCode(200)
-    @Post("query")
-    async query(@Body() query: Query) {
-        try {
-            const result = await this.connectionManager.queryDatabase(query);
-            return result;
-        } catch (error) {
-            if (error.errorCode == "Access Denied") {
-                throw new UnauthorizedException(
-                    "Please ensure that your database credentials are correct.",
-                );
-            } else {
-                console.log(error);
-                throw new BadGatewayException(
-                    "Could not connect to the external database - are the host and port correct?",
-                );
-            }
-        }
-    }
+    async getSchemaMetadata(databaseCredentials: DatabaseCredentials): Promise<any> {
 
-    @Put("schema")
-    async getSchemaMetadata(@Body() credentials: DatabaseCredentials) {
         /*
         SELECT schema_name
         FROM information_schema.schemata
@@ -100,7 +49,7 @@ export class ConnectController {
         ORDER BY schema_name;
         */
         const query: Query = {
-            credentials: credentials,
+            credentials: databaseCredentials,
             databaseName: "information_schema",
             queryParams: {
                 language: "sql",
@@ -114,7 +63,7 @@ export class ConnectController {
             },
         };
 
-        const response = await this.connectionManager.queryDatabase(query);
+        const response = await this.queryHandlerService.queryDatabase(query);
 
         //return in the form the frontend is expecting
         var responseToReturn: Database[] = [];
@@ -129,10 +78,11 @@ export class ConnectController {
         }
 
         return responseToReturn;
+
     }
 
-    @Put("table")
-    async getTableMetadata(@Body() tableQuery: TableQuery) {
+    async getTableMetadata(tableQuery: TableQuery): Promise<any> {
+
         /*
         SELECT table_name
         FROM information_schema.tables
@@ -154,7 +104,7 @@ export class ConnectController {
             },
         };
 
-        const response = await this.connectionManager.queryDatabase(query);
+        const response = await this.queryHandlerService.queryDatabase(query);
 
         //return in the form the frontend is expecting
         var responseToReturn: Table[] = [];
@@ -178,7 +128,7 @@ export class ConnectController {
                 },
             };
     
-            const fieldsResponse = await this.connectionManager.queryDatabase(fieldsQuery);
+            const fieldsResponse = await this.queryHandlerService.queryDatabase(fieldsQuery);
             console.log(fieldsResponse);
 
             var columns: string[] = [];
@@ -198,9 +148,8 @@ export class ConnectController {
 
     }
 
-    @Put("fields")
-    async getFieldMetadata(@Body() fieldQuery: FieldQuery) // need schema and tables
-    {
+    async getFieldMetadata(fieldQuery: FieldQuery) : Promise<any> {
+
         /*
         SELECT column_name
         FROM information_schema.columns
@@ -223,6 +172,8 @@ export class ConnectController {
             },
         };
 
-        return await this.connectionManager.queryDatabase(query);
+        return await this.queryHandlerService.queryDatabase(query);
+
     }
+
 }

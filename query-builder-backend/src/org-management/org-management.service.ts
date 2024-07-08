@@ -4,29 +4,31 @@ import {
   NotFoundException,
   Put,
   UnauthorizedException,
-} from '@nestjs/common';
-import { Supabase } from '../supabase';
-import { Get_Org_Dto } from './dto/get-org.dto';
-import { Create_Org_Dto } from './dto/create-org.dto';
-import { Add_Member_Dto } from './dto/add-member.dto';
-import { Add_Db_Dto } from './dto/add-db.dto';
-import { Update_Org_Dto } from './dto/update-org.dto';
-import { Update_Member_Dto } from './dto/update-member.dto';
-import { Update_Db_Dto } from './dto/update-db.dto';
-import { Remove_Db_Dto } from './dto/remove-db.dto';
-import { Remove_Member_Dto } from './dto/remove-member.dto';
-import { Remove_Org_Dto } from './dto/remove-org.dto';
-import jwt from 'jsonwebtoken';
-import { ConfigService } from '@nestjs/config';
-import { Get_Members_Dto } from './dto/get-members.dto';
-import { Get_Dbs_Dto } from './dto/get-dbs.dto';
+} from "@nestjs/common";
+import { createCipheriv, randomBytes } from 'crypto';
+import { Supabase } from "../supabase";
+import { Get_Org_Dto } from "./dto/get-org.dto";
+import { Create_Org_Dto } from "./dto/create-org.dto";
+import { Add_Member_Dto } from "./dto/add-member.dto";
+import { Add_Db_Dto } from "./dto/add-db.dto";
+import { Update_Org_Dto } from "./dto/update-org.dto";
+import { Update_Member_Dto } from "./dto/update-member.dto";
+import { Update_Db_Dto } from "./dto/update-db.dto";
+import { Remove_Db_Dto } from "./dto/remove-db.dto";
+import { Remove_Member_Dto } from "./dto/remove-member.dto";
+import { Remove_Org_Dto } from "./dto/remove-org.dto";
+import { ConfigService } from "@nestjs/config";
+import { Get_Members_Dto } from "./dto/get-members.dto";
+import { Get_Dbs_Dto } from "./dto/get-dbs.dto";
+import { AppService } from "../app.service";
 
 @Injectable()
 export class OrgManagementService {
   constructor(
     private readonly supabase: Supabase,
     private readonly configService: ConfigService,
-  ) {}
+    private readonly app_service: AppService,
+  ) { }
 
   // TODO: Test this function
   async getOrg(org: Get_Org_Dto) {
@@ -282,13 +284,25 @@ export class OrgManagementService {
       );
     }
 
-    // TODO: ENCRYPT db_info_sens
+    //use the session key to encrypt the database info
+    // console.log(key);
+    // console.log("second key length" + key.length);
+    // const cipher = createCipheriv('aes-256-ctr', key, iv);
+    // const textToEncrypt = add_db_dto.db_info;
+    // const encryptedText = Buffer.concat([
+    //   cipher.update(textToEncrypt),
+    //   cipher.final(),
+    // ]);
+    const encryptedText = this.app_service.encrypt(add_db_dto.db_secrets, add_db_dto.session_key);
+
+    // TODO: Add to vault and store the secret_id
 
     const db_fields = {
       name: add_db_dto.name,
       type: add_db_dto.type,
-      db_info: add_db_dto.db_info,
-      db_info_sens: add_db_dto.db_info_sens,
+      db_info: add_db_dto.db_info ? add_db_dto.db_info : {},
+      host: add_db_dto.host,
+      db_secrets: encryptedText,
     };
 
     const { data: db_data, error: db_error } = await this.supabase
@@ -414,7 +428,7 @@ export class OrgManagementService {
     return { data };
   }
 
-  // TODO: Test this function
+  // TODO: Test this function, allow for updating db_secrets
   async updateDb(update_db_dto: Update_Db_Dto) {
     const { data: owner_data, error: owner_error } = await this.supabase
       .getClient()
@@ -439,6 +453,13 @@ export class OrgManagementService {
         'You are not the owner of this organisation',
       );
     }
+
+    const db_fields = {
+      name: update_db_dto.name,
+      type: update_db_dto.type,
+      db_info: update_db_dto.db_info,
+      host: update_db_dto.host,
+    };
 
     const { data: db_data, error: db_error } = await this.supabase
       .getClient()
@@ -537,7 +558,7 @@ export class OrgManagementService {
     if (error) {
       throw error;
     }
-    if(data.length === 0) {
+    if (data.length === 0) {
       throw new InternalServerErrorException('Member not removed');
     }
 
@@ -564,7 +585,7 @@ export class OrgManagementService {
     if (org_error) {
       throw org_error;
     }
-    if(org_data.length === 0) {
+    if (org_data.length === 0) {
       throw new UnauthorizedException('You are not the owner of this organisation');
     }
 
@@ -578,7 +599,7 @@ export class OrgManagementService {
     if (error) {
       throw new InternalServerErrorException(error.message);
     }
-    if(data.length === 0) {
+    if (data.length === 0) {
       throw new InternalServerErrorException('Database not removed');
     }
 

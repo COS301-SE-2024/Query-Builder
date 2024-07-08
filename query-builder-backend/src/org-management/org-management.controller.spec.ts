@@ -3,6 +3,7 @@ import { OrgManagementController } from "./org-management.controller";
 import { Supabase } from "../supabase";
 import { ConfigService } from "@nestjs/config";
 import { OrgManagementService } from "./org-management.service";
+import { AppService } from "../app.service";
 
 describe("OrgManagementController", () => {
   let controller: OrgManagementController;
@@ -10,7 +11,7 @@ describe("OrgManagementController", () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [OrgManagementController],
-      providers: [OrgManagementService, Supabase, ConfigService],
+      providers: [OrgManagementService, Supabase, ConfigService, AppService],
     }).compile();
 
     controller = module.get<OrgManagementController>(OrgManagementController);

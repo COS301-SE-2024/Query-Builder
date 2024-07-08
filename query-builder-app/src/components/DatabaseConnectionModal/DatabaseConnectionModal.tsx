@@ -1,7 +1,7 @@
 "use client"
 import "../../app/globals.css"
 import React, { useState } from "react";
-import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Spacer} from "@nextui-org/react";
+import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Checkbox, Tooltip} from "@nextui-org/react";
 import { createClient } from "./../../utils/supabase/client";
 import jwt from "jsonwebtoken"
 
@@ -31,6 +31,9 @@ export default function DatabaseConnectionModal(props: DatabaseConnectionModalPr
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
 
     const [databaseConnectionStatus, setDatabaseConnectionStatus] = useState('Not connected to a database');
+
+    //React hook to store whether the user wants QBee to remember their database credentials or not
+    const [rememberDatabaseCredentials, setRememberDatabaseCredentials] = useState(false);
 
     const [url, setUrl] = useState('');
     const [username, setUsername] = useState('');
@@ -72,14 +75,16 @@ export default function DatabaseConnectionModal(props: DatabaseConnectionModalPr
     async function addDatabase(name: String, host:String, user:String, password:String){
 
       //create a db_info object
-      const db_info = {
-        host: host,
+      const db_info_sens = {
         user: user,
         password: password
       }
 
-      //stringify and base64 encode it
-      const db_info_string = btoa(JSON.stringify(db_info));     
+      //stringify the db_info
+      const db_info_sens_string = JSON.stringify(db_info_sens);  
+      
+      //get the session key
+      const session_key = window.localStorage.getItem('qbee_session_key')
 
       //call the add-db API endpoint
       let response = await fetch("http://localhost:55555/api/org-management/add-db", {
@@ -93,7 +98,9 @@ export default function DatabaseConnectionModal(props: DatabaseConnectionModalPr
             org_id: props.org_id,
             name: name,
             type: "mysql",
-            db_info: db_info_string
+            host: host,
+            session_key: session_key,
+            db_secrets: db_info_sens_string
         })
       })
 
@@ -163,6 +170,15 @@ export default function DatabaseConnectionModal(props: DatabaseConnectionModalPr
                     color={!passwordBeenFocused ? "primary" : isPasswordInvalid ? "danger" : "success"}
                     errorMessage="Please enter a password"
                   />
+                  <Checkbox
+                    isSelected={rememberDatabaseCredentials}
+                    onValueChange={setRememberDatabaseCredentials}
+                    classNames={{
+                      label: "text-small",
+                    }}
+                  >
+                    Remember my database credentials
+                  </Checkbox>
                 </ModalBody>
                 <ModalFooter>
                   <Button 
