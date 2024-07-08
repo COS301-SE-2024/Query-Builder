@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import {  describe, it, expect,vi } from 'vitest';
+import { describe, it, expect,vi } from 'vitest';
 import '@testing-library/jest-dom';
 import UserSettings from './UserSettings'; // adjust the import according to your file structure
 
