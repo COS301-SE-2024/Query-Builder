@@ -1,13 +1,6 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { JsonConverterService } from './jsonConverter.service';
-
-interface QueryParams {
-    language: string,
-    query_type: string,
-    table: string,
-    columns: string[],
-    condition: string
-}
+import { QueryParams } from '../interfaces/intermediateJSON';
 
 @Controller('convert')
 export class JsonConverterController {

@@ -1,30 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { QueryHandlerService } from '../query-handler/query-handler.service';
+import { QueryParams } from '../interfaces/intermediateJSON';
 
 interface DatabaseCredentials {
     host: string;
     user: string;
     password: string;
-}
-
-interface SortParams {
-    column: string,
-    direction?: "ascending"|"descending"
-}
-  
-interface PageParams {
-    pageNumber: number,
-    rowsPerPage: number
-}
-  
-interface QueryParams {
-    language: string,
-    query_type: string,
-    table: string,
-    columns: string[],
-    condition?: string,
-    sortParams?: SortParams,
-    pageParams?: PageParams
 }
   
 interface Query {
@@ -73,8 +54,7 @@ export class DbMetadataHandlerService {
             queryParams: {
                 language: "sql",
                 query_type: "select",
-                table: "schemata",
-                columns: ["schema_name"],
+                table: {name:"schemata", columns: [{name: "schema_name"}]},
                 condition:
                     `schema_name NOT IN ('information_schema', 'mysql', 'sys', 'performance_schema')`,
                 sortParams: {
@@ -116,8 +96,7 @@ export class DbMetadataHandlerService {
             queryParams: {
                 language: "sql",
                 query_type: "select",
-                table: "tables",
-                columns: ["table_name"],
+                table: {name:"tables", columns: [{name: "table_name"}]},
                 condition: `table_schema="${tableQuery.schema}"`,
                 sortParams: {
                     column: "table_name",
@@ -140,8 +119,7 @@ export class DbMetadataHandlerService {
                 queryParams: {
                     language: "sql",
                     query_type: "select",
-                    table: "columns",
-                    columns: ["column_name"],
+                    table: {name:"columns", columns: [{name: "column_name"}]},
                     condition:
                         `table_schema = "${tableQuery.schema}" AND table_name="${table.TABLE_NAME}"`,
                     sortParams: {
@@ -185,8 +163,7 @@ export class DbMetadataHandlerService {
             queryParams: {
                 language: "sql",
                 query_type: "select",
-                table: "columns",
-                columns: ["column_name"],
+                table: {name:"columns", columns: [{name: "column_name"}]},
                 condition:
                     `table_schema = "${fieldQuery.schema}" AND table_name="${fieldQuery.table}"`,
                 sortParams: {
