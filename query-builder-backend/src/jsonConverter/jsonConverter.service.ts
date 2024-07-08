@@ -1,25 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-interface SortParams {
-    column: string,
-    direction?: "ascending"|"descending"
-  }
-
-  interface PageParams {
-    //note pageNumbers are indexed from 1
-    pageNumber: number,
-    rowsPerPage: number
-}
-
-interface QueryParams {
-    language: string,
-    query_type: string,
-    table: string,
-    columns: string[],
-    condition?: string,
-    sortParams?: SortParams,
-    pageParams?: PageParams
-}
+import { QueryParams } from '../interfaces/intermediateJSON';
 
 @Injectable()
 export class JsonConverterService {
@@ -31,7 +12,7 @@ export class JsonConverterService {
     
         if (jsonData.language === 'sql') {
             if (jsonData.query_type === 'select') {
-                if (!jsonData.table || !jsonData.columns) {
+                if (!jsonData.table || !jsonData.table.columns) {
                     query = 'Invalid query';
                     return query;
                     throw new Error('Invalid query');
@@ -40,16 +21,16 @@ export class JsonConverterService {
                 let select = '';
 
                 //if the columns array is empty return all the columns
-                if(jsonData.columns.length == 0){
+                if(jsonData.table.columns.length == 0){
                     select = "*";
                 }
                 //otherwise concatenate the column strings together
                 else{
                     //first add tick symbols around each column name to deal with names with spaces
-                    for(let columnIndex = 0; columnIndex < jsonData.columns.length-1; columnIndex++){
-                        select += '`' + jsonData.columns[columnIndex] + '`,'
+                    for(let columnIndex = 0; columnIndex < jsonData.table.columns.length-1; columnIndex++){
+                        select += '`' + jsonData.table.columns[columnIndex] + '`,'
                     }
-                    select += '`' + jsonData.columns[jsonData.columns.length-1] + '`';
+                    select += '`' + jsonData.table.columns[jsonData.table.columns.length-1] + '`';
                 }
 
                 const from = jsonData.table;
