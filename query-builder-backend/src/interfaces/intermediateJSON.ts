@@ -24,7 +24,7 @@ export interface table {
     join?: join
 }
 
-interface column {
+export interface column {
     name: string,
     aggregation? : AggregateFunction,
     alias?: string,

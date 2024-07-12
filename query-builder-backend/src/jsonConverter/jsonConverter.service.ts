@@ -1,12 +1,35 @@
 import { Injectable } from '@nestjs/common';
 
-import { QueryParams, table } from '../interfaces/intermediateJSON';
+import { QueryParams, table, column } from '../interfaces/intermediateJSON';
 
 @Injectable()
 export class JsonConverterService {
 
+    //helper function to generate a string of a column
+    generateColumnString(column: column, tableName: string) : string {
+
+        let columnString = '';
+
+        if(column.aggregation){
+            columnString += column.aggregation + '(';
+        }
+
+        columnString += '`' + tableName + '.' + column.name + '`';
+
+        if(column.aggregation){
+            columnString += ')'
+        }
+
+        if(column.alias){
+            columnString += ' AS `' + column.alias + '`';
+        }
+
+        return columnString;
+
+    }
+
     //helper function to generate string of all the columns to be returned from a table
-    generateListOfColumns(table: table){
+    generateListOfColumns(table: table) : string {
 
         let tableColumns = '';
 
@@ -18,9 +41,9 @@ export class JsonConverterService {
         else{
             //first add tick symbols around each column name to deal with names with spaces
             for(let columnIndex = 0; columnIndex < table.columns.length-1; columnIndex++){
-                tableColumns += '`' + table.name + '.' + table.columns[columnIndex] + '`, '
+                tableColumns += this.generateColumnString(table.columns[columnIndex], table.name) + ', ';
             }
-            tableColumns += '`' + table.name + '.' + table.columns[table.columns.length-1] + '`';
+            tableColumns += this.generateColumnString(table.columns[table.columns.length-1], table.name);
         }
 
         return tableColumns;
