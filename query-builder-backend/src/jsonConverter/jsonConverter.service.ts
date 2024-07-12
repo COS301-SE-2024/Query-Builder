@@ -101,6 +101,53 @@ export class JsonConverterService {
 
     }
 
+    generateOrderByClause(queryParams: QueryParams): string {
+
+        let orderBy = '';
+
+        if (queryParams.sortParams) {
+
+            let sortDirection = '';
+
+            //SQL specific mapping of directions
+            if(queryParams.sortParams.direction == "descending"){
+                sortDirection = "DESC";
+            }
+            //defaults to ascending sorting
+            else{
+                sortDirection = "ASC";
+            }
+
+            orderBy = ` ORDER BY ${queryParams.sortParams.column} ${sortDirection}`;
+
+        }
+
+        return orderBy;
+
+    }
+
+    generateLimitClause(queryParams: QueryParams): string {
+
+        let limit = '';
+
+        if (queryParams.pageParams) {
+
+            //get the page number and number of rows of data per page that we would like to return
+            const rowsPerPage = queryParams.pageParams.rowsPerPage;
+            const pageNumber = queryParams.pageParams.pageNumber;
+
+            //calculate the offset into the data where we should start returning data
+            //in SQL rows are indexed from 1 and the OFFSET is one less than the first row we want to return
+            const offset = (pageNumber-1)*rowsPerPage;
+
+            limit = ` LIMIT ${rowsPerPage} OFFSET ${offset}`;
+
+        }
+
+        return limit;
+
+    }
+
     async convertJsonToQuery(jsonData: QueryParams): Promise<string> {
         let query = '';
         jsonData.language = jsonData.language.toLowerCase();
@@ -123,41 +170,12 @@ export class JsonConverterService {
                     where = ` WHERE ${jsonData.condition}`;
                 }
 
-                let orderBy = '';
+                const orderBy = this.generateOrderByClause(jsonData);
 
-                if (jsonData.sortParams) {
+                const limit = this.generateLimitClause(jsonData);
 
-                    let sortDirection = '';
-
-                    //SQL specific mapping of directions
-                    if(jsonData.sortParams.direction == "descending"){
-                        sortDirection = "DESC";
-                    }
-                    //defaults to ascending sorting
-                    else{
-                        sortDirection = "ASC";
-                    }
-
-                    orderBy = ` ORDER BY ${jsonData.sortParams.column} ${sortDirection}`;
-
-                }
-
-                let limit = '';
-
-                if (jsonData.pageParams) {
-
-                    //get the page number and number of rows of data per page that we would like to return
-                    const rowsPerPage = jsonData.pageParams.rowsPerPage;
-                    const pageNumber = jsonData.pageParams.pageNumber;
-
-                    //calculate the offset into the data where we should start returning data
-                    //in SQL rows are indexed from 1 and the OFFSET is one less than the first row we want to return
-                    const offset = (pageNumber-1)*rowsPerPage;
-
-                    limit = ` LIMIT ${rowsPerPage} OFFSET ${offset}`;
-
-                }
                 query = `SELECT ${select} FROM ${from}${where}${orderBy}${limit}`;
+                
             } else {
                 query = 'Unsupported query type';
                 return query;
