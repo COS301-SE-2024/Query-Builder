@@ -4,15 +4,15 @@ import {
   InternalServerErrorException,
   NotFoundException,
   Session,
-} from "@nestjs/common";
+} from '@nestjs/common';
 import { createCipheriv, randomBytes, scrypt } from 'crypto';
 import { promisify } from 'util';
-import { Get_User_Dto } from "./dto/get-user.dto";
-import { Supabase } from "../supabase";
-import { Create_User_Dto } from "./dto/create-user.dto";
-import { Sign_In_User_Dto } from "./dto/sign-in-user.dto";
-import { Update_User_Dto } from "./dto/update-user.dto";
-import { AuthApiError, PostgrestError } from '@supabase/supabase-js';
+import { Get_User_Dto } from './dto/get-user.dto';
+import { Supabase } from '../supabase';
+import { Create_User_Dto } from './dto/create-user.dto';
+import { Sign_In_User_Dto } from './dto/sign-in-user.dto';
+import { Update_User_Dto } from './dto/update-user.dto';
+import { Express } from 'express';
 
 @Injectable()
 export class UserManagementService {
@@ -80,9 +80,9 @@ export class UserManagementService {
     //generate a session key using a key derivation function
     // The key length is dependent on the algorithm.
     // In this case for aes256, it is 32 bytes.
-    const key = (await promisify(scrypt)(user.password, 'salt', 32)) as Buffer;    
+    const key = (await promisify(scrypt)(user.password, 'salt', 32)) as Buffer;
     console.log(key);
-    console.log("first key length" + key.length);
+    console.log('first key length' + key.length);
 
     return { data, sessionKey: key.toString('base64') };
   }
@@ -156,6 +156,44 @@ export class UserManagementService {
     }
 
     return { data };
+  }
+
+  async uploadProfilePhoto(file: Express.Multer.File) {
+    const {
+      data: { user: user_data },
+      error: user_error,
+    } = await this.supabase.getClient().auth.getUser(this.supabase.getJwt());
+
+    if (user_error) {
+      throw user_error;
+    }
+
+    const user_id = user_data.id;
+
+    const bucket_name = 'profile_photos';
+    const file_path = `${user_id}/${file.originalname}`;
+
+    const { data, error } = await this.supabase
+      .getClient()
+      .storage.from(bucket_name)
+      .upload(file_path, file.buffer, {
+        contentType: file.mimetype,
+        upsert: true,
+      });
+
+    if (error) {
+      throw error;
+    }
+    if (data === null) {
+      throw new InternalServerErrorException('Failed to upload file');
+    }
+
+    const { data: img_url } = await this.supabase
+      .getClient()
+      .storage.from(bucket_name)
+      .getPublicUrl(file_path);
+
+    return img_url;
   }
 
   async updateUserPassword(user: Update_User_Dto) {
