@@ -18,7 +18,7 @@ export class JsonConverterService {
         else{
             //first add tick symbols around each column name to deal with names with spaces
             for(let columnIndex = 0; columnIndex < table.columns.length-1; columnIndex++){
-                tableColumns += '`' + table.name + '.' + table.columns[columnIndex] + '`,'
+                tableColumns += '`' + table.name + '.' + table.columns[columnIndex] + '`, '
             }
             tableColumns += '`' + table.name + '.' + table.columns[table.columns.length-1] + '`';
         }
@@ -30,8 +30,6 @@ export class JsonConverterService {
     generateSelectClause(queryParams: QueryParams): string {
 
         let selectClause = '';
-
-        //get the columns from each table by traversing the table linked list
         
         //get a reference to the first table
         let tableRef = queryParams.table;
@@ -49,8 +47,34 @@ export class JsonConverterService {
 
         }
         
-        console.log(selectClause);
         return selectClause;
+
+    }
+
+    generateFromClause(queryParams: QueryParams): string {
+
+        let fromClause = '';
+
+        //get a reference to the first table
+        let tableRef = queryParams.table;
+
+        //concatenate the first table
+        fromClause += tableRef.name;
+
+        //traverse the table linked list and add each join until tableRef.join is null
+        while(tableRef.join){
+
+            //get the join
+            const join = tableRef.join;
+
+            fromClause += ' JOIN ' + join.table2.name + ' ON `' + tableRef.name + '.' + join.table1MatchingColumnName + '`=`' + join.table2.name + '.' + join.table2MatchingColumnName + '`';
+
+            //move the table reference one on
+            tableRef = tableRef.join.table2;
+
+        }
+
+        return fromClause;
 
     }
 
@@ -66,9 +90,10 @@ export class JsonConverterService {
                     return query;
                 }
                 
-                let select = this.generateSelectClause(jsonData);
+                const select = this.generateSelectClause(jsonData);
 
-                const from = jsonData.table.name;
+                const from = this.generateFromClause(jsonData);
+
                 let where = '';
 
                 if (jsonData.condition) {
