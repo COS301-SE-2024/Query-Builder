@@ -14,7 +14,7 @@ export class JsonConverterService {
             columnString += column.aggregation + '(';
         }
 
-        columnString += '`' + tableName + '.' + column.name + '`';
+        columnString += '`' + tableName + '`.`' + column.name + '`';
 
         if(column.aggregation){
             columnString += ')'
@@ -82,7 +82,7 @@ export class JsonConverterService {
         let tableRef = queryParams.table;
 
         //concatenate the first table
-        fromClause += tableRef.name;
+        fromClause += '`' + tableRef.name + '`';
 
         //traverse the table linked list and add each join until tableRef.join is null
         while(tableRef.join){
@@ -90,7 +90,7 @@ export class JsonConverterService {
             //get the join
             const join = tableRef.join;
 
-            fromClause += ' JOIN ' + join.table2.name + ' ON `' + tableRef.name + '.' + join.table1MatchingColumnName + '`=`' + join.table2.name + '.' + join.table2MatchingColumnName + '`';
+            fromClause += ' JOIN `' + join.table2.name + '` ON `' + tableRef.name + '`.`' + join.table1MatchingColumnName + '`=`' + join.table2.name + '`.`' + join.table2MatchingColumnName + '`';
 
             //move the table reference one on
             tableRef = tableRef.join.table2;
@@ -118,7 +118,7 @@ export class JsonConverterService {
                 sortDirection = "ASC";
             }
 
-            orderBy = ` ORDER BY ${queryParams.sortParams.column} ${sortDirection}`;
+            orderBy = ' ORDER BY `' + queryParams.sortParams.column + '` ' + sortDirection;
 
         }
 
