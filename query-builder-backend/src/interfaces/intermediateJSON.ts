@@ -13,15 +13,15 @@ export interface QueryParams {
     language: string,
     query_type: string,
     table: table,
-    join?: join[],
     condition?: condition,
     sortParams?: SortParams,
     pageParams?: PageParams
 }
 
-interface table {
+export interface table {
     name: string,
     columns: column[],
+    join?: join
 }
 
 interface column {
@@ -31,7 +31,6 @@ interface column {
 }
 
 interface join {
-    table1: table,
     table1MatchingColumnName: string,
     table2: table,
     table2MatchingColumnName: string,

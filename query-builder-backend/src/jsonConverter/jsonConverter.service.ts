@@ -1,9 +1,58 @@
 import { Injectable } from '@nestjs/common';
 
-import { QueryParams } from '../interfaces/intermediateJSON';
+import { QueryParams, table } from '../interfaces/intermediateJSON';
 
 @Injectable()
 export class JsonConverterService {
+
+    //helper function to generate string of all the columns to be returned from a table
+    generateListOfColumns(table: table){
+
+        let tableColumns = '';
+
+        //if the columns array is empty return all the columns for the table
+        if(table.columns.length == 0){
+            tableColumns = table.name + '.' + '*';
+        }
+        //otherwise concatenate the column strings together
+        else{
+            //first add tick symbols around each column name to deal with names with spaces
+            for(let columnIndex = 0; columnIndex < table.columns.length-1; columnIndex++){
+                tableColumns += '`' + table.name + '.' + table.columns[columnIndex] + '`,'
+            }
+            tableColumns += '`' + table.name + '.' + table.columns[table.columns.length-1] + '`';
+        }
+
+        return tableColumns;
+
+    }
+
+    generateSelectClause(queryParams: QueryParams): string {
+
+        let selectClause = '';
+
+        //get the columns from each table by traversing the table linked list
+        
+        //get a reference to the first table
+        let tableRef = queryParams.table;
+
+        //concatenate the first table's columns
+        selectClause += this.generateListOfColumns(tableRef);
+
+        //traverse the table linked list and add columns for each table until tableRef.join is null
+        while(tableRef.join){
+
+            //move the table reference one on
+            tableRef = tableRef.join.table2;
+
+            selectClause += ', ' + this.generateListOfColumns(tableRef);
+
+        }
+        
+        console.log(selectClause);
+        return selectClause;
+
+    }
 
     async convertJsonToQuery(jsonData: QueryParams): Promise<string> {
         let query = '';
@@ -17,22 +66,9 @@ export class JsonConverterService {
                     return query;
                 }
                 
-                let select = '';
+                let select = this.generateSelectClause(jsonData);
 
-                //if the columns array is empty return all the columns
-                if(jsonData.table.columns.length == 0){
-                    select = "*";
-                }
-                //otherwise concatenate the column strings together
-                else{
-                    //first add tick symbols around each column name to deal with names with spaces
-                    for(let columnIndex = 0; columnIndex < jsonData.table.columns.length-1; columnIndex++){
-                        select += '`' + jsonData.table.columns[columnIndex] + '`,'
-                    }
-                    select += '`' + jsonData.table.columns[jsonData.table.columns.length-1] + '`';
-                }
-
-                const from = jsonData.table;
+                const from = jsonData.table.name;
                 let where = '';
 
                 if (jsonData.condition) {
