@@ -18,6 +18,12 @@ interface FieldQuery {
     table: string;
 }
 
+interface ForeignKeyQuery {
+    credentials: DatabaseCredentials;
+    schema: string;
+    table: string;
+}
+
 @Controller('metadata')
 export class DbMetadataHandlerController {
 
@@ -36,6 +42,11 @@ export class DbMetadataHandlerController {
     @Put("fields")
     async getFieldMetadata(@Body() fieldQuery: FieldQuery){
         return this.dbMetadataHandlerService.getFieldMetadata(fieldQuery);
+    }
+
+    @Put("foreign-keys")
+    async getForeignKeyMetadata(@Body() foreignKeyQuery: ForeignKeyQuery){
+        return this.dbMetadataHandlerService.getForeignKeyMetadata(foreignKeyQuery);
     }
 
 }

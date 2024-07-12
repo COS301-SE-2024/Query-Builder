@@ -35,6 +35,12 @@ interface FieldQuery {
     table: string;
 }
 
+interface ForeignKeyQuery {
+    credentials: DatabaseCredentials;
+    schema: string;
+    table: string;
+}
+
 @Injectable()
 export class DbMetadataHandlerService {
 
@@ -173,6 +179,64 @@ export class DbMetadataHandlerService {
         };
 
         return await this.queryHandlerService.queryDatabase(query);
+
+    }
+
+    async getForeignKeyMetadata(foreignKeyQuery: ForeignKeyQuery) : Promise<any> {
+
+        //First get foreign keys 'from' the table pointing 'to' other tables
+
+        /*
+        SELECT column_name, referenced_table_schema, referenced_table_name, referenced_column_name
+        FROM information_schema.key_column_usage
+        WHERE constraint_schema = '----------determined by input----------' AND table_name='----------determined by input----------' AND referenced_column_name IS NOT NULL
+        ORDER BY referenced_table_name;
+        ;
+        */
+        const fromQuery: Query = {
+            credentials: foreignKeyQuery.credentials,
+            databaseName: "information_schema",
+            queryParams: {
+                language: "sql",
+                query_type: "select",
+                table: {name:"key_column_usage", columns: [{name: "column_name"}, {name: "referenced_table_schema"}, {name: "referenced_table_name"}, {name: "referenced_column_name"}]},
+                condition:
+                    `constraint_schema = "${foreignKeyQuery.schema}" AND table_name="${foreignKeyQuery.table}" AND referenced_column_name IS NOT NULL`,
+                sortParams: {
+                    column: "referenced_table_name",
+                },
+            },
+        };
+
+        const fromResponse = await this.queryHandlerService.queryDatabase(fromQuery);
+
+        //Secondly get foreign keys 'from' other tables pointing 'to' the table
+
+        /*
+        SELECT table_schema, table_name, column_name, referenced_column_name
+        FROM information_schema.key_column_usage
+        WHERE table_schema = '----------determined by input----------' AND referenced_table_name='----------determined by input----------'
+        ORDER BY table_name;
+        ;
+        */
+        const toQuery: Query = {
+            credentials: foreignKeyQuery.credentials,
+            databaseName: "information_schema",
+            queryParams: {
+                language: "sql",
+                query_type: "select",
+                table: {name:"key_column_usage", columns: [{name: "table_schema"}, {name: "table_name"}, {name: "column_name"}, {name: "referenced_column_name"}]},
+                condition:
+                    `table_schema = "${foreignKeyQuery.schema}" AND referenced_table_name="${foreignKeyQuery.table}"`,
+                sortParams: {
+                    column: "table_name",
+                },
+            },
+        };
+
+        const toResponse = await this.queryHandlerService.queryDatabase(toQuery);
+
+        return {from: fromResponse.data, to: toResponse.data}
 
     }
 
