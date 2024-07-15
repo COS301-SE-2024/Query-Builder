@@ -145,7 +145,75 @@ export class JsonConverterService {
         return (condition as primitiveCondition).column !== undefined;
     }
 
+    groupBySQL(jsonData: QueryParams) {
+        let groupByColumns = '';
+        for (let i = 0; i < jsonData.table.columns.length; i++) {
+            const column = jsonData.table.columns[i];
+            if (!column.aggregation) {
+                groupByColumns += column.name + ', ';
+            }
+        }
     
+        // Remove the trailing comma and space
+        if (groupByColumns) {
+            groupByColumns = groupByColumns.slice(0, -2);
+            return ` GROUP BY ${groupByColumns}`;
+        } else {
+            return '';
+        }
+    }
+    
+    havingSQL(jsonData: QueryParams)
+    {
+        if (!jsonData.condition) 
+            {
+                return '';
+            }
+    
+        const havingConditions = this.getAggregateConditions(jsonData.condition);
+    
+        return havingConditions.length > 0 ? ` HAVING ${havingConditions.join(' AND ')}` : '';
+    }
+    
+    getAggregateConditions(condition: condition): string[] 
+    {
+        let aggregateConditions: string[] = [];
+    
+        if ((condition as compoundCondition).conditions) 
+            {
+                const compCondition = condition as compoundCondition;
+        
+                for (let i = 0; i < compCondition.conditions.length; i++) 
+                    {
+                        aggregateConditions.push(...this.getAggregateConditions(compCondition.conditions[i]));//asked Chat for help make sure this works as intended
+                    }
+            } 
+        else if ((condition as primitiveCondition).aggregate) 
+            {
+                const primCondition = condition as primitiveCondition;
+                let sql = `${primCondition.aggregate}(${primCondition.column}) ${primCondition.operator} `;
+        
+                if (typeof primCondition.value === 'string') 
+                    {
+                        sql += `'${primCondition.value}'`;
+                    } 
+                else if (typeof primCondition.value === 'boolean') 
+                    {
+                        sql += primCondition.value ? 'TRUE' : 'FALSE';
+                    } 
+                else 
+                    { // number 
+                        sql += primCondition.value;
+                    }
+        
+                aggregateConditions.push(sql);
+        }
+    
+        return aggregateConditions;
+    }
+
+    //code to be added to mongoDB conversion
+
     
     
 }
