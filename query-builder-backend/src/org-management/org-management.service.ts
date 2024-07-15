@@ -4,23 +4,23 @@ import {
   NotFoundException,
   Put,
   UnauthorizedException,
-} from "@nestjs/common";
+} from '@nestjs/common';
 import { createCipheriv, randomBytes } from 'crypto';
-import { Supabase } from "../supabase";
-import { Get_Org_Dto } from "./dto/get-org.dto";
-import { Create_Org_Dto } from "./dto/create-org.dto";
-import { Add_Member_Dto } from "./dto/add-member.dto";
-import { Add_Db_Dto } from "./dto/add-db.dto";
-import { Update_Org_Dto } from "./dto/update-org.dto";
-import { Update_Member_Dto } from "./dto/update-member.dto";
-import { Update_Db_Dto } from "./dto/update-db.dto";
-import { Remove_Db_Dto } from "./dto/remove-db.dto";
-import { Remove_Member_Dto } from "./dto/remove-member.dto";
-import { Remove_Org_Dto } from "./dto/remove-org.dto";
-import { ConfigService } from "@nestjs/config";
-import { Get_Members_Dto } from "./dto/get-members.dto";
-import { Get_Dbs_Dto } from "./dto/get-dbs.dto";
-import { AppService } from "../app.service";
+import { Supabase } from '../supabase';
+import { Get_Org_Dto } from './dto/get-org.dto';
+import { Create_Org_Dto } from './dto/create-org.dto';
+import { Add_Member_Dto } from './dto/add-member.dto';
+import { Add_Db_Dto } from './dto/add-db.dto';
+import { Update_Org_Dto } from './dto/update-org.dto';
+import { Update_Member_Dto } from './dto/update-member.dto';
+import { Update_Db_Dto } from './dto/update-db.dto';
+import { Remove_Db_Dto } from './dto/remove-db.dto';
+import { Remove_Member_Dto } from './dto/remove-member.dto';
+import { Remove_Org_Dto } from './dto/remove-org.dto';
+import { ConfigService } from '@nestjs/config';
+import { Get_Members_Dto } from './dto/get-members.dto';
+import { Get_Dbs_Dto } from './dto/get-dbs.dto';
+import { AppService } from '../app.service';
 
 @Injectable()
 export class OrgManagementService {
@@ -28,7 +28,7 @@ export class OrgManagementService {
     private readonly supabase: Supabase,
     private readonly configService: ConfigService,
     private readonly app_service: AppService,
-  ) { }
+  ) {}
 
   // TODO: Test this function
   async getOrg(org: Get_Org_Dto) {
@@ -293,7 +293,10 @@ export class OrgManagementService {
     //   cipher.update(textToEncrypt),
     //   cipher.final(),
     // ]);
-    const encryptedText = this.app_service.encrypt(add_db_dto.db_secrets, add_db_dto.session_key);
+    const encryptedText = this.app_service.encrypt(
+      add_db_dto.db_secrets,
+      add_db_dto.session_key,
+    );
 
     // TODO: Add to vault and store the secret_id
 
@@ -586,7 +589,9 @@ export class OrgManagementService {
       throw org_error;
     }
     if (org_data.length === 0) {
-      throw new UnauthorizedException('You are not the owner of this organisation');
+      throw new UnauthorizedException(
+        'You are not the owner of this organisation',
+      );
     }
 
     const { data, error } = await this.supabase
