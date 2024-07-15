@@ -13,39 +13,38 @@ export interface QueryParams {
     language: string,
     query_type: string,
     table: table,
-    join?: join[],
     condition?: condition,
     sortParams?: SortParams,
     pageParams?: PageParams
 }
 
-interface table {
+export interface table {
     name: string,
     columns: column[],
+    join?: join
 }
 
-interface column {
+export interface column {
     name: string,
     aggregation? : AggregateFunction,
     alias?: string,
 }
 
 interface join {
-    table1: table,
     table1MatchingColumnName: string,
     table2: table,
     table2MatchingColumnName: string,
 }
 
-interface condition {
+export interface condition {
 }
 
-interface compoundCondition extends condition{
+export interface compoundCondition extends condition{
     conditions: condition[],
     operator: LogicalOperator,
 }
 
-interface primitiveCondition extends condition{
+export interface primitiveCondition extends condition{
     value: string | number | boolean,
     column: string,
     operator: ComparisonOperator,
@@ -67,11 +66,11 @@ export enum LogicalOperator {
 }
 
 export enum ComparisonOperator {
-    "=",
-    "<",
-    ">",
-    "<=",
-    ">=",
-    "<>",
-    "LIKE",
+    Equals = "=",
+    LessThan = "<",
+    GreaterThan = ">",
+    LessThanOrEqual = "<=",
+    GreaterThanOrEqual = ">=",
+    NotEqual = "<>",
+    Like = "LIKE",
 }
