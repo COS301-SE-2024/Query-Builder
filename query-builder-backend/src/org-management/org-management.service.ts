@@ -299,6 +299,15 @@ export class OrgManagementService {
       update_db_access: false,
     };
 
+    if (add_member_dto.user_role === 'admin') {
+      role_perms.add_dbs = true;
+      role_perms.update_dbs = true;
+      role_perms.remove_dbs = true;
+      role_perms.invite_users = true;
+      role_perms.remove_users = true;
+      role_perms.view_all_dbs = true;
+    }
+
     const { data, error } = await this.supabase
       .getClient()
       .from('org_members')
@@ -482,7 +491,10 @@ export class OrgManagementService {
       );
     }
 
-    update_member_dto = await this.updateMemberHelper(update_member_dto, user_data);
+    update_member_dto = await this.updateMemberHelper(
+      update_member_dto,
+      user_data,
+    );
 
     const { data, error } = await this.supabase
       .getClient()
@@ -538,7 +550,7 @@ export class OrgManagementService {
               invite_users: true,
               remove_users: true,
               update_user_roles: false,
-              view_all_dbs: false,
+              view_all_dbs: true,
               view_all_users: false,
               update_db_access: false,
             };
