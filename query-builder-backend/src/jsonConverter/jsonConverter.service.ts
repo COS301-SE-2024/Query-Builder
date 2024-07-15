@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
-import { QueryParams } from '../interfaces/intermediateJSON';
+import { compoundCondition, primitiveCondition, QueryParams } from '../interfaces/intermediateJSON';
+import { condition } from '../interfaces/intermediateJSON';
 
 @Injectable()
 export class JsonConverterService {
@@ -34,10 +35,15 @@ export class JsonConverterService {
 
                 const from = jsonData.table;
                 let where = '';
+                let groupBy = '';
+                let having = '';
 
                 if (jsonData.condition) {
-                    where = ` WHERE ${jsonData.condition}`;
+                    where = "WHERE" + this.conditionWhereSQL(jsonData.condition);
+                    groupBy = await this.groupBySQL(jsonData);
+                    having = await this.havingSQL(jsonData);
                 }
+
 
                 let orderBy = '';
 
@@ -85,4 +91,61 @@ export class JsonConverterService {
     
         return query;
     }
+
+
+    conditionWhereSQL(condition: condition)
+    {
+        if (!condition) 
+        {
+            return '';
+        }
+    
+        if (this.isCompoundCondition(condition)) 
+        {
+            const compCondition = condition as compoundCondition;
+            let conditionsSQL = '';
+    
+            for (let i = 0; i < compCondition.conditions.length; i++) {
+                const condSQL = this.conditionWhereSQL(compCondition.conditions[i]);
+                conditionsSQL += condSQL;
+                if (i < compCondition.conditions.length - 1) {
+                    conditionsSQL += ` ${compCondition.operator} `;
+                }
+            }
+    
+            return `(${conditionsSQL})`;
+        } 
+        else if (this.isPrimitiveCondition(condition)) 
+        {
+            const primCondition = condition as primitiveCondition;
+            let sql = `${primCondition.column} ${primCondition.operator} `;// name =
+    
+            if (typeof primCondition.value === 'string') 
+            {
+                sql += `'${primCondition.value}'`;
+            } 
+            else if (typeof primCondition.value === 'boolean') 
+            {
+                sql += primCondition.value ? 'TRUE' : 'FALSE';
+            } 
+            else // number 
+            {
+                sql += primCondition.value;
+            }// name = 'value'
+    
+            return sql;
+        }
+    }
+
+    private isCompoundCondition(condition: any): condition is compoundCondition {
+        return (condition as compoundCondition).conditions !== undefined;
+    }
+
+    private isPrimitiveCondition(condition: any): condition is primitiveCondition {
+        return (condition as primitiveCondition).column !== undefined;
+    }
+
+    
+    
+    
 }
