@@ -52,25 +52,25 @@ interface primitiveCondition extends condition{
 }
 
 export enum AggregateFunction {
-    "COUNT",
-    "SUM",
-    "AVG",
-    "MIN",
-    "MAX",
+    COUNT = "COUNT",
+    SUM = "SUM",
+    AVG = "AVG",
+    MIN = "MIN",
+    MAX = "MAX",
 }
 
 export enum LogicalOperator {
-    "AND",
-    "OR",
-    "NOT",
+    AND = "AND",
+    OR = "OR",
+    NOT = "NOT",
 }
 
 export enum ComparisonOperator {
-    "=",
-    "<",
-    ">",
-    "<=",
-    ">=",
-    "<>",
-    "LIKE",
+    EQUAL = "=",
+    LESS_THAN = "<",
+    GREATER_THAN = ">",
+    LESS_THAN_EQUAL = "<=",
+    GREATER_THAN_EQUAL = ">=",
+    NOT_EQUAL = "<>",
+    LIKE = "LIKE",
 }

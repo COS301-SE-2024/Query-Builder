@@ -155,9 +155,8 @@ export class JsonConverterService {
     
         if (jsonData.language === 'sql') {
             if (jsonData.query_type === 'select') {
-                if (!jsonData.table || !jsonData.table.columns) {
-                    query = 'Invalid query';
-                    return query;
+                if (!jsonData.table || !jsonData.table.name || !jsonData.table.columns) {
+                    throw new Error('Invalid query');
                 }
                 
                 const select = this.generateSelectClause(jsonData);
