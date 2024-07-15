@@ -35,7 +35,7 @@ export class JsonConverterService {
 
         //if the columns array is empty return all the columns for the table
         if(table.columns.length == 0){
-            tableColumns = table.name + '.' + '*';
+            tableColumns = '`' + table.name + '`.' + '*';
         }
         //otherwise concatenate the column strings together
         else{
@@ -148,7 +148,7 @@ export class JsonConverterService {
 
     }
 
-    async convertJsonToQuery(jsonData: QueryParams): Promise<string> {
+    convertJsonToQuery(jsonData: QueryParams): string {
         let query = '';
         jsonData.language = jsonData.language.toLowerCase();
         jsonData.query_type = jsonData.query_type.toLowerCase();

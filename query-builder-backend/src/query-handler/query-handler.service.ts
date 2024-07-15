@@ -66,7 +66,7 @@ export class QueryHandlerService {
                 console.log(numRows);
 
                 //thirdly, query the database
-                const queryCommand: string = await parser.convertJsonToQuery(query.queryParams);
+                const queryCommand: string = parser.convertJsonToQuery(query.queryParams);
                 console.log(queryCommand);
                 connection.query(queryCommand, function (error, results, fields) {
                   if (error) throw error;
