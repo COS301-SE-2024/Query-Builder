@@ -149,9 +149,10 @@ export class JsonConverterService {
         let groupByColumns = '';
         for (let i = 0; i < jsonData.table.columns.length; i++) {
             const column = jsonData.table.columns[i];
-            if (!column.aggregation) {
-                groupByColumns += column.name + ', ';
-            }
+            if(column.aggregation == null)
+                {
+                    groupByColumns += column.name + ', ';
+                }
         }
     
         // Remove the trailing comma and space
