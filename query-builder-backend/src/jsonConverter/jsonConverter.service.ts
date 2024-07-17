@@ -168,8 +168,8 @@ export class JsonConverterService {
 
                 if (jsonData.condition) {
                     where = "WHERE" + this.conditionWhereSQL(jsonData.condition);
-                    groupBy = await this.groupBySQL(jsonData);
-                    having = await this.havingSQL(jsonData);
+                    groupBy = this.groupBySQL(jsonData);
+                    having = this.havingSQL(jsonData);
                 }
 
 

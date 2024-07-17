@@ -122,19 +122,19 @@ export class mongoJsonConverterService {
                 return "$ne";
             case 'LIKE':
                 return "$regex"; // MongoDB uses regex for pattern matching
-            case ComparisonOperator.Equals:
+            case ComparisonOperator.EQUAL:
                 return "$eq";
-            case ComparisonOperator.LessThan:
+            case ComparisonOperator.LESS_THAN:
                 return "$lt";
-            case ComparisonOperator.GreaterThan:
+            case ComparisonOperator.GREATER_THAN:
                 return "$gt";
-            case ComparisonOperator.LessThanOrEqual:
+            case ComparisonOperator.LESS_THAN_EQUAL:
                 return "$lte";
-            case ComparisonOperator.GreaterThanOrEqual:
+            case ComparisonOperator.GREATER_THAN_EQUAL:
                 return "$gte";
-            case ComparisonOperator.NotEqual:
+            case ComparisonOperator.NOT_EQUAL:
                 return "$ne";
-            case ComparisonOperator.Like:
+            case ComparisonOperator.LIKE:
                 return "$regex"; // MongoDB uses regex for pattern matching
             default:
                 throw new Error(`Unsupported operator: ${sqlOperator}`);
