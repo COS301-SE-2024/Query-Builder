@@ -57,7 +57,7 @@ export class QueryHandlerService {
               });
 
               //secondly, get the number of rows of data
-              const countCommand: string = `SELECT COUNT(*) AS numRows FROM ${query.queryParams.table}`;
+              const countCommand: string = `SELECT COUNT(*) AS numRows FROM ${query.queryParams.table.name}`;
               connection.query(countCommand, async function(error, results, fields){
                 if (error) throw error;
 
@@ -66,7 +66,7 @@ export class QueryHandlerService {
                 console.log(numRows);
 
                 //thirdly, query the database
-                const queryCommand: string = await parser.convertJsonToQuery(query.queryParams);
+                const queryCommand: string = parser.convertJsonToQuery(query.queryParams);
                 console.log(queryCommand);
                 connection.query(queryCommand, function (error, results, fields) {
                   if (error) throw error;

@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { QueryParams, table, column } from '../interfaces/intermediateJSON';
-import { compoundCondition, primitiveCondition, ComparisonOperator } from '../interfaces/intermediateJSON';
-import { condition } from '../interfaces/intermediateJSON';
+import { condition, compoundCondition, primitiveCondition, ComparisonOperator, QueryParams, table, column } from '../interfaces/intermediateJSON';
+
 @Injectable()
 export class mongoJsonConverterService {
 
