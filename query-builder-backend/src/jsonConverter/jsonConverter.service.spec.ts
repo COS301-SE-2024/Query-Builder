@@ -149,4 +149,59 @@ it('should be able to convert compound conditions', () => {
         expect(result).toEqual(["SUM(salary) > 50000", "COUNT(id) > 10"]);
     });
 
+    it('should return empty string when no having conditions are present', () => {
+        const jsonData: QueryParams = {
+            language: "SQL",
+            query_type: "SELECT",
+            table: {
+                name: "test_table",
+                columns: [
+                    { name: "id", aggregation: null }
+                ]
+            },
+            condition: null
+        };
+    
+        const result = service.havingSQL(jsonData);
+    
+        expect(result).toEqual('');
+    });
+    
+
+    it('should return empty string when no group by columns are present', () => {
+        const jsonData: QueryParams = {
+            language: "SQL",
+            query_type: "SELECT",
+            table: {
+                name: "test_table",
+                columns: [
+                    { name: "id", aggregation: AggregateFunction.COUNT },
+                    { name: "name", aggregation: AggregateFunction.COUNT }
+                ]
+            }
+        };
+    
+        const result = service.groupBySQL(jsonData);
+    
+        expect(result).toEqual('');
+    });
+    
+    it('should return GROUP BY clause for columns without aggregation', () => {
+        const jsonData: QueryParams = {
+            language: "SQL",
+            query_type: "SELECT",
+            table: {
+                name: "test_table",
+                columns: [
+                    { name: "id", aggregation: null },
+                    { name: "name", aggregation: AggregateFunction.COUNT },
+                    { name: "age", aggregation: null }
+                ]
+            }
+        };
+    
+        const result = service.groupBySQL(jsonData);
+    
+        expect(result).toEqual(' GROUP BY id, age');
+    });
 });
