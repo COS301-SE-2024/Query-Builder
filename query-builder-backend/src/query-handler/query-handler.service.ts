@@ -39,10 +39,10 @@ export class QueryHandlerService {
             if (err) {
                 console.log(err)
                 if(err.code == "ER_ACCESS_DENIED_ERROR" || err.code == "ER_NOT_SUPPORTED_AUTH_MODE"){
-                  reject(new UnauthorizedException("Please ensure that your database credentials are correct.")); // Reject with an error object
+                  return reject(new UnauthorizedException("Please ensure that your database credentials are correct.")); // Reject with an error object
                 }
                 else{
-                  reject(new BadGatewayException("Could not connect to the external database - are the host and port correct?")); // Reject with an error object
+                  return reject(new BadGatewayException("Could not connect to the external database - are the host and port correct?")); // Reject with an error object
                 }
             }
             else{
@@ -53,23 +53,31 @@ export class QueryHandlerService {
               const useCommand: string = "USE " + databaseToQuery + ";";
 
               connection.query(useCommand, function (error, results, fields) {
-                if (error) throw error;
+                if (error){
+                  return reject(error);
+                };
               });
 
               //secondly, get the number of rows of data
-              const countCommand: string = `SELECT COUNT(*) AS numRows FROM ${query.queryParams.table}`;
+              const countCommand: string = `SELECT COUNT(*) AS numRows FROM ${query.queryParams.table.name}`;
               connection.query(countCommand, async function(error, results, fields){
-                if (error) throw error;
+
+                if (error){
+                  return reject(error);
+                };
 
                 const numRows = results[0].numRows;
 
                 console.log(numRows);
 
                 //thirdly, query the database
-                const queryCommand: string = await parser.convertJsonToQuery(query.queryParams);
+                const queryCommand: string = parser.convertJsonToQuery(query.queryParams);
                 console.log(queryCommand);
                 connection.query(queryCommand, function (error, results, fields) {
-                  if (error) throw error;
+
+                  if (error){
+                    return reject(error);
+                  };
 
                   //terminate the database connection
                   connection.end();

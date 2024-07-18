@@ -8,7 +8,7 @@ export class JsonConverterController {
     constructor(private readonly jsonConverterService: JsonConverterService){}
 
     @Post()
-    async convert(@Body() queryParams: QueryParams){
+    convert(@Body() queryParams: QueryParams){
         return this.jsonConverterService.convertJsonToQuery(queryParams);
     }
 
