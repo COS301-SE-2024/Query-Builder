@@ -5,15 +5,14 @@ import { Save_Query_Dto } from './dto/save-query.dto';
 @Injectable()
 export class QueryManagementService {
 
-    constructor(private supabase: Supabase) {}
+    constructor(private readonly supabase: Supabase,) {}
 
     async saveQuery(save_query_dto: Save_Query_Dto){
 
         //Firstly get the user who is saving the query
         const { data: user_data, error: user_error } = await this.supabase
-            .getClient()
-            .auth
-            .getUser(this.supabase.getJwt());
+        .getClient()
+        .auth.getUser(this.supabase.getJwt());
 
         if(user_error){
             throw user_error;

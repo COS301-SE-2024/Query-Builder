@@ -1,6 +1,6 @@
 export interface Query {
     credentials: DatabaseCredentials,
-    databaseName: string,
+    databaseServerID?: string,
     queryParams: QueryParams
 }
 
@@ -13,6 +13,7 @@ export interface DatabaseCredentials {
 export interface QueryParams {
     language: string,
     query_type: string,
+    databaseName: string,
     table: table,
     condition?: condition,
     sortParams?: SortParams,

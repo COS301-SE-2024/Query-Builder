@@ -1,18 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { QueryHandlerService } from '../query-handler/query-handler.service';
-import { QueryParams } from '../interfaces/intermediateJSON';
-
-interface DatabaseCredentials {
-    host: string;
-    user: string;
-    password: string;
-}
-  
-interface Query {
-    credentials: DatabaseCredentials,
-    databaseName: string,
-    queryParams: QueryParams
-}
+import { Query, DatabaseCredentials } from '../interfaces/intermediateJSON';
 
 interface Database {
     key: string,
@@ -56,10 +44,10 @@ export class DbMetadataHandlerService {
         */
         const query: Query = {
             credentials: databaseCredentials,
-            databaseName: "information_schema",
             queryParams: {
                 language: "sql",
                 query_type: "select",
+                databaseName: "information_schema",
                 table: {name:"schemata", columns: [{name: "schema_name"}]},
                 condition:
                     `schema_name NOT IN ('information_schema', 'mysql', 'sys', 'performance_schema')`,
@@ -98,10 +86,10 @@ export class DbMetadataHandlerService {
 
         const query: Query = {
             credentials: tableQuery.credentials,
-            databaseName: "information_schema",
             queryParams: {
                 language: "sql",
                 query_type: "select",
+                databaseName: "information_schema", 
                 table: {name:"tables", columns: [{name: "table_name"}]},
                 condition: `table_schema="${tableQuery.schema}"`,
                 sortParams: {
@@ -121,10 +109,10 @@ export class DbMetadataHandlerService {
             //query the database to get the columns of the table
             const fieldsQuery: Query = {
                 credentials: tableQuery.credentials,
-                databaseName: "information_schema",
                 queryParams: {
                     language: "sql",
                     query_type: "select",
+                    databaseName: "information_schema",
                     table: {name:"columns", columns: [{name: "column_name"}]},
                     condition:
                         `table_schema = "${tableQuery.schema}" AND table_name="${table.TABLE_NAME}"`,
@@ -165,10 +153,10 @@ export class DbMetadataHandlerService {
         */
         const query: Query = {
             credentials: fieldQuery.credentials,
-            databaseName: "information_schema",
             queryParams: {
                 language: "sql",
                 query_type: "select",
+                databaseName: "information_schema",
                 table: {name:"columns", columns: [{name: "column_name"}]},
                 condition:
                     `table_schema = "${fieldQuery.schema}" AND table_name="${fieldQuery.table}"`,
@@ -195,10 +183,10 @@ export class DbMetadataHandlerService {
         */
         const fromQuery: Query = {
             credentials: foreignKeyQuery.credentials,
-            databaseName: "information_schema",
             queryParams: {
                 language: "sql",
                 query_type: "select",
+                databaseName: "information_schema",
                 table: {name:"key_column_usage", columns: [{name: "column_name"}, {name: "referenced_table_schema"}, {name: "referenced_table_name"}, {name: "referenced_column_name"}]},
                 condition:
                     `constraint_schema = "${foreignKeyQuery.schema}" AND table_name="${foreignKeyQuery.table}" AND referenced_column_name IS NOT NULL`,
@@ -221,10 +209,10 @@ export class DbMetadataHandlerService {
         */
         const toQuery: Query = {
             credentials: foreignKeyQuery.credentials,
-            databaseName: "information_schema",
             queryParams: {
                 language: "sql",
                 query_type: "select",
+                databaseName: "information_schema",
                 table: {name:"key_column_usage", columns: [{name: "table_schema"}, {name: "table_name"}, {name: "column_name"}, {name: "referenced_column_name"}]},
                 condition:
                     `table_schema = "${foreignKeyQuery.schema}" AND referenced_table_name="${foreignKeyQuery.table}"`,

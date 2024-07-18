@@ -1,4 +1,4 @@
-import { IsJSON, IsNotEmpty, IsString, IsUUID } from "class-validator";
+import { IsNotEmpty, IsUUID } from "class-validator";
 
 export class Save_Query_Dto {
 
@@ -7,8 +7,6 @@ export class Save_Query_Dto {
     db_id: string;
 
     @IsNotEmpty()
-    @IsString()
-    @IsJSON()
     parameters: string;
 
 }
