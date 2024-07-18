@@ -101,6 +101,34 @@ export default function Form(){
 
     }
 
+    //async function to fetch the joinable tables
+    async function fetchJoinableTables(database: string, table: string) {
+
+        let response = await fetch("http://localhost:55555/api/metadata/foreign-keys", {
+            method: "PUT",
+            headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + await getToken()
+            },
+            body: JSON.stringify({
+                credentials: {
+                    host: "127.0.0.1",
+                    user: "root",
+                    password: "testPassword"
+                },
+                schema: database,
+                table: table
+            })
+        });
+
+        let json = await response.json();
+
+        //set the joinable tables hook
+        setJoinableTables(json);
+
+    }
+
     //React hook for results modal
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
 
@@ -109,6 +137,9 @@ export default function Form(){
 
     //React hook for all the tables in the database
     const [tables, setTables] = useState<Table[]>([{table: "Select table", columns: ["Select column"]}]);
+
+    //React hook for all the joinable tables in the database
+    const [joinableTables, setJoinableTables] = useState();
 
     const [selectedDatabase, setSelectedDatabase] = useState(new Set(["Select database"]));
     const selectedDatabaseValue = React.useMemo(
@@ -143,6 +174,20 @@ export default function Form(){
         fetchTables(selectedDatabaseValue);
 
     },[selectedDatabaseValue])
+
+    //React hook to fetch joinable tables upon selection of a table
+    React.useEffect(() => {
+
+        fetchJoinableTables(selectedDatabaseValue, selectedTableValue);
+
+    },[selectedTableValue])
+
+    //React hook to test update of joinable tables
+    React.useEffect(() => {
+
+        console.log(joinableTables);
+
+    },[joinableTables])
 
     const handleDatabaseSelection = (keys:any) => {
         if (keys.size === 0) {
