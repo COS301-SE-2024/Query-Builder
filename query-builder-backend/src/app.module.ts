@@ -12,6 +12,7 @@ import { UserManagementModule } from "./user-management/user-management.module";
 import { OrgManagementModule } from "./org-management/org-management.module";
 import { QueryHandlerModule } from './query-handler/query-handler.module';
 import { DbMetadataHandlerModule } from './db-metadata-handler/db-metadata-handler.module';
+import { QueryManagementModule } from './query-management/query-management.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { DbMetadataHandlerModule } from './db-metadata-handler/db-metadata-handl
     OrgManagementModule,
     QueryHandlerModule,
     DbMetadataHandlerModule,
+    QueryManagementModule,
   ],
   controllers: [AppController],
   providers: [AppService]})
