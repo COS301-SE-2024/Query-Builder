@@ -1,12 +1,13 @@
-interface SortParams {
-    column: string,
-    direction?: "ascending"|"descending"
-  }
+export interface Query {
+    credentials: DatabaseCredentials,
+    databaseName: string,
+    queryParams: QueryParams
+}
 
-  interface PageParams {
-    //note pageNumbers are indexed from 1
-    pageNumber: number,
-    rowsPerPage: number
+export interface DatabaseCredentials {
+    host: string,
+    user: string,
+    password: string
 }
 
 export interface QueryParams {
@@ -30,25 +31,36 @@ export interface column {
     alias?: string,
 }
 
-interface join {
+export interface join {
     table1MatchingColumnName: string,
     table2: table,
     table2MatchingColumnName: string,
 }
 
-interface condition {
+export interface condition {
 }
 
-interface compoundCondition extends condition{
+export interface compoundCondition extends condition{
     conditions: condition[],
     operator: LogicalOperator,
 }
 
-interface primitiveCondition extends condition{
+export interface primitiveCondition extends condition{
     value: string | number | boolean,
     column: string,
     operator: ComparisonOperator,
     aggregate?: AggregateFunction
+}
+
+export interface SortParams {
+    column: string,
+    direction?: "ascending"|"descending"
+}
+
+export interface PageParams {
+    //note pageNumbers are indexed from 1
+    pageNumber: number,
+    rowsPerPage: number
 }
 
 export enum AggregateFunction {

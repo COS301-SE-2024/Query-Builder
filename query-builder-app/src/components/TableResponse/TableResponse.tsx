@@ -5,38 +5,8 @@ import {Table, TableHeader, TableBody, TableColumn, TableRow, TableCell, getKeyV
 import {useAsyncList} from "@react-stately/data";
 import Report from "../Report/Report";
 import csvDownload from 'json-to-csv-export'
-
-interface DatabaseCredentials {
-  host: string,
-  user: string,
-  password: string
-}
-
-interface SortParams {
-  column: string,
-  direction?: "ascending"|"descending"
-}
-
-interface PageParams {
-  pageNumber: number,
-  rowsPerPage: number
-}
-
-interface QueryParams {
-  language: string,
-  query_type: string,
-  table: string,
-  columns: string[],
-  condition?: string,
-  sortParams?: SortParams,
-  pageParams?: PageParams
-}
-
-interface Query {
-credentials: DatabaseCredentials,
-databaseName: string,
-queryParams: QueryParams
-}
+import { Query } from "@/interfaces/intermediateJSON";
+import { createClient } from "./../../utils/supabase/client";
 
 interface Column {
   key: string,
@@ -51,11 +21,12 @@ export interface TableResponseProps{
 
 // This function gets the token from local storage.
 // Supabase stores the token in local storage so we can access it from there.
-const getToken = () => {
-  const storageKey = `sb-${process.env.NEXT_PUBLIC_SUPABASE_PROJECT_ID}-auth-token`;
-  const sessionDataString = localStorage.getItem(storageKey);
-  const sessionData = JSON.parse(sessionDataString || "null");
-  const token = sessionData?.access_token;
+const getToken = async () => {
+
+  const supabase = createClient();
+  const token = (await supabase.auth.getSession()).data.session?.access_token
+
+  console.log(token)
 
   return token;
 };
@@ -63,10 +34,10 @@ const getToken = () => {
 export default function TableResponse(props: TableResponseProps){
 
   //dynamically create an array of column objects from the props
-  const columnNames = props.query.queryParams.columns;
+  const columnObjects = props.query.queryParams.table.columns;
   const columns: Column[] = [];
-  for(const columnName of columnNames){
-    columns.push({key: columnName, label: columnName});
+  for(const columnObject of columnObjects){
+    columns.push({key: columnObject.name, label: columnObject.name});
   }
 
   //React hook for report modal

@@ -5,38 +5,7 @@ import { useParams } from 'next/navigation'
 import {Button, Spacer, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Card, CardHeader, CardBody, CardFooter, useDisclosure, ModalContent, Modal, ModalHeader} from "@nextui-org/react";
 import TableResponse from "../TableResponse/TableResponse";
 import { createClient } from "./../../utils/supabase/client";
-
-interface DatabaseCredentials {
-    host: string,
-    user: string,
-    password: string
-  }
-  
-  interface SortParams {
-    column: string,
-    direction?: "ascending"|"descending"
-  }
-  
-  interface PageParams {
-    pageNumber: number,
-    rowsPerPage: number
-  }
-  
-  interface QueryParams {
-    language: string,
-    query_type: string,
-    table: string,
-    columns: string[],
-    condition?: string,
-    sortParams?: SortParams,
-    pageParams?: PageParams
-  }
-  
-  interface Query {
-  credentials: DatabaseCredentials,
-  databaseName: string,
-  queryParams: QueryParams
-  }
+import { Query, column } from "@/interfaces/intermediateJSON";
 
   interface Database {
     key: string,
@@ -206,17 +175,26 @@ export default function Form(){
         }
     };
 
-    function createQuery() : Query{
+    function createQuery() : Query {
 
-        let columns = Array.from(selectColumns);
+        let columnStringArray = Array.from(selectColumns);
 
         //if columns is empty, query all the columns of the selected table
-        if(columns.length == 0){
+        if(columnStringArray.length == 0){
             for(let table of tables){
                 if(table.table == selectedTableValue){
-                    columns = table.columns;
+                    columnStringArray = table.columns;
                 }
             }
+        }
+
+        //create a columns array
+        const columnArray: column[] = [];
+
+        for(let columnString of columnStringArray){
+            columnArray.push({
+                name: columnString
+            });
         }
 
         const query: Query = {
@@ -229,8 +207,10 @@ export default function Form(){
             queryParams: {
                 language: "sql",
                 query_type: "select",
-                table: selectedTableValue,
-                columns: columns
+                table: {
+                    name: selectedTableValue,
+                    columns: columnArray
+                }
             }
         }
 
