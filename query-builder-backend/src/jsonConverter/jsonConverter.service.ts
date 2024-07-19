@@ -1,8 +1,45 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { condition, compoundCondition, primitiveCondition, QueryParams, table, column } from '../interfaces/intermediateJSON';
 
 @Injectable()
 export class JsonConverterService {
+
+    convertJsonToQuery(jsonData: QueryParams): string {
+        let query = '';
+        jsonData.language = jsonData.language.toLowerCase();
+        jsonData.query_type = jsonData.query_type.toLowerCase();
+    
+        if (jsonData.language === 'sql') {
+            if (jsonData.query_type === 'select') {
+                if (!jsonData.table || !jsonData.table.name || !jsonData.table.columns) {
+                    throw new Error('Invalid query');
+                }
+                
+                const select = this.generateSelectClause(jsonData);
+
+                const from = this.generateFromClause(jsonData);
+
+                const where   = this.conditionWhereSQL(jsonData.condition);
+
+                const groupBy = this.groupBySQL(jsonData);
+
+                const having  = this.havingSQL(jsonData);
+
+                const orderBy = this.generateOrderByClause(jsonData);
+
+                const limit = this.generateLimitClause(jsonData);
+
+                query = `SELECT ${select} FROM ${from}${where}${groupBy}${having}${orderBy}${limit}`;
+                
+            } else {
+                throw new Error('Unsupported query type');
+            }
+        } else {
+            throw new Error('Invalid language');
+        }
+    
+        return query;
+    }
 
     //helper function to generate a string of a column
     generateColumnString(column: column, tableName: string) : string {
@@ -32,9 +69,11 @@ export class JsonConverterService {
 
         let tableColumns = '';
 
+        //the below was changed to throw an error - as not specifying any columns at all causes issues when figuring out which columns to group by when working with aggregate conditions
         //if the columns array is empty return all the columns for the table
         if(table.columns.length == 0){
-            tableColumns = '`' + table.name + '`.' + '*';
+            //tableColumns = '`' + table.name + '`.' + '*';
+            throw new Error('No columns specified for table \'' + table.name + '\'');
         }
         //otherwise concatenate the column strings together
         else{
@@ -147,57 +186,6 @@ export class JsonConverterService {
 
     }
 
-    convertJsonToQuery(jsonData: QueryParams): string {
-        let query = '';
-        jsonData.language = jsonData.language.toLowerCase();
-        jsonData.query_type = jsonData.query_type.toLowerCase();
-    
-        if (jsonData.language === 'sql') {
-            if (jsonData.query_type === 'select') {
-                if (!jsonData.table || !jsonData.table.name || !jsonData.table.columns) {
-                    throw new Error('Invalid query');
-                }
-                
-                const select = this.generateSelectClause(jsonData);
-
-                const from = this.generateFromClause(jsonData);
-
-                let where   = this.conditionWhereSQL(jsonData.condition);
-                let groupBy = this.groupBySQL(jsonData);
-                let having  = this.havingSQL(jsonData);
-
-
-
-                const orderBy = this.generateOrderByClause(jsonData);
-
-                const limit = this.generateLimitClause(jsonData);
-
-                if(groupBy != '' && having != '')
-                {
-                    query = `SELECT ${select} FROM ${from}${where}${groupBy}${having}${orderBy}${limit}`;
-                }
-                else if(groupBy != '' && having == '')
-                {
-                    query = `SELECT ${select} FROM ${from}${where}${groupBy}${having}${orderBy}${limit}`;
-                    //query = `SELECT ${select} FROM ${from}${where}${groupBy}${orderBy}${limit}`;
-                }
-                else{
-                    query = `SELECT ${select} FROM ${from}${where}${groupBy}${having}${orderBy}${limit}`;
-                    //query = `SELECT ${select} FROM ${from}${where}${orderBy}${limit}`;
-                }
-                
-            } else {
-                query = 'Unsupported query type';
-                return query;
-            }
-        } else {
-            query = 'Invalid language';
-            return query;
-        }
-    
-        return query;
-    }
-
     conditionWhereSQL(condition:condition)
     {
         if (!condition) 
@@ -261,15 +249,41 @@ export class JsonConverterService {
         return (condition as primitiveCondition).column !== undefined;
     }
 
-    groupBySQL(jsonData: QueryParams) {
-        let groupByColumns = '';
-        
-        // Iterate through the columns and include only those without aggregation functions
-        for (const column of jsonData.table.columns) {
+    generateNonAggregateColumnsString(table: table): string {
+
+        let nonAggregateColumnsString = '';
+
+        // Iterate through the columns of the table and include only those without aggregation functions
+        for (const column of table.columns) {
             if (column.aggregation == null) {
                 // Ensure column names are properly formatted for SQL
-                groupByColumns += `\`${jsonData.table.name}\`.\`${column.name}\`, `;
+                nonAggregateColumnsString += `\`${table.name}\`.\`${column.name}\`, `;
             }
+        }
+
+        return nonAggregateColumnsString;
+
+    }
+
+    groupBySQL(jsonData: QueryParams) {
+        let groupByColumns = '';
+
+        // Iterate over all tables
+
+        //get a reference to the first table
+        let tableRef = jsonData.table;
+
+        //concatenate the first table's columns
+        groupByColumns += this.generateNonAggregateColumnsString(tableRef);
+
+        //traverse the table linked list and add columns for each table until tableRef.join is null
+        while(tableRef.join){
+
+            //move the table reference one on
+            tableRef = tableRef.join.table2;
+
+            groupByColumns += this.generateNonAggregateColumnsString(tableRef);
+
         }
     
         // Remove the trailing comma and space
