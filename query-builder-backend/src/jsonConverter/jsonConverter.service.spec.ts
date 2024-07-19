@@ -27,7 +27,7 @@ describe('JSONConverterService', () => {
 
     const result = service.conditionWhereSQL(condition);
 
-    expect(result).toEqual(" WHERE name = 'value'");
+    expect(result).toEqual(" WHERE `name` = 'value'");
 
 });
 
@@ -51,7 +51,7 @@ it('should be able to convert compound conditions', () => {
     
         const result = service.conditionWhereSQL(condition);
     
-        expect(result).toEqual(" WHERE (name = 'value' AND age > 18)");
+        expect(result).toEqual(" WHERE (`name` = 'value' AND `age` > 18)");
     
     });
 
@@ -90,7 +90,7 @@ it('should be able to convert compound conditions', () => {
     
         const result = service.conditionWhereSQL(condition);
     
-        expect(result).toEqual(" WHERE (name = 'value' AND age > 18 AND (city = 'New York' OR status != 'inactive'))");
+        expect(result).toEqual(" WHERE (`name` = 'value' AND `age` > 18 AND (`city` = 'New York' OR `status` != 'inactive'))");
     
     });
     
@@ -198,7 +198,7 @@ it('should be able to convert compound conditions', () => {
     
         const result = service.groupBySQL(jsonData);
     
-        expect(result).toEqual(' GROUP BY id, age');
+        expect(result).toEqual(' GROUP BY `test_table`.`id`, `test_table`.`age`');
     });
 
   it('should be able to convert queries with all columns selected', () => {
@@ -225,7 +225,7 @@ it('should be able to convert compound conditions', () => {
         table: {name: 'users', columns: [{name: 'id'}, {name: "first_name"}, {name: "last_name"}]},
       };
   
-      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users`';
+      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users` GROUP BY `users`.`id`, `users`.`first_name`, `users`.`last_name`';
   
       const result = service.convertJsonToQuery(queryParams);
   
@@ -268,7 +268,7 @@ it('should be able to convert compound conditions', () => {
         },
       };
   
-      const expectedQuery = 'SELECT `users`.`id`, `actors`.`role` FROM `users` JOIN `actors` ON `users`.`id`=`actors`.`user_id`';
+      const expectedQuery = 'SELECT `users`.`id`, `actors`.`role` FROM `users` JOIN `actors` ON `users`.`id`=`actors`.`user_id` GROUP BY `users`.`id`';
   
       const result = service.convertJsonToQuery(queryParams);
   
@@ -288,7 +288,7 @@ it('should be able to convert compound conditions', () => {
         }
       };
   
-      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users` ORDER BY `first_name` DESC';
+      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users` GROUP BY `users`.`id`, `users`.`first_name`, `users`.`last_name` ORDER BY `first_name` DESC';
   
       const result = service.convertJsonToQuery(queryParams);
   
@@ -307,7 +307,7 @@ it('should be able to convert compound conditions', () => {
         }
       };
   
-      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users` ORDER BY `first_name` ASC';
+      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users` GROUP BY `users`.`id`, `users`.`first_name`, `users`.`last_name` ORDER BY `first_name` ASC';
   
       const result = service.convertJsonToQuery(queryParams);
   
@@ -327,7 +327,7 @@ it('should be able to convert compound conditions', () => {
         }
       };
   
-      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users` LIMIT 10 OFFSET 20';
+      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users` GROUP BY `users`.`id`, `users`.`first_name`, `users`.`last_name` LIMIT 10 OFFSET 20';
   
       const result = service.convertJsonToQuery(queryParams);
   
@@ -409,10 +409,102 @@ it('should be able to convert compound conditions', () => {
         }
     };
 
-    const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users` WHERE age > 18 LIMIT 10 OFFSET 20';
+    const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users` WHERE `age` > 18 GROUP BY `users`.`id`, `users`.`first_name`, `users`.`last_name` LIMIT 10 OFFSET 20';
     const result = service.convertJsonToQuery(queryParams);
 
     expect(result).toEqual(expectedQuery);
 });
 
+it('should be able to convert queries using pagination, where, group by, and having conditions', () => {
+    const queryParams: QueryParams = {
+        language: 'SQL',
+        query_type: 'SELECT',
+        table: {
+            name: 'users',
+            columns: [
+                { name: 'id' },
+                { name: 'first_name' },
+                { name: 'last_name' },
+                { name: 'age', aggregation: AggregateFunction.AVG }
+            ]
+        },
+        condition: {
+            column: 'age',
+            operator: ComparisonOperator.GREATER_THAN,
+            value: 18,
+            aggregate: AggregateFunction.AVG // Adding aggregate function in the condition
+        },
+        pageParams: {
+            pageNumber: 3,
+            rowsPerPage: 10
+        }
+    };
+
+    const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name`, AVG(`users`.`age`) FROM `users` WHERE `age` > 18 GROUP BY `users`.`id`, `users`.`first_name`, `users`.`last_name` HAVING AVG(`users`.`age`) > 18 LIMIT 10 OFFSET 20';
+    const result = service.convertJsonToQuery(queryParams);
+
+    expect(result).toEqual(expectedQuery);
+});
+
+    it('should be able to convert queries using pagination, where, and group by conditions', () => {
+        const queryParams: QueryParams = {
+            language: 'SQL',
+            query_type: 'SELECT',
+            table: {
+                name: 'users',
+                columns: [
+                    { name: 'id' },
+                    { name: 'first_name' },
+                    { name: 'last_name' },
+                    { name: 'age' }
+                ]
+            },
+            condition: {
+                column: 'age',
+                operator: ComparisonOperator.GREATER_THAN,
+                value: 18
+            },
+            pageParams: {
+                pageNumber: 3,
+                rowsPerPage: 10
+            }
+        };
+
+        const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name`, `users`.`age` FROM `users` WHERE `age` > 18 GROUP BY `users`.`id`, `users`.`first_name`, `users`.`last_name`, `users`.`age` LIMIT 10 OFFSET 20';
+        const result = service.convertJsonToQuery(queryParams);
+
+        expect(result).toEqual(expectedQuery);
+    });
+
+    it('should return an empty string if the condition is null', () => {
+        expect(service.conditionWhereSQLHelp(null)).toBe('');
+    });
+
+    it('should return an empty string if the condition is undefined', () => {
+        expect(service.conditionWhereSQLHelp(undefined)).toBe('');
+    });
+
+    it('should handle boolean true values correctly', () => {
+        const condition = {
+            column: 'is_active',
+            operator: '=',
+            value: true, // Boolean true value
+        };
+
+        const result = service.conditionWhereSQLHelp(condition);
+        expect(result).toBe('`is_active` = TRUE');
+    });
+
+    it('should handle boolean false values correctly', () => {
+        const condition = {
+            column: 'is_active',
+            operator: '=',
+            value: false, // Boolean false value
+        };
+
+        const result = service.conditionWhereSQLHelp(condition);
+        expect(result).toBe('`is_active` = FALSE');
+    });
+
+    
 });
