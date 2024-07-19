@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { JsonConverterService } from './jsonConverter.service';
-import { QueryParams, AggregateFunction } from '../interfaces/intermediateJSON';
+import { QueryParams, AggregateFunction, ComparisonOperator } from '../interfaces/intermediateJSON';
 
 describe('JSONConverterService', () => {
   let service: JsonConverterService;
@@ -27,7 +27,7 @@ describe('JSONConverterService', () => {
 
     const result = service.conditionWhereSQL(condition);
 
-    expect(result).toEqual("name = 'value'");
+    expect(result).toEqual(" WHERE name = 'value'");
 
 });
 
@@ -51,7 +51,7 @@ it('should be able to convert compound conditions', () => {
     
         const result = service.conditionWhereSQL(condition);
     
-        expect(result).toEqual("(name = 'value' AND age > 18)");
+        expect(result).toEqual(" WHERE (name = 'value' AND age > 18)");
     
     });
 
@@ -90,7 +90,7 @@ it('should be able to convert compound conditions', () => {
     
         const result = service.conditionWhereSQL(condition);
     
-        expect(result).toEqual("(name = 'value' AND age > 18 AND (city = 'New York' OR status != 'inactive'))");
+        expect(result).toEqual(" WHERE (name = 'value' AND age > 18 AND (city = 'New York' OR status != 'inactive'))");
     
     });
     
@@ -385,5 +385,34 @@ it('should be able to convert compound conditions', () => {
       }
 
   });
+
+  it('should be able to convert queries using pagination and a where condition', () => {
+    const queryParams: QueryParams = {
+        language: 'SQL',
+        query_type: 'SELECT',
+        table: {
+            name: 'users',
+            columns: [
+                { name: 'id' },
+                { name: 'first_name' },
+                { name: 'last_name' }
+            ]
+        },
+        condition: {
+            column: 'age',
+            operator: ComparisonOperator.GREATER_THAN,
+            value: 18
+        },
+        pageParams: {
+            pageNumber: 3,
+            rowsPerPage: 10
+        }
+    };
+
+    const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users` WHERE age > 18 LIMIT 10 OFFSET 20';
+    const result = service.convertJsonToQuery(queryParams);
+
+    expect(result).toEqual(expectedQuery);
+});
 
 });
