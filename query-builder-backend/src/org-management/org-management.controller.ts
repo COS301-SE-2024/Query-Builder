@@ -22,6 +22,8 @@ import { Remove_Member_Dto } from "./dto/remove-member.dto";
 import { OrgManagementService } from "./org-management.service";
 import { Get_Members_Dto } from "./dto/get-members.dto";
 import { Get_Dbs_Dto } from "./dto/get-dbs.dto";
+import { Give_Db_Access_Dto } from "./dto/give-db-access.dto";
+import { Remove_Db_Access_Dto } from "./dto/remove-db-access.dto";
 
 @Controller("org-management")
 export class OrgManagementController {
@@ -62,6 +64,11 @@ export class OrgManagementController {
     return this.org_management_service.addDb(add_db_dto);
   }
 
+  @Post("give-db-access")
+  async giveDbAccess(@Body(ValidationPipe) give_db_access_dto: Give_Db_Access_Dto) {
+    return this.org_management_service.giveDbAccess(give_db_access_dto);
+  }
+
   @Patch("update-org")
   async updateOrg(@Body(ValidationPipe) update_org_dto: Update_Org_Dto) {
     return this.org_management_service.updateOrg(update_org_dto);
@@ -92,5 +99,10 @@ export class OrgManagementController {
   @Delete("remove-db")
   async removeDb(@Body(ValidationPipe) remove_db_dto: Remove_Db_Dto) {
     return this.org_management_service.removeDb(remove_db_dto);
+  }
+
+  @Delete("remove-db-access")
+  async removeDbAccess(@Body(ValidationPipe) remove_db_access_dto: Remove_Db_Access_Dto) {
+    return this.org_management_service.removeDbAccess(remove_db_access_dto);
   }
 }
