@@ -166,11 +166,9 @@ export class JsonConverterService {
                 let groupBy = '';
                 let having = '';
 
-                if (jsonData.condition) {
-                    where = "WHERE" + this.conditionWhereSQL(jsonData.condition);
-                    groupBy = this.groupBySQL(jsonData);
-                    having = this.havingSQL(jsonData);
-                }
+                where = this.conditionWhereSQL(jsonData.condition);
+                groupBy = this.groupBySQL(jsonData);
+                having = this.havingSQL(jsonData);
 
 
                 const orderBy = this.generateOrderByClause(jsonData);
@@ -191,8 +189,13 @@ export class JsonConverterService {
         return query;
     }
 
+    conditionWhereSQL(condition:condition)
+    {
+        return "WHERE" + this.conditionWhereSQLHelp(condition);
+    }
 
-    conditionWhereSQL(condition: condition)
+
+    conditionWhereSQLHelp(condition: condition)
     {
         if (!condition) 
         {
@@ -205,7 +208,7 @@ export class JsonConverterService {
             let conditionsSQL = '';
     
             for (let i = 0; i < compCondition.conditions.length; i++) {
-                const condSQL = this.conditionWhereSQL(compCondition.conditions[i]);
+                const condSQL = this.conditionWhereSQLHelp(compCondition.conditions[i]);
                 conditionsSQL += condSQL;
                 if (i < compCondition.conditions.length - 1) {
                     conditionsSQL += ` ${compCondition.operator} `;
@@ -245,6 +248,10 @@ export class JsonConverterService {
     }
 
     groupBySQL(jsonData: QueryParams) {
+
+        if (!jsonData.table || !jsonData.table.columns || jsonData.condition == null) {
+            return '';
+        }
         let groupByColumns = '';
         for (let i = 0; i < jsonData.table.columns.length; i++) {
             const column = jsonData.table.columns[i];
