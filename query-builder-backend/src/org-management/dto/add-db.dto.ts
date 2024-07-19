@@ -1,6 +1,7 @@
 import { IsEnum, IsJWT, IsNotEmpty, IsOptional, IsString, IsUUID } from "class-validator";
 
 export class Add_Db_Dto {
+
     @IsUUID()
     @IsNotEmpty()
     org_id: string;
@@ -19,16 +20,8 @@ export class Add_Db_Dto {
     @IsNotEmpty()
     host: string;
 
-    @IsString()
-    @IsNotEmpty()
-    session_key: string;
-
     @IsOptional()
     @IsNotEmpty()
     db_info?: string;
-
-    @IsOptional()
-    @IsString()
-    @IsNotEmpty()
-    db_secrets?: string;
+    
 }

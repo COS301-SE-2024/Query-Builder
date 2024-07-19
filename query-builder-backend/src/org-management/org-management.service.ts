@@ -22,6 +22,9 @@ import { Get_Members_Dto } from './dto/get-members.dto';
 import { Get_Dbs_Dto } from './dto/get-dbs.dto';
 import { AppService } from '../app.service';
 import { Role } from '../interfaces/rolesJSON';
+import { Give_Db_Access_Dto } from './dto/give-db-access.dto';
+import { Save_Db_Secrets_Dto } from './dto/save-db-secrets.dto';
+import { Remove_Db_Access_Dto } from './dto/remove-db-access.dto';
 
 @Injectable()
 export class OrgManagementService {
@@ -29,7 +32,7 @@ export class OrgManagementService {
     private readonly supabase: Supabase,
     private readonly configService: ConfigService,
     private readonly app_service: AppService,
-  ) {}
+  ) { }
 
   async deepMerge(target, source) {
     for (const key in source) {
@@ -356,28 +359,11 @@ export class OrgManagementService {
       throw new UnauthorizedException('You do not have permission to add dbs');
     }
 
-    //use the session key to encrypt the database info
-    // console.log(key);
-    // console.log("second key length" + key.length);
-    // const cipher = createCipheriv('aes-256-ctr', key, iv);
-    // const textToEncrypt = add_db_dto.db_info;
-    // const encryptedText = Buffer.concat([
-    //   cipher.update(textToEncrypt),
-    //   cipher.final(),
-    // ]);
-    const encryptedText = this.app_service.encrypt(
-      add_db_dto.db_secrets,
-      add_db_dto.session_key,
-    );
-
-    // TODO: Add to vault and store the secret_id
-
     const db_fields = {
       name: add_db_dto.name,
       type: add_db_dto.type,
       db_info: add_db_dto.db_info ? add_db_dto.db_info : {},
-      host: add_db_dto.host,
-      db_secrets: encryptedText,
+      host: add_db_dto.host
     };
 
     const { data: db_data, error: db_error } = await this.supabase
@@ -411,6 +397,97 @@ export class OrgManagementService {
       throw new InternalServerErrorException(
         'Database not added to organisation',
       );
+    }
+
+    return { db_data };
+  }
+
+  async giveDbAccess(give_db_access_dto: Give_Db_Access_Dto) {
+    const { data: user_data, error: owner_error } = await this.supabase
+      .getClient()
+      .auth.getUser(this.supabase.getJwt());
+
+    if (owner_error) {
+      throw owner_error;
+    }
+
+    const { data: org_data, error: org_error } = await this.supabase
+      .getClient()
+      .from('org_members')
+      .select()
+      .eq('org_id', give_db_access_dto.org_id)
+      .eq('user_id', user_data.user.id);
+
+    if (org_error) {
+      throw org_error;
+    }
+    if (org_data.length === 0) {
+      throw new UnauthorizedException(
+        'You are not a member of this organisation',
+      );
+    }
+
+    if (!org_data[0].role_permissions.add_dbs) {
+      throw new UnauthorizedException('You do not have permission to give database access to other users');
+    }
+
+    const { data: db_data, error: db_error } = await this.supabase
+      .getClient()
+      .from('db_access')
+      .insert({ user_id: give_db_access_dto.user_id, db_id: give_db_access_dto.db_id })
+      .select();
+
+    if (db_error) {
+      throw db_error;
+    }
+    if (db_data.length === 0) {
+      throw new InternalServerErrorException('Database access not given');
+    }
+
+    return { db_data };
+  }
+
+  async saveDbSecrets(save_db_secrets_dto: Save_Db_Secrets_Dto) {
+
+    const { data: user_data, error: user_error } = await this.supabase
+      .getClient()
+      .auth.getUser(this.supabase.getJwt());
+
+    if (user_error) {
+      throw user_error;
+    }
+
+    //get the session key
+    // const key = save_db_secrets_dto.session_key;
+
+    // use the session key to encrypt the database info
+    // console.log(key);
+    // console.log("second key length" + key.length);
+
+    const encryptedText = this.app_service.encrypt(
+      save_db_secrets_dto.db_secrets,
+      save_db_secrets_dto.session_key
+    );
+
+    const uni_key = this.configService.get('UNI_KEY');
+
+    const second_encryptedText = this.app_service.encrypt(
+      encryptedText,
+      uni_key
+    );
+
+    const { data: db_data, error: db_error } = await this.supabase
+      .getClient()
+      .from('db_envs')
+      .update({ db_secrets: second_encryptedText })
+      .match({ user_id: user_data.user.id, db_id: save_db_secrets_dto.db_id })
+      .select()
+
+    if (db_error) {
+      throw db_error;
+    }
+    if (db_data.length === 0) {
+      throw new InternalServerErrorException('Database secrets not saved');
     }
 
     return { db_data };
@@ -828,5 +905,52 @@ export class OrgManagementService {
     }
 
     return { data };
+  }
+
+  async removeDbAccess(remove_db_access_dto: Remove_Db_Access_Dto) {
+    const { data: user_data, error: owner_error } = await this.supabase
+      .getClient()
+      .auth.getUser(this.supabase.getJwt());
+
+    if (owner_error) {
+      throw owner_error;
+    }
+
+    const { data: org_data, error: org_error } = await this.supabase
+      .getClient()
+      .from('org_members')
+      .select()
+      .eq('org_id', remove_db_access_dto.org_id)
+      .eq('user_id', user_data.user.id);
+
+    if (org_error) {
+      throw org_error;
+    }
+    if (org_data.length === 0) {
+      throw new UnauthorizedException(
+        'You are not a member of this organisation',
+      );
+    }
+
+    if (!org_data[0].role_permissions.add_dbs) {
+      throw new UnauthorizedException('You do not have permission to remove database access from other users');
+    }
+
+    const { data: db_data, error: db_error } = await this.supabase
+      .getClient()
+      .from('db_access')
+      .delete()
+      .eq('user_id', remove_db_access_dto.user_id)
+      .eq('db_id', remove_db_access_dto.user_id)
+      .select();
+
+    if (db_error) {
+      throw db_error;
+    }
+    if (db_data.length === 0) {
+      throw new InternalServerErrorException('Database access not removed');
+    }
+
+    return { db_data };
   }
 }
