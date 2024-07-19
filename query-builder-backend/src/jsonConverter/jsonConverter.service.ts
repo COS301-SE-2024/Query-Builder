@@ -162,20 +162,29 @@ export class JsonConverterService {
 
                 const from = this.generateFromClause(jsonData);
 
-                let where = '';
-                let groupBy = '';
-                let having = '';
+                let where   = this.conditionWhereSQL(jsonData.condition);
+                let groupBy = this.groupBySQL(jsonData);
+                let having  = this.havingSQL(jsonData);
 
-                where = this.conditionWhereSQL(jsonData.condition);
-                groupBy = this.groupBySQL(jsonData);
-                having = this.havingSQL(jsonData);
 
 
                 const orderBy = this.generateOrderByClause(jsonData);
 
                 const limit = this.generateLimitClause(jsonData);
 
-                query = `SELECT ${select} FROM ${from}${where}${orderBy}${limit}`;
+                if(groupBy != '' && having != '')
+                {
+                    query = `SELECT ${select} FROM ${from}${where}${groupBy}${having}${orderBy}${limit}`;
+                }
+                else if(groupBy != '' && having == '')
+                {
+                    query = `SELECT ${select} FROM ${from}${where}${groupBy}${having}${orderBy}${limit}`;
+                    //query = `SELECT ${select} FROM ${from}${where}${groupBy}${orderBy}${limit}`;
+                }
+                else{
+                    query = `SELECT ${select} FROM ${from}${where}${groupBy}${having}${orderBy}${limit}`;
+                    //query = `SELECT ${select} FROM ${from}${where}${orderBy}${limit}`;
+                }
                 
             } else {
                 query = 'Unsupported query type';
@@ -191,7 +200,12 @@ export class JsonConverterService {
 
     conditionWhereSQL(condition:condition)
     {
-        return "WHERE" + this.conditionWhereSQLHelp(condition);
+        if (!condition) 
+            {
+                return '';
+            }
+
+        return " WHERE " + this.conditionWhereSQLHelp(condition);
     }
 
 
@@ -220,7 +234,7 @@ export class JsonConverterService {
         else if (this.isPrimitiveCondition(condition)) 
         {
             const primCondition = condition as primitiveCondition;
-            let sql = `${primCondition.column} ${primCondition.operator} `;// name =
+            let sql = `\`${primCondition.column}\` ${primCondition.operator} `;
     
             if (typeof primCondition.value === 'string') 
             {
@@ -248,79 +262,75 @@ export class JsonConverterService {
     }
 
     groupBySQL(jsonData: QueryParams) {
-
-        if (!jsonData.table || !jsonData.table.columns || jsonData.condition == null) {
-            return '';
-        }
         let groupByColumns = '';
-        for (let i = 0; i < jsonData.table.columns.length; i++) {
-            const column = jsonData.table.columns[i];
-            if(column.aggregation == null)
-                {
-                    groupByColumns += column.name + ', ';
-                }
+        
+        // Iterate through the columns and include only those without aggregation functions
+        for (const column of jsonData.table.columns) {
+            if (column.aggregation == null) {
+                // Ensure column names are properly formatted for SQL
+                groupByColumns += `\`${jsonData.table.name}\`.\`${column.name}\`, `;
+            }
         }
     
         // Remove the trailing comma and space
         if (groupByColumns) {
-            groupByColumns = groupByColumns.slice(0, -2);
+            groupByColumns = groupByColumns.slice(0, -2); // Remove last comma and space
             return ` GROUP BY ${groupByColumns}`;
         } else {
             return '';
         }
     }
     
-    havingSQL(jsonData: QueryParams)
-    {
-        if (!jsonData.condition) 
-            {
-                return '';
-            }
+    havingSQL(jsonData: QueryParams) {
+        if (!jsonData.condition) {
+            return '';
+        }
     
-        const havingConditions = this.getAggregateConditions(jsonData.condition);
+        const havingConditions = this.getAggregateConditions(jsonData.condition, jsonData.table.name);
     
         return havingConditions.length > 0 ? ` HAVING ${havingConditions.join(' AND ')}` : '';
     }
     
-    getAggregateConditions(condition: condition): string[] 
-    {
+    getAggregateConditions(condition: condition, tableName?: string): string[] {
         let aggregateConditions: string[] = [];
     
-        if ((condition as compoundCondition).conditions) 
-            {
-                const compCondition = condition as compoundCondition;
-        
-                for (let i = 0; i < compCondition.conditions.length; i++) 
-                    {
-                        aggregateConditions.push(...this.getAggregateConditions(compCondition.conditions[i]));//asked Chat for help make sure this works as intended
-                    }
-            } 
-        else if ((condition as primitiveCondition).aggregate) 
-            {
-                const primCondition = condition as primitiveCondition;
-                let sql = `${primCondition.aggregate}(${primCondition.column}) ${primCondition.operator} `;
-        
-                if (typeof primCondition.value === 'string') 
-                    {
-                        sql += `'${primCondition.value}'`;
-                    } 
-                else if (typeof primCondition.value === 'boolean') 
-                    {
-                        sql += primCondition.value ? 'TRUE' : 'FALSE';
-                    } 
-                else 
-                    { // number 
-                        sql += primCondition.value;
-                    }
-        
-                aggregateConditions.push(sql);
+        // Ensure tableName is a string
+        tableName = tableName || '';
+    
+        if (this.isCompoundCondition(condition)) {
+            const compCondition = condition as compoundCondition;
+    
+            for (let i = 0; i < compCondition.conditions.length; i++) {
+                aggregateConditions.push(...this.getAggregateConditions(compCondition.conditions[i], tableName));
+            }
+        } else if (this.isPrimitiveCondition(condition) && condition.aggregate) {
+            const primCondition = condition as primitiveCondition;
+            let sql = '';
+    
+            if (tableName) {
+                sql = `${primCondition.aggregate}(\`${tableName}\`.\`${primCondition.column}\`) ${primCondition.operator} `;
+            } else {
+                sql = `${primCondition.aggregate}(\`${primCondition.column}\`) ${primCondition.operator} `;
+            }
+    
+            if (typeof primCondition.value === 'string') 
+                {
+                    sql += `'${primCondition.value}'`;
+                } 
+            else if (typeof primCondition.value === 'boolean') 
+                {
+                    sql += primCondition.value ? 'TRUE' : 'FALSE';
+                } 
+            else 
+                { // number
+                    sql += primCondition.value;
+                }
+    
+            aggregateConditions.push(sql);
         }
     
         return aggregateConditions;
     }
-
-    //code to be added to mongoDB conversion
-
     
     
 }
