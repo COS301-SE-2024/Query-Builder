@@ -38,7 +38,7 @@ export class mongoJsonConverterService {
 
         return {
             find: this.generateFindString(queryParams),
-            filter: this.generateFilterObject(queryParams),
+            filter: this.generateFilterObject(queryParams.condition),
             sort: this.generateSortObject(queryParams),
             projection: this.generateProjectionObject(queryParams),
             skip: this.generateSkipInt(queryParams),
@@ -54,8 +54,29 @@ export class mongoJsonConverterService {
     }
 
     //function that generates the 'filter' object of the JSON object
-    generateFilterObject(queryParams: QueryParams){
-        //TODO
+    generateFilterObject(condition: condition){
+        if (!condition) 
+            {
+                return {};
+            }
+    
+        if (this.isPrimitiveCondition(condition)) 
+            {
+                const primCondition = condition as primitiveCondition;
+                return {[primCondition.column]: {[this.sqlToMongoOperator(primCondition.operator)]: primCondition.value}};
+            } 
+        else if (this.isCompoundCondition(condition)) 
+            {
+                const compCondition = condition as compoundCondition;
+                let conditions: object[] = [];
+                for (let i = 0; i < compCondition.conditions.length; i++) 
+                    {
+                        const cond = this.generateFilterObject(compCondition.conditions[i]);
+                        conditions.push(cond);
+                    }
+                return {[compCondition.operator]: conditions};
+            }
+        return {};
     }
 
     //function that generates the 'sort' object of the JSON object
@@ -141,31 +162,6 @@ export class mongoJsonConverterService {
         }
     }
 
-    conditionMongo(condition: condition)
-    {
-        if (!condition) 
-            {
-                return {};
-            }
-    
-        if (this.isPrimitiveCondition(condition)) 
-            {
-                const primCondition = condition as primitiveCondition;
-                return {[primCondition.column]: {[this.sqlToMongoOperator(primCondition.operator)]: primCondition.value}};
-            } 
-        else if (this.isCompoundCondition(condition)) 
-            {
-                const compCondition = condition as compoundCondition;
-                let conditions: object[] = [];
-                for (let i = 0; i < compCondition.conditions.length; i++) 
-                    {
-                        const cond = this.conditionMongo(compCondition.conditions[i]);
-                        conditions.push(cond);
-                    }
-                return {[compCondition.operator]: conditions};
-            }
-        return {};
-    }
 
     private isCompoundCondition(condition: any): condition is compoundCondition 
     {
