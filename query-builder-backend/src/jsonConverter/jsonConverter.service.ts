@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-
-import { QueryParams, table, column } from '../interfaces/intermediateJSON';
+import { condition, compoundCondition, primitiveCondition, QueryParams, table, column } from '../interfaces/intermediateJSON';
 
 @Injectable()
 export class JsonConverterService {
@@ -163,17 +162,29 @@ export class JsonConverterService {
 
                 const from = this.generateFromClause(jsonData);
 
-                let where = '';
+                let where   = this.conditionWhereSQL(jsonData.condition);
+                let groupBy = this.groupBySQL(jsonData);
+                let having  = this.havingSQL(jsonData);
 
-                if (jsonData.condition) {
-                    where = ` WHERE ${jsonData.condition}`;
-                }
+
 
                 const orderBy = this.generateOrderByClause(jsonData);
 
                 const limit = this.generateLimitClause(jsonData);
 
-                query = `SELECT ${select} FROM ${from}${where}${orderBy}${limit}`;
+                if(groupBy != '' && having != '')
+                {
+                    query = `SELECT ${select} FROM ${from}${where}${groupBy}${having}${orderBy}${limit}`;
+                }
+                else if(groupBy != '' && having == '')
+                {
+                    query = `SELECT ${select} FROM ${from}${where}${groupBy}${having}${orderBy}${limit}`;
+                    //query = `SELECT ${select} FROM ${from}${where}${groupBy}${orderBy}${limit}`;
+                }
+                else{
+                    query = `SELECT ${select} FROM ${from}${where}${groupBy}${having}${orderBy}${limit}`;
+                    //query = `SELECT ${select} FROM ${from}${where}${orderBy}${limit}`;
+                }
                 
             } else {
                 query = 'Unsupported query type';
@@ -186,4 +197,140 @@ export class JsonConverterService {
     
         return query;
     }
+
+    conditionWhereSQL(condition:condition)
+    {
+        if (!condition) 
+            {
+                return '';
+            }
+
+        return " WHERE " + this.conditionWhereSQLHelp(condition);
+    }
+
+
+    conditionWhereSQLHelp(condition: condition)
+    {
+        if (!condition) 
+        {
+            return '';
+        }
+    
+        if (this.isCompoundCondition(condition)) 
+        {
+            const compCondition = condition as compoundCondition;
+            let conditionsSQL = '';
+    
+            for (let i = 0; i < compCondition.conditions.length; i++) {
+                const condSQL = this.conditionWhereSQLHelp(compCondition.conditions[i]);
+                conditionsSQL += condSQL;
+                if (i < compCondition.conditions.length - 1) {
+                    conditionsSQL += ` ${compCondition.operator} `;
+                }
+            }
+    
+            return `(${conditionsSQL})`;
+        } 
+        else if (this.isPrimitiveCondition(condition)) 
+        {
+            const primCondition = condition as primitiveCondition;
+            let sql = `\`${primCondition.column}\` ${primCondition.operator} `;
+    
+            if (typeof primCondition.value === 'string') 
+            {
+                sql += `'${primCondition.value}'`;
+            } 
+            else if (typeof primCondition.value === 'boolean') 
+            {
+                sql += primCondition.value ? 'TRUE' : 'FALSE';
+            } 
+            else // number 
+            {
+                sql += primCondition.value;
+            }// name = 'value'
+    
+            return sql;
+        }
+    }
+
+    private isCompoundCondition(condition: any): condition is compoundCondition {
+        return (condition as compoundCondition).conditions !== undefined;
+    }
+
+    private isPrimitiveCondition(condition: any): condition is primitiveCondition {
+        return (condition as primitiveCondition).column !== undefined;
+    }
+
+    groupBySQL(jsonData: QueryParams) {
+        let groupByColumns = '';
+        
+        // Iterate through the columns and include only those without aggregation functions
+        for (const column of jsonData.table.columns) {
+            if (column.aggregation == null) {
+                // Ensure column names are properly formatted for SQL
+                groupByColumns += `\`${jsonData.table.name}\`.\`${column.name}\`, `;
+            }
+        }
+    
+        // Remove the trailing comma and space
+        if (groupByColumns) {
+            groupByColumns = groupByColumns.slice(0, -2); // Remove last comma and space
+            return ` GROUP BY ${groupByColumns}`;
+        } else {
+            return '';
+        }
+    }
+    
+    havingSQL(jsonData: QueryParams) {
+        if (!jsonData.condition) {
+            return '';
+        }
+    
+        const havingConditions = this.getAggregateConditions(jsonData.condition, jsonData.table.name);
+    
+        return havingConditions.length > 0 ? ` HAVING ${havingConditions.join(' AND ')}` : '';
+    }
+    
+    getAggregateConditions(condition: condition, tableName?: string): string[] {
+        let aggregateConditions: string[] = [];
+    
+        // Ensure tableName is a string
+        tableName = tableName || '';
+    
+        if (this.isCompoundCondition(condition)) {
+            const compCondition = condition as compoundCondition;
+    
+            for (let i = 0; i < compCondition.conditions.length; i++) {
+                aggregateConditions.push(...this.getAggregateConditions(compCondition.conditions[i], tableName));
+            }
+        } else if (this.isPrimitiveCondition(condition) && condition.aggregate) {
+            const primCondition = condition as primitiveCondition;
+            let sql = '';
+    
+            if (tableName) {
+                sql = `${primCondition.aggregate}(\`${tableName}\`.\`${primCondition.column}\`) ${primCondition.operator} `;
+            } else {
+                sql = `${primCondition.aggregate}(\`${primCondition.column}\`) ${primCondition.operator} `;
+            }
+    
+            if (typeof primCondition.value === 'string') 
+                {
+                    sql += `'${primCondition.value}'`;
+                } 
+            else if (typeof primCondition.value === 'boolean') 
+                {
+                    sql += primCondition.value ? 'TRUE' : 'FALSE';
+                } 
+            else 
+                { // number
+                    sql += primCondition.value;
+                }
+    
+            aggregateConditions.push(sql);
+        }
+    
+        return aggregateConditions;
+    }
+    
+    
 }

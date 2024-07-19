@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { JsonConverterService } from './jsonConverter.service';
-import { QueryParams, AggregateFunction } from '../interfaces/intermediateJSON';
+import { QueryParams, AggregateFunction, ComparisonOperator } from '../interfaces/intermediateJSON';
 
 describe('JSONConverterService', () => {
   let service: JsonConverterService;
@@ -16,6 +16,190 @@ describe('JSONConverterService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
+
+  it('should be able to convert primitive conditions', () => {
+    
+    const condition = {
+        column: "name",
+        operator: "=",
+        value: "value"
+    }
+
+    const result = service.conditionWhereSQL(condition);
+
+    expect(result).toEqual(" WHERE `name` = 'value'");
+
+});
+
+it('should be able to convert compound conditions', () => {
+    
+        const condition = {
+            conditions: [
+                {
+                    column: "name",
+                    operator: "=",
+                    value: "value"
+                },
+                {
+                    column: "age",
+                    operator: ">",
+                    value: 18
+                }
+            ],
+            operator: "AND"
+        }
+    
+        const result = service.conditionWhereSQL(condition);
+    
+        expect(result).toEqual(" WHERE (`name` = 'value' AND `age` > 18)");
+    
+    });
+
+    it('should be able to convert compound conditions with AND and OR', () => {
+
+        const condition = {
+            conditions: [
+                {
+                    column: "name",
+                    operator: "=",
+                    value: "value"
+                },
+                {
+                    column: "age",
+                    operator: ">",
+                    value: 18
+                },
+                {
+                    conditions: [
+                        {
+                            column: "city",
+                            operator: "=",
+                            value: "New York"
+                        },
+                        {
+                            column: "status",
+                            operator: "!=",
+                            value: "inactive"
+                        }
+                    ],
+                    operator: "OR"
+                }
+            ],
+            operator: "AND"
+        }
+    
+        const result = service.conditionWhereSQL(condition);
+    
+        expect(result).toEqual(" WHERE (`name` = 'value' AND `age` > 18 AND (`city` = 'New York' OR `status` != 'inactive'))");
+    
+    });
+    
+
+    it('should return an empty string if no condition is provided', () => {
+    
+        const result = service.conditionWhereSQL(null);
+    
+        expect(result).toEqual("");
+    
+    });
+
+    
+    
+    it('should return SQL for a simple aggregate condition', () => {
+        const condition = {
+            aggregate: "SUM",
+            column: "salary",
+            operator: ">",
+            value: 50000
+        };
+    
+        const result = service.getAggregateConditions(condition);
+    
+        expect(result).toEqual(["SUM(`salary`) > 50000"]);
+    });
+
+    
+    
+
+    it('should return SQL for compound aggregate conditions', () => {
+        const condition = {
+            conditions: [
+                {
+                    aggregate: "SUM",
+                    column: "salary",
+                    operator: ">",
+                    value: 50000
+                },
+                {
+                    aggregate: "COUNT",
+                    column: "id",
+                    operator: ">",
+                    value: 10
+                }
+            ],
+            operator: "AND"
+        };
+    
+        const result = service.getAggregateConditions(condition);
+    
+        expect(result).toEqual(["SUM(`salary`) > 50000", "COUNT(`id`) > 10"]);
+    });
+
+    it('should return empty string when no having conditions are present', () => {
+        const jsonData: QueryParams = {
+            language: "SQL",
+            query_type: "SELECT",
+            table: {
+                name: "test_table",
+                columns: [
+                    { name: "id", aggregation: null }
+                ]
+            },
+            condition: null
+        };
+    
+        const result = service.havingSQL(jsonData);
+    
+        expect(result).toEqual('');
+    });
+    
+
+    it('should return empty string when no group by columns are present', () => {
+        const jsonData: QueryParams = {
+            language: "SQL",
+            query_type: "SELECT",
+            table: {
+                name: "test_table",
+                columns: [
+                    { name: "id", aggregation: AggregateFunction.COUNT },
+                    { name: "name", aggregation: AggregateFunction.COUNT }
+                ]
+            }
+        };
+    
+        const result = service.groupBySQL(jsonData);
+    
+        expect(result).toEqual('');
+    });
+    
+    it('should return GROUP BY clause for columns without aggregation', () => {
+        const jsonData: QueryParams = {
+            language: "SQL",
+            query_type: "SELECT",
+            table: {
+                name: "test_table",
+                columns: [
+                    { name: "id", aggregation: null },
+                    { name: "name", aggregation: AggregateFunction.COUNT },
+                    { name: "age", aggregation: null }
+                ]
+            }
+        };
+    
+        const result = service.groupBySQL(jsonData);
+    
+        expect(result).toEqual(' GROUP BY `test_table`.`id`, `test_table`.`age`');
+    });
 
   it('should be able to convert queries with all columns selected', () => {
 
@@ -41,7 +225,7 @@ describe('JSONConverterService', () => {
         table: {name: 'users', columns: [{name: 'id'}, {name: "first_name"}, {name: "last_name"}]},
       };
   
-      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users`';
+      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users` GROUP BY `users`.`id`, `users`.`first_name`, `users`.`last_name`';
   
       const result = service.convertJsonToQuery(queryParams);
   
@@ -84,7 +268,7 @@ describe('JSONConverterService', () => {
         },
       };
   
-      const expectedQuery = 'SELECT `users`.`id`, `actors`.`role` FROM `users` JOIN `actors` ON `users`.`id`=`actors`.`user_id`';
+      const expectedQuery = 'SELECT `users`.`id`, `actors`.`role` FROM `users` JOIN `actors` ON `users`.`id`=`actors`.`user_id` GROUP BY `users`.`id`';
   
       const result = service.convertJsonToQuery(queryParams);
   
@@ -104,7 +288,7 @@ describe('JSONConverterService', () => {
         }
       };
   
-      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users` ORDER BY `first_name` DESC';
+      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users` GROUP BY `users`.`id`, `users`.`first_name`, `users`.`last_name` ORDER BY `first_name` DESC';
   
       const result = service.convertJsonToQuery(queryParams);
   
@@ -123,7 +307,7 @@ describe('JSONConverterService', () => {
         }
       };
   
-      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users` ORDER BY `first_name` ASC';
+      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users` GROUP BY `users`.`id`, `users`.`first_name`, `users`.`last_name` ORDER BY `first_name` ASC';
   
       const result = service.convertJsonToQuery(queryParams);
   
@@ -143,7 +327,7 @@ describe('JSONConverterService', () => {
         }
       };
   
-      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users` LIMIT 10 OFFSET 20';
+      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users` GROUP BY `users`.`id`, `users`.`first_name`, `users`.`last_name` LIMIT 10 OFFSET 20';
   
       const result = service.convertJsonToQuery(queryParams);
   
@@ -202,4 +386,195 @@ describe('JSONConverterService', () => {
 
   });
 
+  it('should be able to convert queries using pagination and a where condition', () => {
+    const queryParams: QueryParams = {
+        language: 'SQL',
+        query_type: 'SELECT',
+        table: {
+            name: 'users',
+            columns: [
+                { name: 'id' },
+                { name: 'first_name' },
+                { name: 'last_name' }
+            ]
+        },
+        condition: {
+            column: 'age',
+            operator: ComparisonOperator.GREATER_THAN,
+            value: 18
+        },
+        pageParams: {
+            pageNumber: 3,
+            rowsPerPage: 10
+        }
+    };
+
+    const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users` WHERE `age` > 18 GROUP BY `users`.`id`, `users`.`first_name`, `users`.`last_name` LIMIT 10 OFFSET 20';
+    const result = service.convertJsonToQuery(queryParams);
+
+    expect(result).toEqual(expectedQuery);
+});
+
+it('should be able to convert queries using pagination, where, group by, and having conditions', () => {
+    const queryParams: QueryParams = {
+        language: 'SQL',
+        query_type: 'SELECT',
+        table: {
+            name: 'users',
+            columns: [
+                { name: 'id' },
+                { name: 'first_name' },
+                { name: 'last_name' },
+                { name: 'age', aggregation: AggregateFunction.AVG }
+            ]
+        },
+        condition: {
+            column: 'age',
+            operator: ComparisonOperator.GREATER_THAN,
+            value: 18,
+            aggregate: AggregateFunction.AVG // Adding aggregate function in the condition
+        },
+        pageParams: {
+            pageNumber: 3,
+            rowsPerPage: 10
+        }
+    };
+
+    const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name`, AVG(`users`.`age`) FROM `users` WHERE `age` > 18 GROUP BY `users`.`id`, `users`.`first_name`, `users`.`last_name` HAVING AVG(`users`.`age`) > 18 LIMIT 10 OFFSET 20';
+    const result = service.convertJsonToQuery(queryParams);
+
+    expect(result).toEqual(expectedQuery);
+});
+
+    it('should be able to convert queries using pagination, where, and group by conditions', () => {
+        const queryParams: QueryParams = {
+            language: 'SQL',
+            query_type: 'SELECT',
+            table: {
+                name: 'users',
+                columns: [
+                    { name: 'id' },
+                    { name: 'first_name' },
+                    { name: 'last_name' },
+                    { name: 'age' }
+                ]
+            },
+            condition: {
+                column: 'age',
+                operator: ComparisonOperator.GREATER_THAN,
+                value: 18
+            },
+            pageParams: {
+                pageNumber: 3,
+                rowsPerPage: 10
+            }
+        };
+
+        const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name`, `users`.`age` FROM `users` WHERE `age` > 18 GROUP BY `users`.`id`, `users`.`first_name`, `users`.`last_name`, `users`.`age` LIMIT 10 OFFSET 20';
+        const result = service.convertJsonToQuery(queryParams);
+
+        expect(result).toEqual(expectedQuery);
+    });
+
+    it('should return an empty string if the condition is null', () => {
+        expect(service.conditionWhereSQLHelp(null)).toBe('');
+    });
+
+    it('should return an empty string if the condition is undefined', () => {
+        expect(service.conditionWhereSQLHelp(undefined)).toBe('');
+    });
+
+    it('should handle boolean true values correctly', () => {
+        const condition = {
+            column: 'is_active',
+            operator: '=',
+            value: true, // Boolean true value
+        };
+
+        const result = service.conditionWhereSQLHelp(condition);
+        expect(result).toBe('`is_active` = TRUE');
+    });
+
+    it('should handle boolean false values correctly', () => {
+        const condition = {
+            column: 'is_active',
+            operator: '=',
+            value: false, // Boolean false value
+        };
+
+        const result = service.conditionWhereSQLHelp(condition);
+        expect(result).toBe('`is_active` = FALSE');
+    });
+
+    it('should handle string values correctly with table name', () => {
+        const condition = {
+            column: 'status',
+            aggregate: 'COUNT',
+            operator: '=',
+            value: 'active', // String value
+        };
+
+        const result = service.getAggregateConditions(condition, 'users');
+        expect(result).toEqual([`COUNT(\`users\`.\`status\`) = 'active'`]);
+    });
+
+    it('should handle string values correctly without table name', () => {
+        const condition = {
+            column: 'status',
+            aggregate: 'MAX',
+            operator: '=',
+            value: 'inactive', // String value
+        };
+
+        const result = service.getAggregateConditions(condition);
+        expect(result).toEqual([`MAX(\`status\`) = 'inactive'`]);
+    });
+
+    it('should handle boolean true values correctly with table name', () => {
+        const condition = {
+            column: 'is_active',
+            aggregate: 'SUM',
+            operator: '=',
+            value: true, // Boolean true value
+        };
+
+        const result = service.getAggregateConditions(condition, 'users');
+        expect(result).toEqual([`SUM(\`users\`.\`is_active\`) = TRUE`]);
+    });
+
+    it('should handle boolean false values correctly with table name', () => {
+        const condition = {
+            column: 'is_active',
+            aggregate: 'COUNT',
+            operator: '=',
+            value: false, // Boolean false value
+        };
+
+        const result = service.getAggregateConditions(condition, 'users');
+        expect(result).toEqual([`COUNT(\`users\`.\`is_active\`) = FALSE`]);
+    });
+
+    it('should handle boolean true values correctly without table name', () => {
+        const condition = {
+            column: 'is_active',
+            aggregate: 'AVG',
+            operator: '=',
+            value: true, // Boolean true value
+        };
+
+        const result = service.getAggregateConditions(condition);
+        expect(result).toEqual([`AVG(\`is_active\`) = TRUE`]);
+    });
+
+    it('should handle boolean false values correctly without table name', () => {
+        const condition = {
+            column: 'is_active',
+            aggregate: 'MAX',
+            operator: '=',
+            value: false, // Boolean false value
+        };
+
+        const result = service.getAggregateConditions(condition);
+        expect(result).toEqual([`MAX(\`is_active\`) = FALSE`]);
+    });
 });
