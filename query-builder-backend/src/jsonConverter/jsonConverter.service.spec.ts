@@ -115,7 +115,7 @@ it('should be able to convert compound conditions', () => {
     
         const result = service.getAggregateConditions(condition);
     
-        expect(result).toEqual(["SUM(salary) > 50000"]);
+        expect(result).toEqual(["SUM(`salary`) > 50000"]);
     });
 
     
@@ -142,7 +142,7 @@ it('should be able to convert compound conditions', () => {
     
         const result = service.getAggregateConditions(condition);
     
-        expect(result).toEqual(["SUM(salary) > 50000", "COUNT(id) > 10"]);
+        expect(result).toEqual(["SUM(`salary`) > 50000", "COUNT(`id`) > 10"]);
     });
 
     it('should return empty string when no having conditions are present', () => {
@@ -506,5 +506,75 @@ it('should be able to convert queries using pagination, where, group by, and hav
         expect(result).toBe('`is_active` = FALSE');
     });
 
-    
+    it('should handle string values correctly with table name', () => {
+        const condition = {
+            column: 'status',
+            aggregate: 'COUNT',
+            operator: '=',
+            value: 'active', // String value
+        };
+
+        const result = service.getAggregateConditions(condition, 'users');
+        expect(result).toEqual([`COUNT(\`users\`.\`status\`) = 'active'`]);
+    });
+
+    it('should handle string values correctly without table name', () => {
+        const condition = {
+            column: 'status',
+            aggregate: 'MAX',
+            operator: '=',
+            value: 'inactive', // String value
+        };
+
+        const result = service.getAggregateConditions(condition);
+        expect(result).toEqual([`MAX(\`status\`) = 'inactive'`]);
+    });
+
+    it('should handle boolean true values correctly with table name', () => {
+        const condition = {
+            column: 'is_active',
+            aggregate: 'SUM',
+            operator: '=',
+            value: true, // Boolean true value
+        };
+
+        const result = service.getAggregateConditions(condition, 'users');
+        expect(result).toEqual([`SUM(\`users\`.\`is_active\`) = TRUE`]);
+    });
+
+    it('should handle boolean false values correctly with table name', () => {
+        const condition = {
+            column: 'is_active',
+            aggregate: 'COUNT',
+            operator: '=',
+            value: false, // Boolean false value
+        };
+
+        const result = service.getAggregateConditions(condition, 'users');
+        expect(result).toEqual([`COUNT(\`users\`.\`is_active\`) = FALSE`]);
+    });
+
+    it('should handle boolean true values correctly without table name', () => {
+        const condition = {
+            column: 'is_active',
+            aggregate: 'AVG',
+            operator: '=',
+            value: true, // Boolean true value
+        };
+
+        const result = service.getAggregateConditions(condition);
+        expect(result).toEqual([`AVG(\`is_active\`) = TRUE`]);
+    });
+
+    it('should handle boolean false values correctly without table name', () => {
+        const condition = {
+            column: 'is_active',
+            aggregate: 'MAX',
+            operator: '=',
+            value: false, // Boolean false value
+        };
+
+        const result = service.getAggregateConditions(condition);
+        expect(result).toEqual([`MAX(\`is_active\`) = FALSE`]);
+    });
 });
