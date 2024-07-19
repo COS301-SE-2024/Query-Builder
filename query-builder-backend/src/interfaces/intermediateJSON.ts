@@ -46,7 +46,7 @@ export interface compoundCondition extends condition{
 }
 
 export interface primitiveCondition extends condition{
-    value: string | number | boolean,
+    value: string | number | boolean | null,
     column: string,
     operator: ComparisonOperator,
     aggregate?: AggregateFunction
@@ -85,4 +85,6 @@ export enum ComparisonOperator {
     GREATER_THAN_EQUAL = ">=",
     NOT_EQUAL = "<>",
     LIKE = "LIKE",
+    IS = "IS",
+    IS_NOT = "IS NOT"
 }

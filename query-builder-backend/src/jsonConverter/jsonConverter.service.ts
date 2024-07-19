@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { condition, compoundCondition, primitiveCondition, QueryParams, table, column } from '../interfaces/intermediateJSON';
 
 @Injectable()
@@ -232,6 +232,9 @@ export class JsonConverterService {
             {
                 sql += primCondition.value ? 'TRUE' : 'FALSE';
             } 
+            else if (primCondition.value == null){
+                sql += "NULL";
+            }
             else // number 
             {
                 sql += primCondition.value;
@@ -335,6 +338,9 @@ export class JsonConverterService {
                 {
                     sql += primCondition.value ? 'TRUE' : 'FALSE';
                 } 
+            else if (primCondition.value == null){
+                sql += "NULL";
+            }
             else 
                 { // number
                     sql += primCondition.value;
