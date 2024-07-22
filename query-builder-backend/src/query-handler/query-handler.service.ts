@@ -1,6 +1,8 @@
-import { BadGatewayException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadGatewayException, Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { JsonConverterService } from './../jsonConverter/jsonConverter.service';
 import { Query } from 'src/interfaces/intermediateJSON';
+import { SessionStore } from 'src/session-store/session-store.service';
+
 
 @Injectable()
 export class QueryHandlerService {
@@ -15,7 +17,9 @@ export class QueryHandlerService {
 
           console.log(query);
 
-          const connection = require('mysql').createConnection({
+          try
+          {
+            const connection = require('mysql').createConnection({
             host: query.credentials.host,
             user: query.credentials.user,
             password: query.credentials.password
@@ -84,22 +88,26 @@ export class QueryHandlerService {
                     results[i].qbee_id = i; // Add "total": 2 to all objects in array
                   }
 
-                  //return a response object with numRows and results
-                  const response = {
-                    totalNumRows: numRows,
-                    data: results
-                  }
+                    //return a response object with numRows and results
+                    const response = {
+                      totalNumRows: numRows,
+                      data: results,
+                    };
 
-                  resolve(response);
-
-                });
-
-              })
-            }
-          });
-
+                    return resolve(response);
+                  },
+                );
+              },
+            );
+          }
         });
-
+      } catch (err) {
+        return reject(
+          new BadRequestException(
+            'Please ensure that the request is formatted correctly',
+          ),
+        );
       }
-
+    });
+  }
 }
