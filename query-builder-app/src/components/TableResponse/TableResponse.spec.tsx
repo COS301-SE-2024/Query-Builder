@@ -20,8 +20,10 @@ describe('TableResponse basic rendering tests', () => {
         queryParams: {
             language: "sql",
             query_type: "select",
-            table: "film",
-            columns: ["title", "release_year", "rating", "rental_rate", "rental_duration", "language_id"],
+            table: {
+              name: "film",
+              columns: [{name: "title"}, {name: "release_year"}, {name: "rating"}, {name: "rental_rate"}, {name:"rental_duration"}, {name: "language_id"}]
+            }
         }
     }}/>);
     expect(baseElement).toBeTruthy();
@@ -41,8 +43,10 @@ describe('TableResponse tests with no backend', () => {
           queryParams: {
               language: "sql",
               query_type: "select",
-              table: "film",
-              columns: ["title", "release_year", "rating", "rental_rate", "rental_duration", "language_id"],
+              table: {
+                name: "film",
+                columns: [{name: "title"}, {name: "release_year"}, {name: "rating"}, {name: "rental_rate"}, {name:"rental_duration"}, {name: "language_id"}]
+              }
           }
       }}/>);
 

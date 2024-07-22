@@ -47,6 +47,7 @@ export interface compoundCondition extends condition{
 
 export interface primitiveCondition extends condition{
     value: string | number | boolean | null,
+    tableName?: string,
     column: string,
     operator: ComparisonOperator,
     aggregate?: AggregateFunction
