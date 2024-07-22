@@ -305,6 +305,29 @@ export class JsonConverterService {
             return '';
         }
     }
+
+    isThereAggregates(jsonData: QueryParams): boolean {
+
+        let tableRef = jsonData.table;
+
+        for (const column of tableRef.columns) {
+            if (column.aggregation) {
+                return true;
+            }
+        }
+        while(tableRef.join){
+            tableRef = tableRef.join.table2;
+
+            for (const column of tableRef.columns) {
+                if(column.aggregation) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+
+    }
     
     havingSQL(jsonData: QueryParams) {
         if (!jsonData.condition) {
