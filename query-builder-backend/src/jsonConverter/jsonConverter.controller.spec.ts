@@ -18,22 +18,19 @@ describe('JsonConverterController', () => {
     expect(controller).toBeDefined();
   });
 
-  // it('should return a JSON object containing SELECT, FROM, and WHERE', async () => {
-  //   const queryParams = {
-  //     language: 'SQL',
-  //     query_type: 'SELECT',
-  //     table: 'users',
-  //     columns: ['id'],
-  //     condition: 'id = 1',
-  //   };
+  it('should be able to return a basic query correctly converted into SQL', async () => {
 
-  //   const expectedQuery = 'SELECT `id` FROM users WHERE id = 1';
+    const queryParams = {
+      language: 'SQL',
+      query_type: 'SELECT',
+      table: {name: 'users', columns: [{name: 'id'}]},
+    };
 
-  //   const result = await controller.convert(queryParams);
+    const expectedQuery = 'SELECT `users`.`id` FROM `users`';
 
-  //   expect(result).toContain('SELECT');
-  //   expect(result).toContain('FROM');
-  //   expect(result).toContain('WHERE');
-  //   expect(result).toEqual(expectedQuery);
-  // });
+    const result = controller.convert(queryParams);
+
+    expect(result).toEqual(expectedQuery);
+
+  });
 });

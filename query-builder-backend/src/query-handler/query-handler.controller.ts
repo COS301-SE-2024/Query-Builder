@@ -1,18 +1,6 @@
 import {Body, Controller, HttpCode, Post} from '@nestjs/common';
 import { QueryHandlerService } from './query-handler.service';
-import { QueryParams } from 'src/interfaces/intermediateJSON';
-
-interface DatabaseCredentials {
-    host: string,
-    user: string,
-    password: string
-}
-  
-interface Query {
-    credentials: DatabaseCredentials,
-    databaseName: string,
-    queryParams: QueryParams
-}
+import { Query } from 'src/interfaces/intermediateJSON';
 
 @Controller('query')
 export class QueryHandlerController {
