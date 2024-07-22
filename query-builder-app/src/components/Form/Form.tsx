@@ -33,7 +33,7 @@ const getToken = async () => {
 export default function Form(){
 
     //React hook for URL params
-    const {databaseServerID} = useParams();
+    const {databaseServerID} = useParams<{databaseServerID: string}>();
 
     //async function to get the database credentials, either from supabase, or prompt the user
     async function getDatabaseCredentials() {
@@ -248,10 +248,11 @@ export default function Form(){
                 user: "root",
                 password: "testPassword"
             },
-            databaseName: selectedDatabaseValue,
+            databaseServerID: databaseServerID,
             queryParams: {
                 language: "sql",
                 query_type: "select",
+                databaseName: selectedDatabaseValue,
                 table: {
                     name: selectedTableValue,
                     columns: columnArray

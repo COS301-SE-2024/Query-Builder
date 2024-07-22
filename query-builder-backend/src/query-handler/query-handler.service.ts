@@ -1,18 +1,6 @@
 import { BadGatewayException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JsonConverterService } from './../jsonConverter/jsonConverter.service';
-import { QueryParams } from 'src/interfaces/intermediateJSON';
-
-interface DatabaseCredentials {
-    host: string,
-    user: string,
-    password: string
-}
-  
-interface Query {
-    credentials: DatabaseCredentials,
-    databaseName: string,
-    queryParams: QueryParams
-}
+import { Query } from 'src/interfaces/intermediateJSON';
 
 @Injectable()
 export class QueryHandlerService {
@@ -49,7 +37,7 @@ export class QueryHandlerService {
               //query the connected database if the connection is successful
 
               //first, use the correct database as specified in query
-              const databaseToQuery: string = query.databaseName;
+              const databaseToQuery: string = query.queryParams.databaseName;
               const useCommand: string = "USE " + databaseToQuery + ";";
 
               connection.query(useCommand, function (error, results, fields) {
