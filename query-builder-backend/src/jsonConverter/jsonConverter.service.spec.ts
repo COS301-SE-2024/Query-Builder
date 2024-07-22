@@ -225,7 +225,7 @@ it('should be able to convert compound conditions', () => {
         table: {name: 'users', columns: [{name: 'id'}, {name: "first_name"}, {name: "last_name"}]},
       };
   
-      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users` GROUP BY `users`.`id`, `users`.`first_name`, `users`.`last_name`';
+      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users`';
   
       const result = service.convertJsonToQuery(queryParams);
   
@@ -268,7 +268,7 @@ it('should be able to convert compound conditions', () => {
         },
       };
   
-      const expectedQuery = 'SELECT `users`.`id`, `actors`.`role` FROM `users` JOIN `actors` ON `users`.`id`=`actors`.`user_id` GROUP BY `users`.`id`';
+      const expectedQuery = 'SELECT `users`.`id`, `actors`.`role` FROM `users` JOIN `actors` ON `users`.`id`=`actors`.`user_id`';
   
       const result = service.convertJsonToQuery(queryParams);
   
@@ -288,7 +288,7 @@ it('should be able to convert compound conditions', () => {
         }
       };
   
-      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users` GROUP BY `users`.`id`, `users`.`first_name`, `users`.`last_name` ORDER BY `first_name` DESC';
+      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users` ORDER BY `first_name` DESC';
   
       const result = service.convertJsonToQuery(queryParams);
   
@@ -307,7 +307,7 @@ it('should be able to convert compound conditions', () => {
         }
       };
   
-      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users` GROUP BY `users`.`id`, `users`.`first_name`, `users`.`last_name` ORDER BY `first_name` ASC';
+      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users` ORDER BY `first_name` ASC';
   
       const result = service.convertJsonToQuery(queryParams);
   
@@ -327,7 +327,7 @@ it('should be able to convert compound conditions', () => {
         }
       };
   
-      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users` GROUP BY `users`.`id`, `users`.`first_name`, `users`.`last_name` LIMIT 10 OFFSET 20';
+      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users` LIMIT 10 OFFSET 20';
   
       const result = service.convertJsonToQuery(queryParams);
   
@@ -409,7 +409,7 @@ it('should be able to convert compound conditions', () => {
         }
     };
 
-    const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users` WHERE `age` > 18 GROUP BY `users`.`id`, `users`.`first_name`, `users`.`last_name` LIMIT 10 OFFSET 20';
+    const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users` WHERE `age` > 18 LIMIT 10 OFFSET 20';
     const result = service.convertJsonToQuery(queryParams);
 
     expect(result).toEqual(expectedQuery);
@@ -470,7 +470,7 @@ it('should be able to convert queries using pagination, where, group by, and hav
             }
         };
 
-        const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name`, `users`.`age` FROM `users` WHERE `age` > 18 GROUP BY `users`.`id`, `users`.`first_name`, `users`.`last_name`, `users`.`age` LIMIT 10 OFFSET 20';
+        const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name`, `users`.`age` FROM `users` WHERE `age` > 18 LIMIT 10 OFFSET 20';
         const result = service.convertJsonToQuery(queryParams);
 
         expect(result).toEqual(expectedQuery);
@@ -611,5 +611,34 @@ it('should be able to convert queries using pagination, where, group by, and hav
 
         expect(result).toEqual('SELECT COUNT(`city`.`city_id`) AS `Number of cities per country`, `country`.`country` FROM `city` JOIN `country` ON `city`.`country_id`=`country`.`country_id` HAVING COUNT(`city`.`city_id`) > 10');
 
+    });
+
+    it('Should not return GroupBY if there is no aggregates', () => {
+        const jsonData: QueryParams = {
+            "language": "sql",
+            "query_type": "select",
+            "table": {
+                "name":"city", 
+                "columns":[{
+                    "name": "city_id",
+                }],
+                "join": {
+                    "table1MatchingColumnName": "country_id",
+                    "table2MatchingColumnName": "country_id",
+                    "table2": {
+                        "name": "country",
+                        "columns": [{"name": "country"}]
+                    }
+                }
+            },
+            "condition": {
+                "column": "city_id",
+                "operator": ">",
+                "value": 10,
+            },
+
+        }
+        const result = service.convertJsonToQuery(jsonData);
+        expect(result).toEqual('SELECT `city`.`city_id`, `country`.`country` FROM `city` JOIN `country` ON `city`.`country_id`=`country`.`country_id` WHERE `city_id` > 10');
     });
 });
