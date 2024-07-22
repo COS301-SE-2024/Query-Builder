@@ -272,7 +272,7 @@ export class JsonConverterService {
     groupBySQL(jsonData: QueryParams) {
         let groupByColumns = '';
 
-        if(!this.isThereAggregates)
+        if(this.isThereAggregates(jsonData) == false)
         {
             return '';
         }
@@ -296,7 +296,6 @@ export class JsonConverterService {
 
     isThereAggregates(jsonData: QueryParams): boolean {
 
-        let selectClause = '';
         let tableRef = jsonData.table;
 
         for (const column of tableRef.columns) {
@@ -304,16 +303,16 @@ export class JsonConverterService {
                 return true;
             }
         }
-        selectClause += this.generateListOfColumns(tableRef);
         while(tableRef.join){
             tableRef = tableRef.join.table2;
 
             for (const column of tableRef.columns) {
-                if (column.aggregation) {
+                if(column.aggregation) {
                     return true;
                 }
             }
         }
+
         return false;
 
     }
