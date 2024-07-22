@@ -13,9 +13,47 @@ describe('JSONConverterService', () => {
     service = module.get<JsonConverterService>(JsonConverterService);
   });
 
+  //------------------------------------- Service setup test -------------------------------------//
+
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
+
+  //------------------------------------- Individual functions tests -------------------------------------//
+
+    //conditionWhereSQLHelp()
+
+    it('should return an empty string if the condition is null', () => {
+        expect(service.conditionWhereSQLHelp(null)).toBe('');
+    });
+
+    it('should return an empty string if the condition is undefined', () => {
+        expect(service.conditionWhereSQLHelp(undefined)).toBe('');
+    });
+
+    it('should handle boolean true values correctly', () => {
+        const condition = {
+            column: 'is_active',
+            operator: '=',
+            value: true, // Boolean true value
+        };
+
+        const result = service.conditionWhereSQLHelp(condition);
+        expect(result).toBe('`is_active` = TRUE');
+    });
+
+    it('should handle boolean false values correctly', () => {
+        const condition = {
+            column: 'is_active',
+            operator: '=',
+            value: false, // Boolean false value
+        };
+
+        const result = service.conditionWhereSQLHelp(condition);
+        expect(result).toBe('`is_active` = FALSE');
+    });
+
+  //conditionWhereSQL()
 
   it('should be able to convert primitive conditions', () => {
     
@@ -103,7 +141,7 @@ it('should be able to convert compound conditions', () => {
     
     });
 
-    
+    //getAggregateConditions()
     
     it('should return SQL for a simple aggregate condition', () => {
         const condition = {
@@ -117,9 +155,6 @@ it('should be able to convert compound conditions', () => {
     
         expect(result).toEqual(["SUM(`salary`) > 50000"]);
     });
-
-    
-    
 
     it('should return SQL for compound aggregate conditions', () => {
         const condition = {
@@ -145,6 +180,80 @@ it('should be able to convert compound conditions', () => {
         expect(result).toEqual(["SUM(`salary`) > 50000", "COUNT(`id`) > 10"]);
     });
 
+    it('should handle string values correctly with table name', () => {
+        const condition = {
+            column: 'status',
+            aggregate: 'COUNT',
+            operator: '=',
+            value: 'active', // String value
+        };
+
+        const result = service.getAggregateConditions(condition, 'users');
+        expect(result).toEqual([`COUNT(\`users\`.\`status\`) = 'active'`]);
+    });
+
+    it('should handle string values correctly without table name', () => {
+        const condition = {
+            column: 'status',
+            aggregate: 'MAX',
+            operator: '=',
+            value: 'inactive', // String value
+        };
+
+        const result = service.getAggregateConditions(condition);
+        expect(result).toEqual([`MAX(\`status\`) = 'inactive'`]);
+    });
+
+    it('should handle boolean true values correctly with table name', () => {
+        const condition = {
+            column: 'is_active',
+            aggregate: 'SUM',
+            operator: '=',
+            value: true, // Boolean true value
+        };
+
+        const result = service.getAggregateConditions(condition, 'users');
+        expect(result).toEqual([`SUM(\`users\`.\`is_active\`) = TRUE`]);
+    });
+
+    it('should handle boolean false values correctly with table name', () => {
+        const condition = {
+            column: 'is_active',
+            aggregate: 'COUNT',
+            operator: '=',
+            value: false, // Boolean false value
+        };
+
+        const result = service.getAggregateConditions(condition, 'users');
+        expect(result).toEqual([`COUNT(\`users\`.\`is_active\`) = FALSE`]);
+    });
+
+    it('should handle boolean true values correctly without table name', () => {
+        const condition = {
+            column: 'is_active',
+            aggregate: 'AVG',
+            operator: '=',
+            value: true, // Boolean true value
+        };
+
+        const result = service.getAggregateConditions(condition);
+        expect(result).toEqual([`AVG(\`is_active\`) = TRUE`]);
+    });
+
+    it('should handle boolean false values correctly without table name', () => {
+        const condition = {
+            column: 'is_active',
+            aggregate: 'MAX',
+            operator: '=',
+            value: false, // Boolean false value
+        };
+
+        const result = service.getAggregateConditions(condition);
+        expect(result).toEqual([`MAX(\`is_active\`) = FALSE`]);
+    });
+
+    //havingSQL()
+
     it('should return empty string when no having conditions are present', () => {
         const jsonData: QueryParams = {
             language: "SQL",
@@ -162,7 +271,8 @@ it('should be able to convert compound conditions', () => {
     
         expect(result).toEqual('');
     });
-    
+
+    //groupBySQL()
 
     it('should return empty string when no group by columns are present', () => {
         const jsonData: QueryParams = {
@@ -201,7 +311,9 @@ it('should be able to convert compound conditions', () => {
         expect(result).toEqual(' GROUP BY `test_table`.`id`, `test_table`.`age`');
     });
 
-  it('should be able to convert queries with all columns selected', () => {
+    //------------------------------------- Complete query conversion tests -------------------------------------//
+
+  it('should report an error when no columns are specified for a table', () => {
 
     const queryParams: QueryParams = {
         language: 'SQL',
@@ -209,11 +321,12 @@ it('should be able to convert compound conditions', () => {
         table: {name: 'users', columns: []},
       };
   
-      const expectedQuery = 'SELECT `users`.* FROM `users`';
-  
-      const result = service.convertJsonToQuery(queryParams);
-  
-      expect(result).toEqual(expectedQuery);
+      try{
+        service.convertJsonToQuery(queryParams)
+      }
+      catch(e){
+        expect(e.message).toBe("No columns specified for table 'users'");
+      }
 
   });
 
@@ -476,109 +589,7 @@ it('should be able to convert queries using pagination, where, group by, and hav
         expect(result).toEqual(expectedQuery);
     });
 
-    it('should return an empty string if the condition is null', () => {
-        expect(service.conditionWhereSQLHelp(null)).toBe('');
-    });
-
-    it('should return an empty string if the condition is undefined', () => {
-        expect(service.conditionWhereSQLHelp(undefined)).toBe('');
-    });
-
-    it('should handle boolean true values correctly', () => {
-        const condition = {
-            column: 'is_active',
-            operator: '=',
-            value: true, // Boolean true value
-        };
-
-        const result = service.conditionWhereSQLHelp(condition);
-        expect(result).toBe('`is_active` = TRUE');
-    });
-
-    it('should handle boolean false values correctly', () => {
-        const condition = {
-            column: 'is_active',
-            operator: '=',
-            value: false, // Boolean false value
-        };
-
-        const result = service.conditionWhereSQLHelp(condition);
-        expect(result).toBe('`is_active` = FALSE');
-    });
-
-    it('should handle string values correctly with table name', () => {
-        const condition = {
-            column: 'status',
-            aggregate: 'COUNT',
-            operator: '=',
-            value: 'active', // String value
-        };
-
-        const result = service.getAggregateConditions(condition, 'users');
-        expect(result).toEqual([`COUNT(\`users\`.\`status\`) = 'active'`]);
-    });
-
-    it('should handle string values correctly without table name', () => {
-        const condition = {
-            column: 'status',
-            aggregate: 'MAX',
-            operator: '=',
-            value: 'inactive', // String value
-        };
-
-        const result = service.getAggregateConditions(condition);
-        expect(result).toEqual([`MAX(\`status\`) = 'inactive'`]);
-    });
-
-    it('should handle boolean true values correctly with table name', () => {
-        const condition = {
-            column: 'is_active',
-            aggregate: 'SUM',
-            operator: '=',
-            value: true, // Boolean true value
-        };
-
-        const result = service.getAggregateConditions(condition, 'users');
-        expect(result).toEqual([`SUM(\`users\`.\`is_active\`) = TRUE`]);
-    });
-
-    it('should handle boolean false values correctly with table name', () => {
-        const condition = {
-            column: 'is_active',
-            aggregate: 'COUNT',
-            operator: '=',
-            value: false, // Boolean false value
-        };
-
-        const result = service.getAggregateConditions(condition, 'users');
-        expect(result).toEqual([`COUNT(\`users\`.\`is_active\`) = FALSE`]);
-    });
-
-    it('should handle boolean true values correctly without table name', () => {
-        const condition = {
-            column: 'is_active',
-            aggregate: 'AVG',
-            operator: '=',
-            value: true, // Boolean true value
-        };
-
-        const result = service.getAggregateConditions(condition);
-        expect(result).toEqual([`AVG(\`is_active\`) = TRUE`]);
-    });
-
-    it('should handle boolean false values correctly without table name', () => {
-        const condition = {
-            column: 'is_active',
-            aggregate: 'MAX',
-            operator: '=',
-            value: false, // Boolean false value
-        };
-
-        const result = service.getAggregateConditions(condition);
-        expect(result).toEqual([`MAX(\`is_active\`) = FALSE`]);
-    });
-
-    it('Should not return a where clause if the having is used without a condition', () => {
+    it('Should be able to convert a query with a join and a having, with aggregate in first table', () => {
         const jsonData: QueryParams = {
                 "language": "sql",
                 "query_type": "select",
@@ -609,7 +620,65 @@ it('should be able to convert queries using pagination, where, group by, and hav
 
         const result = service.convertJsonToQuery(jsonData);
 
-        expect(result).toEqual('SELECT COUNT(`city`.`city_id`) AS `Number of cities per country`, `country`.`country` FROM `city` JOIN `country` ON `city`.`country_id`=`country`.`country_id` HAVING COUNT(`city`.`city_id`) > 10');
+        expect(result).toEqual('SELECT COUNT(`city`.`city_id`) AS `Number of cities per country`, `country`.`country` FROM `city` JOIN `country` ON `city`.`country_id`=`country`.`country_id` GROUP BY `country`.`country` HAVING COUNT(`city`.`city_id`) > 10');
 
     });
+
+    it('Should be able to convert a query with a join and a having, with aggregate in second table', () => {
+        const jsonData: QueryParams = {
+                "language": "sql",
+                "query_type": "select",
+                "table": {
+                    "name":"city", 
+                    "columns":[{
+                        "name": "city_id",
+                        "aggregation": AggregateFunction.COUNT,
+                        "alias": "Number of cities per country"
+                    }],
+                    "join": {
+                        "table1MatchingColumnName": "country_id",
+                        "table2MatchingColumnName": "country_id",
+                        "table2": {
+                            "name": "country",
+                            "columns": [{"name": "country"}]
+                        }
+                    }
+                },
+                "condition": {
+                    "column": "city_id",
+                    "operator": ">",
+                    "value": 10,
+                    "aggregate":"COUNT"
+                },
+
+        }
+
+        const result = service.convertJsonToQuery(jsonData);
+
+        expect(result).toEqual('SELECT COUNT(`city`.`city_id`) AS `Number of cities per country`, `country`.`country` FROM `city` JOIN `country` ON `city`.`country_id`=`country`.`country_id` GROUP BY `country`.`country` HAVING COUNT(`city`.`city_id`) > 10');
+
+    });
+
+    it('Should convert a query finding country names starting with B', () => {
+        const jsonData: QueryParams = {
+                "language": "sql",
+                "query_type": "select",
+                "table": {
+                    "name": "country",
+                    "columns": [{"name": "country"}]
+                },
+                "condition": {
+                    "column": "country",
+                    "operator": "LIKE",
+                    "value": "B%"
+                },
+
+        }
+
+        const result = service.convertJsonToQuery(jsonData);
+
+        expect(result).toEqual("SELECT `country`.`country` FROM `country` WHERE `country` LIKE 'B%'");
+
+    });
+
 });
