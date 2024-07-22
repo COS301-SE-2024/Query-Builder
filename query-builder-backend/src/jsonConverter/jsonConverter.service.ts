@@ -321,8 +321,19 @@ export class JsonConverterService {
         if (!jsonData.condition) {
             return '';
         }
-    
-        const havingConditions = this.getAggregateConditions(jsonData.condition, jsonData.table.name);
+
+        let tableRef = jsonData.table;
+
+        let havingConditions = [];
+
+        havingConditions.push(this.getAggregateConditions(jsonData.condition, tableRef.name));
+
+        while(tableRef.join){
+            tableRef = tableRef.join.table2;
+
+            havingConditions.push(this.getAggregateConditions(jsonData.condition, tableRef.name));
+
+        }
     
         return havingConditions.length > 0 ? ` HAVING ${havingConditions.join(' AND ')}` : '';
     }
