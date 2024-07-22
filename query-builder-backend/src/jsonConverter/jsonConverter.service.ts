@@ -205,6 +205,14 @@ export class JsonConverterService {
                 return '';
             }
 
+            if (this.isPrimitiveCondition(condition)) 
+                {
+                    const primCondition = condition as primitiveCondition;
+                    if(primCondition.aggregate != null)
+                    {
+                        return '';
+                    }}
+
         return " WHERE " + this.conditionWhereSQLHelp(condition);
     }
 
