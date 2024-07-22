@@ -3,7 +3,7 @@
 	"deno.lint": true,
 	"deno.unstable": true,
 	"[typescript]": {
-		"editor.defaultFormatter": "ms-vsliveshare.vsliveshare"
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
 	"deno.enable": true
 }
