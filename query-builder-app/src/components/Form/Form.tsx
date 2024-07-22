@@ -5,38 +5,7 @@ import { useParams } from 'next/navigation'
 import {Button, Spacer, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Card, CardHeader, CardBody, CardFooter, useDisclosure, ModalContent, Modal, ModalHeader} from "@nextui-org/react";
 import TableResponse from "../TableResponse/TableResponse";
 import { createClient } from "./../../utils/supabase/client";
-
-interface DatabaseCredentials {
-    host: string,
-    user: string,
-    password: string
-  }
-  
-  interface SortParams {
-    column: string,
-    direction?: "ascending"|"descending"
-  }
-  
-  interface PageParams {
-    pageNumber: number,
-    rowsPerPage: number
-  }
-  
-  interface QueryParams {
-    language: string,
-    query_type: string,
-    table: string,
-    columns: string[],
-    condition?: string,
-    sortParams?: SortParams,
-    pageParams?: PageParams
-  }
-  
-  interface Query {
-  credentials: DatabaseCredentials,
-  databaseName: string,
-  queryParams: QueryParams
-  }
+import { Query, column } from "@/interfaces/intermediateJSON";
 
   interface Database {
     key: string,
@@ -132,6 +101,34 @@ export default function Form(){
 
     }
 
+    //async function to fetch the joinable tables
+    async function fetchJoinableTables(database: string, table: string) {
+
+        let response = await fetch("http://localhost:55555/api/metadata/foreign-keys", {
+            method: "PUT",
+            headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + await getToken()
+            },
+            body: JSON.stringify({
+                credentials: {
+                    host: "127.0.0.1",
+                    user: "root",
+                    password: "testPassword"
+                },
+                schema: database,
+                table: table
+            })
+        });
+
+        let json = await response.json();
+
+        //set the joinable tables hook
+        setJoinableTables(json);
+
+    }
+
     //React hook for results modal
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
 
@@ -140,6 +137,9 @@ export default function Form(){
 
     //React hook for all the tables in the database
     const [tables, setTables] = useState<Table[]>([{table: "Select table", columns: ["Select column"]}]);
+
+    //React hook for all the joinable tables in the database
+    const [joinableTables, setJoinableTables] = useState();
 
     const [selectedDatabase, setSelectedDatabase] = useState(new Set(["Select database"]));
     const selectedDatabaseValue = React.useMemo(
@@ -175,6 +175,20 @@ export default function Form(){
 
     },[selectedDatabaseValue])
 
+    //React hook to fetch joinable tables upon selection of a table
+    React.useEffect(() => {
+
+        fetchJoinableTables(selectedDatabaseValue, selectedTableValue);
+
+    },[selectedTableValue])
+
+    //React hook to test update of joinable tables
+    React.useEffect(() => {
+
+        console.log(joinableTables);
+
+    },[joinableTables])
+
     const handleDatabaseSelection = (keys:any) => {
         if (keys.size === 0) {
             setSelectedDatabase(new Set(["Select database"])); // Reset to default
@@ -206,17 +220,26 @@ export default function Form(){
         }
     };
 
-    function createQuery() : Query{
+    function createQuery() : Query {
 
-        let columns = Array.from(selectColumns);
+        let columnStringArray = Array.from(selectColumns);
 
         //if columns is empty, query all the columns of the selected table
-        if(columns.length == 0){
+        if(columnStringArray.length == 0){
             for(let table of tables){
                 if(table.table == selectedTableValue){
-                    columns = table.columns;
+                    columnStringArray = table.columns;
                 }
             }
+        }
+
+        //create a columns array
+        const columnArray: column[] = [];
+
+        for(let columnString of columnStringArray){
+            columnArray.push({
+                name: columnString
+            });
         }
 
         const query: Query = {
@@ -229,8 +252,10 @@ export default function Form(){
             queryParams: {
                 language: "sql",
                 query_type: "select",
-                table: selectedTableValue,
-                columns: columns
+                table: {
+                    name: selectedTableValue,
+                    columns: columnArray
+                }
             }
         }
 
