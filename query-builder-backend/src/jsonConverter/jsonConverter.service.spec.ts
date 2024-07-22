@@ -440,7 +440,7 @@ it('should be able to convert queries using pagination, where, group by, and hav
         }
     };
 
-    const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name`, AVG(`users`.`age`) FROM `users` WHERE `age` > 18 GROUP BY `users`.`id`, `users`.`first_name`, `users`.`last_name` HAVING AVG(`users`.`age`) > 18 LIMIT 10 OFFSET 20';
+    const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name`, AVG(`users`.`age`) FROM `users` GROUP BY `users`.`id`, `users`.`first_name`, `users`.`last_name` HAVING AVG(`users`.`age`) > 18 LIMIT 10 OFFSET 20';
     const result = service.convertJsonToQuery(queryParams);
 
     expect(result).toEqual(expectedQuery);
@@ -576,5 +576,40 @@ it('should be able to convert queries using pagination, where, group by, and hav
 
         const result = service.getAggregateConditions(condition);
         expect(result).toEqual([`MAX(\`is_active\`) = FALSE`]);
+    });
+
+    it('Should not return a where clause if the having is used without a condition', () => {
+        const jsonData: QueryParams = {
+                "language": "sql",
+                "query_type": "select",
+                "table": {
+                    "name":"city", 
+                    "columns":[{
+                        "name": "city_id",
+                        "aggregation": AggregateFunction.COUNT,
+                        "alias": "Number of cities per country"
+                    }],
+                    "join": {
+                        "table1MatchingColumnName": "country_id",
+                        "table2MatchingColumnName": "country_id",
+                        "table2": {
+                            "name": "country",
+                            "columns": [{"name": "country"}]
+                        }
+                    }
+                },
+                "condition": {
+                    "column": "city_id",
+                    "operator": ">",
+                    "value": 10,
+                    "aggregate":"COUNT"
+                },
+
+        }
+
+        const result = service.convertJsonToQuery(jsonData);
+
+        expect(result).toEqual('SELECT COUNT(`city`.`city_id`) AS `Number of cities per country`, `country`.`country` FROM `city` JOIN `country` ON `city`.`country_id`=`country`.`country_id` HAVING COUNT(`city`.`city_id`) > 10');
+
     });
 });
