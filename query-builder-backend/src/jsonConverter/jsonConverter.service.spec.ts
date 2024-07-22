@@ -184,11 +184,12 @@ it('should be able to convert compound conditions', () => {
         const condition = {
             column: 'status',
             aggregate: 'COUNT',
+            tableName: 'users',
             operator: '=',
             value: 'active', // String value
         };
 
-        const result = service.getAggregateConditions(condition, 'users');
+        const result = service.getAggregateConditions(condition);
         expect(result).toEqual([`COUNT(\`users\`.\`status\`) = 'active'`]);
     });
 
@@ -208,11 +209,12 @@ it('should be able to convert compound conditions', () => {
         const condition = {
             column: 'is_active',
             aggregate: 'SUM',
+            tableName: 'users',
             operator: '=',
             value: true, // Boolean true value
         };
 
-        const result = service.getAggregateConditions(condition, 'users');
+        const result = service.getAggregateConditions(condition);
         expect(result).toEqual([`SUM(\`users\`.\`is_active\`) = TRUE`]);
     });
 
@@ -220,11 +222,12 @@ it('should be able to convert compound conditions', () => {
         const condition = {
             column: 'is_active',
             aggregate: 'COUNT',
+            tableName: 'users',
             operator: '=',
             value: false, // Boolean false value
         };
 
-        const result = service.getAggregateConditions(condition, 'users');
+        const result = service.getAggregateConditions(condition);
         expect(result).toEqual([`COUNT(\`users\`.\`is_active\`) = FALSE`]);
     });
 
@@ -543,6 +546,7 @@ it('should be able to convert queries using pagination, where, group by, and hav
         },
         condition: {
             column: 'age',
+            tableName: 'users',
             operator: ComparisonOperator.GREATER_THAN,
             value: 18,
             aggregate: AggregateFunction.AVG // Adding aggregate function in the condition
@@ -611,6 +615,7 @@ it('should be able to convert queries using pagination, where, group by, and hav
                 },
                 "condition": {
                     "column": "city_id",
+                    "tableName": "city",
                     "operator": ">",
                     "value": 10,
                     "aggregate":"COUNT"
@@ -629,23 +634,24 @@ it('should be able to convert queries using pagination, where, group by, and hav
                 "language": "sql",
                 "query_type": "select",
                 "table": {
-                    "name":"city", 
-                    "columns":[{
-                        "name": "city_id",
-                        "aggregation": AggregateFunction.COUNT,
-                        "alias": "Number of cities per country"
-                    }],
+                    "name":"country", 
+                    "columns":[{"name": "country"}],
                     "join": {
                         "table1MatchingColumnName": "country_id",
                         "table2MatchingColumnName": "country_id",
                         "table2": {
-                            "name": "country",
-                            "columns": [{"name": "country"}]
+                            "name": "city",
+                            "columns": [{
+                                "name": "city_id",
+                                "aggregation": AggregateFunction.COUNT,
+                                "alias": "Number of cities per country"
+                            }]
                         }
                     }
                 },
                 "condition": {
                     "column": "city_id",
+                    "tableName": "city",
                     "operator": ">",
                     "value": 10,
                     "aggregate":"COUNT"
@@ -655,7 +661,7 @@ it('should be able to convert queries using pagination, where, group by, and hav
 
         const result = service.convertJsonToQuery(jsonData);
 
-        expect(result).toEqual('SELECT COUNT(`city`.`city_id`) AS `Number of cities per country`, `country`.`country` FROM `city` JOIN `country` ON `city`.`country_id`=`country`.`country_id` GROUP BY `country`.`country` HAVING COUNT(`city`.`city_id`) > 10');
+        expect(result).toEqual('SELECT `country`.`country`, COUNT(`city`.`city_id`) AS `Number of cities per country` FROM `country` JOIN `city` ON `country`.`country_id`=`city`.`country_id` GROUP BY `country`.`country` HAVING COUNT(`city`.`city_id`) > 10');
 
     });
 

@@ -337,40 +337,26 @@ export class JsonConverterService {
             return '';
         }
 
-        let tableRef = jsonData.table;
-
-        let havingConditions = [];
-
-        havingConditions.push(this.getAggregateConditions(jsonData.condition, tableRef.name));
-
-        while(tableRef.join){
-            tableRef = tableRef.join.table2;
-
-            havingConditions.push(this.getAggregateConditions(jsonData.condition, tableRef.name));
-
-        }
+        const havingConditions = this.getAggregateConditions(jsonData.condition);
     
         return havingConditions.length > 0 ? ` HAVING ${havingConditions.join(' AND ')}` : '';
     }
     
-    getAggregateConditions(condition: condition, tableName?: string): string[] {
+    getAggregateConditions(condition: condition): string[] {
         let aggregateConditions: string[] = [];
-    
-        // Ensure tableName is a string
-        tableName = tableName || '';
     
         if (this.isCompoundCondition(condition)) {
             const compCondition = condition as compoundCondition;
     
             for (let i = 0; i < compCondition.conditions.length; i++) {
-                aggregateConditions.push(...this.getAggregateConditions(compCondition.conditions[i], tableName));
+                aggregateConditions.push(...this.getAggregateConditions(compCondition.conditions[i]));
             }
         } else if (this.isPrimitiveCondition(condition) && condition.aggregate) {
             const primCondition = condition as primitiveCondition;
             let sql = '';
     
-            if (tableName) {
-                sql = `${primCondition.aggregate}(\`${tableName}\`.\`${primCondition.column}\`) ${primCondition.operator} `;
+            if (condition.tableName) {
+                sql = `${primCondition.aggregate}(\`${condition.tableName}\`.\`${primCondition.column}\`) ${primCondition.operator} `;
             } else {
                 sql = `${primCondition.aggregate}(\`${primCondition.column}\`) ${primCondition.operator} `;
             }
