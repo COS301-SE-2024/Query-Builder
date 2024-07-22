@@ -23,6 +23,7 @@ describe('JsonConverterController', () => {
     const queryParams = {
       language: 'SQL',
       query_type: 'SELECT',
+      databaseName: 'sakila',
       table: {name: 'users', columns: [{name: 'id'}]},
     };
 

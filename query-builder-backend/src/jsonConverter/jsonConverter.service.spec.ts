@@ -261,6 +261,7 @@ it('should be able to convert compound conditions', () => {
         const jsonData: QueryParams = {
             language: "SQL",
             query_type: "SELECT",
+            databaseName: "sakila",
             table: {
                 name: "test_table",
                 columns: [
@@ -281,6 +282,7 @@ it('should be able to convert compound conditions', () => {
         const jsonData: QueryParams = {
             language: "SQL",
             query_type: "SELECT",
+            databaseName: "sakila",
             table: {
                 name: "test_table",
                 columns: [
@@ -299,6 +301,7 @@ it('should be able to convert compound conditions', () => {
         const jsonData: QueryParams = {
             language: "SQL",
             query_type: "SELECT",
+            databaseName: "sakila",
             table: {
                 name: "test_table",
                 columns: [
@@ -321,6 +324,7 @@ it('should be able to convert compound conditions', () => {
     const queryParams: QueryParams = {
         language: 'SQL',
         query_type: 'SELECT',
+        databaseName: "sakila",
         table: {name: 'users', columns: []},
       };
   
@@ -338,6 +342,7 @@ it('should be able to convert compound conditions', () => {
     const queryParams: QueryParams = {
         language: 'SQL',
         query_type: 'SELECT',
+        databaseName: "sakila",
         table: {name: 'users', columns: [{name: 'id'}, {name: "first_name"}, {name: "last_name"}]},
       };
   
@@ -354,6 +359,7 @@ it('should be able to convert compound conditions', () => {
     const queryParams: QueryParams = {
         language: 'SQL',
         query_type: 'SELECT',
+        databaseName: "sakila",
         table: {name: 'users', columns: [{name: 'id', aggregation: AggregateFunction.COUNT, alias: "Number"}]},
       };
   
@@ -370,6 +376,7 @@ it('should be able to convert compound conditions', () => {
     const queryParams: QueryParams = {
         language: 'SQL',
         query_type: 'SELECT',
+        databaseName: "sakila",
         table: {
             name: 'users', 
             columns: [{name: 'id'}],
@@ -397,6 +404,7 @@ it('should be able to convert compound conditions', () => {
     const queryParams: QueryParams = {
         language: 'SQL',
         query_type: 'SELECT',
+        databaseName: "sakila",
         table: {name: 'users', columns: [{name: 'id'}, {name: "first_name"}, {name: "last_name"}]},
         sortParams: {
             column: 'first_name',
@@ -417,6 +425,7 @@ it('should be able to convert compound conditions', () => {
     const queryParams: QueryParams = {
         language: 'SQL',
         query_type: 'SELECT',
+        databaseName: "sakila",
         table: {name: 'users', columns: [{name: 'id'}, {name: "first_name"}, {name: "last_name"}]},
         sortParams: {
             column: 'first_name'
@@ -436,6 +445,7 @@ it('should be able to convert compound conditions', () => {
     const queryParams: QueryParams = {
         language: 'SQL',
         query_type: 'SELECT',
+        databaseName: "sakila",
         table: {name: 'users', columns: [{name: 'id'}, {name: "first_name"}, {name: "last_name"}]},
         pageParams: {
             pageNumber: 3,
@@ -506,6 +516,7 @@ it('should be able to convert compound conditions', () => {
     const queryParams: QueryParams = {
         language: 'SQL',
         query_type: 'SELECT',
+        databaseName: "sakila",
         table: {
             name: 'users',
             columns: [
@@ -535,6 +546,7 @@ it('should be able to convert queries using pagination, where, group by, and hav
     const queryParams: QueryParams = {
         language: 'SQL',
         query_type: 'SELECT',
+        databaseName: "sakila",
         table: {
             name: 'users',
             columns: [
@@ -567,6 +579,7 @@ it('should be able to convert queries using pagination, where, group by, and hav
         const queryParams: QueryParams = {
             language: 'SQL',
             query_type: 'SELECT',
+            databaseName: "sakila",
             table: {
                 name: 'users',
                 columns: [
@@ -597,6 +610,7 @@ it('should be able to convert queries using pagination, where, group by, and hav
         const jsonData: QueryParams = {
                 "language": "sql",
                 "query_type": "select",
+                "databaseName": "sakila",
                 "table": {
                     "name":"city", 
                     "columns":[{
@@ -633,6 +647,7 @@ it('should be able to convert queries using pagination, where, group by, and hav
         const jsonData: QueryParams = {
                 "language": "sql",
                 "query_type": "select",
+                "databaseName": "sakila",
                 "table": {
                     "name":"country", 
                     "columns":[{"name": "country"}],
@@ -669,6 +684,7 @@ it('should be able to convert queries using pagination, where, group by, and hav
         const jsonData: QueryParams = {
             "language": "sql",
             "query_type": "select",
+            "databaseName": "sakila",
             "table": {
                 "name":"city", 
                 "columns":[{
@@ -698,6 +714,7 @@ it('should be able to convert queries using pagination, where, group by, and hav
         const jsonData: QueryParams = {
                 "language": "sql",
                 "query_type": "select",
+                "databaseName": "sakila",
                 "table": {
                     "name": "country",
                     "columns": [{"name": "country"}]

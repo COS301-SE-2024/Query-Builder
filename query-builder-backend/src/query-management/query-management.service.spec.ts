@@ -1,12 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { QueryManagementService } from './query-management.service';
+import { Supabase } from '../supabase';
+import { ConfigService } from '@nestjs/config';
 
 describe('QueryManagementService', () => {
   let service: QueryManagementService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [QueryManagementService],
+      providers: [QueryManagementService, Supabase, ConfigService],
     }).compile();
 
     service = module.get<QueryManagementService>(QueryManagementService);
