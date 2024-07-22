@@ -280,6 +280,9 @@ export class JsonConverterService {
         let groupByColumns = '';
 
         // Iterate over all tables
+        if(this.isThereAggregates(jsonData) == false){
+            return '';
+        }
 
         //get a reference to the first table
         let tableRef = jsonData.table;
