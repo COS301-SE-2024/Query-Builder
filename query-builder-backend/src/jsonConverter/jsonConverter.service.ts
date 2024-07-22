@@ -271,6 +271,11 @@ export class JsonConverterService {
 
     groupBySQL(jsonData: QueryParams) {
         let groupByColumns = '';
+
+        if(!this.isThereAggregates)
+        {
+            return '';
+        }
         
         // Iterate through the columns and include only those without aggregation functions
         for (const column of jsonData.table.columns) {
@@ -287,6 +292,30 @@ export class JsonConverterService {
         } else {
             return '';
         }
+    }
+
+    isThereAggregates(jsonData: QueryParams): boolean {
+
+        let selectClause = '';
+        let tableRef = jsonData.table;
+
+        for (const column of tableRef.columns) {
+            if (column.aggregation) {
+                return true;
+            }
+        }
+        selectClause += this.generateListOfColumns(tableRef);
+        while(tableRef.join){
+            tableRef = tableRef.join.table2;
+
+            for (const column of tableRef.columns) {
+                if (column.aggregation) {
+                    return true;
+                }
+            }
+        }
+        return false;
+
     }
     
     havingSQL(jsonData: QueryParams) {
