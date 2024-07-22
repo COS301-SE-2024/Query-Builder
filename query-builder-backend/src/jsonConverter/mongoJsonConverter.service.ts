@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { QueryParams, table, column } from '../interfaces/intermediateJSON';
+import { condition, compoundCondition, primitiveCondition, ComparisonOperator, QueryParams, table, column } from '../interfaces/intermediateJSON';
 
 @Injectable()
 export class mongoJsonConverterService {
@@ -38,7 +38,7 @@ export class mongoJsonConverterService {
 
         return {
             find: this.generateFindString(queryParams),
-            filter: this.generateFilterObject(queryParams),
+            filter: this.generateFilterObject(queryParams.condition),
             sort: this.generateSortObject(queryParams),
             projection: this.generateProjectionObject(queryParams),
             skip: this.generateSkipInt(queryParams),
@@ -54,8 +54,29 @@ export class mongoJsonConverterService {
     }
 
     //function that generates the 'filter' object of the JSON object
-    generateFilterObject(queryParams: QueryParams){
-        //TODO
+    generateFilterObject(condition: condition){
+        if (!condition) 
+            {
+                return {};
+            }
+    
+        if (this.isPrimitiveCondition(condition)) 
+            {
+                const primCondition = condition as primitiveCondition;
+                return {[primCondition.column]: {[this.sqlToMongoOperator(primCondition.operator)]: primCondition.value}};
+            } 
+        else if (this.isCompoundCondition(condition)) 
+            {
+                const compCondition = condition as compoundCondition;
+                let conditions: object[] = [];
+                for (let i = 0; i < compCondition.conditions.length; i++) 
+                    {
+                        const cond = this.generateFilterObject(compCondition.conditions[i]);
+                        conditions.push(cond);
+                    }
+                return {[compCondition.operator]: conditions};
+            }
+        return {};
     }
 
     //function that generates the 'sort' object of the JSON object
@@ -104,6 +125,52 @@ export class mongoJsonConverterService {
     //function that generates the 'limit' int of the JSON object
     generateLimitInt(queryParams: QueryParams){
         return queryParams.pageParams.rowsPerPage;
+    }
+
+    sqlToMongoOperator(sqlOperator: ComparisonOperator): string {
+        switch (sqlOperator) {
+            case '=':
+                return "$eq";
+            case '<':
+                return "$lt";
+            case '>':
+                return "$gt";
+            case '<=':
+                return "$lte";
+            case '>=':
+                return "$gte";
+            case '<>':
+                return "$ne";
+            case 'LIKE':
+                return "$regex"; // MongoDB uses regex for pattern matching
+            case ComparisonOperator.EQUAL:
+                return "$eq";
+            case ComparisonOperator.LESS_THAN:
+                return "$lt";
+            case ComparisonOperator.GREATER_THAN:
+                return "$gt";
+            case ComparisonOperator.LESS_THAN_EQUAL:
+                return "$lte";
+            case ComparisonOperator.GREATER_THAN_EQUAL:
+                return "$gte";
+            case ComparisonOperator.NOT_EQUAL:
+                return "$ne";
+            case ComparisonOperator.LIKE:
+                return "$regex"; // MongoDB uses regex for pattern matching
+            default:
+                throw new Error(`Unsupported operator: ${sqlOperator}`);
+        }
+    }
+
+
+    private isCompoundCondition(condition: any): condition is compoundCondition 
+    {
+        return (condition as compoundCondition).conditions !== undefined;
+    }
+
+    private isPrimitiveCondition(condition: any): condition is primitiveCondition 
+    {
+        return (condition as primitiveCondition).column !== undefined;
     }
 
 }

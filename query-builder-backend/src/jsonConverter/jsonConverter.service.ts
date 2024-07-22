@@ -1,9 +1,45 @@
 import { Injectable } from '@nestjs/common';
-
-import { QueryParams, table, column } from '../interfaces/intermediateJSON';
+import { condition, compoundCondition, primitiveCondition, QueryParams, table, column } from '../interfaces/intermediateJSON';
 
 @Injectable()
 export class JsonConverterService {
+
+    convertJsonToQuery(jsonData: QueryParams): string {
+        let query = '';
+        jsonData.language = jsonData.language.toLowerCase();
+        jsonData.query_type = jsonData.query_type.toLowerCase();
+    
+        if (jsonData.language === 'sql') {
+            if (jsonData.query_type === 'select') {
+                if (!jsonData.table || !jsonData.table.name || !jsonData.table.columns) {
+                    throw new Error('Invalid query');
+                }
+                
+                const select = this.generateSelectClause(jsonData);
+
+                const from = this.generateFromClause(jsonData);
+
+                const where   = this.conditionWhereSQL(jsonData.condition);
+
+                const groupBy = this.groupBySQL(jsonData);
+
+                const having  = this.havingSQL(jsonData);
+
+                const orderBy = this.generateOrderByClause(jsonData);
+
+                const limit = this.generateLimitClause(jsonData);
+
+                query = `SELECT ${select} FROM ${from}${where}${groupBy}${having}${orderBy}${limit}`;
+                
+            } else {
+                throw new Error('Unsupported query type');
+            }
+        } else {
+            throw new Error('Invalid language');
+        }
+    
+        return query;
+    }
 
     //helper function to generate a string of a column
     generateColumnString(column: column, tableName: string) : string {
@@ -33,9 +69,11 @@ export class JsonConverterService {
 
         let tableColumns = '';
 
+        //the below was changed to throw an error - as not specifying any columns at all causes issues when figuring out which columns to group by when working with aggregate conditions
         //if the columns array is empty return all the columns for the table
         if(table.columns.length == 0){
-            tableColumns = '`' + table.name + '`.' + '*';
+            //tableColumns = '`' + table.name + '`.' + '*';
+            throw new Error('No columns specified for table \'' + table.name + '\'');
         }
         //otherwise concatenate the column strings together
         else{
@@ -148,42 +186,202 @@ export class JsonConverterService {
 
     }
 
-    convertJsonToQuery(jsonData: QueryParams): string {
-        let query = '';
-        jsonData.language = jsonData.language.toLowerCase();
-        jsonData.query_type = jsonData.query_type.toLowerCase();
-    
-        if (jsonData.language === 'sql') {
-            if (jsonData.query_type === 'select') {
-                if (!jsonData.table || !jsonData.table.name || !jsonData.table.columns) {
-                    throw new Error('Invalid query');
-                }
-                
-                const select = this.generateSelectClause(jsonData);
-
-                const from = this.generateFromClause(jsonData);
-
-                let where = '';
-
-                if (jsonData.condition) {
-                    where = ` WHERE ${jsonData.condition}`;
-                }
-
-                const orderBy = this.generateOrderByClause(jsonData);
-
-                const limit = this.generateLimitClause(jsonData);
-
-                query = `SELECT ${select} FROM ${from}${where}${orderBy}${limit}`;
-                
-            } else {
-                query = 'Unsupported query type';
-                return query;
+    conditionWhereSQL(condition:condition)
+    {
+        if (!condition) 
+            {
+                return '';
             }
-        } else {
-            query = 'Invalid language';
-            return query;
+
+            if (this.isPrimitiveCondition(condition)) 
+                {
+                    const primCondition = condition as primitiveCondition;
+                    if(primCondition.aggregate != null)
+                    {
+                        return '';
+                    }}
+
+        return " WHERE " + this.conditionWhereSQLHelp(condition);
+    }
+
+
+    conditionWhereSQLHelp(condition: condition)
+    {
+        if (!condition) 
+        {
+            return '';
         }
     
-        return query;
+        if (this.isCompoundCondition(condition)) 
+        {
+            const compCondition = condition as compoundCondition;
+            let conditionsSQL = '';
+    
+            for (let i = 0; i < compCondition.conditions.length; i++) {
+                const condSQL = this.conditionWhereSQLHelp(compCondition.conditions[i]);
+                conditionsSQL += condSQL;
+                if (i < compCondition.conditions.length - 1) {
+                    conditionsSQL += ` ${compCondition.operator} `;
+                }
+            }
+    
+            return `(${conditionsSQL})`;
+        } 
+        else if (this.isPrimitiveCondition(condition)) 
+        {
+            const primCondition = condition as primitiveCondition;
+            let sql = `\`${primCondition.column}\` ${primCondition.operator} `;
+    
+            if (typeof primCondition.value === 'string') 
+            {
+                sql += `'${primCondition.value}'`;
+            } 
+            else if (typeof primCondition.value === 'boolean') 
+            {
+                sql += primCondition.value ? 'TRUE' : 'FALSE';
+            } 
+            else if (primCondition.value == null){
+                sql += "NULL";
+            }
+            else // number 
+            {
+                sql += primCondition.value;
+            }// name = 'value'
+    
+            return sql;
+        }
     }
+
+    private isCompoundCondition(condition: any): condition is compoundCondition {
+        return (condition as compoundCondition).conditions !== undefined;
+    }
+
+    private isPrimitiveCondition(condition: any): condition is primitiveCondition {
+        return (condition as primitiveCondition).column !== undefined;
+    }
+
+    generateNonAggregateColumnsString(table: table): string {
+
+        let nonAggregateColumnsString = '';
+
+        // Iterate through the columns of the table and include only those without aggregation functions
+        for (const column of table.columns) {
+            if (column.aggregation == null) {
+                // Ensure column names are properly formatted for SQL
+                nonAggregateColumnsString += `\`${table.name}\`.\`${column.name}\`, `;
+            }
+        }
+
+        return nonAggregateColumnsString;
+
+    }
+
+    groupBySQL(jsonData: QueryParams) {
+        let groupByColumns = '';
+
+        // Iterate over all tables
+        if(this.isThereAggregates(jsonData) == false){
+            return '';
+        }
+
+        //get a reference to the first table
+        let tableRef = jsonData.table;
+
+        //concatenate the first table's columns
+        groupByColumns += this.generateNonAggregateColumnsString(tableRef);
+
+        //traverse the table linked list and add columns for each table until tableRef.join is null
+        while(tableRef.join){
+
+            //move the table reference one on
+            tableRef = tableRef.join.table2;
+
+            groupByColumns += this.generateNonAggregateColumnsString(tableRef);
+
+        }
+    
+        // Remove the trailing comma and space
+        if (groupByColumns) {
+            groupByColumns = groupByColumns.slice(0, -2); // Remove last comma and space
+            return ` GROUP BY ${groupByColumns}`;
+        } else {
+            return '';
+        }
+    }
+
+    isThereAggregates(jsonData: QueryParams): boolean {
+
+        let tableRef = jsonData.table;
+
+        for (const column of tableRef.columns) {
+            if (column.aggregation) {
+                return true;
+            }
+        }
+        while(tableRef.join){
+            tableRef = tableRef.join.table2;
+
+            for (const column of tableRef.columns) {
+                if(column.aggregation) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+
+    }
+    
+    havingSQL(jsonData: QueryParams) {
+        if (!jsonData.condition) {
+            return '';
+        }
+
+        const havingConditions = this.getAggregateConditions(jsonData.condition);
+    
+        return havingConditions.length > 0 ? ` HAVING ${havingConditions.join(' AND ')}` : '';
+    }
+    
+    getAggregateConditions(condition: condition): string[] {
+        let aggregateConditions: string[] = [];
+    
+        if (this.isCompoundCondition(condition)) {
+            const compCondition = condition as compoundCondition;
+    
+            for (let i = 0; i < compCondition.conditions.length; i++) {
+                aggregateConditions.push(...this.getAggregateConditions(compCondition.conditions[i]));
+            }
+        } else if (this.isPrimitiveCondition(condition) && condition.aggregate) {
+            const primCondition = condition as primitiveCondition;
+            let sql = '';
+    
+            if (condition.tableName) {
+                sql = `${primCondition.aggregate}(\`${condition.tableName}\`.\`${primCondition.column}\`) ${primCondition.operator} `;
+            } else {
+                sql = `${primCondition.aggregate}(\`${primCondition.column}\`) ${primCondition.operator} `;
+            }
+    
+            if (typeof primCondition.value === 'string') 
+                {
+                    sql += `'${primCondition.value}'`;
+                } 
+            else if (typeof primCondition.value === 'boolean') 
+                {
+                    sql += primCondition.value ? 'TRUE' : 'FALSE';
+                } 
+            else if (primCondition.value == null){
+                sql += "NULL";
+            }
+            else 
+                { // number
+                    sql += primCondition.value;
+                }
+    
+            aggregateConditions.push(sql);
+        }
+    
+        return aggregateConditions;
+    }
+    
+    
 }
