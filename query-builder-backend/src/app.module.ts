@@ -31,9 +31,7 @@ import { SessionStoreModule } from './session-store/session-store.module';
   ],
   controllers: [AppController],
   providers: [AppService]})
-export class AppModule {
-  
-}
+export class AppModule {}
 
 /*
 {
