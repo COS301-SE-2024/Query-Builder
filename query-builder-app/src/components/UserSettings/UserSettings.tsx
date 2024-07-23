@@ -116,7 +116,7 @@ export default function UserSettings(){
         console.log(response)
     };
 
-    const updateEmailCall = async() => {
+    const updateEmailFunction = async() => {
         let email;
         
         if (updateEmail == initialEmail){
@@ -133,7 +133,7 @@ export default function UserSettings(){
 
         console.log(updatedDetails);
 
-        let response = await fetch("http://localhost:55555/api/user-management/update-user-phone", {
+        let response = await fetch("http://localhost:55555/api/user-management/update-user-email", {
             method: "PATCH",
             headers: {
               'Accept': 'application/json',
@@ -162,7 +162,7 @@ export default function UserSettings(){
 
         console.log(updatedDetails);
 
-        let response = await fetch("http://localhost:55555/api/user-management/update-user-email", {
+        let response = await fetch("http://localhost:55555/api/user-management/update-user-phone", {
             method: "PATCH",
             headers: {
               'Accept': 'application/json',
@@ -172,6 +172,10 @@ export default function UserSettings(){
             body: JSON.stringify(updatedDetails)
         })
         console.log(response)
+    };
+
+    const updateProfilePicture = async() => {
+
     };
 
     const validateEmail = (value: any) =>
@@ -308,7 +312,7 @@ export default function UserSettings(){
                     </div>
                         <Button 
                             color="primary"  
-                            onClick={() => updateEmailCall()}
+                            onClick={() => updateEmailFunction()}
                         >
                             Update
                         </Button>
@@ -320,7 +324,6 @@ export default function UserSettings(){
                 <CardBody>
                     <div className="infield">
                     <ImageUploading
-                        multiple
                         value={images}
                         onChange={onChange}
                         maxNumber={maxNumber}
@@ -337,31 +340,35 @@ export default function UserSettings(){
                         }) => (
                         // write your building UI
                         <div className="upload__image-wrapper">
-                            <button
-                            style={isDragging ? { color: 'red' } : undefined}
-                            onClick={onImageUpload}
-                            {...dragProps}
-                            >
-                            Click or Drop here
-                            </button>
-                            &nbsp;
-                            <button onClick={onImageRemoveAll}>Remove all images</button>
-                            {imageList.map((image, index) => (
-                            <div key={index} className="image-item">
-                                <img src={image['data_url']} alt="" width="100" />
-                                <div className="image-item__btn-wrapper">
-                                <button onClick={() => onImageUpdate(index)}>Update</button>
-                                <button onClick={() => onImageRemove(index)}>Remove</button>
-                                </div>
-                            </div>
-                            ))}
+                            {(imageList.length < 1)?
+                            (<>
+                                <button
+                                style={isDragging ? { color: 'red' } : undefined}
+                                onClick={onImageUpload}
+                                {...dragProps}
+                                >
+                                Add a profile picture
+                                </button> 
+                            </>) : 
+                            (
+                                <>
+                                    {imageList.map((image, index) => (
+                                    <div key={index} className="image-item">
+                                        <img src={image['data_url']} alt="" width="100" />
+                                        <div className="image-item__btn-wrapper">
+                                        <button onClick={() => onImageUpdate(index)}>Update</button>
+                                        <button onClick={() => onImageRemove(index)}>Remove</button>
+                                        </div>
+                                    </div>
+                                    ))}
+                                </>)}
                         </div>
                         )}
                     </ImageUploading>
                     </div>
                         <Button 
                             color="primary"  
-                            onClick={() => updateEmailCall()}
+                            onClick={() => updateEmailFunction()}
                         >
                             Update
                         </Button>
