@@ -47,7 +47,6 @@ export class OrgManagementService {
     return target;
   }
 
-  // TODO: Test this function
   async getOrg(org: Get_Org_Dto) {
     const { data, error } = await this.supabase
       .getClient()
@@ -90,7 +89,7 @@ export class OrgManagementService {
       throw new NotFoundException('Organisation not found');
     }
 
-    return { org_data };
+    return { data: org_data };
   }
 
   // TODO: Test this function
