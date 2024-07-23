@@ -40,8 +40,8 @@ export class DbMetadataHandlerController {
     }
 
     @Put("foreign-keys")
-    async getForeignKeyMetadata(@Body() foreignKeyQuery: ForeignKeyQuery){
-        return this.dbMetadataHandlerService.getForeignKeyMetadata(foreignKeyQuery);
+    async getForeignKeyMetadata(@Body() foreignKeyQuery: ForeignKeyQuery, session: Record<string, any>){
+        return this.dbMetadataHandlerService.getForeignKeyMetadata(foreignKeyQuery, session);
     }
 
 }

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { QueryHandlerService } from '../query-handler/query-handler.service';
 import { Query, DatabaseCredentials, ComparisonOperator, LogicalOperator, QueryParams } from '../interfaces/intermediateJSON';
+import session from 'express-session';
 
 interface Database {
     key: string,
@@ -191,7 +192,7 @@ export class DbMetadataHandlerService {
 
     }
 
-    async getForeignKeyMetadata(foreignKeyQuery: ForeignKeyQuery) : Promise<any> {
+    async getForeignKeyMetadata(foreignKeyQuery: ForeignKeyQuery, session: Record<string, any>) : Promise<any> {
 
         //First get foreign keys 'from' the table pointing 'to' other tables
 
@@ -223,7 +224,7 @@ export class DbMetadataHandlerService {
             },
         };
 
-        const fromResponse = await this.queryHandlerService.queryDatabase(fromQuery);
+        const fromResponse = await this.queryHandlerService.queryDatabase(fromQuery, session);
 
         //Secondly get foreign keys 'from' other tables pointing 'to' the table
 
@@ -254,7 +255,7 @@ export class DbMetadataHandlerService {
             },
         };
 
-        const toResponse = await this.queryHandlerService.queryDatabase(toQuery);
+        const toResponse = await this.queryHandlerService.queryDatabase(toQuery, session);
 
         return {from: fromResponse.data, to: toResponse.data}
 
