@@ -1,6 +1,6 @@
 import { Body, Controller, Put, Session } from '@nestjs/common';
 import { DbMetadataHandlerService } from './db-metadata-handler.service';
-import { DatabaseCredentials } from 'src/interfaces/intermediateJSON';
+import { DatabaseCredentials } from '../interfaces/intermediateJSON';
 
 interface TableQuery {
     credentials: DatabaseCredentials;

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConnectionManagerController } from './connection-manager.controller';
 import { ConnectionManagerService } from './connection-manager.service';
-import { SessionStore } from 'src/session-store/session-store.service';
+import { SessionStore } from '../session-store/session-store.service';
 
 describe('ConnectionManagerController', () => {
   let controller: ConnectionManagerController;
