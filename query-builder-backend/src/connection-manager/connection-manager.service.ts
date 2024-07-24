@@ -3,7 +3,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { SessionStore } from 'src/session-store/session-store.service';
+import { SessionStore } from '../session-store/session-store.service';
 import { createHash } from 'crypto';
 
 interface DatabaseCredentials {

@@ -4,8 +4,8 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JsonConverterService } from './../jsonConverter/jsonConverter.service';
-import { Query } from 'src/interfaces/intermediateJSON';
-import { SessionStore } from 'src/session-store/session-store.service';
+import { Query } from '../interfaces/intermediateJSON';
+import { SessionStore } from '../session-store/session-store.service';
 import { createHash } from 'crypto';
 
 @Injectable()
