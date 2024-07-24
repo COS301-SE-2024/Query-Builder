@@ -2,11 +2,11 @@ import {
   BadGatewayException,
   Injectable,
   UnauthorizedException,
-  BadRequestException,
 } from '@nestjs/common';
 import { JsonConverterService } from './../jsonConverter/jsonConverter.service';
 import { Query } from 'src/interfaces/intermediateJSON';
 import { SessionStore } from 'src/session-store/session-store.service';
+import { createHash } from 'crypto';
 
 @Injectable()
 export class QueryHandlerService {
@@ -16,14 +16,37 @@ export class QueryHandlerService {
   ) {}
 
   queryDatabase(query: Query, session: Record<string, any>): Promise<any> {
-    console.log(this.sessionStore.getAllSessions());
-
-    const parser = this.jsonConverterService;
-
     return new Promise(async (resolve, reject) => {
-      console.log(query);
+      if (
+        session.host === query.credentials.host &&
+        session.user === query.credentials.user
+      ) {
+        if (
+          session.pass ===
+          createHash('sha256').update(query.credentials.password).digest('hex')
+        ) {
+          console.log(
+            `[Reconnecting] ${query.credentials.user} connected to ${query.credentials.host}`,
+          );
+          return resolve(this.queryHelper(query, session));
+        } else {
+          return reject(
+            new UnauthorizedException(
+              'Please ensure that your database credentials are correct.',
+            ),
+          ); // Reject with an error object
+        }
+      } else {
+        if (session.connected === true) {
+          this.sessionStore.get(session.id).conn.end();
+          this.sessionStore.remove(session.id);
+          console.log(`[Connection Disconnected] ${session.id}`);
+          session.connected = false;
+          session.host = undefined;
+          session.user = undefined;
+          session.pass = undefined;
+        }
 
-      try {
         const connection = require('mysql').createConnection({
           host: query.credentials.host,
           user: query.credentials.user,
@@ -52,76 +75,86 @@ export class QueryHandlerService {
             }
           } else {
             //query the connected database if the connection is successful
+            session.connected = true;
+            session.host = query.credentials.host;
+            session.user = query.credentials.user;
+            session.pass = createHash('sha256')
+              .update(query.credentials.password)
+              .digest('hex');
 
-            //first, use the correct database as specified in query
-            const databaseToQuery: string = query.queryParams.databaseName;
-            const useCommand: string = 'USE ' + databaseToQuery + ';';
-
-            connection.query(useCommand, function (error, results, fields) {
-              if (error) {
-                return reject(error);
-              }
+            this.sessionStore.add({
+              id: session.id,
+              pass: query.credentials.password,
+              conn: connection,
             });
 
-            //secondly, get the number of rows of data
-            const countCommand: string = `SELECT COUNT(*) AS numRows FROM ${query.queryParams.table.name}`;
-            connection.query(
-              countCommand,
-              async function (error, results, fields) {
-                if (error) {
-                  return reject(error);
-                }
-
-                const numRows = results[0].numRows;
-
-                console.log(numRows);
-
-                //thirdly, query the database
-
-                let queryCommand: string;
-
-                try {
-                  queryCommand = parser.convertJsonToQuery(query.queryParams);
-                } catch (e) {
-                  return reject(e);
-                }
-
-                console.log(queryCommand);
-                connection.query(
-                  queryCommand,
-                  function (error, results, fields) {
-                    if (error) {
-                      return reject(error);
-                    }
-
-                    //terminate the database connection
-                    connection.end();
-
-                    //add a unique key field to each returned row
-                    for (var i = 0; i < results.length; i++) {
-                      results[i].qbee_id = i; // Add "total": 2 to all objects in array
-                    }
-
-                    //return a response object with numRows and results
-                    const response = {
-                      totalNumRows: numRows,
-                      data: results,
-                    };
-
-                    return resolve(response);
-                  },
-                );
-              },
+            console.log(
+              `[Inital Connection] ${query.credentials.user} connected to ${query.credentials.host}`,
             );
+            return resolve(this.queryHelper(query, session));
           }
         });
-      } catch (err) {
-        return reject(
-          new BadRequestException(
-            'Please ensure that the request is formatted correctly',
-          ),
-        );
       }
+    });
+  }
+
+  queryHelper(query: Query, session: Record<string, any>): Promise<any> {
+    const parser = this.jsonConverterService;
+
+    return new Promise(async (resolve, reject) => {
+      //first, use the correct database as specified in query
+      const databaseToQuery: string = query.queryParams.databaseName;
+      const useCommand: string = 'USE ' + databaseToQuery + ';';
+
+      let connection = this.sessionStore.get(session.id).conn;
+
+      connection.query(useCommand, function (error, results, fields) {
+        if (error) {
+          return reject(error);
+        }
+      });
+
+      //secondly, get the number of rows of data
+      const countCommand: string = `SELECT COUNT(*) AS numRows FROM ${query.queryParams.table.name}`;
+      connection.query(countCommand, async function (error, results, fields) {
+        if (error) {
+          return reject(error);
+        }
+
+        const numRows = results[0].numRows;
+
+        console.log(numRows);
+
+        //thirdly, query the database
+
+        let queryCommand: string;
+
+        try {
+          queryCommand = parser.convertJsonToQuery(query.queryParams);
+        } catch (e) {
+          return reject(e);
+        }
+
+        console.log(queryCommand);
+        connection.query(queryCommand, function (error, results, fields) {
+          if (error) {
+            return reject(error);
+          }
+
+          //add a unique key field to each returned row
+          for (var i = 0; i < results.length; i++) {
+            results[i].qbee_id = i; // Add "total": 2 to all objects in array
+          }
+
+          //return a response object with numRows and results
+          const response = {
+            totalNumRows: numRows,
+            data: results,
+          };
+
+          return resolve(response);
+        });
+      });
     });
   }
 }

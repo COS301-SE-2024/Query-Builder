@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { QueryHandlerService } from '../query-handler/query-handler.service';
 import { Query, DatabaseCredentials, ComparisonOperator, LogicalOperator, QueryParams } from '../interfaces/intermediateJSON';
-import session from 'express-session';
 
 interface Database {
     key: string,
