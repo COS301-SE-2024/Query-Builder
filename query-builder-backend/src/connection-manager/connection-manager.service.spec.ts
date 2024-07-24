@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConnectionManagerService } from './connection-manager.service';
 import { JsonConverterService } from './../jsonConverter/jsonConverter.service';
-import { SessionStore } from 'src/session-store/session-store.service';
+import { SessionStore } from '../session-store/session-store.service';
 
 describe('ConnectionManagerService', () => {
   let service: ConnectionManagerService;

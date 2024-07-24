@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { DbMetadataHandlerService } from './db-metadata-handler.service';
 import { QueryHandlerService } from '../query-handler/query-handler.service';
 import { JsonConverterService } from '../jsonConverter/jsonConverter.service';
-import { SessionStore } from 'src/session-store/session-store.service';
+import { SessionStore } from '../session-store/session-store.service';
 
 describe('DbMetadataHandlerService', () => {
   let service: DbMetadataHandlerService;
