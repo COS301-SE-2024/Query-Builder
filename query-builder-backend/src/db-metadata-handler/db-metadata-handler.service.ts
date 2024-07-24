@@ -34,7 +34,7 @@ export class DbMetadataHandlerService {
 
     constructor(private readonly queryHandlerService: QueryHandlerService) {}
 
-    async getSchemaMetadata(databaseCredentials: DatabaseCredentials): Promise<any> {
+    async getSchemaMetadata(databaseCredentials: DatabaseCredentials, session: Record<string, any>): Promise<any> {
 
         /*
         SELECT schema_name
@@ -64,7 +64,7 @@ export class DbMetadataHandlerService {
             },
         };
 
-        const response = await this.queryHandlerService.queryDatabase(query);
+        const response = await this.queryHandlerService.queryDatabase(query, session);
 
         //return in the form the frontend is expecting
         var responseToReturn: Database[] = [];
@@ -82,7 +82,7 @@ export class DbMetadataHandlerService {
 
     }
 
-    async getTableMetadata(tableQuery: TableQuery): Promise<any> {
+    async getTableMetadata(tableQuery: TableQuery, session: Record<string, any>): Promise<any> {
 
         /*
         SELECT table_name
@@ -109,7 +109,7 @@ export class DbMetadataHandlerService {
             },
         };
 
-        const response = await this.queryHandlerService.queryDatabase(query);
+        const response = await this.queryHandlerService.queryDatabase(query, session);
 
         //return in the form the frontend is expecting
         var responseToReturn: Table[] = [];
@@ -138,7 +138,7 @@ export class DbMetadataHandlerService {
                 },
             };
     
-            const fieldsResponse = await this.queryHandlerService.queryDatabase(fieldsQuery);
+            const fieldsResponse = await this.queryHandlerService.queryDatabase(fieldsQuery, session);
             console.log(fieldsResponse);
 
             var columns: string[] = [];
@@ -158,7 +158,7 @@ export class DbMetadataHandlerService {
 
     }
 
-    async getFieldMetadata(fieldQuery: FieldQuery) : Promise<any> {
+    async getFieldMetadata(fieldQuery: FieldQuery, session: Record<string, any>) : Promise<any> {
 
         /*
         SELECT column_name
@@ -187,11 +187,11 @@ export class DbMetadataHandlerService {
             },
         };
 
-        return await this.queryHandlerService.queryDatabase(query);
+        return await this.queryHandlerService.queryDatabase(query, session);
 
     }
 
-    async getForeignKeyMetadata(foreignKeyQuery: ForeignKeyQuery) : Promise<any> {
+    async getForeignKeyMetadata(foreignKeyQuery: ForeignKeyQuery, session: Record<string, any>) : Promise<any> {
 
         //First get foreign keys 'from' the table pointing 'to' other tables
 
@@ -223,7 +223,7 @@ export class DbMetadataHandlerService {
             },
         };
 
-        const fromResponse = await this.queryHandlerService.queryDatabase(fromQuery);
+        const fromResponse = await this.queryHandlerService.queryDatabase(fromQuery, session);
 
         //Secondly get foreign keys 'from' other tables pointing 'to' the table
 
@@ -254,7 +254,7 @@ export class DbMetadataHandlerService {
             },
         };
 
-        const toResponse = await this.queryHandlerService.queryDatabase(toQuery);
+        const toResponse = await this.queryHandlerService.queryDatabase(toQuery, session);
 
         return {from: fromResponse.data, to: toResponse.data}
 
