@@ -208,7 +208,7 @@ export class DbMetadataHandlerService {
                 language: "sql",
                 query_type: "select",
                 databaseName: "information_schema",
-                table: {name:"key_column_usage", columns: [{name: "column_name"}, {name: "referenced_table_schema"}, {name: "referenced_table_name"}, {name: "referenced_column_name"}]},
+                table: {name:"key_column_usage", columns: [{name: "column_name"}, {name: "referenced_table_schema"}, {name: "referenced_table_name", alias: "table_name"}, {name: "referenced_column_name"}]},
                 condition: {
                     operator: LogicalOperator.AND,
                     conditions: [
@@ -240,7 +240,7 @@ export class DbMetadataHandlerService {
                 language: "sql",
                 query_type: "select",
                 databaseName: "information_schema",
-                table: {name:"key_column_usage", columns: [{name: "table_schema"}, {name: "table_name"}, {name: "column_name"}, {name: "referenced_column_name"}]},
+                table: {name:"key_column_usage", columns: [{name: "table_schema"}, {name: "table_name", alias: "table_name"}, {name: "column_name"}, {name: "referenced_column_name"}]},
                 condition: {
                     operator: LogicalOperator.AND,
                     conditions: [
@@ -256,7 +256,7 @@ export class DbMetadataHandlerService {
 
         const toResponse = await this.queryHandlerService.queryDatabase(toQuery, session);
 
-        return {from: fromResponse.data, to: toResponse.data}
+        return fromResponse.data.concat(toResponse.data);
 
     }
 

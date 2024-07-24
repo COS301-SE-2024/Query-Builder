@@ -2,10 +2,10 @@
 import "../../app/globals.css"
 import React, { useState} from "react";
 import { useParams } from 'next/navigation'
-import {Button, Spacer, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Card, CardHeader, CardBody, CardFooter, useDisclosure, ModalContent, Modal, ModalHeader} from "@nextui-org/react";
+import {Button, Spacer, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Card, CardHeader, CardBody, CardFooter, useDisclosure, ModalContent, Modal, ModalHeader, DropdownSection} from "@nextui-org/react";
 import TableResponse from "../TableResponse/TableResponse";
 import { createClient } from "./../../utils/supabase/client";
-import { Query, column } from "@/interfaces/intermediateJSON";
+import { Query, column, QueryParams } from "@/interfaces/intermediateJSON";
 
   interface Database {
     key: string,
@@ -139,26 +139,35 @@ export default function Form(){
     const [tables, setTables] = useState<Table[]>([{table: "Select table", columns: ["Select column"]}]);
 
     //React hook for all the joinable tables in the database
-    const [joinableTables, setJoinableTables] = useState();
+    const [joinableTables, setJoinableTables] = useState([]);
 
-    const [selectedDatabase, setSelectedDatabase] = useState(new Set(["Select database"]));
-    const selectedDatabaseValue = React.useMemo(
-        () => Array.from(selectedDatabase).join(", "),
-        [selectedDatabase]
+    //React hook containing all the databases selected by the user
+    const [selectedDatabases, setSelectedDatabases] = useState(new Set(["Select database"]));
+    //The label shown in the dropdown trigger/button
+    const selectedDatabasesLabel = React.useMemo(
+        () => Array.from(selectedDatabases).join(", "),
+        [selectedDatabases]
     );
 
     const [outputQuery, setOutputQuery] = useState("");
 
-    const [selectedTable, setSelectedTable] = useState(new Set(["Select table"]));
-    const selectedTableValue = React.useMemo(
-        () => Array.from(selectedTable).join(", "),
-        [selectedTable]
+    //React hook containing the QueryParams the user is busy building
+    const [queryParams, setQueryParams] = useState<QueryParams>();
+
+    //React hook containing all the tables selected by the user
+    const [selectedTables, setSelectedTables] = useState(new Set(["Select table"]));
+    //The label shown in the dropdown trigger/button
+    const selectedTablesLabel = React.useMemo(
+        () => Array.from(selectedTables).join(", "),
+        [selectedTables]
     );
 
-    const [selectColumns, setSelectedColumns] = React.useState<Set<string>>(new Set<string>());
-    const selectedColValue = React.useMemo(
-        () => Array.from(selectColumns).join(", "),
-        [selectColumns]
+    //React hook containing all the tables selected by the user
+    const [selectedColumns, setSelectedColumns] = React.useState<Set<string>>(new Set<string>());
+    //The label shown in the dropdown trigger/button
+    const selectedColumnsLabel = React.useMemo(
+        () => Array.from(selectedColumns).join(", "),
+        [selectedColumns]
     );
 
     //React hook to fetch the database server's databases upon rerender of the Form
@@ -171,16 +180,16 @@ export default function Form(){
     //React hook to fetch the database's tables upon selection of the database
     React.useEffect(() => {
 
-        fetchTables(selectedDatabaseValue);
+        fetchTables(selectedDatabasesLabel);
 
-    },[selectedDatabaseValue])
+    },[selectedDatabasesLabel])
 
     //React hook to fetch joinable tables upon selection of a table
     React.useEffect(() => {
 
-        fetchJoinableTables(selectedDatabaseValue, selectedTableValue);
+        fetchJoinableTables(selectedDatabasesLabel, selectedTablesLabel);
 
-    },[selectedTableValue])
+    },[selectedTablesLabel])
 
     //React hook to test update of joinable tables
     React.useEffect(() => {
@@ -191,28 +200,32 @@ export default function Form(){
 
     const handleDatabaseSelection = (keys:any) => {
         if (keys.size === 0) {
-            setSelectedDatabase(new Set(["Select database"])); // Reset to default
+            setSelectedDatabases(new Set(["Select database"])); // Reset to default
         } else {
-            setSelectedDatabase(keys);
+            setSelectedDatabases(keys);
         }
-        setSelectedTable(new Set(["Select table"])); // Clear selected columns
+        setSelectedTables(new Set(["Select table"])); // Clear selected columns
     };
 
     const handleTableSelection = (keys:any) => {
         if (keys.size === 0) {
-            setSelectedTable(new Set(["Select table"])); // Reset to default
+            setSelectedTables(new Set(["Select table"])); // Reset to default
         } else {
-            setSelectedTable(keys);
+            setSelectedTables(keys);
         }
         setSelectedColumns(new Set()); // Clear selected columns
     };
 
+    const handleAddJoinableTable = (key: React.Key) => {
+        
+    }
+
     const handleColumnSelection = (keys:any) => {
         if (keys.has("Select All")) {
-            if (selectColumns.size === tables.find(t => t.table === selectedTableValue)?.columns.length) {
+            if (selectedColumns.size === tables.find(t => t.table === selectedTablesLabel)?.columns.length) {
                 setSelectedColumns(new Set());
             } else {
-                const allColumns = tables.find(t => t.table === selectedTableValue)?.columns || [];
+                const allColumns = tables.find(t => t.table === selectedTablesLabel)?.columns || [];
                 setSelectedColumns(new Set(allColumns));
             }
         } else {
@@ -222,12 +235,12 @@ export default function Form(){
 
     function createQuery() : Query {
 
-        let columnStringArray = Array.from(selectColumns);
+        let columnStringArray = Array.from(selectedColumns);
 
         //if columns is empty, query all the columns of the selected table
         if(columnStringArray.length == 0){
             for(let table of tables){
-                if(table.table == selectedTableValue){
+                if(table.table == selectedTablesLabel){
                     columnStringArray = table.columns;
                 }
             }
@@ -252,9 +265,9 @@ export default function Form(){
             queryParams: {
                 language: "sql",
                 query_type: "select",
-                databaseName: selectedDatabaseValue,
+                databaseName: selectedDatabasesLabel,
                 table: {
-                    name: selectedTableValue,
+                    name: selectedTablesLabel,
                     columns: columnArray
                 }
             }
@@ -285,7 +298,7 @@ export default function Form(){
                         variant="bordered" 
                         className="capitalize"
                         >
-                        {selectedDatabaseValue || "Select database"}
+                        {selectedDatabasesLabel || "Select database"}
                         </Button>
                     </DropdownTrigger>
                     <DropdownMenu 
@@ -295,7 +308,7 @@ export default function Form(){
                         variant="flat"
                         // disallowEmptySelection
                         selectionMode="single"
-                        selectedKeys={selectedDatabase}
+                        selectedKeys={selectedDatabases}
                         onSelectionChange={handleDatabaseSelection}
                     >
                         {(item:any) => (
@@ -309,10 +322,32 @@ export default function Form(){
                 </Dropdown>
                 <Spacer y={2}/>
                 {/* Select columns */}
-                {!selectedDatabase.has("Select database") ? 
+                {!selectedDatabases.has("Select database") ? 
                     (<>
-                 <div className="flex">
+                 <div className="flex justify-between">
                     <h2>Table to query:</h2>
+                    {(joinableTables.length > 0) && (
+                        <>
+                            <Dropdown>
+                                <DropdownTrigger>
+                                    <Button variant="bordered">+</Button>
+                                </DropdownTrigger>
+                                <DropdownMenu 
+                                    items={joinableTables} 
+                                    onAction={handleAddJoinableTable}
+                                >
+                                    {(item:any) => (
+                                    <DropdownItem
+                                        key={item.table_name}
+                                    >
+                                        {item.table_name}
+                                    </DropdownItem>
+                                    )}
+                                </DropdownMenu>
+                            </Dropdown>
+                        </>
+                    )
+                    }
                 </div>
                 <Dropdown className="text-black">
                     <DropdownTrigger>
@@ -320,7 +355,7 @@ export default function Form(){
                         variant="bordered" 
                         className="capitalize"
                         >
-                        {selectedTableValue}
+                        {selectedTablesLabel}
                         </Button>
                     </DropdownTrigger>
                     <DropdownMenu 
@@ -329,7 +364,7 @@ export default function Form(){
                         items={tables} 
                         variant="flat"
                         selectionMode="single"
-                        selectedKeys={selectedTable}
+                        selectedKeys={selectedTables}
                         onSelectionChange={handleTableSelection}
                     >
                         {(item:any) => (
@@ -345,7 +380,7 @@ export default function Form(){
                 </>) : null}
                 {/* select columns */}
                 
-                {!selectedTable.has("Select table") ? 
+                {!selectedTables.has("Select table") ? 
                     (<>
                         <div className="flex">
                             <h2>Select the columns to display:</h2>
@@ -355,25 +390,25 @@ export default function Form(){
                                 <Button 
                                 variant="bordered" 
                                 >
-                                {selectedColValue || "No columns selected, will default to all columns selected"} 
+                                {selectedColumnsLabel || "No columns selected, will default to all columns selected"} 
                                 </Button>
                             </DropdownTrigger>
                             <DropdownMenu
                                 className="max-h-[50vh] overflow-y-auto"
                                 aria-label="Multiple column selection"
                                 variant="flat"
-                                items={tables.filter(item => item.table === selectedTableValue)[0]?.columns.map(col => ({ table: selectedTableValue, columns: [col] }))}
+                                items={tables.filter(item => item.table === selectedTablesLabel)[0]?.columns.map(col => ({ table: selectedTablesLabel, columns: [col] }))}
                                 closeOnSelect={false}
                                 // disallowEmptySelection
                                 selectionMode="multiple"
-                                selectedKeys={selectColumns}
+                                selectedKeys={selectedColumns}
                                 onSelectionChange={handleColumnSelection}
                             >
                                 <DropdownItem key="Select All">
                                     Select All
                                 </DropdownItem>
                                 {tables.map((item) => (
-                                    (item.table == selectedTableValue)?(
+                                    (item.table == selectedTablesLabel)?(
                                         (item.columns).map((col) =>
                                             <DropdownItem
                                             key={col}
@@ -390,7 +425,7 @@ export default function Form(){
                     }
             </CardBody>
             <CardFooter>
-                {!selectedTable.has("Select table") ? 
+                {!selectedTables.has("Select table") ? 
                 (<>
                     <Button 
                         onPress={onOpen} 
