@@ -2,14 +2,25 @@ import { Chip, Input, Popover, PopoverContent, PopoverTrigger, Radio, RadioGroup
 import { AggregateFunction, column } from "../../interfaces/intermediateJSON"
 import { FiMoreVertical } from "react-icons/fi";
 import { useState } from "react";
+import React from "react";
 
 interface ColumnChipProps {
-    column: column
+    column: column,
+    index?: number,
+    onChange?: (column: column, index: number) => void
   }
 
 export default function ColumnChip(props: ColumnChipProps){
 
     const [column, setColumn] = useState<column>(props.column);
+
+    React.useEffect(() => {
+
+        if((props.onChange != null) && (props.index != null)){
+            props.onChange(column, props.index);
+        }
+
+    },[column])
 
     return(
         <Chip

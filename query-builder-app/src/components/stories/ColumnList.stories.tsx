@@ -1,22 +1,20 @@
 // import the component you want to make a story for
 import React from "react";
-import ColumnChip from "../ColumnChip/ColumnChip";
+import ColumnList from "../ColumnList/ColumnList";
 import {column} from "../../interfaces/intermediateJSON"
 
 // A story has a lot of options, but the only required one is to specify the component we want to render
 // Setting up the story's default component
 export default {
-    component: ColumnChip
+    component: ColumnList
 }
 
-const columnProp: column = {
-    name: "first_name"
-}
+const columnListProp: column[] = [{name: "first_name"}, {name: "last_name"}, {name: "id"}, {name: "salary"}]
 
 
 // Can have multiple different variants of a component
-export const DefaultColumnChip = {
+export const DefaultColumnList = {
 
-    render: () => <ColumnChip column={columnProp}/> // this function specifies how we want to render this variant of the component
+    render: () => <ColumnList columns={columnListProp} /> // this function specifies how we want to render this variant of the component
 
 };
