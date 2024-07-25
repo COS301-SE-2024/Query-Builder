@@ -13,7 +13,6 @@ const columnProp: column = {
     name: "first_name"
 }
 
-
 // Can have multiple different variants of a component
 export const DefaultColumnChip = {
 
