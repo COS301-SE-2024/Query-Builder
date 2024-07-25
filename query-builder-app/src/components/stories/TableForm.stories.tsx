@@ -11,7 +11,7 @@ export default {
 
 const tableProp: table = {
     name: "actor",
-    columns: [{name: "first_name"}, {name: "last_name"}, {name: "salary"}]
+    columns: []
 }
 
 

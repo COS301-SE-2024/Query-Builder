@@ -173,7 +173,7 @@ export class DbMetadataHandlerService {
                 language: "sql",
                 query_type: "select",
                 databaseName: "information_schema",
-                table: {name:"columns", columns: [{name: "column_name"}]},
+                table: {name:"columns", columns: [{name: "column_name", alias: "name"}]},
                 condition: {
                     operator: LogicalOperator.AND,
                     conditions: [

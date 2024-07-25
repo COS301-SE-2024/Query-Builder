@@ -6,8 +6,8 @@ import React from "react";
 
 interface ColumnChipProps {
     column: column,
-    index?: number,
-    onChange?: (column: column, index: number) => void
+    key?: React.Key,
+    onChange?: (column: column, key: React.Key) => void
   }
 
 export default function ColumnChip(props: ColumnChipProps){
@@ -16,8 +16,15 @@ export default function ColumnChip(props: ColumnChipProps){
 
     React.useEffect(() => {
 
-        if((props.onChange != null) && (props.index != null)){
-            props.onChange(column, props.index);
+        console.log("hello");
+        console.log(JSON.stringify(props));
+
+    },[])
+
+    React.useEffect(() => {
+
+        if((props.onChange != null) && (props.key != null)){
+            props.onChange(column, props.key);
         }
 
     },[column])
