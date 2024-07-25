@@ -64,7 +64,6 @@ export class OrgManagementService {
     return { data };
   }
 
-  // TODO: Test this function
   async getOrgLoggedIn() {
     const { data, error } = await this.supabase
       .getClient()
