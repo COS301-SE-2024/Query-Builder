@@ -111,7 +111,7 @@ export default function TableForm(props: TableFormProps){
     }
 
     return(
-        <>
+        <div className="w-full">
             <h2>Select the columns to display from {table.name}:</h2>
             <Spacer y={2}/>
             <Card>
@@ -148,7 +148,7 @@ export default function TableForm(props: TableFormProps){
                 </CardBody>
             </Card>
             <h1>{JSON.stringify(table)}</h1>
-        </>
+        </div>
     );
 
 }
