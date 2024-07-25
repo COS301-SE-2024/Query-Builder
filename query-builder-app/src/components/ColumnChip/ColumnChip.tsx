@@ -16,15 +16,8 @@ export default function ColumnChip(props: ColumnChipProps){
 
     React.useEffect(() => {
 
-        console.log("hello");
-        console.log(JSON.stringify(props));
-
-    },[])
-
-    React.useEffect(() => {
-
-        if((props.onChange != null) && (props.key != null)){
-            props.onChange(column, props.key);
+        if((props.onChange != null)){
+            props.onChange(column, column.name);
         }
 
     },[column])
