@@ -48,4 +48,4 @@ jobs:
               uses: coverallsapp/github-action@v2
               with:
                   github-token: ${{ secrets.COVERALLS_REPO_TOKEN }}
-                  file: combined-lcov.info
+                  base-path: coverage
