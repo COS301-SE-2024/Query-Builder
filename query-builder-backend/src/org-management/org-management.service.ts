@@ -3,7 +3,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
   Put,
-  UnauthorizedException,
+  UnauthorizedException
 } from '@nestjs/common';
 import { createCipheriv, randomBytes } from 'crypto';
 import { Supabase } from '../supabase';
@@ -31,8 +31,8 @@ export class OrgManagementService {
   constructor(
     private readonly supabase: Supabase,
     private readonly configService: ConfigService,
-    private readonly app_service: AppService,
-  ) { }
+    private readonly app_service: AppService
+  ) {}
 
   async deepMerge(target, source) {
     for (const key in source) {
@@ -91,7 +91,6 @@ export class OrgManagementService {
     return { data: org_data };
   }
 
-  // TODO: Test this function
   async getMembers(get_members_dto: Get_Members_Dto) {
     const { data: user_data, error: owner_error } = await this.supabase
       .getClient()
@@ -113,13 +112,13 @@ export class OrgManagementService {
     }
     if (org_data.length === 0) {
       throw new UnauthorizedException(
-        'You are not a member of this organisation',
+        'You are not a member of this organisation'
       );
     }
 
     if (!org_data[0].role_permissions.view_all_users) {
       throw new UnauthorizedException(
-        'You do not have permission to view all members',
+        'You do not have permission to view all members'
       );
     }
 
@@ -139,7 +138,6 @@ export class OrgManagementService {
     return { data };
   }
 
-  // TODO: Test this function
   async getDbs(get_dbs_dto: Get_Dbs_Dto) {
     const { data: user_data, error: owner_error } = await this.supabase
       .getClient()
@@ -161,15 +159,11 @@ export class OrgManagementService {
     }
     if (org_data.length === 0) {
       throw new UnauthorizedException(
-        'You are not a member of this organisation',
+        'You are not a member of this organisation'
       );
     }
 
-    if (!org_data[0].role_permissions.view_all_dbs) {
-      throw new UnauthorizedException(
-        'You do not have permission to view all databases',
-      );
-    }
+    // TODO: Add functionality to show only the databases that the user has access to
 
     const { data, error } = await this.supabase
       .getClient()
@@ -187,7 +181,6 @@ export class OrgManagementService {
     return { data };
   }
 
-  // TODO: Test this function
   async createOrg(create_org_dto: Create_Org_Dto) {
     if (create_org_dto.owner_id === undefined) {
       const { data: org_owner, error: org_owner_error } = await this.supabase
@@ -225,7 +218,7 @@ export class OrgManagementService {
       update_user_roles: true,
       view_all_dbs: true,
       view_all_users: true,
-      update_db_access: true,
+      update_db_access: true
     };
 
     const { data: org_member_data, error: org_member_error } =
@@ -236,7 +229,7 @@ export class OrgManagementService {
           org_id: data[0].org_id,
           user_id: create_org_dto.owner_id,
           user_role: 'owner',
-          role_permissions: role_perms,
+          role_permissions: role_perms
         })
         .select();
 
@@ -277,13 +270,13 @@ export class OrgManagementService {
     }
     if (org_data.length === 0) {
       throw new UnauthorizedException(
-        'You are not a member of this organisation',
+        'You are not a member of this organisation'
       );
     }
 
     if (!org_data[0].role_permissions.invite_users) {
       throw new UnauthorizedException(
-        'You do not have permission to add users',
+        'You do not have permission to add users'
       );
     }
 
@@ -297,7 +290,7 @@ export class OrgManagementService {
       update_user_roles: false,
       view_all_dbs: false,
       view_all_users: false,
-      update_db_access: false,
+      update_db_access: false
     };
 
     if (add_member_dto.user_role === 'admin') {
@@ -320,7 +313,7 @@ export class OrgManagementService {
     }
     if (data.length === 0) {
       throw new InternalServerErrorException(
-        'Member not added to organisation',
+        'Member not added to organisation'
       );
     }
 
@@ -349,7 +342,7 @@ export class OrgManagementService {
     }
     if (org_data.length === 0) {
       throw new UnauthorizedException(
-        'You are not a member of this organisation',
+        'You are not a member of this organisation'
       );
     }
 
@@ -393,13 +386,14 @@ export class OrgManagementService {
         .delete()
         .eq('db_id', db_data[0].db_id);
       throw new InternalServerErrorException(
-        'Database not added to organisation',
+        'Database not added to organisation'
       );
     }
 
     return { db_data };
   }
 
+  // TODO: Test this function
   async giveDbAccess(give_db_access_dto: Give_Db_Access_Dto) {
     const { data: user_data, error: owner_error } = await this.supabase
       .getClient()
@@ -421,18 +415,23 @@ export class OrgManagementService {
     }
     if (org_data.length === 0) {
       throw new UnauthorizedException(
-        'You are not a member of this organisation',
+        'You are not a member of this organisation'
       );
     }
 
     if (!org_data[0].role_permissions.add_dbs) {
-      throw new UnauthorizedException('You do not have permission to give database access to other users');
+      throw new UnauthorizedException(
+        'You do not have permission to give database access to other users'
+      );
     }
 
     const { data: db_data, error: db_error } = await this.supabase
       .getClient()
       .from('db_access')
-      .insert({ user_id: give_db_access_dto.user_id, db_id: give_db_access_dto.db_id })
+      .insert({
+        user_id: give_db_access_dto.user_id,
+        db_id: give_db_access_dto.db_id
+      })
       .select();
 
     if (db_error) {
@@ -445,8 +444,8 @@ export class OrgManagementService {
     return { db_data };
   }
 
+  // TODO: Test this function
   async saveDbSecrets(save_db_secrets_dto: Save_Db_Secrets_Dto) {
-
     const { data: user_data, error: user_error } = await this.supabase
       .getClient()
       .auth.getUser(this.supabase.getJwt());
@@ -479,7 +478,7 @@ export class OrgManagementService {
       .from('db_envs')
       .update({ db_secrets: second_encryptedText })
       .match({ user_id: user_data.user.id, db_id: save_db_secrets_dto.db_id })
-      .select()
+      .select();
 
     if (db_error) {
       throw db_error;
@@ -513,7 +512,7 @@ export class OrgManagementService {
     }
     if (org_data.length === 0) {
       throw new UnauthorizedException(
-        'You are not the owner of this organisation',
+        'You are not the owner of this organisation'
       );
     }
 
@@ -556,19 +555,19 @@ export class OrgManagementService {
     }
     if (org_data.length === 0) {
       throw new UnauthorizedException(
-        'You are not a member of this organisation',
+        'You are not a member of this organisation'
       );
     }
 
     if (org_data[0].role_permissions.update_user_roles === false) {
       throw new UnauthorizedException(
-        'You do not have permission to update user roles',
+        'You do not have permission to update user roles'
       );
     }
 
     update_member_dto = await this.updateMemberHelper(
       update_member_dto,
-      user_data,
+      user_data
     );
 
     const { data, error } = await this.supabase
@@ -589,9 +588,10 @@ export class OrgManagementService {
     return { data };
   }
 
+  // TODO: Test this function
   async updateMemberHelper(
     update_member_dto: Update_Member_Dto,
-    user_data: any,
+    user_data: any
   ) {
     if (!update_member_dto.role_permissions) {
       update_member_dto.role_permissions = {};
@@ -614,7 +614,7 @@ export class OrgManagementService {
             member_data[0].user_id === user_data.user.id
           ) {
             throw new UnauthorizedException(
-              'You cannot update this users role',
+              'You cannot update this users role'
             );
           } else {
             update_member_dto.role_permissions = {
@@ -627,7 +627,7 @@ export class OrgManagementService {
               update_user_roles: false,
               view_all_dbs: true,
               view_all_users: false,
-              update_db_access: false,
+              update_db_access: false
             };
           }
           break;
@@ -637,7 +637,7 @@ export class OrgManagementService {
             member_data[0].user_id === user_data.user.id
           ) {
             throw new UnauthorizedException(
-              'You cannot update this users role',
+              'You cannot update this users role'
             );
           } else {
             update_member_dto.role_permissions = {
@@ -650,7 +650,7 @@ export class OrgManagementService {
               update_user_roles: false,
               view_all_dbs: false,
               view_all_users: false,
-              update_db_access: false,
+              update_db_access: false
             };
           }
           break;
@@ -676,12 +676,12 @@ export class OrgManagementService {
             member_data[0].user_id === user_data.user.id
           ) {
             throw new UnauthorizedException(
-              'You cannot update this users role',
+              'You cannot update this users role'
             );
           } else {
             update_member_dto.role_permissions = await this.deepMerge(
               member_data[0].role_permissions,
-              update_member_dto.role_permissions,
+              update_member_dto.role_permissions
             );
             update_member_dto.role_permissions.is_owner = false;
           }
@@ -692,12 +692,12 @@ export class OrgManagementService {
             member_data[0].user_id === user_data.user.id
           ) {
             throw new UnauthorizedException(
-              'You cannot update this users role',
+              'You cannot update this users role'
             );
           } else {
             update_member_dto.role_permissions = await this.deepMerge(
               member_data[0].role_permissions,
-              update_member_dto.role_permissions,
+              update_member_dto.role_permissions
             );
             update_member_dto.role_permissions.is_owner = false;
           }
@@ -729,13 +729,13 @@ export class OrgManagementService {
     }
     if (org_data.length === 0) {
       throw new UnauthorizedException(
-        'You are not a member of this organisation',
+        'You are not a member of this organisation'
       );
     }
 
     if (!org_data[0].role_permissions.update_dbs) {
       throw new UnauthorizedException(
-        'You do not have permission to update dbs',
+        'You do not have permission to update dbs'
       );
     }
 
@@ -743,7 +743,7 @@ export class OrgManagementService {
       name: update_db_dto.name,
       type: update_db_dto.type,
       db_info: update_db_dto.db_info,
-      host: update_db_dto.host,
+      host: update_db_dto.host
     };
 
     const { data: db_data, error: db_error } = await this.supabase
@@ -785,7 +785,7 @@ export class OrgManagementService {
     }
     if (org_data.length === 0) {
       throw new UnauthorizedException(
-        'You are not the owner of this organisation',
+        'You are not the owner of this organisation'
       );
     }
 
@@ -828,13 +828,13 @@ export class OrgManagementService {
     }
     if (org_data.length === 0) {
       throw new UnauthorizedException(
-        'You are not a member of this organisation',
+        'You are not a member of this organisation'
       );
     }
 
     if (org_data[0].role_permissions.remove_users === false) {
       throw new UnauthorizedException(
-        'You do not have permission to remove users',
+        'You do not have permission to remove users'
       );
     }
 
@@ -878,13 +878,13 @@ export class OrgManagementService {
     }
     if (org_data.length === 0) {
       throw new UnauthorizedException(
-        'You are not a member of this organisation',
+        'You are not a member of this organisation'
       );
     }
 
     if (!org_data[0].role_permissions.remove_dbs) {
       throw new UnauthorizedException(
-        'You do not have permission to remove databases',
+        'You do not have permission to remove databases'
       );
     }
 
@@ -905,6 +905,7 @@ export class OrgManagementService {
     return { data };
   }
 
+  // TODO: Test this function
   async removeDbAccess(remove_db_access_dto: Remove_Db_Access_Dto) {
     const { data: user_data, error: owner_error } = await this.supabase
       .getClient()
@@ -926,12 +927,14 @@ export class OrgManagementService {
     }
     if (org_data.length === 0) {
       throw new UnauthorizedException(
-        'You are not a member of this organisation',
+        'You are not a member of this organisation'
       );
     }
 
     if (!org_data[0].role_permissions.add_dbs) {
-      throw new UnauthorizedException('You do not have permission to remove database access from other users');
+      throw new UnauthorizedException(
+        'You do not have permission to remove database access from other users'
+      );
     }
 
     const { data: db_data, error: db_error } = await this.supabase
