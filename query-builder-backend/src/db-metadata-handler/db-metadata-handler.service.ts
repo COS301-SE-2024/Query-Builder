@@ -97,7 +97,7 @@ export class DbMetadataHandlerService {
                 language: "sql",
                 query_type: "select",
                 databaseName: "information_schema", 
-                table: {name:"tables", columns: [{name: "table_name"}]},
+                table: {name:"tables", columns: [{name: "table_name", alias: "table_name"}]},
                 condition: {
                     column: "table_schema",
                     operator: ComparisonOperator.EQUAL,
@@ -111,50 +111,7 @@ export class DbMetadataHandlerService {
 
         const response = await this.queryHandlerService.queryDatabase(query, session);
 
-        //return in the form the frontend is expecting
-        var responseToReturn: Table[] = [];
-
-        for(var table of response.data){
-
-            //COULD THE BELOW BE DONE QUICKER USING JOINS?
-            //query the database to get the columns of the table
-            const fieldsQuery: Query = {
-                credentials: tableQuery.credentials,
-                queryParams: {
-                    language: "sql",
-                    query_type: "select",
-                    databaseName: "information_schema",
-                    table: {name:"columns", columns: [{name: "column_name"}]},
-                    condition: {
-                        operator: LogicalOperator.AND,
-                        conditions: [
-                            {column: "table_schema", operator: ComparisonOperator.EQUAL, value: tableQuery.schema},
-                            {column: "table_name", operator: ComparisonOperator.EQUAL, value: table.TABLE_NAME}
-                        ]
-                    },
-                    sortParams: {
-                        column: "column_name",
-                    },
-                },
-            };
-    
-            const fieldsResponse = await this.queryHandlerService.queryDatabase(fieldsQuery, session);
-            console.log(fieldsResponse);
-
-            var columns: string[] = [];
-
-            for(var column of fieldsResponse.data){
-                columns.push(column.COLUMN_NAME)
-            }
-
-            const newTable: Table = {
-                table: table.TABLE_NAME,
-                columns: columns
-            }
-            responseToReturn.push(newTable);
-        }
-
-        return responseToReturn;
+        return response.data;
 
     }
 

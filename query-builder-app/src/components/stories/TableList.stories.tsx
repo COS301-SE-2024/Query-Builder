@@ -10,22 +10,14 @@ export default {
 }
 
 const tableProp: table = {
-    name: "actor",
+    name: "",
     columns: [],
-    join: {
-        table1MatchingColumnName: "id",
-        table2MatchingColumnName: "id",
-        table2: {
-            name: "film",
-            columns: []
-        }
-    }
 }
 
 
 // Can have multiple different variants of a component
 export const DefaultTableList = {
 
-    render: () => <TableList table={tableProp}/> // this function specifies how we want to render this variant of the component
+    render: () => <TableList databaseName="sakila" table={tableProp}/> // this function specifies how we want to render this variant of the component
 
 };

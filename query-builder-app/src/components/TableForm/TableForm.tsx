@@ -147,7 +147,6 @@ export default function TableForm(props: TableFormProps){
                     </div>
                 </CardBody>
             </Card>
-            <h1>{JSON.stringify(table)}</h1>
         </div>
     );
 
