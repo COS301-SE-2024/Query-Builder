@@ -4,10 +4,7 @@ on:
         branches:
             - dev
             - main
-        paths:
-            - 'query-builder-app/**'
-            - 'query-builder-backend/**'
-            - 'coverage/**'
+            - feature/coverage-tests
 jobs:
     coverage:
         runs-on: ubuntu-latest
