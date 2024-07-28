@@ -37,7 +37,10 @@ export class OrgManagementService {
   async deepMerge(target, source) {
     for (const key in source) {
       if (source[key] instanceof Object && key in target) {
-        Object.assign(source[key], this.deepMerge(target[key], source[key]));
+        Object.assign(
+          source[key],
+          await this.deepMerge(target[key], source[key])
+        );
       }
     }
 
@@ -91,21 +94,13 @@ export class OrgManagementService {
     return { data: org_data };
   }
 
-  async getMembers(get_members_dto: Get_Members_Dto) {
-    const { data: user_data, error: owner_error } = await this.supabase
-      .getClient()
-      .auth.getUser(this.supabase.getJwt());
-
-    if (owner_error) {
-      throw owner_error;
-    }
-
+  async getMembers_H1(orgId: string, userId: string) {
     const { data: org_data, error: org_error } = await this.supabase
       .getClient()
       .from('org_members')
       .select()
-      .eq('org_id', get_members_dto.org_id)
-      .eq('user_id', user_data.user.id);
+      .eq('org_id', orgId)
+      .eq('user_id', userId);
 
     if (org_error) {
       throw org_error;
@@ -121,6 +116,18 @@ export class OrgManagementService {
         'You do not have permission to view all members'
       );
     }
+  }
+
+  async getMembers(get_members_dto: Get_Members_Dto) {
+    const { data: user_data, error: owner_error } = await this.supabase
+      .getClient()
+      .auth.getUser(this.supabase.getJwt());
+
+    if (owner_error) {
+      throw owner_error;
+    }
+
+    await this.getMembers_H1(get_members_dto.org_id, user_data.user.id);
 
     const { data, error } = await this.supabase
       .getClient()
