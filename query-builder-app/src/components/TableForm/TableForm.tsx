@@ -5,7 +5,8 @@ import ColumnChip from "../ColumnChip/ColumnChip";
 import { createClient } from "./../../utils/supabase/client";
 
 interface TableFormProps {
-    table: table
+    table: table,
+    onChange?: (table: table) => void
 }
 
 interface SelectableColumn {
@@ -24,6 +25,15 @@ export default function TableForm(props: TableFormProps){
         fetchColumns();
 
     },[])
+
+    //React hook to inform the parent component that the data model has changed
+    React.useEffect(() => {
+
+        if((props.onChange != null)){
+            props.onChange(table);
+        }
+
+    },[table])
 
     // This function gets the token from local storage.
     // Supabase stores the token in local storage so we can access it from there.

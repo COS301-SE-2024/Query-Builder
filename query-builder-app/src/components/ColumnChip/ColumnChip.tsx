@@ -14,6 +14,7 @@ export default function ColumnChip(props: ColumnChipProps){
 
     const [column, setColumn] = useState<column>(props.column);
 
+    //React hook to inform the parent component that the data model has changed
     React.useEffect(() => {
 
         if((props.onChange != null)){

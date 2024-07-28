@@ -74,11 +74,36 @@ export default function TableList(props: TableListProps){
 
         const supabase = createClient();
         const token = (await supabase.auth.getSession()).data.session?.access_token
-    
-        console.log(token)
-    
         return token;
+
     };
+
+    //callback function for TableForm
+    function updateTable(updatedTable: table) {
+
+        setTable((previousTableState) => {
+      
+          function updateTableRef(tableRef: table): table {
+            if (tableRef.name === updatedTable.name) {
+                return {
+                    ...updatedTable, // Update name and columns from updatedTable
+                    join: tableRef.join // Keep the original join property
+                  };
+            } else if (tableRef.join) {
+              return {
+                ...tableRef,
+                join: {
+                    ...tableRef.join,
+                    table2: updateTableRef(tableRef.join.table2)
+                }
+              };
+            }
+            return tableRef;
+          }
+      
+          return updateTableRef(previousTableState);
+        });
+      }
 
     //async function to fetch all the database's tables
     async function fetchAllTables(database: string) {
@@ -169,15 +194,32 @@ export default function TableList(props: TableListProps){
             }
 
             setTable((previousTableState) => {
-                return {...previousTableState, join: {
-                    table1MatchingColumnName: table1MatchingColumnName,
-                    table2MatchingColumnName: table2MatchingColumnName,
-                    table2: {
-                        name: key,
-                        columns: []
-                    }
-                }}
-            });
+                function addTableToJoin(tableState: table): table {
+                  if (!tableState.join) {
+                    return {
+                      ...tableState,
+                      join: {
+                        table1MatchingColumnName: table1MatchingColumnName,
+                        table2MatchingColumnName: table2MatchingColumnName,
+                        table2: {
+                          name: key,
+                          columns: []
+                        }
+                      }
+                    };
+                  } else {
+                    return {
+                      ...tableState,
+                      join: {
+                        ...tableState.join,
+                        table2: addTableToJoin(tableState.join.table2)
+                      }
+                    };
+                  }
+                }
+              
+                return addTableToJoin(previousTableState);
+              });
         }
 
     }
@@ -236,7 +278,7 @@ export default function TableList(props: TableListProps){
     //add the table for the first (compulsory) table
     tables.push(createTableCard(tableRef));
     //add the TableForm for the first (compulsory) table
-    tableForms.push(<TableForm table={tableRef} ></TableForm>)
+    tableForms.push(<TableForm table={tableRef} onChange={updateTable} ></TableForm>)
 
     //iterate over the linked list of joined tables
     while(tableRef.join != null){
@@ -244,7 +286,7 @@ export default function TableList(props: TableListProps){
         //add the table for the next table
         tables.push(createTableCard(tableRef));
         //add the TableForm for the next table
-        tableForms.push(<TableForm table={tableRef} ></TableForm>)
+        tableForms.push(<TableForm table={tableRef} onChange={updateTable} ></TableForm>)
     }
 
     //----------------------------RENDER THE COMPONENT------------------------------------//
