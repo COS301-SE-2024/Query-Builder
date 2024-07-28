@@ -40,6 +40,7 @@ jobs:
             - name: Combining coverage data
               run: |
                 pnpm install -g lcov
+                mkdir -p coverage  # Create the 'coverage' directory if it doesn't exist
                 touch coverage/combined-lcov.info
                 lcov -a ./query-builder-app/coverage/lcov.info -a ./query-builder-backend/coverage/lcov.info -o ./coverage/combined-lcov.info
                 cat ./coverage/combined-lcov.info
