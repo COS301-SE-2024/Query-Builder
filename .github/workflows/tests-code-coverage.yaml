@@ -43,7 +43,7 @@ jobs:
                 mkdir -p coverage  # Create the 'coverage' directory if it doesn't exist
                 touch coverage/combined-lcov.info
                 lcov -a ./query-builder-app/coverage/lcov.info -a ./query-builder-backend/coverage/lcov.info -o ./coverage/combined-lcov.info
-                ls
+                ls coverage
               
             - name: Upload Coverage to Coveralls
               uses: coverallsapp/github-action@v2
