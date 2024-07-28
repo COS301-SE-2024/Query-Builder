@@ -4,6 +4,11 @@ on:
         branches:
             - dev
             - main
+        paths:
+            - 'query-builder-app/**'
+            - 'query-builder-backend/**'
+            - 'coverage/**'
+            - '.github/workflows/**'
 jobs:
     coverage:
         runs-on: ubuntu-latest
