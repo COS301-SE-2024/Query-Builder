@@ -33,8 +33,17 @@ const getToken = async () => {
 
 export default function TableResponse(props: TableResponseProps){
 
+  let tableRef = props.query.queryParams.table;
+
   //dynamically create an array of column objects from the props
-  const columnObjects = props.query.queryParams.table.columns;
+  let columnObjects = tableRef.columns;
+
+  //traverse the joined tables linked list and add all column objects
+  while(tableRef.join != null){
+    tableRef = tableRef.join.table2;
+    columnObjects = columnObjects.concat(tableRef.columns);
+  }
+
   const columns: Column[] = [];
   for(const columnObject of columnObjects){
     columns.push({key: columnObject.name, label: columnObject.name});

@@ -11,6 +11,7 @@ import { createClient } from "./../../utils/supabase/client";
 interface TableListProps {
     databaseName: string,
     table: table
+    onChange?: (table: table) => void
 }
 
 interface JoinableTable {
@@ -33,6 +34,15 @@ export default function TableList(props: TableListProps){
 
     //React hook for all the joinable tables in the database
     const [joinableTables, setJoinableTables] = useState<JoinableTable[]>([]);
+
+    //React hook to inform the parent component that the data model has changed
+    React.useEffect(() => {
+
+        if((props.onChange != null)){
+            props.onChange(table);
+        }
+
+    },[table])
 
     //React hook to fetch the database's tables upon render of the TableList
     React.useEffect(() => {
@@ -306,7 +316,6 @@ export default function TableList(props: TableListProps){
                     </div>
                 ))
             }
-            <h1>{JSON.stringify(table)}</h1>
         </>
     );
 
