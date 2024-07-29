@@ -1,0 +1,16 @@
+services:
+  query-builder-app:
+    build:
+      context: ./query-builder-app
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - query-builder-backend
+
+  query-builder-backend:
+    build:
+      context: ./query-builder-backend
+      dockerfile: Dockerfile
+    ports:
+      - "55555:55555"
