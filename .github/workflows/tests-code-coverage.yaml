@@ -10,6 +10,15 @@ on:
             - 'query-builder-backend/**'
             - 'coverage/**'
             - '.github/workflows/**'
+    push:
+        branches:
+            - dev
+            - main
+        paths:
+            - 'query-builder-app/**'
+            - 'query-builder-backend/**'
+            - 'coverage/**'
+            - '.github/workflows/**'
 
 jobs:
     coverage:
