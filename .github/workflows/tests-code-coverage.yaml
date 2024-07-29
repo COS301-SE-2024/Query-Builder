@@ -1,5 +1,6 @@
 name: Code Coverage
-on:
+on: 
+    workflow_dispatch:
     pull_request:
         branches:
             - dev
@@ -7,6 +8,18 @@ on:
         paths:
             - 'query-builder-app/**'
             - 'query-builder-backend/**'
+            - 'coverage/**'
+            - '.github/workflows/**'
+    push:
+        branches:
+            - dev
+            - main
+        paths:
+            - 'query-builder-app/**'
+            - 'query-builder-backend/**'
+            - 'coverage/**'
+            - '.github/workflows/**'
+
 jobs:
     coverage:
         runs-on: ubuntu-latest
@@ -23,18 +36,27 @@ jobs:
                 node-version: 20
                 cache: 'pnpm'
                 cache-dependency-path: query-builder-app/pnpm-lock.yaml
-            - name: Install Dependencies
+            - name: Install Dependencies App
               run: |
                   pnpm install --frozen-lockfile
               working-directory: query-builder-app
             - name: Coverage Test Frontend
-              run: pnpm run coverage # Currently only generates reports for front-end
+              run: pnpm run coverage
               working-directory: query-builder-app
-            #    - name: Coverage Test Backend
-            #      run: pnpm run coverage
-            #      working-directory: query-builder-backend # need to update pnpm deps for backend to enable
-            - name: Coveralls
-              uses: coverallsapp/github-action@v2
+            - name: Install Dependencies Backend
+              run: |
+                  pnpm install --frozen-lockfile
+              working-directory: query-builder-backend
+            - name: Coverage Test Backend
+              run: pnpm run test:cov
+              working-directory: query-builder-backend
+            - name: Combining coverage data
+              run: |
+                pnpm install -g lcov
+                mkdir -p coverage  # Create the 'coverage' directory if it doesn't exist
+                touch coverage/combined-lcov.info
+                lcov -a ./query-builder-app/coverage/lcov.info -a ./query-builder-backend/coverage/lcov.info -o ./coverage/combined-lcov.info
+            - name: Upload coverage reports to Codecov
+              uses: codecov/codecov-action@v4.0.1
               with:
-                github-token: ${{ secrets.COVERALLS_REPO_TOKEN }}
-                base-path: query-builder-app
+                  token: ${{ secrets.CODECOV_TOKEN }}
