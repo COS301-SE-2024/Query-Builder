@@ -998,7 +998,7 @@ describe('OrgManagementService', () => {
       const url = await service.uploadOrgLogo(file, { org_id: '0000' });
       expect(url).toBeDefined();
       expect(url).toBe(testData[STORAGE]);
-    })
+    });
   });
 
   describe('addMember', () => {
@@ -1052,7 +1052,7 @@ describe('OrgManagementService', () => {
         });
     });
 
-    it('should throw a UnauthorizedException when the user is not part of the organisation', async () => {
+    it('should throw an UnauthorizedException when the user is not part of the organisation', async () => {
       const { setTestData } = require('../supabase/supabase.ts');
 
       let testData = [];
@@ -1074,6 +1074,318 @@ describe('OrgManagementService', () => {
             'You are not a member of this organisation'
           );
         });
+    });
+
+    it('should throw an UnauthorizedException when the user does not have the required permissions to add a member', async () => {
+      const { setTestData } = require('../supabase/supabase.ts');
+
+      let testData = [];
+      testData[SELECT] = [
+        {
+          org_id: '0000',
+          user_role: 'member',
+          role_permissions: {
+            add_dbs: false,
+            is_owner: false,
+            remove_dbs: false,
+            update_dbs: false,
+            invite_users: false,
+            remove_users: false,
+            view_all_dbs: false,
+            view_all_users: false,
+            update_db_access: false,
+            update_user_roles: false
+          }
+        }
+      ];
+
+      testData[AUTH] = {
+        user: {
+          id: '0000'
+        }
+      };
+
+      setTestData(testData);
+
+      service
+        .addMember({ org_id: '0000', user_id: '0001', user_role: 'member' })
+        .catch((error) => {
+          expect(error).toBeDefined();
+          expect(error).toBeInstanceOf(UnauthorizedException);
+          expect(error.message).toBe(
+            'You do not have permission to add members'
+          );
+        });
+    });
+
+    it('should set role_perms to default values for the type of user_role that the new member will have (member)', async () => {
+      const { setTestData } = require('../supabase/supabase.ts');
+
+      let testData = [];
+      testData[SELECT] = [
+        {
+          org_id: '0000',
+          user_role: 'owner',
+          role_permissions: {
+            add_dbs: true,
+            is_owner: true,
+            remove_dbs: true,
+            update_dbs: true,
+            invite_users: true,
+            remove_users: true,
+            view_all_dbs: true,
+            view_all_users: true,
+            update_db_access: true,
+            update_user_roles: true
+          }
+        }
+      ];
+
+      testData[AUTH] = {
+        user: {
+          id: '0000'
+        }
+      };
+
+      testData[INSERT] = [
+        {
+          created_at: 'now',
+          org_id: '0000',
+          user_role: 'member',
+          user_id: '0000',
+          role_permissions: {
+            add_dbs: false,
+            is_owner: false,
+            remove_dbs: false,
+            update_dbs: false,
+            invite_users: false,
+            remove_users: false,
+            view_all_dbs: false,
+            view_all_users: false,
+            update_db_access: false,
+            update_user_roles: false
+          }
+        }
+      ];
+
+      setTestData(testData);
+
+      const { data } = await service.addMember({
+        org_id: '0000',
+        user_id: '0000',
+        user_role: 'member'
+      });
+
+      expect(data).toBeDefined();
+      expect(data).toEqual(testData[INSERT]);
+    });
+
+    it('should set role_perms to default values for the type of user_role that the new member will have (admin)', async () => {
+      const { setTestData } = require('../supabase/supabase.ts');
+
+      let testData = [];
+      testData[SELECT] = [
+        {
+          org_id: '0000',
+          user_role: 'owner',
+          role_permissions: {
+            add_dbs: true,
+            is_owner: true,
+            remove_dbs: true,
+            update_dbs: true,
+            invite_users: true,
+            remove_users: true,
+            view_all_dbs: true,
+            view_all_users: true,
+            update_db_access: true,
+            update_user_roles: true
+          }
+        }
+      ];
+
+      testData[AUTH] = {
+        user: {
+          id: '0000'
+        }
+      };
+
+      testData[INSERT] = [
+        {
+          created_at: 'now',
+          org_id: '0000',
+          user_role: 'admin',
+          user_id: '0000',
+          role_permissions: {
+            add_dbs: true,
+            is_owner: false,
+            remove_dbs: true,
+            update_dbs: true,
+            invite_users: true,
+            remove_users: true,
+            view_all_dbs: true,
+            view_all_users: true,
+            update_db_access: true,
+            update_user_roles: true
+          }
+        }
+      ];
+
+      setTestData(testData);
+
+      const { data } = await service.addMember({
+        org_id: '0000',
+        user_id: '0000',
+        user_role: 'admin'
+      });
+
+      expect(data).toBeDefined();
+      expect(data).toEqual(testData[INSERT]);
+    });
+
+    it('should rethrow the error generated by Supabase when adding member into the organisation', async () => {
+      const { setTestData, setTestError } = require('../supabase/supabase.ts');
+
+      let testData = [];
+      testData[SELECT] = [
+        {
+          org_id: '0000',
+          user_role: 'member',
+          role_permissions: {
+            add_dbs: true,
+            is_owner: true,
+            remove_dbs: true,
+            update_dbs: true,
+            invite_users: true,
+            remove_users: true,
+            view_all_dbs: true,
+            view_all_users: true,
+            update_db_access: true,
+            update_user_roles: true
+          }
+        }
+      ];
+
+      testData[AUTH] = {
+        user: {
+          id: '0000'
+        }
+      };
+
+      let testError = [];
+      testError[INSERT] = { message: 'Internal Server Error', status: 500 };
+
+      setTestData(testData);
+      setTestError(testError);
+
+      service
+        .addMember({ org_id: '0000', user_id: '0000', user_role: 'member' })
+        .catch((error) => {
+          expect(error).toBeDefined();
+          expect(error).toHaveProperty('message', 'Internal Server Error');
+          expect(error).toHaveProperty('status', 500);
+        });
+    });
+
+    it('should throw an InternalServerErrorException when there is no data returned after a member is added into the organisation', async () => {
+      const { setTestData } = require('../supabase/supabase.ts');
+
+      let testData = [];
+      testData[SELECT] = [
+        {
+          org_id: '0000',
+          user_role: 'owner',
+          role_permissions: {
+            add_dbs: true,
+            is_owner: true,
+            remove_dbs: true,
+            update_dbs: true,
+            invite_users: true,
+            remove_users: true,
+            view_all_dbs: true,
+            view_all_users: true,
+            update_db_access: true,
+            update_user_roles: true
+          }
+        }
+      ];
+
+      testData[AUTH] = {
+        user: {
+          id: '0000'
+        }
+      };
+
+      testData[INSERT] = [];
+
+      setTestData(testData);
+
+      service.addMember({ org_id: '0000', user_id: '0000', user_role: 'member' }).catch((error) => {
+        expect(error).toBeDefined();
+        expect(error).toBeInstanceOf(InternalServerErrorException);
+        expect(error.message).toBe('Member not added to organisation');
+      })
+    });
+
+    it('should return the newly added member', async () => {
+      const { setTestData } = require('../supabase/supabase.ts');
+
+      let testData = [];
+      testData[SELECT] = [
+        {
+          org_id: '0000',
+          user_role: 'owner',
+          role_permissions: {
+            add_dbs: true,
+            is_owner: true,
+            remove_dbs: true,
+            update_dbs: true,
+            invite_users: true,
+            remove_users: true,
+            view_all_dbs: true,
+            view_all_users: true,
+            update_db_access: true,
+            update_user_roles: true
+          }
+        }
+      ];
+
+      testData[AUTH] = {
+        user: {
+          id: '0000'
+        }
+      };
+
+      testData[INSERT] = [
+        {
+          created_at: 'now',
+          org_id: '0000',
+          user_role: 'member',
+          user_id: '0000',
+          role_permissions: {
+            add_dbs: false,
+            is_owner: false,
+            remove_dbs: false,
+            update_dbs: false,
+            invite_users: false,
+            remove_users: false,
+            view_all_dbs: false,
+            view_all_users: false,
+            update_db_access: false,
+            update_user_roles: false
+          }
+        }
+      ];
+
+      setTestData(testData);
+
+      const { data } = await service.addMember({
+        org_id: '0000',
+        user_id: '0000',
+        user_role: 'member'
+      });
+
+      expect(data).toBeDefined();
+      expect(data).toEqual(testData[INSERT]);
     });
   });
   describe('addDb', () => {});

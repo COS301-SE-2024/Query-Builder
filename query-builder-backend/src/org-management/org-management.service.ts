@@ -264,7 +264,6 @@ export class OrgManagementService {
     return { data };
   }
 
-  // TODO: Test this function
   async uploadOrgLogo(
     file: Express.Multer.File,
     upload_org_logo_dto: Upload_Org_Logo_Dto
@@ -295,7 +294,6 @@ export class OrgManagementService {
     return img_url;
   }
 
-  // TODO: Test this function
   async addMember(add_member_dto: Add_Member_Dto) {
     const { data: user_data, error: owner_error } = await this.supabase
       .getClient()
@@ -323,7 +321,7 @@ export class OrgManagementService {
 
     if (!org_data[0].role_permissions.invite_users) {
       throw new UnauthorizedException(
-        'You do not have permission to add users'
+        'You do not have permission to add members'
       );
     }
 
