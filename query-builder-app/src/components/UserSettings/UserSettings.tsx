@@ -5,7 +5,6 @@ import {Button, Card, CardBody, CardHeader, Input, input} from "@nextui-org/reac
 import PhoneInput, { formatPhoneNumber, formatPhoneNumberIntl, isValidPhoneNumber } from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import { createClient } from "./../../utils/supabase/client";
-import ImageUploading, { ImageListType } from 'react-images-uploading';
 
 const getToken = async () => {
 
@@ -174,10 +173,6 @@ export default function UserSettings(){
         console.log(response)
     };
 
-    const updateProfilePicture = async() => {
-
-    };
-
     const validateEmail = (value: any) =>
         value.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$/i);
 
@@ -187,17 +182,48 @@ export default function UserSettings(){
         return validateEmail(updateEmail) ? false : true;
     }, [updateEmail]);
 
-    const [images, setImages] = React.useState([]);
-    const maxNumber = 1;
+    const [profilePic, setProfilePic] = useState('');
+    const [file, setFile] = useState(null);
+    const [profilePicURL, setProfilePicURL] = useState('');
 
-    const onChange = (
-        imageList: ImageListType,
-        addUpdateIndex: number[] | undefined
-      ) => {
-        // data for submit
-        console.log(imageList, addUpdateIndex);
-        setImages(imageList as never[]);
-      };
+    useEffect(() => {
+        if (file) {
+            updateProfilePicture();
+        }
+    }, [file]);
+
+    const handleProfilePicChange = async (event:any) => {
+        const selectedFile = event.target.files[0];
+        if (selectedFile) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                setProfilePic(reader.result);
+            };
+            reader.readAsDataURL(selectedFile);
+            setFile(selectedFile);
+        }
+    };
+
+    const updateProfilePicture = async() => {
+        if(file != null) {
+            const formData = new FormData();
+            formData.append('file', file);
+            console.log(formData.get('file'));
+  
+            let response = await fetch("http://localhost:55555/api/user-management/upload-profile-photo", {
+                method: "POST",
+                headers: {
+                'Authorization': 'Bearer ' + await getToken()
+                },
+                body: formData
+            }).then((response) => {
+                console.log(response);
+                response.json().then((data) => {
+                    setProfilePicURL(data.publicUrl);
+                });
+            });
+        }
+    };
 
     return (
         <>
@@ -323,55 +349,17 @@ export default function UserSettings(){
                 <CardHeader><div className="user-management-options">Profile Picture</div></CardHeader>
                 <CardBody>
                     <div className="infield">
-                    <ImageUploading
-                        value={images}
-                        onChange={onChange}
-                        maxNumber={maxNumber}
-                        dataURLKey="data_url"
-                    >
-                        {({
-                        imageList,
-                        onImageUpload,
-                        onImageRemoveAll,
-                        onImageUpdate,
-                        onImageRemove,
-                        isDragging,
-                        dragProps,
-                        }) => (
-                        // write your building UI
-                        <div className="upload__image-wrapper">
-                            {(imageList.length < 1)?
-                            (<>
-                                <button
-                                style={isDragging ? { color: 'red' } : undefined}
-                                onClick={onImageUpload}
-                                {...dragProps}
-                                >
-                                Add a profile picture
-                                </button> 
-                            </>) : 
-                            (
-                                <>
-                                    {imageList.map((image, index) => (
-                                    <div key={index} className="image-item">
-                                        <img src={image['data_url']} alt="" width="100" />
-                                        <div className="image-item__btn-wrapper">
-                                        <button onClick={() => onImageUpdate(index)}>Update</button>
-                                        <button onClick={() => onImageRemove(index)}>Remove</button>
-                                        </div>
-                                    </div>
-                                    ))}
-                                </>)}
-                        </div>
-                        )}
-                    </ImageUploading>
+                        {/* {<>profilePicURL == "" ? (setProfilePicURL("https://img.icons8.com/?size=100&id=ABBSjQJK83zf&format=png&color=000000")):()</>} */}
+                        <img className="profilePicture" src={profilePicURL} alt="Profilepic" />
+                        <input
+                            data-testid="file-input"
+                            type="file"
+                            accept=".jpg,.jpeg"
+                            onInput={(event) => handleProfilePicChange(event)}
+                        />
+
                     </div>
-                        <Button 
-                            color="primary"  
-                            onClick={() => updateEmailFunction()}
-                        >
-                            Update
-                        </Button>
+            
                 </CardBody>
             </Card>
         </>
