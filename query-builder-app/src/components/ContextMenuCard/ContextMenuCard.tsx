@@ -13,7 +13,7 @@ export default function ContextMenuCard({ queryTitle, saved_at, parameters }: Co
         <Dropdown>
             <DropdownTrigger>
                 <Button
-                    variant="flat" className="w-[275px]" color="primary"
+                    variant="flat" className="w-[235px]" color="primary"
                 >
                     {queryTitle}
                 </Button>
