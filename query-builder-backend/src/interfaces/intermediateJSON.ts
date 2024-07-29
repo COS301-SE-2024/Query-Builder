@@ -90,3 +90,9 @@ export enum ComparisonOperator {
     IS = "IS",
     IS_NOT = "IS NOT"
 }
+
+export interface ContextMenuCardProps {
+    title: string,
+    date: string,
+    query: QueryParams
+}
