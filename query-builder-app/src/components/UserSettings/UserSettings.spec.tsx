@@ -29,7 +29,7 @@ describe('UserSettings component', () => {
   it('renders the component with initial state', async () => {
     render(<UserSettings />);
 
-    expect(screen.getByText('Change User Details')).toBeInTheDocument();
+    expect(screen.getByText('Change User&apos;s Personal Details')).toBeInTheDocument();
 
     // Wait for useEffect to run
     await waitFor(() => {

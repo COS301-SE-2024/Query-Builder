@@ -229,7 +229,7 @@ export default function UserSettings(){
         <>
             <Card
             fullWidth>
-                <CardHeader><div className="user-management-options">Change User&lsquo;s Personal Details</div></CardHeader>
+                <CardHeader><div className="user-management-options">Change User&apos;s Personal Details</div></CardHeader>
                 <CardBody>
                         <div className="infield">
                             <Input
@@ -250,7 +250,7 @@ export default function UserSettings(){
                                 isRequired
                                 label="Last Name"
                                 variant="bordered"
-                                defaultValue={initialLastName}
+                                placeholder={initialLastName}
                                 onValueChange={setUpdateLastName}
                                 onFocus={() => {setUpdateFirstNameHasBeenFocused(false);setUpdateLastNameHasBeenFocused(true);setUpdatePhoneHasBeenFocused(false)}}
                                 isInvalid={isUpdateLastNameInvalid && updateLastNameHasBeenFocused}
@@ -269,7 +269,7 @@ export default function UserSettings(){
 
             <Card
             fullWidth>
-                <CardHeader><div className="user-management-options">Change User&lsquo;s Contact Details</div></CardHeader>
+                <CardHeader><div className="user-management-options">Change User&apos;s Contact Details</div></CardHeader>
                 <CardBody>
                     <div className="infield">
                         <PhoneInput
@@ -311,7 +311,7 @@ export default function UserSettings(){
 
             <Card
             fullWidth>
-                <CardHeader><div className="user-management-options">Change User&lsquo;s Email</div></CardHeader>
+                <CardHeader><div className="user-management-options">Change User&apos;s Email</div></CardHeader>
                 <CardBody>
                     <div className="infield">
                     <Input
