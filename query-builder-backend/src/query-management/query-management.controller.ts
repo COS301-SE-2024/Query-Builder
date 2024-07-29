@@ -12,4 +12,9 @@ export class QueryManagementController {
       return this.query_management_service.saveQuery(save_query_dto);
     }
 
+    @Post("get-queries")
+    async getQ(@Body(ValidationPipe)save_query_dto: Save_Query_Dto) {
+      return this.query_management_service.getQueries();
+    }
+
 }
