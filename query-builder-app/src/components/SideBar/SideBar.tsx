@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { createClient } from "./../../utils/supabase/client";
 import {Button, useRadioGroup} from "@nextui-org/react";
 import { useRouter } from 'next/navigation'
+import ContextMenu from "../ContextMenu/ContextMenu";	
 
 const Sidebar = () => {
   // State to manage the open/close state of the sidebar
@@ -40,6 +41,9 @@ const Sidebar = () => {
                         </Link>
                     </div>
                 </nav>
+            </div>
+            <div className = "sidebar-item">
+                    <ContextMenu/>
             </div>
 
             {/* Footer */}
