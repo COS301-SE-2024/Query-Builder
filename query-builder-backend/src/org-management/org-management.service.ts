@@ -145,21 +145,13 @@ export class OrgManagementService {
     return { data };
   }
 
-  async getDbs(get_dbs_dto: Get_Dbs_Dto) {
-    const { data: user_data, error: owner_error } = await this.supabase
-      .getClient()
-      .auth.getUser(this.supabase.getJwt());
-
-    if (owner_error) {
-      throw owner_error;
-    }
-
+  async getDbs_H1(org_id, user_id){
     const { data: org_data, error: org_error } = await this.supabase
       .getClient()
       .from('org_members')
       .select()
-      .eq('org_id', get_dbs_dto.org_id)
-      .eq('user_id', user_data.user.id);
+      .eq('org_id', org_id)
+      .eq('user_id', user_id);
 
     if (org_error) {
       throw org_error;
@@ -169,6 +161,18 @@ export class OrgManagementService {
         'You are not a member of this organisation'
       );
     }
+  }
+
+  async getDbs(get_dbs_dto: Get_Dbs_Dto) {
+    const { data: user_data, error: owner_error } = await this.supabase
+      .getClient()
+      .auth.getUser(this.supabase.getJwt());
+
+    if (owner_error) {
+      throw owner_error;
+    }
+
+    await this.getDbs_H1(get_dbs_dto.org_id, user_data.user.id)
 
     // TODO: Add functionality to show only the databases that the user has access to
 
@@ -186,6 +190,45 @@ export class OrgManagementService {
     }
 
     return { data };
+  }
+
+  async createOrg_H1(owner_id, org_id){
+    const role_perms: Role = {
+      is_owner: true,
+      add_dbs: true,
+      update_dbs: true,
+      remove_dbs: true,
+      invite_users: true,
+      remove_users: true,
+      update_user_roles: true,
+      view_all_dbs: true,
+      view_all_users: true,
+      update_db_access: true
+    };
+
+    const { data: org_member_data, error: org_member_error } =
+      await this.supabase
+        .getClient()
+        .from('org_members')
+        .insert({
+          org_id: org_id,
+          user_id: owner_id,
+          user_role: 'owner',
+          role_permissions: role_perms
+        })
+        .select();
+
+    if (org_member_error) {
+      throw org_member_error;
+    }
+    if (org_member_data.length === 0) {
+      await this.supabase
+        .getClient()
+        .from('organisations')
+        .delete()
+        .eq('org_id', org_id);
+      throw new InternalServerErrorException('Owner not added to organisation');
+    }
   }
 
   async createOrg(create_org_dto: Create_Org_Dto) {
@@ -215,42 +258,7 @@ export class OrgManagementService {
       throw new InternalServerErrorException('Organisation not created');
     }
 
-    const role_perms: Role = {
-      is_owner: true,
-      add_dbs: true,
-      update_dbs: true,
-      remove_dbs: true,
-      invite_users: true,
-      remove_users: true,
-      update_user_roles: true,
-      view_all_dbs: true,
-      view_all_users: true,
-      update_db_access: true
-    };
-
-    const { data: org_member_data, error: org_member_error } =
-      await this.supabase
-        .getClient()
-        .from('org_members')
-        .insert({
-          org_id: data[0].org_id,
-          user_id: create_org_dto.owner_id,
-          user_role: 'owner',
-          role_permissions: role_perms
-        })
-        .select();
-
-    if (org_member_error) {
-      throw org_member_error;
-    }
-    if (org_member_data.length === 0) {
-      await this.supabase
-        .getClient()
-        .from('organisations')
-        .delete()
-        .eq('org_id', data[0].org_id);
-      throw new InternalServerErrorException('Owner not added to organisation');
-    }
+    await this.createOrg_H1(create_org_dto.owner_id, data[0].org_id)
 
     return { data };
   }
