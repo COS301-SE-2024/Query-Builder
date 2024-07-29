@@ -229,7 +229,7 @@ export default function UserSettings(){
         <>
             <Card
             fullWidth>
-                <CardHeader><div className="user-management-options">Change User's Personal Details</div></CardHeader>
+                <CardHeader><div className="user-management-options">Change User&lsquo;s Personal Details</div></CardHeader>
                 <CardBody>
                         <div className="infield">
                             <Input
@@ -269,7 +269,7 @@ export default function UserSettings(){
 
             <Card
             fullWidth>
-                <CardHeader><div className="user-management-options">Change User's Contact Details</div></CardHeader>
+                <CardHeader><div className="user-management-options">Change User&lsquo;s Contact Details</div></CardHeader>
                 <CardBody>
                     <div className="infield">
                         <PhoneInput
@@ -311,7 +311,7 @@ export default function UserSettings(){
 
             <Card
             fullWidth>
-                <CardHeader><div className="user-management-options">Change User's Email</div></CardHeader>
+                <CardHeader><div className="user-management-options">Change User&lsquo;s Email</div></CardHeader>
                 <CardBody>
                     <div className="infield">
                     <Input
