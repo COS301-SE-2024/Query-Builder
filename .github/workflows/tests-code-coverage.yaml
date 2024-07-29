@@ -1,5 +1,6 @@
 name: Code Coverage
 on: 
+    workflow_dispatch:
     pull_request:
         branches:
             - dev
@@ -8,6 +9,8 @@ on:
             - 'query-builder-app/**'
             - 'query-builder-backend/**'
             - 'coverage/**'
+            - '.github/workflows/**'
+
 jobs:
     coverage:
         runs-on: ubuntu-latest
@@ -41,12 +44,10 @@ jobs:
             - name: Combining coverage data
               run: |
                 pnpm install -g lcov
-                touch ./coverage/combined-lcov.info
+                mkdir -p coverage  # Create the 'coverage' directory if it doesn't exist
+                touch coverage/combined-lcov.info
                 lcov -a ./query-builder-app/coverage/lcov.info -a ./query-builder-backend/coverage/lcov.info -o ./coverage/combined-lcov.info
-                cat ./coverage/combined-lcov.info
-              
-            - name: Upload Coverage to Coveralls
-              uses: coverallsapp/github-action@v2
+            - name: Upload coverage reports to Codecov
+              uses: codecov/codecov-action@v4.0.1
               with:
-                  github-token: ${{ secrets.COVERALLS_REPO_TOKEN }}
-                  path-to-lcov: coverage/combined-lcov.info
+                  token: ${{ secrets.CODECOV_TOKEN }}
