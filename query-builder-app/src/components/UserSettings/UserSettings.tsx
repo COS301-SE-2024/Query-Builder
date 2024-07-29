@@ -229,7 +229,7 @@ export default function UserSettings(){
         <>
             <Card
             fullWidth>
-                <CardHeader><div className="user-management-options">Change User&apos;s Personal Details</div></CardHeader>
+                <CardHeader><div className="user-management-options">Change Peronal Details</div></CardHeader>
                 <CardBody>
                         <div className="infield">
                             <Input
@@ -304,7 +304,7 @@ export default function UserSettings(){
                             color="primary"  
                             onClick={() => updatePhoneNumber()}
                         >
-                            Update
+                            Update phone number
                         </Button>
                 </CardBody>
             </Card>
@@ -340,7 +340,7 @@ export default function UserSettings(){
                             color="primary"  
                             onClick={() => updateEmailFunction()}
                         >
-                            Update
+                            Update email
                         </Button>
                 </CardBody>
             </Card>
