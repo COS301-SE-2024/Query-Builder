@@ -229,7 +229,7 @@ export default function UserSettings(){
         <>
             <Card
             fullWidth>
-                <CardHeader><div className="user-management-options">Change Peronal Details</div></CardHeader>
+                <CardHeader><div className="user-management-options">Change Personal Details</div></CardHeader>
                 <CardBody>
                         <div className="infield">
                             <Input
@@ -262,7 +262,7 @@ export default function UserSettings(){
                             color="primary"  
                             onClick={() => updateQuery()}
                         >
-                            Update
+                            Update personal details
                         </Button>
                 </CardBody>
             </Card>

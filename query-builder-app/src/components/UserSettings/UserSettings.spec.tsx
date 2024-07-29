@@ -48,7 +48,7 @@ describe('UserSettings component', () => {
 
     const firstNameInput = screen.getByLabelText('First Name');
     const lastNameInput = screen.getByLabelText('Last Name');
-    const updateButton = screen.getByRole('button', { name: /update/i });
+    const updateButton = screen.getByRole('button', { name: /update personal details/i });
 
     // Update the first and last name fields
     fireEvent.change(firstNameInput, { target: { value: 'Jane' } });

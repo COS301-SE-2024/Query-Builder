@@ -122,7 +122,7 @@ export default function OrganisationManagement(){
               <div className="relative flex items-center gap-2">
                 <Tooltip content="Edit user">
                   <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                    <EditUserModal org_id={"1"} on_add={()=>{}} />
+                    {/* <EditUserModal org_id={"1"} on_add={()=>{}} /> */}
                   </span>
                 </Tooltip>
                 <Tooltip color="danger" content="Delete user">
