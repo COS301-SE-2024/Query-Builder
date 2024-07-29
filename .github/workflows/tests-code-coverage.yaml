@@ -9,9 +9,7 @@ on:
             - 'query-builder-backend/**'
             - 'coverage/**'
             - '.github/workflows/**'
-    push:
-        branches:
-            - feature/coverage-tests
+
 jobs:
     coverage:
         runs-on: ubuntu-latest
@@ -48,13 +46,6 @@ jobs:
                 mkdir -p coverage  # Create the 'coverage' directory if it doesn't exist
                 touch coverage/combined-lcov.info
                 lcov -a ./query-builder-app/coverage/lcov.info -a ./query-builder-backend/coverage/lcov.info -o ./coverage/combined-lcov.info
-              
-            - name: Upload Coverage to Coveralls
-              uses: coverallsapp/github-action@v2
-              with:
-                  github-token: ${{ secrets.COVERALLS_REPO_TOKEN }}
-                  base-path: coverage
-
             - name: Upload coverage reports to Codecov
               uses: codecov/codecov-action@v4.0.1
               with:
