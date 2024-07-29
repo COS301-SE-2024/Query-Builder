@@ -7,6 +7,8 @@ import {
   Post,
   Put,
   Session,
+  UploadedFile,
+  UseInterceptors,
   ValidationPipe,
 } from "@nestjs/common";
 import { Supabase } from "../supabase";
@@ -26,6 +28,10 @@ import { Get_Dbs_Dto } from "./dto/get-dbs.dto";
 import { Give_Db_Access_Dto } from "./dto/give-db-access.dto";
 import { Remove_Db_Access_Dto } from "./dto/remove-db-access.dto";
 import { Save_Db_Secrets_Dto } from "./dto/save-db-secrets.dto";
+import { Upload_Org_Logo_Dto } from "./dto/upload-org-logo.dto";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { Express } from "express";
+
 
 @Controller("org-management")
 export class OrgManagementController {
@@ -49,6 +55,12 @@ export class OrgManagementController {
   @Put("get-dbs")
   async getDbs(@Body(ValidationPipe) get_dbs_dto: Get_Dbs_Dto) {
     return this.org_management_service.getDbs(get_dbs_dto);
+  }
+
+  @Post('upload-org-logo')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadOrgLogo(@UploadedFile() file: Express.Multer.File, @Body(ValidationPipe) upload_org_logo_dto: Upload_Org_Logo_Dto) {
+    return this.org_management_service.uploadOrgLogo(file, upload_org_logo_dto)
   }
 
   @Post("create-org")

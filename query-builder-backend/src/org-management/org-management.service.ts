@@ -25,6 +25,7 @@ import { Role } from '../interfaces/rolesJSON';
 import { Give_Db_Access_Dto } from './dto/give-db-access.dto';
 import { Save_Db_Secrets_Dto } from './dto/save-db-secrets.dto';
 import { Remove_Db_Access_Dto } from './dto/remove-db-access.dto';
+import { Upload_Org_Logo_Dto } from './dto/upload-org-logo.dto';
 
 @Injectable()
 export class OrgManagementService {
@@ -145,7 +146,7 @@ export class OrgManagementService {
     return { data };
   }
 
-  async getDbs_H1(org_id, user_id){
+  async getDbs_H1(org_id, user_id) {
     const { data: org_data, error: org_error } = await this.supabase
       .getClient()
       .from('org_members')
@@ -172,7 +173,7 @@ export class OrgManagementService {
       throw owner_error;
     }
 
-    await this.getDbs_H1(get_dbs_dto.org_id, user_data.user.id)
+    await this.getDbs_H1(get_dbs_dto.org_id, user_data.user.id);
 
     // TODO: Add functionality to show only the databases that the user has access to
 
@@ -192,7 +193,7 @@ export class OrgManagementService {
     return { data };
   }
 
-  async createOrg_H1(owner_id, org_id){
+  async createOrg_H1(owner_id, org_id) {
     const role_perms: Role = {
       is_owner: true,
       add_dbs: true,
@@ -258,9 +259,38 @@ export class OrgManagementService {
       throw new InternalServerErrorException('Organisation not created');
     }
 
-    await this.createOrg_H1(create_org_dto.owner_id, data[0].org_id)
+    await this.createOrg_H1(create_org_dto.owner_id, data[0].org_id);
 
     return { data };
+  }
+
+  // TODO: Test this function
+  async uploadOrgLogo(file: Express.Multer.File, upload_org_logo_dto: Upload_Org_Logo_Dto) {
+
+    const bucket_name = 'org_logos';
+    const file_path = `${upload_org_logo_dto.org_id}/${file.originalname}`;
+
+    const { data, error } = await this.supabase
+      .getClient()
+      .storage.from(bucket_name)
+      .upload(file_path, file.buffer, {
+        contentType: file.mimetype,
+        upsert: true
+      });
+
+    if (error) {
+      throw error;
+    }
+    if (data === null) {
+      throw new InternalServerErrorException('Failed to upload file');
+    }
+
+    const { data: img_url } = await this.supabase
+      .getClient()
+      .storage.from(bucket_name)
+      .getPublicUrl(file_path);
+
+    return img_url;
   }
 
   // TODO: Test this function
