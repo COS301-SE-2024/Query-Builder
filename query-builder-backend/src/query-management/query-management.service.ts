@@ -58,7 +58,7 @@ export class QueryManagementService {
             const { data: query_data, error: query_error } = await this.supabase
                 .getClient()
                 .from('saved_queries')
-                .select()
+                .select('parameters, queryTitle, saved_at')
                 .eq('user_id', user_data.user.id);
     
             if (query_error) {
