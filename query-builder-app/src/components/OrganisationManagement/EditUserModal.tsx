@@ -53,7 +53,10 @@ export default function EditUserModal(props: EditUserModalProps){
     return (
 
         <>
-        <Button onPress={onOpen} color="primary"><EditIcon/></Button>
+        {/* <label  className="custom-file-upload bg-white p-1 border-2 border-slate-600 rounded-full">
+        </label> */}
+          <EditIcon  onClick={onOpen}/>                              
+        
         <Modal 
           isOpen={isOpen} 
           onOpenChange={onOpenChange}

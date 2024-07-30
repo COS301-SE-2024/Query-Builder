@@ -62,7 +62,7 @@ export default function OrganisationManagement(){
             let orgData = (await response.json()).data[0];
             setInitialOrgName(orgData.name);
             setInitialOrgLogo(orgData.logo);
-            setOrgMembers(orgData.org_members);
+            // setOrgMembers(orgData.org_members);
             setProfilePicURL(orgData.logo);
             setUpdateOrgName(orgData.name);
           } catch (error) {
@@ -71,10 +71,32 @@ export default function OrganisationManagement(){
         };
     
         getOrganisationInfo();
+        getMembers();
       }, [orgServerID]);
 
     // TODO: get members
     async function getMembers() {
+      try {
+        let response = await fetch("http://localhost:55555/api/org-management/get-members", {
+          method: "PUT",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + await getToken(),
+          },
+          body: JSON.stringify({ org_id: orgServerID, }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+        let membersData = ((await response.json()).data);
+        console.log(membersData);
+        setOrgMembers(membersData);
+      } catch (error) {
+        console.error("Failed to fetch members of the organisation:", error);
+      }
     }
    
     // // Updated fields
@@ -111,24 +133,23 @@ export default function OrganisationManagement(){
     };
 
     const renderCell = React.useCallback((user, columnKey) => {
-        const cellValue = user[columnKey];
+        // const cellValue = user[columnKey];
     
         switch (columnKey) {
           case "name":
             return (
               <User
-                avatarProps={{radius: "lg", src: user.avatar}}
-                description={user.email}
-                name={cellValue}
+                avatarProps={{radius: "lg", src: user.profiles.profile_photo}}
+                description={user.profiles.email}
+                name={user.profiles.first_name + " " + user.profiles.last_name}
               >
-                {user.email}
+                {user.profiles.email}
               </User>
             );
           case "role":
             return (
               <div className="flex flex-col">
-                <p className="text-bold text-sm capitalize">{cellValue}</p>
-                <p className="text-bold text-sm capitalize text-default-400">{user.team}</p>
+                <p className="text-bold text-sm capitalize">{user.user_role}</p>
               </div>
             );
           case "actions":
@@ -147,38 +168,15 @@ export default function OrganisationManagement(){
               </div>
             );
           default:
-            return cellValue;
+            return user.profiles.phone;
         }
       }, []);
 
       const columns = [
         {name: "NAME", uid: "name"},
         {name: "ROLE", uid: "role"},
-        {name: "STATUS", uid: "status"},
         {name: "ACTIONS", uid: "actions"},
       ];
-      
-      const users = [
-        {
-          id: 1,
-          name: "Tony Reichert",
-          role: "CEO",
-          team: "Management",
-          status: "active",
-          age: "29",
-          avatar: "https://i.pravatar.cc/150?u=a042581f4e29026024d",
-          email: "tony.reichert@example.com",
-        },
-        {
-          id: 2,
-          name: "Zoey Lang",
-          role: "Technical Lead",
-          team: "Development",
-          status: "paused",
-          age: "25",
-          avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704d",
-          email: "zoey.lang@example.com",
-        }];
 
         const [profilePic, setProfilePic] = useState('');
         const [file, setFile] = useState(null);
@@ -287,14 +285,14 @@ export default function OrganisationManagement(){
                             <Table aria-label="Example table with custom cells">
                                 <TableHeader columns={columns}>
                                     {(column) => (
-                                    <TableColumn key={column.uid} align={column.uid === "actions" ? "center" : "start"}>
+                                    <TableColumn key={column.uid}>
                                         {column.name}
                                     </TableColumn>
                                     )}
                                 </TableHeader>
-                                <TableBody items={users}>
+                                <TableBody items={orgMembers}>
                                     {(item) => (
-                                    <TableRow key={item.id}>
+                                    <TableRow key={item.profiles.user_id} >
                                         {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
                                     </TableRow>
                                     )}
