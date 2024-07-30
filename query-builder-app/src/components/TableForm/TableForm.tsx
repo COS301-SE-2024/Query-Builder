@@ -51,6 +51,7 @@ export default function TableForm(props: TableFormProps){
     async function fetchColumns() {
     
         let response = await fetch("http://localhost:55555/api/metadata/fields", {
+            credentials: "include",
             method: "PUT",
             headers: {
             'Accept': 'application/json',

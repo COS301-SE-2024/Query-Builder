@@ -119,6 +119,7 @@ export default function TableList(props: TableListProps){
     async function fetchAllTables(database: string) {
 
         let response = await fetch("http://localhost:55555/api/metadata/tables", {
+            credentials: "include",
             method: "PUT",
             headers: {
             'Accept': 'application/json',
@@ -148,6 +149,7 @@ export default function TableList(props: TableListProps){
     async function fetchJoinableTables(database: string, table: string) {
 
         let response = await fetch("http://localhost:55555/api/metadata/foreign-keys", {
+            credentials: "include",
             method: "PUT",
             headers: {
             'Accept': 'application/json',

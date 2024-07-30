@@ -107,6 +107,7 @@ export default function Authentication() {
     //sign into QBee server
     //call the sign-in API endpoint
     let response = await fetch("http://localhost:55555/api/user-management/sign-in", {
+      credentials: "include",
       method: "PUT",
       headers: {
           'Accept': 'application/json',

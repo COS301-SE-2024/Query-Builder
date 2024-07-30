@@ -67,6 +67,7 @@ export default function Form(){
         let databaseCredentials = await getDatabaseCredentials();
     
         let response = await fetch("http://localhost:55555/api/metadata/schemas", {
+            credentials: "include",
             method: "PUT",
             headers: {
             'Accept': 'application/json',

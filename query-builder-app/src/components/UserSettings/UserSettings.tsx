@@ -21,6 +21,7 @@ export default function UserSettings(){
     // get user information with JWT token
     const getUserInfo = async () => {
         let response = await fetch("http://localhost:55555/api/user-management/get-user", {
+            credentials: "include",
             method: "GET",
             headers: {
             'Accept': 'application/json',
@@ -87,6 +88,7 @@ export default function UserSettings(){
         console.log(updatedDetails);
 
         let response = await fetch("http://localhost:55555/api/user-management/update-user", {
+            credentials: "include",
             method: "PATCH",
             headers: {
               'Accept': 'application/json',

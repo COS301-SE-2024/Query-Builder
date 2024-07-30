@@ -88,6 +88,7 @@ export default function DatabaseConnectionModal(props: DatabaseConnectionModalPr
 
       //call the add-db API endpoint
       let response = await fetch("http://localhost:55555/api/org-management/add-db", {
+        credentials: "include",
         method: "POST",
         headers: {
           'Accept': 'application/json',

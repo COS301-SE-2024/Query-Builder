@@ -17,14 +17,18 @@ export class QueryHandlerService {
 
   queryDatabase(query: Query, session: Record<string, any>): Promise<any> {
     return new Promise(async (resolve, reject) => {
+      //check if the host and username stored in the session match those of the query's credentials
       if (
         session.host === query.credentials.host &&
         session.user === query.credentials.user
       ) {
+        //---------------------------------EXISTING CONNECTION---------------------------------//
+        //check if the hashed version of the password stored in the session matches the hash of the password in the query
         if (
           session.pass ===
           createHash('sha256').update(query.credentials.password).digest('hex')
         ) {
+          //Print out that you are reconnecting to an existing session and not a new one
           console.log(
             `[Reconnecting] ${query.credentials.user} connected to ${query.credentials.host}`,
           );
@@ -37,6 +41,7 @@ export class QueryHandlerService {
           ); // Reject with an error object
         }
       } else {
+        //---------------------------------NO EXISTING CONNECTION---------------------------------//
         if (session.connected === true) {
           this.sessionStore.get(session.id).conn.end();
           this.sessionStore.remove(session.id);
