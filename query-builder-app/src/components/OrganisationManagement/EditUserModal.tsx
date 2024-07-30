@@ -1,12 +1,13 @@
 "use client"
 import "../../app/globals.css"
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {Modal, ModalContent, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Checkbox, Tooltip} from "@nextui-org/react";
 import { createClient } from "./../../utils/supabase/client";
 import {EditIcon} from "./EditIcon";
 
 interface EditUserModalProps {
     org_id: String,
+    user_id: String,
     on_add: () => void
 }
 
@@ -28,10 +29,12 @@ export default function EditUserModal(props: EditUserModalProps){
 
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
 
-    const [roles, setRoles] = useState<Role[]>([{role: "Admin"}]);
+    const [roles, setRoles] = useState<Role[]>([]);
 
     // set roles
-    setRoles([{role: "Admin"}, {role: "Member"}]);
+    useEffect(() => {
+      setRoles([{role: "Admin"}, {role: "Member"}]);
+    }, []);
 
     const [selectedRole, setSelectedRole] = useState(new Set(["Select a role"]));
     const selectedRoleValue = React.useMemo(
@@ -93,8 +96,8 @@ export default function EditUserModal(props: EditUserModalProps){
                 <ModalFooter>
                   <Button 
                     color="primary" 
-                    onPress={onClose}  
-                    // onClick={() => addDatabase(dbName, url, username, password)}
+                    onPress={() => onClose}  
+                    onClick={() => {console.log("onPress")}}
                     // isDisabled={isURLInvalid || isUsernameInvalid || isPasswordInvalid || isDbNameInvalid}
                     >
                     Update

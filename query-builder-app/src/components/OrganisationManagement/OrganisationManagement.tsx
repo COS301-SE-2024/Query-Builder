@@ -1,7 +1,7 @@
 import "../../app/globals.css"
 import "../Authentication/Authentication.css"
 import React, { useState, useEffect } from "react";
-import {Button, Spacer, Card, CardBody, CardHeader, Input, Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, User, Chip, Tooltip, getKeyValue} from "@nextui-org/react";
+import {Button, Image, Spacer, Card, CardBody, CardHeader, Input, Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, User, Chip, Tooltip, getKeyValue} from "@nextui-org/react";
 import { createClient } from "./../../utils/supabase/client";
 import {DeleteIcon} from "./DeleteIcon";
 import { useParams } from 'next/navigation'
@@ -19,10 +19,12 @@ export default function OrganisationManagement(){
 
     const {orgServerID} = useParams<{orgServerID: string}>();
 
-    const [initialOrgName, setInitialOrgName] = useState('');
-    const [updateOrgName, setUpdateOrgName] = useState(initialOrgName);
-    const [updateOrgNameHasBeenFocused, setUpdateOrgNameHasBeenFocused] = useState(false);
-    
+    let [initialOrgName, setInitialOrgName] = useState('');
+    let [initialOrgLogo, setInitialOrgLogo] = useState('');
+    let [orgMembers, setOrgMembers] = useState(null);
+    let [updateOrgName, setUpdateOrgName] = useState(initialOrgName);
+    let [updateOrgNameHasBeenFocused, setUpdateOrgNameHasBeenFocused] = useState(false);
+    let [profilePicURL, setProfilePicURL] = useState(initialOrgLogo);
 
     const isUpdateOrgNameInvalid = React.useMemo(() => {
         if (updateOrgName === "") return true;
@@ -52,59 +54,68 @@ export default function OrganisationManagement(){
             let orgData = (await response.json()).data[0];
             console.log(orgData);
             setInitialOrgName(orgData.name);
+            setInitialOrgLogo(orgData.logo);
+            setOrgMembers(orgData.org_members);
+            setProfilePicURL(initialOrgLogo);
         } catch (error) {
             console.error("Failed to fetch organisation info:", error);
         }
     }
+
+    // TODO: get members
+    async function getMembers() {
+    }
+
 
     useEffect(() => {
         getOrganisationInfo();
     }, []);
 
     useEffect(() => {
-        getOrganisationInfo();
+        setUpdateOrgName(initialOrgName);
     }, [initialOrgName]);
 
+    useEffect(() => {
+        setProfilePic(initialOrgLogo);
+    }, [initialOrgLogo]);
+   
     // // Updated fields
-    // const [updateOrgName, setUpdateOrgName] = useState(initialOrgName);
-    // const [updateOrgLogo, setUpdateOrgLogo] = useState(initialOrgLogo);
-
-    // const updateQuery = async() => {
-    //     let orgName;
-    //     let logoURL;
+    const updateQuery = async() => {
+        let orgName;
+        let logoURL;
         
-    //     if (updateOrgName == initialOrgName){
-    //         orgName = initialOrgName;
-    //     }
-    //     else {
-    //         orgName = updateOrgName;
-    //     }
+        if (updateOrgName == initialOrgName){
+            orgName = initialOrgName;
+        }
+        else {
+            orgName = updateOrgName;
+        }
 
-    //     if (updateOrgLogo == initialOrgLogo){
-    //         logoURL = initialOrgLogo;
-    //     }
-    //     else {
-    //         logoURL = updateOrgLogo;
-    //     }
+        if (profilePicURL == initialOrgLogo){
+            logoURL = initialOrgLogo;
+        }
+        else {
+            logoURL = profilePicURL;
+        }
 
-    //     let updatedDetails = {
-    //         name: orgName,
-    //         logo: orgLogo,
-    //     };
+        let updatedDetails = {
+            name: orgName,
+            logo: logoURL,
+        };
 
-    //     console.log(updatedDetails);
+        console.log(updatedDetails);
 
-    //     let response = await fetch("http://localhost:55555/api/org-management/update-org", {
-    //         method: "PATCH",
-    //         headers: {
-    //           'Accept': 'application/json',
-    //           'Content-Type': 'application/json',
-    //           'Authorization': 'Bearer ' + await getToken()
-    //         },
-    //         body: JSON.stringify(updatedDetails)
-    //     })
-    //     console.log(response)
-    // };
+        let response = await fetch("http://localhost:55555/api/org-management/update-org", {
+            method: "PATCH",
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + await getToken()
+            },
+            body: JSON.stringify(updatedDetails)
+        })
+        console.log(response)
+    };
 
     const renderCell = React.useCallback((user, columnKey) => {
         const cellValue = user[columnKey];
@@ -132,7 +143,7 @@ export default function OrganisationManagement(){
               <div className="relative flex items-center gap-2">
                 <Tooltip content="Edit user">
                   <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                    {/* <EditUserModal org_id={"1"} on_add={()=>{}} /> */}
+                    <EditUserModal org_id={orgServerID} user_id={user.id} on_add={getMembers} />
                   </span>
                 </Tooltip>
                 <Tooltip color="danger" content="Delete user">
@@ -178,14 +189,14 @@ export default function OrganisationManagement(){
 
         const [profilePic, setProfilePic] = useState('');
         const [file, setFile] = useState(null);
-        const [profilePicURL, setProfilePicURL] = useState('');
     
         useEffect(() => {
             if (file) {
                 updateProfilePicture();
             }
         }, [file]);
-    
+
+        
         const handleProfilePicChange = async (event:any) => {
             const selectedFile = event.target.files[0];
             if (selectedFile) {
@@ -245,7 +256,14 @@ export default function OrganisationManagement(){
                             </div>
                             <div className="infield">
                                 {/* {<>profilePicURL == "" ? (setProfilePicURL("https://img.icons8.com/?size=100&id=ABBSjQJK83zf&format=png&color=000000")):()</>} */}
-                                <img className="profilePicture" src={profilePicURL} alt="Profilepic" />
+                                <Image
+                                    className="orgLogo"
+                                    width={300}
+                                    height={200}
+                                    alt="Organisation Logo"
+                                    src={profilePicURL}
+                                />
+                                <Spacer y={2}/>
                                 <input
                                     data-testid="file-input"
                                     type="file"
@@ -257,7 +275,7 @@ export default function OrganisationManagement(){
                             <Spacer y={2}/>
                             <Button 
                                 color="primary"  
-                                // onClick={() => updateEmailFunction()}
+                                onClick={() => updateQuery()}
                             >
                                 Update
                             </Button>
