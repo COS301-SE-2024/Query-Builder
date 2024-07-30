@@ -334,7 +334,7 @@ export class OrgManagementService {
       remove_users: false,
       update_user_roles: false,
       view_all_dbs: false,
-      view_all_users: false,
+      view_all_users: true,
       update_db_access: false
     };
 
@@ -684,7 +684,7 @@ export class OrgManagementService {
               remove_users: true,
               update_user_roles: false,
               view_all_dbs: true,
-              view_all_users: false,
+              view_all_users: true,
               update_db_access: false
             };
           }
@@ -707,7 +707,7 @@ export class OrgManagementService {
               remove_users: false,
               update_user_roles: false,
               view_all_dbs: false,
-              view_all_users: false,
+              view_all_users: true,
               update_db_access: false
             };
           }
