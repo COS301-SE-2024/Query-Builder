@@ -10,8 +10,4 @@ export class Save_Db_Secrets_Dto {
     @IsNotEmpty()
     db_secrets: string;
 
-    @IsString()
-    @IsNotEmpty()
-    session_key: string;
-
 }

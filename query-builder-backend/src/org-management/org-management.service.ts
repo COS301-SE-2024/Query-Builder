@@ -397,6 +397,14 @@ export class OrgManagementService {
       );
     }
 
+    let give_db_access_dto = {
+      db_id: db_data[0].db_id,
+      org_id: add_db_dto.org_id,
+      user_id: user_data.user.id
+    }
+
+    await this.giveDbAccess(give_db_access_dto)
+
     return { db_data };
   }
 
@@ -452,7 +460,7 @@ export class OrgManagementService {
   }
 
   // TODO: Test this function
-  async saveDbSecrets(save_db_secrets_dto: Save_Db_Secrets_Dto) {
+  async saveDbSecrets(save_db_secrets_dto: Save_Db_Secrets_Dto, session: Record<string, any>) {
     const { data: user_data, error: user_error } = await this.supabase
       .getClient()
       .auth.getUser(this.supabase.getJwt());
@@ -470,7 +478,7 @@ export class OrgManagementService {
 
     const encryptedText = this.app_service.encrypt(
       save_db_secrets_dto.db_secrets,
-      save_db_secrets_dto.session_key
+      session.sessionKey
     );
 
     const uni_key = this.configService.get('UNI_KEY');
@@ -482,7 +490,7 @@ export class OrgManagementService {
 
     const { data: db_data, error: db_error } = await this.supabase
       .getClient()
-      .from('db_envs')
+      .from('db_access')
       .update({ db_secrets: second_encryptedText })
       .match({ user_id: user_data.user.id, db_id: save_db_secrets_dto.db_id })
       .select();

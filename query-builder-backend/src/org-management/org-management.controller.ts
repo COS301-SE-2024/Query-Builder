@@ -6,6 +6,7 @@ import {
   Patch,
   Post,
   Put,
+  Session,
   ValidationPipe,
 } from "@nestjs/common";
 import { Supabase } from "../supabase";
@@ -24,6 +25,7 @@ import { Get_Members_Dto } from "./dto/get-members.dto";
 import { Get_Dbs_Dto } from "./dto/get-dbs.dto";
 import { Give_Db_Access_Dto } from "./dto/give-db-access.dto";
 import { Remove_Db_Access_Dto } from "./dto/remove-db-access.dto";
+import { Save_Db_Secrets_Dto } from "./dto/save-db-secrets.dto";
 
 @Controller("org-management")
 export class OrgManagementController {
@@ -67,6 +69,11 @@ export class OrgManagementController {
   @Post("give-db-access")
   async giveDbAccess(@Body(ValidationPipe) give_db_access_dto: Give_Db_Access_Dto) {
     return this.org_management_service.giveDbAccess(give_db_access_dto);
+  }
+
+  @Post('save-db-secrets')
+  async saveDbSecrets(@Body(ValidationPipe) save_db_secrets_dto: Save_Db_Secrets_Dto, @Session() session: Record<string, any>) {
+    return this.org_management_service.saveDbSecrets(save_db_secrets_dto, session);
   }
 
   @Patch("update-org")
