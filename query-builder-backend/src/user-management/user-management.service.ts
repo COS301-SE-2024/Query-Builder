@@ -62,7 +62,7 @@ export class UserManagementService {
       throw new NotFoundException('User not found');
     }
 
-    return { profile_data };
+    return { data: profile_data };
   }
 
   async genSessionKey(user: Sign_In_User_Dto, session: Record<string, any>) {
