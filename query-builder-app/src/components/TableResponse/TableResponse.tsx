@@ -69,6 +69,7 @@ export default function TableResponse(props: TableResponseProps){
     //save the query to the query-management/save-query endpoint
     let response = await fetch("http://localhost:55555/api/query-management/save-query", {
       credentials: "include",
+      method: "POST",
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
