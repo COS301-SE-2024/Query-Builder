@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import {Button, Spacer, Card, CardBody, CardHeader, Input, Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, User, Chip, Tooltip, getKeyValue} from "@nextui-org/react";
 import { createClient } from "./../../utils/supabase/client";
 import {DeleteIcon} from "./DeleteIcon";
+import { useParams } from 'next/navigation'
 import EditUserModal from "./EditUserModal";
 
 const getToken = async () => {
@@ -16,6 +17,8 @@ const getToken = async () => {
 
 export default function OrganisationManagement(){
 
+    const {orgServerID} = useParams<{orgServerID: string}>();
+
     const [initialOrgName, setInitialOrgName] = useState('');
     const [updateOrgName, setUpdateOrgName] = useState(initialOrgName);
     const [updateOrgNameHasBeenFocused, setUpdateOrgNameHasBeenFocused] = useState(false);
@@ -27,33 +30,40 @@ export default function OrganisationManagement(){
         return false;
     }, [updateOrgName]);
 
-    // const getOrganisationInfo = async () => {
+    const getOrganisationInfo = async () => {
 
-    //     try {
-    //         let response = await fetch("http://localhost:55555/api/org-management/get-org", {
-    //             method: "PUT",
-    //             headers: {
-    //             'Accept': 'application/json',
-    //             'Content-Type': 'application/json',
-    //             'Authorization': 'Bearer ' + await getToken()
-    //             },
-    //         })
+        try {
+            let response = await fetch("http://localhost:55555/api/org-management/get-org", {
+                method: "PUT",
+                headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + await getToken()
+                },
+                body: JSON.stringify({
+                    org_id:orgServerID
+                })
+            })
             
-    //         if (!response.ok) {
-    //             throw new Error("Network response was not ok");
-    //         }
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
 
-    //         //   console.log((await response.json()));
-    //         let json = await response.json();
-    //         // console.log(json.profile_data[0]);
-    //     } catch (error) {
-    //         console.error("Failed to fetch organisation info:", error);
-    //     }
-    // }
+            let orgData = (await response.json()).data[0];
+            console.log(orgData);
+            setInitialOrgName(orgData.name);
+        } catch (error) {
+            console.error("Failed to fetch organisation info:", error);
+        }
+    }
 
-    // useEffect(() => {
-    //     getOrganisationInfo();
-    // }, []);
+    useEffect(() => {
+        getOrganisationInfo();
+    }, []);
+
+    useEffect(() => {
+        getOrganisationInfo();
+    }, [initialOrgName]);
 
     // // Updated fields
     // const [updateOrgName, setUpdateOrgName] = useState(initialOrgName);

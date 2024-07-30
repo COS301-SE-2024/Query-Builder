@@ -84,6 +84,7 @@ export default function SignedInHomePage(){
                 <div className="flex justify-between">
                     <h1 className="text-3xl">{org.name}</h1>
                     <DatabaseConnectionModal org_id={org.org_id} on_add={fetchOrgs}/>
+                    <Link href={"/organisation/" + org.org_id}>settings</Link>
                 </div>
 
                 <Spacer y={5}/>
