@@ -499,7 +499,7 @@ export class OrgManagementService {
       throw new InternalServerErrorException('Database access not given');
     }
 
-    return { db_data };
+    return { data: db_data };
   }
 
   // TODO: Test this function
@@ -545,7 +545,7 @@ export class OrgManagementService {
       throw new InternalServerErrorException('Database secrets not saved');
     }
 
-    return { db_data };
+    return { data: db_data };
   }
 
   // TODO: Test this function
@@ -818,7 +818,7 @@ export class OrgManagementService {
       throw new InternalServerErrorException('Database not updated');
     }
 
-    return { db_data };
+    return { data: db_data };
   }
 
   // TODO: Test this function
@@ -1010,6 +1010,6 @@ export class OrgManagementService {
       throw new InternalServerErrorException('Database access not removed');
     }
 
-    return { db_data };
+    return { data: db_data };
   }
 }
