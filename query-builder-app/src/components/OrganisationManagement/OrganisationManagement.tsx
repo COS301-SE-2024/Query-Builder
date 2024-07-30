@@ -1,11 +1,20 @@
 import "../../app/globals.css"
 import "../Authentication/Authentication.css"
+import './OrganisationManagement.css';
 import React, { useState, useEffect } from "react";
 import {Button, Image, Spacer, Card, CardBody, CardHeader, Input, Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, User, Chip, Tooltip, getKeyValue} from "@nextui-org/react";
 import { createClient } from "./../../utils/supabase/client";
 import {DeleteIcon} from "./DeleteIcon";
 import { useParams } from 'next/navigation'
 import EditUserModal from "./EditUserModal";
+import {EditIcon} from "./EditIcon";
+
+
+interface UpdateOrganisation {
+    org_id: string;
+    name?: string;
+    logo?: string;
+  }
 
 const getToken = async () => {
 
@@ -24,7 +33,7 @@ export default function OrganisationManagement(){
     let [orgMembers, setOrgMembers] = useState(null);
     let [updateOrgName, setUpdateOrgName] = useState(initialOrgName);
     let [updateOrgNameHasBeenFocused, setUpdateOrgNameHasBeenFocused] = useState(false);
-    let [profilePicURL, setProfilePicURL] = useState(initialOrgLogo);
+    let [profilePicURL, setProfilePicURL] = useState('');
 
     const isUpdateOrgNameInvalid = React.useMemo(() => {
         if (updateOrgName === "") return true;
@@ -32,77 +41,61 @@ export default function OrganisationManagement(){
         return false;
     }, [updateOrgName]);
 
-    const getOrganisationInfo = async () => {
-
-        try {
+    useEffect(() => {
+        // Fetch organisation info on initial render
+        const getOrganisationInfo = async () => {
+          try {
             let response = await fetch("http://localhost:55555/api/org-management/get-org", {
-                method: "PUT",
-                headers: {
+              method: "PUT",
+              headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + await getToken()
-                },
-                body: JSON.stringify({
-                    org_id:orgServerID
-                })
-            })
-            
+                'Authorization': 'Bearer ' + await getToken(),
+              },
+              body: JSON.stringify({ org_id: orgServerID }),
+            });
+    
             if (!response.ok) {
-                throw new Error("Network response was not ok");
+              throw new Error("Network response was not ok");
             }
-
+    
             let orgData = (await response.json()).data[0];
-            console.log(orgData);
             setInitialOrgName(orgData.name);
             setInitialOrgLogo(orgData.logo);
             setOrgMembers(orgData.org_members);
-            setProfilePicURL(initialOrgLogo);
-        } catch (error) {
+            setProfilePicURL(orgData.logo);
+            setUpdateOrgName(orgData.name);
+          } catch (error) {
             console.error("Failed to fetch organisation info:", error);
-        }
-    }
+          }
+        };
+    
+        getOrganisationInfo();
+      }, [orgServerID]);
 
     // TODO: get members
     async function getMembers() {
     }
-
-
-    useEffect(() => {
-        getOrganisationInfo();
-    }, []);
-
-    useEffect(() => {
-        setUpdateOrgName(initialOrgName);
-    }, [initialOrgName]);
-
-    useEffect(() => {
-        setProfilePic(initialOrgLogo);
-    }, [initialOrgLogo]);
    
     // // Updated fields
     const updateQuery = async() => {
-        let orgName;
-        let logoURL;
-        
-        if (updateOrgName == initialOrgName){
-            orgName = initialOrgName;
-        }
-        else {
-            orgName = updateOrgName;
-        }
 
-        if (profilePicURL == initialOrgLogo){
-            logoURL = initialOrgLogo;
-        }
-        else {
-            logoURL = profilePicURL;
-        }
-
-        let updatedDetails = {
-            name: orgName,
-            logo: logoURL,
+        let updatedDetails: UpdateOrganisation = {
+            org_id: orgServerID,
         };
 
+        if(updateOrgName === initialOrgName && profilePicURL === initialOrgLogo){
+            console.log("No Updates")
+            return;
+        }
+        
+        if (updateOrgName !== initialOrgName){
+            updatedDetails.name = updateOrgName;   
+        }
+
+        if (profilePicURL !== initialOrgLogo){
+            updatedDetails.logo = profilePicURL;
+        }
         console.log(updatedDetails);
 
         let response = await fetch("http://localhost:55555/api/org-management/update-org", {
@@ -195,7 +188,6 @@ export default function OrganisationManagement(){
                 updateProfilePicture();
             }
         }, [file]);
-
         
         const handleProfilePicChange = async (event:any) => {
             const selectedFile = event.target.files[0];
@@ -240,37 +232,44 @@ export default function OrganisationManagement(){
                             Organisation Settings
                         </CardHeader>
                         <CardBody>
-                            <div className="infield">
-                                <Input
-                                    // isRequired
-                                    label="Organisation Name"
-                                    defaultValue={initialOrgName}
-                                    variant="bordered"
-                                    placeholder={initialOrgName}
-                                    onValueChange={setUpdateOrgName}
-                                    onFocus={() => {setUpdateOrgNameHasBeenFocused(true);}}
-                                    isInvalid={isUpdateOrgNameInvalid && updateOrgNameHasBeenFocused}
-                                    color={!updateOrgNameHasBeenFocused ? "primary" : isUpdateOrgNameInvalid ? "danger" : "success"}
-                                    errorMessage="Please enter the Organisation's name"
-                                />
-                            </div>
-                            <div className="infield">
-                                {/* {<>profilePicURL == "" ? (setProfilePicURL("https://img.icons8.com/?size=100&id=ABBSjQJK83zf&format=png&color=000000")):()</>} */}
-                                <Image
-                                    className="orgLogo"
-                                    width={300}
-                                    height={200}
-                                    alt="Organisation Logo"
-                                    src={profilePicURL}
-                                />
-                                <Spacer y={2}/>
-                                <input
-                                    data-testid="file-input"
-                                    type="file"
-                                    accept=".jpg,.jpeg"
-                                    onInput={(event) => handleProfilePicChange(event)}
-                                />
+                            <div className="flex flex-col">
+                                <div className="infield flex justify-center relative pb-4"  >
+                                    <Image
+                                        className="orgLogo rounded-full"
+                                        width={200}
+                                        height={100}
+                                        alt="Organisation Logo"
+                                        src={profilePicURL}
+                                    />
+                                
+                                    <div className="flex flex-col justify-end absolute bottom-0">
+                                        <label className="custom-file-upload bg-white p-1 border-2 border-slate-600 rounded-full">
+                                            <input
+                                                data-testid="file-input"
+                                                type="file"
+                                                accept=".jpg,.jpeg,.png"
+                                                onInput={(event) => handleProfilePicChange(event)}
+                                            />
+                                            <EditIcon/>
+                                        </label>
+                                    </div>
 
+                                </div>
+                                <Spacer y={2}/>
+                                <div className="infield">
+                                    <Input
+                                        // isRequired
+                                        label="Organisation Name"
+                                        defaultValue={updateOrgName}
+                                        variant="bordered"
+                                        placeholder={updateOrgName}
+                                        onValueChange={setUpdateOrgName}
+                                        onFocus={() => {setUpdateOrgNameHasBeenFocused(true);}}
+                                        isInvalid={isUpdateOrgNameInvalid && updateOrgNameHasBeenFocused}
+                                        color={!updateOrgNameHasBeenFocused ? "primary" : isUpdateOrgNameInvalid ? "danger" : "success"}
+                                        errorMessage="Please enter the Organisation's name"
+                                    />
+                                </div>
                             </div>
                             <Spacer y={2}/>
                             <Button 
@@ -308,6 +307,7 @@ export default function OrganisationManagement(){
                     <Card>
                         <CardBody>
                             TO BE ADDED
+                            {/* TODO: Get end point to only show available databases in the organisation */}
                         </CardBody>
                     </Card>  
                     </Tab>
