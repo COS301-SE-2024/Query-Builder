@@ -33,8 +33,17 @@ const getToken = async () => {
 
 export default function TableResponse(props: TableResponseProps){
 
+  let tableRef = props.query.queryParams.table;
+
   //dynamically create an array of column objects from the props
-  const columnObjects = props.query.queryParams.table.columns;
+  let columnObjects = tableRef.columns;
+
+  //traverse the joined tables linked list and add all column objects
+  while(tableRef.join != null){
+    tableRef = tableRef.join.table2;
+    columnObjects = columnObjects.concat(tableRef.columns);
+  }
+
   const columns: Column[] = [];
   for(const columnObject of columnObjects){
     columns.push({key: columnObject.name, label: columnObject.name});
@@ -59,6 +68,7 @@ export default function TableResponse(props: TableResponseProps){
 
     //save the query to the query-management/save-query endpoint
     let response = await fetch("http://localhost:55555/api/query-management/save-query", {
+      credentials: "include",
       method: "POST",
       headers: {
         'Accept': 'application/json',
@@ -96,6 +106,7 @@ export default function TableResponse(props: TableResponseProps){
     
     //fetch the data from the endpoint
     let response = await fetch("http://localhost:55555/api/query", {
+      credentials: "include",
       method: "POST",
       headers: {
         'Accept': 'application/json',
@@ -145,6 +156,7 @@ export default function TableResponse(props: TableResponseProps){
 
       //fetch the data from the endpoint
       let response = await fetch("http://localhost:55555/api/query", {
+        credentials: "include",
         method: "POST",
         headers: {
           'Accept': 'application/json',

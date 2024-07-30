@@ -42,6 +42,7 @@ export default function SignedInHomePage(){
         
         //Get the orgs of the logged-in user
         let response = await fetch("http://localhost:55555/api/org-management/get-org", {
+            credentials: "include",
             method: "GET",
             headers: {
             'Accept': 'application/json',

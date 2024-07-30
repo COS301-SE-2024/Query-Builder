@@ -33,7 +33,12 @@ async function bootstrap() {
 
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
 
-  app.enableCors();
+  app.enableCors({
+    //change in production
+    origin: [
+      'http://localhost:3000',],
+    credentials: true
+  });
   await app.listen(55555);
 }
 bootstrap();
