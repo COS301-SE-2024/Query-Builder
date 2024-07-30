@@ -29,7 +29,7 @@ export default function ColumnChip(props: ColumnChipProps){
             endContent={
                 <Popover placement="right">
                     <PopoverTrigger>
-                        <FiMoreVertical/>
+                        <FiMoreVertical aria-label="edit"/>
                     </PopoverTrigger>
                     <PopoverContent>
                         <div>
