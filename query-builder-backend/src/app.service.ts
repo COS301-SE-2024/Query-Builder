@@ -31,8 +31,8 @@ export class AppService {
     // The key length is dependent on the algorithm.
     // In this case for aes256, it is 32 bytes.
     const key = (await promisify(scrypt)(text, 'salt', 32)) as Buffer;
-    console.log(key);
-    console.log('first key length' + key.length);
+    // console.log(key);
+    // console.log('first key length' + key.length);
 
     return key.toString('base64');
   }

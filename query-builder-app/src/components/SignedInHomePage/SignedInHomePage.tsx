@@ -5,6 +5,7 @@ import React from "react";
 import { EditIcon } from "./EditIcon";
 import { DeleteIcon } from "./DeleteIcon";
 import { createClient } from "./../../utils/supabase/client";
+import AddOrganisationModal from "../AddOrganisationModal/AddOrganisationModal";
 
 interface Database {
     created_at: String,
@@ -54,9 +55,9 @@ export default function SignedInHomePage(){
         let json = await response.json();
 
         //the org_data property is an array of organisations
-        console.log(json.org_data);
+        console.log(json.data);
 
-        setOrganisations(json.org_data)
+        setOrganisations(json.data)
 
     }
 
@@ -73,10 +74,15 @@ export default function SignedInHomePage(){
     return (
 
         <div className="p-5 app">
-        {organisations.map((org: Organisation) => (
+        <div className="flex justify-between">
+            <h1 className="text-5xl">Your Organisations</h1>
+            <AddOrganisationModal on_add={fetchOrgs} ></AddOrganisationModal>
+        </div>
+        <Spacer y={10}/>
+        {organisations ? organisations.map((org: Organisation) => (
             <>
                 <div className="flex justify-between">
-                    <h1 className="text-4xl">{org.name}</h1>
+                    <h1 className="text-3xl">{org.name}</h1>
                     <DatabaseConnectionModal org_id={org.org_id} on_add={fetchOrgs}/>
                 </div>
 
@@ -99,7 +105,7 @@ export default function SignedInHomePage(){
                 </Table>
                 <Spacer y={5}/>
             </>
-        ))}
+        )): <></>}
         </div>
 
 )
