@@ -1,20 +1,19 @@
 import { Body, Controller, Put, Session } from '@nestjs/common';
 import { DbMetadataHandlerService } from './db-metadata-handler.service';
-import { DatabaseCredentials } from '../interfaces/intermediateJSON';
 
 interface TableQuery {
-    credentials: DatabaseCredentials;
+    databaseServerID: string,
     schema: string;
 }
 
 interface FieldQuery {
-    credentials: DatabaseCredentials;
+    databaseServerID: string,
     schema: string;
     table: string;
 }
 
 interface ForeignKeyQuery {
-    credentials: DatabaseCredentials;
+    databaseServerID: string,
     schema: string;
     table: string;
 }
@@ -25,8 +24,8 @@ export class DbMetadataHandlerController {
     constructor(private readonly dbMetadataHandlerService: DbMetadataHandlerService) {}
 
     @Put("schemas")
-    async getSchemaMetadata(@Body() credentials: DatabaseCredentials, @Session() session: Record<string, any>) {
-        return this.dbMetadataHandlerService.getSchemaMetadata(credentials, session);
+    async getSchemaMetadata(@Body() databaseServerID: string, @Session() session: Record<string, any>) {
+        return this.dbMetadataHandlerService.getSchemaMetadata(databaseServerID, session);
     }
 
     @Put("tables")

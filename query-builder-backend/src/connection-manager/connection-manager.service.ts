@@ -24,37 +24,63 @@ export interface ConnectionStatus {
 export class ConnectionManagerService {
   constructor(private readonly sessionStore: SessionStore, private readonly supabase: Supabase, private readonly config_service: ConfigService, private readonly app_service: AppService) {}
 
-  connectToDatabase(
-    credentials: DatabaseCredentials,
+  async connectToDatabase(
+    db_id: string,
     session: Record<string, any>,
   ): Promise<ConnectionStatus> {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
+
+      const { data: user_data, error: user_error } = await this.supabase.getClient().auth.getUser(this.supabase.getJwt());
+      if (user_error) {
+        throw user_error;
+      }
+
+      const { data: db_data, error: error } = await this.supabase.getClient().from('db_envs').select('host').eq('db_id', db_id).single();
+      if(error) {
+        throw error
+      }
+      if(!db_data) {
+        throw new UnauthorizedException('You do not have access to this database');
+      }
+      
+      let { user, password } = await this.decryptDbSecrets(db_id, session);
+
+      let credentials = {
+        host: db_data.host,
+        user: user,
+        password: password,
+      }
+
       if (
         session.host === credentials.host &&
         session.user === credentials.user
       ) {
+        //---------------------------------EXISTING CONNECTION---------------------------------//
+        //check if the hashed version of the password stored in the session matches the hash of the password in the query
         if (
           session.pass ===
           createHash('sha256').update(credentials.password).digest('hex')
         ) {
-          console.log(`[Reconnecting] ${credentials.user} connected to ${credentials.host}`);
-
-          resolve({
+          //Print out that you are reconnecting to an existing session and not a new one
+          console.log(
+            `[Reconnecting] ${credentials.user} connected to ${credentials.host}`,
+          );
+          return resolve({
             success: true,
-            connectionID: this.sessionStore.get(session.id).conn
-              .threadID,
+            connectionID: this.sessionStore.get(session.id).conn.threadID
           });
         } else {
-          reject(
+          return reject(
             new UnauthorizedException(
               'Please ensure that your database credentials are correct.',
             ),
-          );
+          ); // Reject with an error object
         }
       } else {
+        //---------------------------------NO EXISTING CONNECTION---------------------------------//
         if (session.connected === true) {
-          this.sessionStore.get(session.id).conn.end(); // id will be sessionID
-          this.sessionStore.remove(session.id); // id will be sessionID
+          this.sessionStore.get(session.id).conn.end();
+          this.sessionStore.remove(session.id);
           console.log(`[Connection Disconnected] ${session.id}`);
           session.connected = false;
           session.host = undefined;
@@ -69,25 +95,27 @@ export class ConnectionManagerService {
         });
 
         connection.connect((err) => {
+          //if there is an error with the connection, reject
           if (err) {
             console.log(err);
             if (
               err.code == 'ER_ACCESS_DENIED_ERROR' ||
               err.code == 'ER_NOT_SUPPORTED_AUTH_MODE'
             ) {
-              reject(
+              return reject(
                 new UnauthorizedException(
                   'Please ensure that your database credentials are correct.',
                 ),
-              );
+              ); // Reject with an error object
             } else {
-              reject(
+              return reject(
                 new BadGatewayException(
                   'Could not connect to the external database - are the host and port correct?',
                 ),
-              );
+              ); // Reject with an error object
             }
           } else {
+            //query the connected database if the connection is successful
             session.connected = true;
             session.host = credentials.host;
             session.user = credentials.user;
@@ -100,8 +128,11 @@ export class ConnectionManagerService {
               pass: credentials.password,
               conn: connection,
             });
-            console.log(`[Initial Connection] ${credentials.user} connected to ${credentials.host}`);
-            resolve({ success: true, connectionID: connection.threadID }); // Resolve with connection info
+
+            console.log(
+              `[Inital Connection] ${credentials.user} connected to ${credentials.host}`,
+            );
+            return resolve({ success: true, connectionID: connection.threadID });
           }
         });
       }
@@ -134,6 +165,8 @@ export class ConnectionManagerService {
 
     const decryptedText2 = this.app_service.decrypt(decryptedText, session.sessionKey);
 
-    return { data: decryptedText2 };
+    let decryptedSecrets = JSON.parse(decryptedText2);
+
+    return { user: decryptedSecrets.user, password: decryptedSecrets.password };
   }
 }
