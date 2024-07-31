@@ -59,8 +59,8 @@ export class OrgManagementController {
 
   @Post('upload-org-logo')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadOrgLogo(@UploadedFile() file: Express.Multer.File, @Body(ValidationPipe) upload_org_logo_dto: Upload_Org_Logo_Dto) {
-    return this.org_management_service.uploadOrgLogo(file, upload_org_logo_dto)
+  async uploadOrgLogo(@UploadedFile() file: Express.Multer.File, @Body() body: Upload_Org_Logo_Dto) {
+    return this.org_management_service.uploadOrgLogo(file, body)
   }
 
   @Post("create-org")
