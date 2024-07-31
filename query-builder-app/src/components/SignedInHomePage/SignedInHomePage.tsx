@@ -2,8 +2,6 @@
 import { Chip, Spacer, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Link} from "@nextui-org/react"
 import DatabaseConnectionModal from "../DatabaseConnectionModal/DatabaseConnectionModal"
 import React from "react";
-import { EditIcon } from "./EditIcon";
-import { DeleteIcon } from "./DeleteIcon";
 import { createClient } from "./../../utils/supabase/client";
 import AddOrganisationModal from "../AddOrganisationModal/AddOrganisationModal";
 
@@ -84,6 +82,7 @@ export default function SignedInHomePage(){
                 <div className="flex justify-between">
                     <h1 className="text-3xl">{org.name}</h1>
                     <DatabaseConnectionModal org_id={org.org_id} on_add={fetchOrgs}/>
+                    <Link href={"/organisation/" + org.org_id}>settings</Link>
                 </div>
 
                 <Spacer y={5}/>

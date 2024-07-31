@@ -1,0 +1,8 @@
+input[type="file"] {
+    display: none;
+}
+
+.custom-file-upload{
+    z-index: 10;
+    font-size: 1.25rem;
+}
