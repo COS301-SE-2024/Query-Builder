@@ -136,22 +136,90 @@ describe('Column Chip aggregate function tests', () => {
 
  });
 
-// describe('Column Chip alias tests', () => {
+describe('Column Chip alias tests', () => {
 
-//     it('should be able to give the column an alias', async () => {
+    it('should be able to give the column an alias', async () => {
 
-//         //create a user that can perform actions
-//         const user = userEvent.setup();
+        let columnProp: column = {
+            name: "first_name"
+        }
 
-//         //render the component
-//         const { baseElement } = render(<ColumnChip column={columnProp}/>);
+        //callback function for column chip to modify columnProp
+        function updateColumn(column: column, key: React.Key){
 
-//         //get the edit button
-//         const button = screen.getAllByLabelText('edit')[0];
+            //modify columnProp
+            columnProp = column;
 
-//         //click the edit button
-//         await user.click(button);
+        }
 
-//     });
+        //create a user that can perform actions
+        const user = userEvent.setup();
 
-// });
+        //render the component
+        render(<ColumnChip column={columnProp} onChange={updateColumn}/>);
+
+        //get the edit button
+        const button = screen.getAllByLabelText('edit')[0];
+
+        //click the edit button
+        await user.click(button);
+
+        //get the alias input field
+        const aliasInputField = screen.getAllByLabelText('Rename')[0];
+
+        //type an alias into the input field
+        await user.type(aliasInputField, "Given Name");
+
+        //check that columnProp now matches the expectedColumn
+        const expectedColumn: column = {
+            name: "first_name",
+            alias: "Given Name"
+        }
+
+        expect(columnProp).toEqual(expectedColumn);
+
+    });
+
+    it('should be able to remove a column\'s alias', async () => {
+
+        let columnProp: column = {
+            name: "first_name",
+            alias: "Given Name"
+        }
+
+        //callback function for column chip to modify columnProp
+        function updateColumn(column: column, key: React.Key){
+
+            //modify columnProp
+            columnProp = column;
+
+        }
+
+        //create a user that can perform actions
+        const user = userEvent.setup();
+
+        //render the component
+        render(<ColumnChip column={columnProp} onChange={updateColumn}/>);
+
+        //get the edit button
+        const button = screen.getAllByLabelText('edit')[0];
+
+        //click the edit button
+        await user.click(button);
+
+        //get the alias input field
+        const aliasInputField = screen.getAllByLabelText('Rename')[0];
+
+        //remove the alias from the input field
+        await user.type(aliasInputField, "{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}{backspace}");
+
+        //check that columnProp now matches the expectedColumn
+        const expectedColumn: column = {
+            name: "first_name"
+        }
+
+        expect(columnProp).toEqual(expectedColumn);
+
+    });
+
+});
