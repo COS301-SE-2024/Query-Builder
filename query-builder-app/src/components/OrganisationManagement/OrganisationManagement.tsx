@@ -33,6 +33,7 @@ const getUser = async () => {
 export default function OrganisationManagement(){
 
     const {orgServerID} = useParams<{orgServerID: string}>();
+    let [loggedInUserID, setLoggedInUserID] = useState('');
     let [initialOrgName, setInitialOrgName] = useState('');
     let [initialOrgLogo, setInitialOrgLogo] = useState('');
     let [orgMembers, setOrgMembers] = useState([]);
@@ -102,7 +103,7 @@ export default function OrganisationManagement(){
         setOrgMembers(membersData);
 
         getUser().then((user) => {
-          console.log(user);
+          setLoggedInUserID(user as string);
           console.log(orgMembers);
           console.log(membersData);
           let loggedInUserRole = (membersData.find((orgMember:any) => orgMember.profiles.user_id === user).user_role);
@@ -149,9 +150,7 @@ export default function OrganisationManagement(){
         console.log(response)
     };
 
-    const renderCell = React.useCallback((user, columnKey) => {
-        // const cellValue = user[columnKey];
-    
+    const renderCell = React.useCallback((user:any, columnKey:any) => {
         switch (columnKey) {
           case "name":
             return (
@@ -171,7 +170,7 @@ export default function OrganisationManagement(){
             );
           case "actions":
             if (hasAdminPermission) {
-              if(user.user_role == "admin" || user.user_role == "member"){
+              if((user.user_role == "admin" || user.user_role == "member") && user.profiles.user_id !== loggedInUserID){
                 return (
                   
                   <div className="relative flex items-center gap-2">
@@ -230,7 +229,7 @@ export default function OrganisationManagement(){
                 formData.append('file', file);
                 console.log(formData.get('file'));
       
-                let response = await fetch("http://localhost:55555/api/user-management/upload-profile-photo", {
+                let response = await fetch("http://localhost:55555/api/org-management/upload-org-logo", {
                     method: "POST",
                     headers: {
                     'Authorization': 'Bearer ' + await getToken()
@@ -316,7 +315,7 @@ export default function OrganisationManagement(){
                                     )}
                                 </TableHeader>
                                 <TableBody items={orgMembers}>
-                                    {(item) => (
+                                    {(item:any) => (
                                     <TableRow key={item.profiles.user_id} >
                                         {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
                                     </TableRow>

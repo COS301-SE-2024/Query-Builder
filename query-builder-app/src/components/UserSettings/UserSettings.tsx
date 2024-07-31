@@ -81,14 +81,18 @@ export default function UserSettings(){
         let fName;
         let lName;
         
-        if (updateFirstName == initialFirstName){
+        if (updateFirstName === initialFirstName && updateLastName === initialLastName) {
+            return;
+        }
+        
+        if (updateFirstName === initialFirstName){
             fName = initialFirstName;
         }
         else {
             fName = updateFirstName;
         }
 
-        if (updateLastName == initialLastName){
+        if (updateLastName ===  initialLastName){
             lName = initialLastName;
         }
         else {
@@ -97,7 +101,7 @@ export default function UserSettings(){
 
         let updatedDetails = {
             first_name: fName,
-            last_name:lName,
+            last_name: lName,
         };
 
         console.log(updatedDetails);
@@ -119,12 +123,11 @@ export default function UserSettings(){
         let email;
         
         if (updateEmail == initialEmail){
-            email = initialEmail;
+            return;
         }
         else {
             email = updateEmail;
         }
-
 
         let updatedDetails = {
             email: updateEmail
@@ -197,7 +200,7 @@ export default function UserSettings(){
         if (selectedFile) {
             const reader = new FileReader();
             reader.onload = () => {
-                setProfilePic(reader.result);
+                setProfilePic(reader.result as string);
             };
             reader.readAsDataURL(selectedFile);
             setFile(selectedFile);
