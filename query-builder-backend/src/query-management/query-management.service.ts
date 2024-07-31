@@ -59,7 +59,7 @@ export class QueryManagementService {
                 .getClient()
                 .from('saved_queries')
                 .select('parameters, queryTitle, saved_at')
-                .eq('user_id', user_data.user.id);
+                // .eq('user_id', user_data.user.id);
     
             if (query_error) {
                 throw query_error;
