@@ -4,17 +4,19 @@ import ColumnChip from './ColumnChip';
 import userEvent from '@testing-library/user-event'
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import { column } from '@/interfaces/intermediateJSON';
-
-const columnProp: column = {
-    name: "first_name"
-}
+import { column, AggregateFunction } from "../../interfaces/intermediateJSON"
 
 //basic component rendering tests
 describe('Column Chip basic rendering tests', () => {
   it('should render successfully', () => {
+
+    const columnProp: column = {
+        name: "first_name"
+    }
+
     const { baseElement } = render(<ColumnChip column={columnProp}/>);
     expect(baseElement).toBeTruthy();
+
   });
 });
 
@@ -22,11 +24,15 @@ describe('Column Chip edit tests', () => {
 
     it('should be able to open the edit popover', async () => {
 
+        const columnProp: column = {
+            name: "first_name"
+        }
+
         //create a user that can perform actions
         const user = userEvent.setup();
 
         //render the component
-        const { baseElement } = render(<ColumnChip column={columnProp}/>);
+        render(<ColumnChip column={columnProp}/>);
 
         //get the edit button
         const button = screen.getAllByLabelText('edit')[0];
@@ -46,11 +52,23 @@ describe('Column Chip aggregate function tests', () => {
 
     it('should be able to set the column\'s aggregate function to AVG', async () => {
 
+        let columnProp: column = {
+            name: "first_name"
+        }
+
+        //callback function for column chip to modify columnProp
+        function updateColumn(column: column, key: React.Key){
+
+            //modify columnProp
+            columnProp = column;
+
+        }
+
         //create a user that can perform actions
         const user = userEvent.setup();
 
         //render the component
-        const { baseElement } = render(<ColumnChip column={columnProp}/>);
+        render(<ColumnChip column={columnProp} onChange={updateColumn}/>);
 
         //get the edit button
         const button = screen.getAllByLabelText('edit')[0];
@@ -64,15 +82,36 @@ describe('Column Chip aggregate function tests', () => {
         //click the average radio button
         await user.click(averageRadioButton);
 
+        //check that columnProp now matches the expectedColumn
+        const expectedColumn: column = {
+            name: "first_name",
+            aggregation: AggregateFunction.AVG
+        }
+
+        expect(columnProp).toEqual(expectedColumn);
+
     });
 
-    it('should be able to set the column\'s aggregate function to None', async () => {
+    it('should be able to set the column\'s aggregate function back to none', async () => {
+
+        let columnProp: column = {
+            name: "first_name",
+            aggregation: AggregateFunction.AVG
+        }
+
+        //callback function for column chip to modify columnProp
+        function updateColumn(column: column, key: React.Key){
+
+            //modify columnProp
+            columnProp = column;
+
+        }
 
         //create a user that can perform actions
         const user = userEvent.setup();
 
         //render the component
-        const { baseElement } = render(<ColumnChip column={columnProp}/>);
+        render(<ColumnChip column={columnProp} onChange={updateColumn}/>);
 
         //get the edit button
         const button = screen.getAllByLabelText('edit')[0];
@@ -81,31 +120,38 @@ describe('Column Chip aggregate function tests', () => {
         await user.click(button);
 
         //get the average radio button
-        const averageRadioButton = screen.getAllByLabelText('None')[0];
+        const noneRadioButton = screen.getAllByLabelText('None')[0];
 
         //click the average radio button
-        await user.click(averageRadioButton);
+        await user.click(noneRadioButton);
+
+        //check that columnProp now matches the expectedColumn
+        const expectedColumn: column = {
+            name: "first_name"
+        }
+
+        expect(columnProp).toEqual(expectedColumn);
 
     });
 
-});
+ });
 
-describe('Column Chip alias tests', () => {
+// describe('Column Chip alias tests', () => {
 
-    it('should be able to give the column an alias', async () => {
+//     it('should be able to give the column an alias', async () => {
 
-        //create a user that can perform actions
-        const user = userEvent.setup();
+//         //create a user that can perform actions
+//         const user = userEvent.setup();
 
-        //render the component
-        const { baseElement } = render(<ColumnChip column={columnProp}/>);
+//         //render the component
+//         const { baseElement } = render(<ColumnChip column={columnProp}/>);
 
-        //get the edit button
-        const button = screen.getAllByLabelText('edit')[0];
+//         //get the edit button
+//         const button = screen.getAllByLabelText('edit')[0];
 
-        //click the edit button
-        await user.click(button);
+//         //click the edit button
+//         await user.click(button);
 
-    });
+//     });
 
-});
+// });
