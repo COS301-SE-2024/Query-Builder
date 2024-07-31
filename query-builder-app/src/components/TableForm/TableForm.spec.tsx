@@ -1,10 +1,10 @@
 import '@testing-library/jest-dom/vitest'
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vitest, vi, Mock } from 'vitest';
-import TableForm from "./TableForm"
 import { table } from "@/interfaces/intermediateJSON";
+import TableForm from "./TableForm"
 import userEvent from '@testing-library/user-event'
+import React from 'react';
 
 //Mock out Supabase access token retrieval
 vitest.mock("./../../utils/supabase/client", () => {
@@ -29,7 +29,7 @@ global.fetch = vi.fn(() =>
     Promise.resolve({
       json: () => Promise.resolve({ data: [{name: "first_name"}, {name: "last_name"}] }),
     }),
-  ) as Mock;
+) as Mock;
 
 //basic component rendering tests
 describe('TableForm basic rendering tests', () => {
@@ -47,7 +47,8 @@ describe('TableForm basic rendering tests', () => {
 });
 
 describe('TableForm column selection tests', () => {
-    it('should be able to select a column and update a table', async () => {
+
+    it('should be able to select a column and add it to a table', async () => {
   
         let tableProp: table = {
             name: "users",
@@ -74,10 +75,10 @@ describe('TableForm column selection tests', () => {
         //click the add button
         await user.click(button);
 
-        //find the users column
+        //find the first_name column
         const userSelection = screen.getByLabelText("first_name");
 
-        //select the users column
+        //select the first_name column
         await user.click(userSelection);
 
         //check that tableProp now matches the expectedTable
@@ -89,4 +90,48 @@ describe('TableForm column selection tests', () => {
         expect(tableProp).toEqual(expectedTable);
   
     });
+
+    it('should be able to select a column and remove it from a table', async () => {
+  
+        let tableProp: table = {
+            name: "users",
+            columns: [{name: "last_name"}]
+        }
+
+        //callback function for TableForm to modify table
+        function updateTable(table: table){
+
+            //modify tableProp
+            tableProp = table;
+
+        }
+
+        //create a user that can perform actions
+        const user = userEvent.setup();
+    
+        //render the TableForm
+        render(<TableForm table={tableProp} onChange={updateTable} />);
+
+        //get the add button
+        const button = screen.getAllByLabelText('addColumn')[0];
+
+        //click the add button
+        await user.click(button);
+
+        //find the last_name column
+        const userSelection = screen.getByLabelText("last_name");
+
+        //select the last_name column
+        await user.click(userSelection);
+
+        //check that tableProp now matches the expectedTable
+        const expectedTable: table = {
+            name: "users",
+            columns: []
+        }
+
+        expect(tableProp).toEqual(expectedTable);
+  
+    });
+
 });
