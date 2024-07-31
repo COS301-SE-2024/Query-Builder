@@ -36,15 +36,6 @@ export default function Form(){
     //React hook for URL params
     const {databaseServerID} = useParams<{databaseServerID: string}>();
 
-    //async function to get the database credentials, either from supabase, or prompt the user
-    async function getDatabaseCredentials() {
-
-        //query the appropriate endpoint to get the credentials for the database, passing through the session key
-
-        console.log(databaseServerID);
-
-    }
-
     //callback function for TableList
     function updateTable(updatedTable: table) {
 
@@ -63,8 +54,6 @@ export default function Form(){
 
     //async function to fetch the database server's databases
     async function fetchDatabases() {
-
-        let databaseCredentials = await getDatabaseCredentials();
     
         let response = await fetch("http://localhost:55555/api/metadata/schemas", {
             credentials: "include",

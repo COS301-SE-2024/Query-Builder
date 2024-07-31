@@ -1,15 +1,19 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConnectionManagerController } from './connection-manager.controller';
 import { ConnectionManagerService } from './connection-manager.service';
-import { SessionStore } from '../session-store/session-store.service';
+import { SessionStoreModule } from '../session-store/session-store.module';
+import { SupabaseModule } from '../supabase/supabase.module';
+import { ConfigModule } from '@nestjs/config';
+import { AppService } from '../app.service';
 
 describe('ConnectionManagerController', () => {
   let controller: ConnectionManagerController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [SupabaseModule, ConfigModule.forRoot({ isGlobal: true }), SessionStoreModule],
       controllers: [ConnectionManagerController],
-      providers: [ConnectionManagerService, SessionStore]
+      providers: [ConnectionManagerService, AppService]
     }).compile();
 
     controller = module.get<ConnectionManagerController>(ConnectionManagerController);
