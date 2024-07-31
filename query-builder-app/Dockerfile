@@ -25,7 +25,7 @@ ENV NODE_ENV production
 
 # setting up for background services
 RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --gid 1001 nextjs
+RUN adduser --system --uid 1001 nextjs
 
 COPY --from=builder /app/public ./public
 
