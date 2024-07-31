@@ -25,6 +25,7 @@ import { Role } from '../interfaces/rolesJSON';
 import { Give_Db_Access_Dto } from './dto/give-db-access.dto';
 import { Save_Db_Secrets_Dto } from './dto/save-db-secrets.dto';
 import { Remove_Db_Access_Dto } from './dto/remove-db-access.dto';
+import { Upload_Org_Logo_Dto } from './dto/upload-org-logo.dto';
 
 @Injectable()
 export class OrgManagementService {
@@ -145,21 +146,13 @@ export class OrgManagementService {
     return { data };
   }
 
-  async getDbs(get_dbs_dto: Get_Dbs_Dto) {
-    const { data: user_data, error: owner_error } = await this.supabase
-      .getClient()
-      .auth.getUser(this.supabase.getJwt());
-
-    if (owner_error) {
-      throw owner_error;
-    }
-
+  async getDbs_H1(org_id, user_id) {
     const { data: org_data, error: org_error } = await this.supabase
       .getClient()
       .from('org_members')
       .select()
-      .eq('org_id', get_dbs_dto.org_id)
-      .eq('user_id', user_data.user.id);
+      .eq('org_id', org_id)
+      .eq('user_id', user_id);
 
     if (org_error) {
       throw org_error;
@@ -169,6 +162,18 @@ export class OrgManagementService {
         'You are not a member of this organisation'
       );
     }
+  }
+
+  async getDbs(get_dbs_dto: Get_Dbs_Dto) {
+    const { data: user_data, error: owner_error } = await this.supabase
+      .getClient()
+      .auth.getUser(this.supabase.getJwt());
+
+    if (owner_error) {
+      throw owner_error;
+    }
+
+    await this.getDbs_H1(get_dbs_dto.org_id, user_data.user.id);
 
     // TODO: Add functionality to show only the databases that the user has access to
 
@@ -186,6 +191,45 @@ export class OrgManagementService {
     }
 
     return { data };
+  }
+
+  async createOrg_H1(owner_id, org_id) {
+    const role_perms: Role = {
+      is_owner: true,
+      add_dbs: true,
+      update_dbs: true,
+      remove_dbs: true,
+      invite_users: true,
+      remove_users: true,
+      update_user_roles: true,
+      view_all_dbs: true,
+      view_all_users: true,
+      update_db_access: true
+    };
+
+    const { data: org_member_data, error: org_member_error } =
+      await this.supabase
+        .getClient()
+        .from('org_members')
+        .insert({
+          org_id: org_id,
+          user_id: owner_id,
+          user_role: 'owner',
+          role_permissions: role_perms
+        })
+        .select();
+
+    if (org_member_error) {
+      throw org_member_error;
+    }
+    if (org_member_data.length === 0) {
+      await this.supabase
+        .getClient()
+        .from('organisations')
+        .delete()
+        .eq('org_id', org_id);
+      throw new InternalServerErrorException('Owner not added to organisation');
+    }
   }
 
   async createOrg(create_org_dto: Create_Org_Dto) {
@@ -215,47 +259,41 @@ export class OrgManagementService {
       throw new InternalServerErrorException('Organisation not created');
     }
 
-    const role_perms: Role = {
-      is_owner: true,
-      add_dbs: true,
-      update_dbs: true,
-      remove_dbs: true,
-      invite_users: true,
-      remove_users: true,
-      update_user_roles: true,
-      view_all_dbs: true,
-      view_all_users: true,
-      update_db_access: true
-    };
-
-    const { data: org_member_data, error: org_member_error } =
-      await this.supabase
-        .getClient()
-        .from('org_members')
-        .insert({
-          org_id: data[0].org_id,
-          user_id: create_org_dto.owner_id,
-          user_role: 'owner',
-          role_permissions: role_perms
-        })
-        .select();
-
-    if (org_member_error) {
-      throw org_member_error;
-    }
-    if (org_member_data.length === 0) {
-      await this.supabase
-        .getClient()
-        .from('organisations')
-        .delete()
-        .eq('org_id', data[0].org_id);
-      throw new InternalServerErrorException('Owner not added to organisation');
-    }
+    await this.createOrg_H1(create_org_dto.owner_id, data[0].org_id);
 
     return { data };
   }
 
-  // TODO: Test this function
+  async uploadOrgLogo(
+    file: Express.Multer.File,
+    upload_org_logo_dto: Upload_Org_Logo_Dto
+  ) {
+    const bucket_name = 'org_logos';
+    const file_path = `${upload_org_logo_dto.org_id}/${file.originalname}`;
+
+    const { data, error } = await this.supabase
+      .getClient()
+      .storage.from(bucket_name)
+      .upload(file_path, file.buffer, {
+        contentType: file.mimetype,
+        upsert: true
+      });
+
+    if (error) {
+      throw error;
+    }
+    if (data === null) {
+      throw new InternalServerErrorException('Failed to upload file');
+    }
+
+    const { data: img_url } = await this.supabase
+      .getClient()
+      .storage.from(bucket_name)
+      .getPublicUrl(file_path);
+
+    return img_url;
+  }
+
   async addMember(add_member_dto: Add_Member_Dto) {
     const { data: user_data, error: owner_error } = await this.supabase
       .getClient()
@@ -283,7 +321,7 @@ export class OrgManagementService {
 
     if (!org_data[0].role_permissions.invite_users) {
       throw new UnauthorizedException(
-        'You do not have permission to add users'
+        'You do not have permission to add members'
       );
     }
 
@@ -296,7 +334,7 @@ export class OrgManagementService {
       remove_users: false,
       update_user_roles: false,
       view_all_dbs: false,
-      view_all_users: false,
+      view_all_users: true,
       update_db_access: false
     };
 
@@ -327,7 +365,30 @@ export class OrgManagementService {
     return { data };
   }
 
-  // TODO: Test this function
+  async addDb_H1(add_db_dto: Add_Db_Dto) {
+    const db_fields = {
+      name: add_db_dto.name,
+      type: add_db_dto.type,
+      db_info: add_db_dto.db_info ? add_db_dto.db_info : {},
+      host: add_db_dto.host
+    };
+
+    const { data: db_data, error: db_error } = await this.supabase
+      .getClient()
+      .from('db_envs')
+      .insert({ ...db_fields })
+      .select();
+
+    if (db_error) {
+      throw db_error;
+    }
+    if (db_data.length === 0) {
+      throw new InternalServerErrorException('Database not added');
+    }
+
+    return { db_data };
+  }
+
   async addDb(add_db_dto: Add_Db_Dto) {
     const { data: user_data, error: owner_error } = await this.supabase
       .getClient()
@@ -357,25 +418,7 @@ export class OrgManagementService {
       throw new UnauthorizedException('You do not have permission to add dbs');
     }
 
-    const db_fields = {
-      name: add_db_dto.name,
-      type: add_db_dto.type,
-      db_info: add_db_dto.db_info ? add_db_dto.db_info : {},
-      host: add_db_dto.host
-    };
-
-    const { data: db_data, error: db_error } = await this.supabase
-      .getClient()
-      .from('db_envs')
-      .insert({ ...db_fields })
-      .select();
-
-    if (db_error) {
-      throw db_error;
-    }
-    if (db_data.length === 0) {
-      throw new InternalServerErrorException('Database not added');
-    }
+    const { db_data } = await this.addDb_H1(add_db_dto);
 
     const { data, error } = await this.supabase
       .getClient()
@@ -405,7 +448,7 @@ export class OrgManagementService {
 
     await this.giveDbAccess(give_db_access_dto)
 
-    return { db_data };
+    return { data: db_data };
   }
 
   // TODO: Test this function
@@ -456,7 +499,7 @@ export class OrgManagementService {
       throw new InternalServerErrorException('Database access not given');
     }
 
-    return { db_data };
+    return { data: db_data };
   }
 
   // TODO: Test this function
@@ -502,7 +545,7 @@ export class OrgManagementService {
       throw new InternalServerErrorException('Database secrets not saved');
     }
 
-    return { db_data };
+    return { data: db_data };
   }
 
   // TODO: Test this function
@@ -641,7 +684,7 @@ export class OrgManagementService {
               remove_users: true,
               update_user_roles: false,
               view_all_dbs: true,
-              view_all_users: false,
+              view_all_users: true,
               update_db_access: false
             };
           }
@@ -664,7 +707,7 @@ export class OrgManagementService {
               remove_users: false,
               update_user_roles: false,
               view_all_dbs: false,
-              view_all_users: false,
+              view_all_users: true,
               update_db_access: false
             };
           }
@@ -775,7 +818,7 @@ export class OrgManagementService {
       throw new InternalServerErrorException('Database not updated');
     }
 
-    return { db_data };
+    return { data: db_data };
   }
 
   // TODO: Test this function
@@ -967,6 +1010,6 @@ export class OrgManagementService {
       throw new InternalServerErrorException('Database access not removed');
     }
 
-    return { db_data };
+    return { data: db_data };
   }
 }
