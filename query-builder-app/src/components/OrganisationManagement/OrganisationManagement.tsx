@@ -20,20 +20,26 @@ const getToken = async () => {
 
     const supabase = createClient();
     const token = (await supabase.auth.getSession()).data.session?.access_token;
-  
     return token;
+};
+
+const getUser = async () => {
+    const supabase = createClient();
+    const loggedInUser = (await supabase.auth.getSession()).data.session?.user.id;
+    // console.log(loggedInUser);
+    return loggedInUser;
 };
 
 export default function OrganisationManagement(){
 
     const {orgServerID} = useParams<{orgServerID: string}>();
-
     let [initialOrgName, setInitialOrgName] = useState('');
     let [initialOrgLogo, setInitialOrgLogo] = useState('');
-    let [orgMembers, setOrgMembers] = useState(null);
+    let [orgMembers, setOrgMembers] = useState([]);
     let [updateOrgName, setUpdateOrgName] = useState(initialOrgName);
     let [updateOrgNameHasBeenFocused, setUpdateOrgNameHasBeenFocused] = useState(false);
     let [profilePicURL, setProfilePicURL] = useState('');
+    let [hasAdminPermission, setHasAdminPermission] = useState(false);
 
     const isUpdateOrgNameInvalid = React.useMemo(() => {
         if (updateOrgName === "") return true;
@@ -94,6 +100,17 @@ export default function OrganisationManagement(){
         let membersData = ((await response.json()).data);
         console.log(membersData);
         setOrgMembers(membersData);
+
+        getUser().then((user) => {
+          console.log(user);
+          console.log(orgMembers);
+          console.log(membersData);
+          let loggedInUserRole = (membersData.find((orgMember:any) => orgMember.profiles.user_id === user).user_role);
+          if (loggedInUserRole == "owner" || loggedInUserRole == "admin") {
+            setHasAdminPermission(true);
+          }
+        });
+
       } catch (error) {
         console.error("Failed to fetch members of the organisation:", error);
       }
@@ -153,20 +170,28 @@ export default function OrganisationManagement(){
               </div>
             );
           case "actions":
-            return (
-              <div className="relative flex items-center gap-2">
-                <Tooltip content="Edit user">
-                  <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                    <EditUserModal org_id={orgServerID} user_id={user.id} on_add={getMembers} />
-                  </span>
-                </Tooltip>
-                <Tooltip color="danger" content="Delete user">
-                  <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                    <DeleteIcon />
-                  </span>
-                </Tooltip>
-              </div>
-            );
+            if (hasAdminPermission) {
+              if(user.user_role == "admin" || user.user_role == "member"){
+                return (
+                  
+                  <div className="relative flex items-center gap-2">
+                    <Tooltip content="Edit user">
+                      <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                        <EditUserModal org_id={orgServerID} user_id={user.profiles.user_id} on_add={getMembers} />
+                      </span>
+                    </Tooltip>
+                    <Tooltip color="danger" content="Delete user">
+                      <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                        <DeleteIcon />
+                      </span>
+                    </Tooltip>
+                  </div>
+                );
+              }
+            }
+            else{
+              return(<></>);
+            }
           default:
             return user.profiles.phone;
         }
