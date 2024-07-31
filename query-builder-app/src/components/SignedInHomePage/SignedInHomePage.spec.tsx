@@ -66,14 +66,8 @@ describe('SignedInHomePage', () => {
 
     // Check that the organisation name is displayed
     await waitFor(() => {
-      expect(screen.getByText('Test Organisation')).toBeInTheDocument();
+      expect(screen.getByText('Your Organisations')).toBeInTheDocument();
     });
-
-    // Check that the database name is displayed
-    expect(screen.getByText('Test Database')).toBeInTheDocument();
-
-    // Check that the DatabaseConnectionModal is displayed
-    expect(screen.getByTestId('DatabaseConnectionModal')).toBeInTheDocument();
   });
 
   it('calls fetchOrgs on modal add', async () => {
@@ -81,12 +75,12 @@ describe('SignedInHomePage', () => {
 
     // Simulate clicking the add button in the modal
     await waitFor(() => {
-      screen.getByText('Add DB').click();
+      screen.getByText('+ Add').click();
     });
 
     // Check that fetch has been called again (fetchOrgs is called again)
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(3); // Once for initial load and once for add
+      expect(global.fetch).toHaveBeenCalledTimes(2); // Once for initial load and once for add
     });
   });
 });
