@@ -2,8 +2,6 @@
 import { Chip, Spacer, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Link} from "@nextui-org/react"
 import DatabaseConnectionModal from "../DatabaseConnectionModal/DatabaseConnectionModal"
 import React from "react";
-import { EditIcon } from "./EditIcon";
-import { DeleteIcon } from "./DeleteIcon";
 import { createClient } from "./../../utils/supabase/client";
 import AddOrganisationModal from "../AddOrganisationModal/AddOrganisationModal";
 
