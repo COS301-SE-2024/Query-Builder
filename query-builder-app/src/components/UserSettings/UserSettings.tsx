@@ -6,11 +6,18 @@ import PhoneInput, { formatPhoneNumber, formatPhoneNumberIntl, isValidPhoneNumbe
 import 'react-phone-number-input/style.css';
 import { createClient } from "./../../utils/supabase/client";
 
-const getToken = async () => {
+interface UpdateUserPersonalDetails {
+    user_id?: string;
+    username?: string;
+    first_name?: string;
+    last_name?: string;
+    email?: string;
+    profile_photo?: string;
+}
 
+const getToken = async () => {
     const supabase = createClient();
     const token = (await supabase.auth.getSession()).data.session?.access_token;
-  
     return token;
 };
 
@@ -37,12 +44,12 @@ export default function UserSettings(){
             }
 
             //   console.log((await response.json()));
-            let json = await response.json();
-            console.log(json.profile_data[0]);
-            setInitialFirstName(json.profile_data[0].first_name);
-            setInitialLastName(json.profile_data[0].last_name);
-            setInitialPhone(json.profile_data[0].phone);
-            setInitialEmail(json.profile_data[0].email);
+            let json = (await response.json()).data[0];
+            console.log(json);
+            setInitialFirstName(json.first_name);
+            setInitialLastName(json.last_name);
+            setInitialPhone(json.phone);
+            setInitialEmail(json.email);
         } catch (error) {
             console.error("Failed to fetch user info:", error);
         }
@@ -77,33 +84,20 @@ export default function UserSettings(){
         return false;
     }, [updateLastName]);
 
-    const updateQuery = async() => {
-        let fName;
-        let lName;
-        
+    const updateQuery = async() => {    
+        let updatedDetails: UpdateUserPersonalDetails = {};
+
         if (updateFirstName === initialFirstName && updateLastName === initialLastName) {
             return;
         }
         
-        if (updateFirstName === initialFirstName){
-            fName = initialFirstName;
-        }
-        else {
-            fName = updateFirstName;
+        if (updateFirstName !== initialFirstName){
+            updatedDetails.first_name = updateFirstName;
         }
 
-        if (updateLastName ===  initialLastName){
-            lName = initialLastName;
+        if (updateLastName !==  initialLastName){
+            updatedDetails.last_name = updateLastName;
         }
-        else {
-            lName = updateLastName;
-        }
-
-        let updatedDetails = {
-            first_name: fName,
-            last_name: lName,
-        };
-
         console.log(updatedDetails);
 
         let response = await fetch("http://localhost:55555/api/user-management/update-user", {
@@ -120,18 +114,14 @@ export default function UserSettings(){
     };
 
     const updateEmailFunction = async() => {
-        let email;
+        let updatedDetails: UpdateUserPersonalDetails = {};
         
         if (updateEmail == initialEmail){
             return;
         }
         else {
-            email = updateEmail;
+            updatedDetails.email = updateEmail;
         }
-
-        let updatedDetails = {
-            email: updateEmail
-        };
 
         console.log(updatedDetails);
 

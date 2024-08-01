@@ -14,7 +14,7 @@ interface UpdateOrganisation {
     org_id: string;
     name?: string;
     logo?: string;
-  }
+}
 
 const getToken = async () => {
 
@@ -42,6 +42,43 @@ export default function OrganisationManagement(){
     let [profilePicURL, setProfilePicURL] = useState('');
     let [hasAdminPermission, setHasAdminPermission] = useState(false);
     let [table, setTable] = useState('');
+
+    async function getMembers() {
+      try {
+        let response = await fetch("http://localhost:55555/api/org-management/get-members", {
+          method: "PUT",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + await getToken(),
+          },
+          body: JSON.stringify({ org_id: orgServerID, }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+        let membersData = ((await response.json()).data);
+        console.log(membersData);
+        setOrgMembers(membersData);
+
+        getUser().then((user) => {
+          setLoggedInUserID(user as string);
+          console.log(orgMembers);
+          console.log(membersData);
+          let loggedInUserRole = (membersData.find((orgMember:any) => orgMember.profiles.user_id === user).user_role);
+          console.log(loggedInUserRole);
+          if (loggedInUserRole == "owner" || loggedInUserRole == "admin") {
+            setHasAdminPermission(true);
+          }
+        });
+
+      } catch (error) {
+        console.error("Failed to fetch members of the organisation:", error);
+      }
+    };
+
 
     const isUpdateOrgNameInvalid = React.useMemo(() => {
         if (updateOrgName === "") return true;
@@ -77,47 +114,14 @@ export default function OrganisationManagement(){
             console.error("Failed to fetch organisation info:", error);
           }
         };
-    
-        getOrganisationInfo();
+
         getMembers();
+        
+        getOrganisationInfo();
       }, []);
 
     // TODO: get members
-    async function getMembers() {
-      try {
-        let response = await fetch("http://localhost:55555/api/org-management/get-members", {
-          method: "PUT",
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + await getToken(),
-          },
-          body: JSON.stringify({ org_id: orgServerID, }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-
-        let membersData = ((await response.json()).data);
-        console.log(membersData);
-        setOrgMembers(membersData);
-
-        getUser().then((user) => {
-          setLoggedInUserID(user as string);
-          console.log(orgMembers);
-          console.log(membersData);
-          let loggedInUserRole = (membersData.find((orgMember:any) => orgMember.profiles.user_id === user).user_role);
-          console.log(loggedInUserRole);
-          if (loggedInUserRole == "owner" || loggedInUserRole == "admin") {
-            setHasAdminPermission(true);
-          }
-        });
-
-      } catch (error) {
-        console.error("Failed to fetch members of the organisation:", error);
-      }
-    }
+    
    
     // // Updated fields
     const updateQuery = async() => {
@@ -152,6 +156,19 @@ export default function OrganisationManagement(){
         console.log(response)
     };
 
+    async function deleteUserFromOrg(userId: string){
+      let response = await fetch("http://localhost:55555/api/org-management/remove-member", {
+          method: "DELETE",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + await getToken(),
+          },
+          body: JSON.stringify({ org_id: orgServerID, user_id: userId})
+      })
+      console.log(response);
+    }
+
     const renderCell = React.useCallback((user:any, columnKey:any) => {
         switch (columnKey) {
           case "name":
@@ -172,8 +189,8 @@ export default function OrganisationManagement(){
             );
           case "actions":
             if (hasAdminPermission) {
-              console.log("yes you have admin permission");
-              if((user.user_role == "admin" || user.user_role == "member")){
+              
+              if((user.user_role == "admin" || user.user_role == "member") && user.profiles.user_id !== loggedInUserID){
                 return (
                   
                   <div className="relative flex items-center gap-2">
@@ -184,7 +201,7 @@ export default function OrganisationManagement(){
                     </Tooltip>
                     <Tooltip color="danger" content="Delete user">
                       <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                        <DeleteIcon />
+                        <DeleteIcon onClick={() => deleteUserFromOrg(user.profiles.user_id)}/>
                       </span>
                     </Tooltip>
                   </div>
@@ -197,7 +214,7 @@ export default function OrganisationManagement(){
           default:
             return user.profiles.phone;
         }
-      }, []);
+      }, [hasAdminPermission]);
 
       const columns = [
         {name: "NAME", uid: "name"},
