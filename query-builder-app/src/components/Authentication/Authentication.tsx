@@ -11,7 +11,7 @@ import PhoneInput, {
   isValidPhoneNumber,
 } from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
-import {login, signup} from '@/app/authentication/actions'
+import {login, signup} from '../../app/authentication/actions'
 
 export default function Authentication() {
 
