@@ -1,7 +1,8 @@
 import { table } from "@/interfaces/intermediateJSON";
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vitest, vi, Mock, beforeAll } from 'vitest';
 import TableList from "./TableList";
+import userEvent from '@testing-library/user-event'
 import React from 'react';
 
 //Mock out Supabase access token retrieval
@@ -27,12 +28,12 @@ global.fetch = vi.fn((url: string, config: any) => {
 
     if(url == "http://localhost:55555/api/metadata/tables"){
         return Promise.resolve({
-            json: () => Promise.resolve({ data: [{name: "users", qbee_id: 0}, {name: "payments", qbee_id: 1}] }),
+            json: () => Promise.resolve([{table_name: "users", qbee_id: 0}, {table_name: "payments", qbee_id: 1}]),
         })
     }
     else if(url == "http://localhost:55555/api/metadata/foreign-keys"){
         return Promise.resolve({
-            json: () => Promise.resolve({ data: [{name: "payments", qbee_id: 1, REFERENCED_COLUMN_NAME: "id", COLUMN_NAME: "user_id", TABLE_SCHEMA: "sakila"}] }),
+            json: () => Promise.resolve([{table_name: "payments", qbee_id: 1, REFERENCED_COLUMN_NAME: "id", COLUMN_NAME: "user_id", TABLE_SCHEMA: "sakila"}]),
         })
     }
     else if(url == "http://localhost:55555/api/metadata/fields"){
@@ -58,3 +59,50 @@ describe('TableList basic rendering tests', () => {
   
     });
 });
+
+// describe('TableList table selection tests', () => {
+
+//     it('should be able to add a table to an empty table object', async () => {
+
+//         let tableProp: table = {
+//             name: "",
+//             columns: []
+//         }
+
+//         //callback function for TableForm to modify table
+//         function updateTable(table: table){
+
+//             //modify tableProp
+//             tableProp = table;
+
+//         }
+
+//         //create a user that can perform actions
+//         const user = userEvent.setup();
+    
+//         //render the TableList
+//         render(<TableList databaseName="sakila" table={tableProp} onChange={updateTable} />);
+
+//         //get the add button
+//         const button = screen.getAllByLabelText('+')[0];
+
+//         //click the add button
+//         await user.click(button);
+
+//         //find the users table
+//         const userSelection = screen.getByLabelText("users");
+
+//         //select the users table
+//         await user.click(userSelection);
+
+//         //check that tableProp now matches the expectedTable
+//         const expectedTable: table = {
+//             name: "users",
+//             columns: [{name: "first_name"}]
+//         }
+
+//         expect(tableProp).toEqual(expectedTable);
+
+//     })
+
+// });
