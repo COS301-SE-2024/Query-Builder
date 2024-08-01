@@ -37,10 +37,11 @@ export default function OrganisationManagement(){
     let [initialOrgName, setInitialOrgName] = useState('');
     let [initialOrgLogo, setInitialOrgLogo] = useState('');
     let [orgMembers, setOrgMembers] = useState([]);
-    let [updateOrgName, setUpdateOrgName] = useState(initialOrgName);
+    let [updateOrgName, setUpdateOrgName] = useState('');
     let [updateOrgNameHasBeenFocused, setUpdateOrgNameHasBeenFocused] = useState(false);
     let [profilePicURL, setProfilePicURL] = useState('');
     let [hasAdminPermission, setHasAdminPermission] = useState(false);
+    let [table, setTable] = useState('');
 
     const isUpdateOrgNameInvalid = React.useMemo(() => {
         if (updateOrgName === "") return true;
@@ -59,7 +60,7 @@ export default function OrganisationManagement(){
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + await getToken(),
               },
-              body: JSON.stringify({ org_id: orgServerID }),
+              body: JSON.stringify({ org_id: orgServerID, }),
             });
     
             if (!response.ok) {
@@ -79,7 +80,7 @@ export default function OrganisationManagement(){
     
         getOrganisationInfo();
         getMembers();
-      }, [orgServerID]);
+      }, []);
 
     // TODO: get members
     async function getMembers() {
@@ -107,6 +108,7 @@ export default function OrganisationManagement(){
           console.log(orgMembers);
           console.log(membersData);
           let loggedInUserRole = (membersData.find((orgMember:any) => orgMember.profiles.user_id === user).user_role);
+          console.log(loggedInUserRole);
           if (loggedInUserRole == "owner" || loggedInUserRole == "admin") {
             setHasAdminPermission(true);
           }
@@ -170,7 +172,8 @@ export default function OrganisationManagement(){
             );
           case "actions":
             if (hasAdminPermission) {
-              if((user.user_role == "admin" || user.user_role == "member") && user.profiles.user_id !== loggedInUserID){
+              console.log("yes you have admin permission");
+              if((user.user_role == "admin" || user.user_role == "member")){
                 return (
                   
                   <div className="relative flex items-center gap-2">
@@ -228,6 +231,7 @@ export default function OrganisationManagement(){
                 const formData = new FormData();
                 formData.append('file', file);
                 console.log(formData.get('file'));
+                formData.append('org_id', orgServerID);
       
                 let response = await fetch("http://localhost:55555/api/org-management/upload-org-logo", {
                     method: "POST",
@@ -247,40 +251,59 @@ export default function OrganisationManagement(){
     return (
         <>
             <div className="flex w-full flex-col">
-                <Tabs aria-label="Options">
+                <Spacer y={2}/>
+                <div className="organisationHeader m-auto mt-0 mb-0 md:ml-10 flex flex-col md:flex-row justify-center content-center md:justify-start">
+                    <Image
+                      className="orgLogo md:rounded-1"
+                      width={200}
+                      height={100}
+                      alt="Organisation Logo"
+                      src={profilePicURL}
+                    />
+                    <Spacer y={2}/>
+                    <span className="m-auto md:ml-10 justify-center content-center text-2xl ">{updateOrgName}</span>
+                </div>
+                <Spacer y={2}/>
+
+                <Tabs aria-label="Options" className="m-auto mb-0 mt-0 md:m-0 md:ml-1">
                     <Tab key="orgInfo" title="Organisation Information">
                     <Card>
                         <CardHeader>
                             Organisation Settings
                         </CardHeader>
                         <CardBody>
-                            <div className="flex flex-col">
-                                <div className="infield flex justify-center relative pb-4"  >
-                                    <Image
-                                        className="orgLogo rounded-full"
-                                        width={200}
-                                        height={100}
-                                        alt="Organisation Logo"
-                                        src={profilePicURL}
-                                    />
-                                
-                                    <div className="flex flex-col justify-end absolute bottom-0">
-                                        <label className="custom-file-upload bg-white p-1 border-2 border-slate-600 rounded-full">
-                                            <input
-                                                data-testid="file-input"
-                                                type="file"
-                                                accept=".jpg,.jpeg,.png"
-                                                onInput={(event) => handleProfilePicChange(event)}
-                                            />
-                                            <EditIcon/>
-                                        </label>
-                                    </div>
+                          <div className="flex flex-col">
+                            {hasAdminPermission ? 
+                              (<>
+                                  <div className="infield flex justify-center relative pb-4"  >
+                                      <Image
+                                          className="orgLogo rounded-full"
+                                          width={200}
+                                          height={100}
+                                          alt="Organisation Logo"
+                                          src={profilePicURL}
+                                      />
+                                  
+                                      <div className="flex flex-col justify-end absolute bottom-0">
+                                          <label className="custom-file-upload bg-white p-1 border-2 border-slate-600 rounded-full">
+                                              <input
+                                                  data-testid="file-input"
+                                                  type="file"
+                                                  accept=".jpg,.jpeg,.png"
+                                                  onInput={(event) => handleProfilePicChange(event)}
+                                              />
+                                              <EditIcon/>
+                                          </label>
+                                      </div>
 
-                                </div>
-                                <Spacer y={2}/>
+                                  </div>
+                                  <Spacer y={2}/>
+                                </>):(<></>)}
+                            
                                 <div className="infield">
                                     <Input
                                         // isRequired
+                                        isDisabled = {!hasAdminPermission}
                                         label="Organisation Name"
                                         defaultValue={updateOrgName}
                                         variant="bordered"
