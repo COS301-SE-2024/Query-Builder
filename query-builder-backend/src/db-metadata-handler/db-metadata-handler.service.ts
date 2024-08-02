@@ -12,6 +12,10 @@ interface Table {
     columns: string[]
 }
 
+interface SchemaQuery {
+    databaseServerID: string
+}
+
 interface TableQuery {
     databaseServerID: string,
     schema: string;
@@ -34,7 +38,7 @@ export class DbMetadataHandlerService {
 
     constructor(private readonly queryHandlerService: QueryHandlerService) {}
 
-    async getSchemaMetadata(db_id: string, session: Record<string, any>): Promise<any> {
+    async getSchemaMetadata(schemaQuery: SchemaQuery, session: Record<string, any>): Promise<any> {
 
         /*
         SELECT schema_name
@@ -43,7 +47,7 @@ export class DbMetadataHandlerService {
         ORDER BY schema_name;
         */
         const query: Query = {
-            databaseServerID: db_id,
+            databaseServerID: schemaQuery.databaseServerID,
             queryParams: {
                 language: "sql",
                 query_type: "select",

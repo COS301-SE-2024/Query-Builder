@@ -1,6 +1,10 @@
 import { Body, Controller, Put, Session } from '@nestjs/common';
 import { DbMetadataHandlerService } from './db-metadata-handler.service';
 
+interface SchemaQuery {
+    databaseServerID: string
+}
+
 interface TableQuery {
     databaseServerID: string,
     schema: string;
@@ -24,8 +28,8 @@ export class DbMetadataHandlerController {
     constructor(private readonly dbMetadataHandlerService: DbMetadataHandlerService) {}
 
     @Put("schemas")
-    async getSchemaMetadata(@Body() databaseServerID: string, @Session() session: Record<string, any>) {
-        return this.dbMetadataHandlerService.getSchemaMetadata(databaseServerID, session);
+    async getSchemaMetadata(@Body() schemaQuery: SchemaQuery, @Session() session: Record<string, any>) {
+        return this.dbMetadataHandlerService.getSchemaMetadata(schemaQuery, session);
     }
 
     @Put("tables")

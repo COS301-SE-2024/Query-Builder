@@ -9,10 +9,8 @@ import { Supabase } from '../supabase';
 import { AppService } from '../app.service';
 import { ConfigService } from '@nestjs/config';
 
-interface DatabaseCredentials {
-  host: string;
-  user: string;
-  password: string;
+interface ConnectRequest{
+  databaseServerID: string
 }
 
 export interface ConnectionStatus {
@@ -29,18 +27,19 @@ export class ConnectionManagerService {
     session: Record<string, any>,
   ): Promise<ConnectionStatus> {
     return new Promise(async (resolve, reject) => {
-
       const { data: user_data, error: user_error } = await this.supabase.getClient().auth.getUser(this.supabase.getJwt());
       if (user_error) {
-        throw user_error;
+        return reject(user_error);
       }
 
       const { data: db_data, error: error } = await this.supabase.getClient().from('db_envs').select('host').eq('db_id', db_id).single();
       if(error) {
-        throw error
+        console.log(error);
+        return reject(error);
       }
+
       if(!db_data) {
-        throw new UnauthorizedException('You do not have access to this database');
+        return reject(new UnauthorizedException('You do not have access to this database'));
       }
       
       let { user, password } = await this.decryptDbSecrets(db_id, session);
@@ -148,20 +147,20 @@ export class ConnectionManagerService {
     
     const user_id = user_data.user.id;
 
-    const { data: db_secrets, error: db_error } = await this.supabase.getClient().from('db_access').select('db_secrets').eq('user_id', user_id).eq('db_id', db_id);
+    const { data: db_secrets_data, error: db_error } = await this.supabase.getClient().from('db_access').select('db_secrets').eq('user_id', user_id).eq('db_id', db_id);
 
     if(db_error) {
       throw db_error;
     }
-    if(db_secrets.length === 0) {
+    if(db_secrets_data.length === 0) {
       throw new UnauthorizedException('Database secret not found, you do not have access to this database');
     }
 
-    const db_secret = db_secrets[0].db_secrets;
+    const db_secrets = db_secrets_data[0].db_secrets;
 
     const uni_key = this.config_service.get('UNI_KEY');
 
-    const decryptedText = this.app_service.decrypt(db_secret, uni_key);
+    const decryptedText = this.app_service.decrypt(db_secrets, uni_key);
 
     const decryptedText2 = this.app_service.decrypt(decryptedText, session.sessionKey);
 
