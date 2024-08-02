@@ -59,13 +59,9 @@ export class QueryManagementService {
                 .getClient()
                 .from('saved_queries')
                 .select('parameters, queryTitle, saved_at')
-                // .eq('user_id', user_data.user.id);
-    
+                .eq('user_id', user_data.user.id);
             if (query_error) {
-                throw query_error;
-            }
-            if (query_data.length === 0) {
-                throw new InternalServerErrorException('No queries found');
+                throw query_error;//
             }
     
             return { query_data };
