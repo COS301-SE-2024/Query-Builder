@@ -74,20 +74,17 @@ export default function DatabaseConnectionModal(props: DatabaseConnectionModalPr
 
     async function addDatabase(name: String, host:String, user:String, password:String){
 
-      //create a db_info object
-      const db_info_sens = {
-        user: user,
-        password: password
-      }
-
-      //stringify the db_info
-      const db_info_sens_string = JSON.stringify(db_info_sens);  
-      
-      //get the session key
-      const session_key = window.localStorage.getItem('qbee_session_key')
+      //log request body
+      console.log("BODY OF REQUEST: " + JSON.stringify({
+        org_id: props.org_id,
+        name: name,
+        type: "mysql",
+        host: host
+      }))
 
       //call the add-db API endpoint
       let response = await fetch("http://localhost:55555/api/org-management/add-db", {
+        credentials: "include",
         method: "POST",
         headers: {
           'Accept': 'application/json',
@@ -98,15 +95,55 @@ export default function DatabaseConnectionModal(props: DatabaseConnectionModalPr
             org_id: props.org_id,
             name: name,
             type: "mysql",
-            host: host,
-            session_key: session_key,
-            db_secrets: db_info_sens_string
+            host: host
         })
       })
 
-      console.log("ADD DB RESPONSE " + response)
+      //log response body
+      let addDBResponse = await response.json();
+      console.log("ADD DB RESPONSE " + JSON.stringify(addDBResponse));
 
+      //call the on_add callback so parent component can refetch the modified databases
       props.on_add();
+
+      //if rememberDatabaseCredentials is set, save the db_secrets
+      if(rememberDatabaseCredentials){
+
+        //create a db_secrets object
+        const db_secrets = {
+          user: user,
+          password: password
+        }
+
+        //stringify the db_secrets
+        const db_secrets_string = JSON.stringify(db_secrets);   
+
+        //log request body
+        console.log("BODY OF REQUEST: " + JSON.stringify({
+          db_id: addDBResponse.db_data[0].db_id,
+          db_secrets: db_secrets_string
+        }))
+
+        //call the save-db-secrets API endpoint
+        let response = await fetch("http://localhost:55555/api/org-management/save-db-secrets", {
+          credentials: "include",
+          method: "POST",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + await getToken()
+          },
+          body: JSON.stringify({
+              db_id: addDBResponse.db_data[0].db_id,
+              db_secrets: db_secrets_string
+          })
+        })
+
+        //log response body
+        let json = await response.json();
+        console.log("ADD DB RESPONSE " + JSON.stringify(json));
+
+      }
 
     }
 

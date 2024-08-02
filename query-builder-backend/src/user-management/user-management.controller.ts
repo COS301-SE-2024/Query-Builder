@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Post, Put, UploadedFile, UseInterceptors, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Put, Session, UploadedFile, UseInterceptors, ValidationPipe } from '@nestjs/common';
 import { UserManagementService } from './user-management.service';
 import { Get_User_Dto } from './dto/get-user.dto';
 import { Create_User_Dto } from './dto/create-user.dto';
@@ -19,6 +19,11 @@ export class UserManagementController {
     @Put('get-user')
     async getUser(@Body(ValidationPipe) user: Get_User_Dto) {
         return await this.user_management_service.getUser(user);
+    }
+
+    @Put('gen-session-key')
+    async genSessionKey(@Body(ValidationPipe) user: Sign_In_User_Dto, @Session() session: Record<string, any>) {
+        return await this.user_management_service.genSessionKey(user, session);
     }
 
     @Put('sign-in')
@@ -44,7 +49,6 @@ export class UserManagementController {
     @Post('upload-profile-photo')
     @UseInterceptors(FileInterceptor('file'))
     async uploadProfilePhoto(@UploadedFile() file: Express.Multer.File) {
-        console.log(file);
         return await this.user_management_service.uploadProfilePhoto(file);
     }
 

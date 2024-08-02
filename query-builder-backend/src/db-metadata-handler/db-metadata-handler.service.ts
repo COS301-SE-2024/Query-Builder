@@ -34,7 +34,7 @@ export class DbMetadataHandlerService {
 
     constructor(private readonly queryHandlerService: QueryHandlerService) {}
 
-    async getSchemaMetadata(databaseCredentials: DatabaseCredentials): Promise<any> {
+    async getSchemaMetadata(databaseCredentials: DatabaseCredentials, session: Record<string, any>): Promise<any> {
 
         /*
         SELECT schema_name
@@ -64,7 +64,7 @@ export class DbMetadataHandlerService {
             },
         };
 
-        const response = await this.queryHandlerService.queryDatabase(query);
+        const response = await this.queryHandlerService.queryDatabase(query, session);
 
         //return in the form the frontend is expecting
         var responseToReturn: Database[] = [];
@@ -82,7 +82,7 @@ export class DbMetadataHandlerService {
 
     }
 
-    async getTableMetadata(tableQuery: TableQuery): Promise<any> {
+    async getTableMetadata(tableQuery: TableQuery, session: Record<string, any>): Promise<any> {
 
         /*
         SELECT table_name
@@ -97,7 +97,7 @@ export class DbMetadataHandlerService {
                 language: "sql",
                 query_type: "select",
                 databaseName: "information_schema", 
-                table: {name:"tables", columns: [{name: "table_name"}]},
+                table: {name:"tables", columns: [{name: "table_name", alias: "table_name"}]},
                 condition: {
                     column: "table_schema",
                     operator: ComparisonOperator.EQUAL,
@@ -109,56 +109,13 @@ export class DbMetadataHandlerService {
             },
         };
 
-        const response = await this.queryHandlerService.queryDatabase(query);
+        const response = await this.queryHandlerService.queryDatabase(query, session);
 
-        //return in the form the frontend is expecting
-        var responseToReturn: Table[] = [];
-
-        for(var table of response.data){
-
-            //COULD THE BELOW BE DONE QUICKER USING JOINS?
-            //query the database to get the columns of the table
-            const fieldsQuery: Query = {
-                credentials: tableQuery.credentials,
-                queryParams: {
-                    language: "sql",
-                    query_type: "select",
-                    databaseName: "information_schema",
-                    table: {name:"columns", columns: [{name: "column_name"}]},
-                    condition: {
-                        operator: LogicalOperator.AND,
-                        conditions: [
-                            {column: "table_schema", operator: ComparisonOperator.EQUAL, value: tableQuery.schema},
-                            {column: "table_name", operator: ComparisonOperator.EQUAL, value: table.TABLE_NAME}
-                        ]
-                    },
-                    sortParams: {
-                        column: "column_name",
-                    },
-                },
-            };
-    
-            const fieldsResponse = await this.queryHandlerService.queryDatabase(fieldsQuery);
-            console.log(fieldsResponse);
-
-            var columns: string[] = [];
-
-            for(var column of fieldsResponse.data){
-                columns.push(column.COLUMN_NAME)
-            }
-
-            const newTable: Table = {
-                table: table.TABLE_NAME,
-                columns: columns
-            }
-            responseToReturn.push(newTable);
-        }
-
-        return responseToReturn;
+        return response.data;
 
     }
 
-    async getFieldMetadata(fieldQuery: FieldQuery) : Promise<any> {
+    async getFieldMetadata(fieldQuery: FieldQuery, session: Record<string, any>) : Promise<any> {
 
         /*
         SELECT column_name
@@ -173,7 +130,7 @@ export class DbMetadataHandlerService {
                 language: "sql",
                 query_type: "select",
                 databaseName: "information_schema",
-                table: {name:"columns", columns: [{name: "column_name"}]},
+                table: {name:"columns", columns: [{name: "column_name", alias: "name"}]},
                 condition: {
                     operator: LogicalOperator.AND,
                     conditions: [
@@ -187,11 +144,11 @@ export class DbMetadataHandlerService {
             },
         };
 
-        return await this.queryHandlerService.queryDatabase(query);
+        return await this.queryHandlerService.queryDatabase(query, session);
 
     }
 
-    async getForeignKeyMetadata(foreignKeyQuery: ForeignKeyQuery) : Promise<any> {
+    async getForeignKeyMetadata(foreignKeyQuery: ForeignKeyQuery, session: Record<string, any>) : Promise<any> {
 
         //First get foreign keys 'from' the table pointing 'to' other tables
 
@@ -208,7 +165,7 @@ export class DbMetadataHandlerService {
                 language: "sql",
                 query_type: "select",
                 databaseName: "information_schema",
-                table: {name:"key_column_usage", columns: [{name: "column_name"}, {name: "referenced_table_schema"}, {name: "referenced_table_name"}, {name: "referenced_column_name"}]},
+                table: {name:"key_column_usage", columns: [{name: "column_name"}, {name: "referenced_table_schema"}, {name: "referenced_table_name", alias: "table_name"}, {name: "referenced_column_name"}]},
                 condition: {
                     operator: LogicalOperator.AND,
                     conditions: [
@@ -223,7 +180,7 @@ export class DbMetadataHandlerService {
             },
         };
 
-        const fromResponse = await this.queryHandlerService.queryDatabase(fromQuery);
+        const fromResponse = await this.queryHandlerService.queryDatabase(fromQuery, session);
 
         //Secondly get foreign keys 'from' other tables pointing 'to' the table
 
@@ -240,7 +197,7 @@ export class DbMetadataHandlerService {
                 language: "sql",
                 query_type: "select",
                 databaseName: "information_schema",
-                table: {name:"key_column_usage", columns: [{name: "table_schema"}, {name: "table_name"}, {name: "column_name"}, {name: "referenced_column_name"}]},
+                table: {name:"key_column_usage", columns: [{name: "table_schema"}, {name: "table_name", alias: "table_name"}, {name: "column_name"}, {name: "referenced_column_name"}]},
                 condition: {
                     operator: LogicalOperator.AND,
                     conditions: [
@@ -254,9 +211,9 @@ export class DbMetadataHandlerService {
             },
         };
 
-        const toResponse = await this.queryHandlerService.queryDatabase(toQuery);
+        const toResponse = await this.queryHandlerService.queryDatabase(toQuery, session);
 
-        return {from: fromResponse.data, to: toResponse.data}
+        return fromResponse.data.concat(toResponse.data);
 
     }
 

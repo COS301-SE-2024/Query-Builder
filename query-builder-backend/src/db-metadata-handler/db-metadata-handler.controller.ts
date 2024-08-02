@@ -1,6 +1,6 @@
-import { Body, Controller, Put } from '@nestjs/common';
+import { Body, Controller, Put, Session } from '@nestjs/common';
 import { DbMetadataHandlerService } from './db-metadata-handler.service';
-import { DatabaseCredentials } from 'src/interfaces/intermediateJSON';
+import { DatabaseCredentials } from '../interfaces/intermediateJSON';
 
 interface TableQuery {
     credentials: DatabaseCredentials;
@@ -25,23 +25,23 @@ export class DbMetadataHandlerController {
     constructor(private readonly dbMetadataHandlerService: DbMetadataHandlerService) {}
 
     @Put("schemas")
-    async getSchemaMetadata(@Body() credentials: DatabaseCredentials) {
-        return this.dbMetadataHandlerService.getSchemaMetadata(credentials);
+    async getSchemaMetadata(@Body() credentials: DatabaseCredentials, @Session() session: Record<string, any>) {
+        return this.dbMetadataHandlerService.getSchemaMetadata(credentials, session);
     }
 
     @Put("tables")
-    async getTableMetadata(@Body() tableQuery: TableQuery) {
-        return this.dbMetadataHandlerService.getTableMetadata(tableQuery);
+    async getTableMetadata(@Body() tableQuery: TableQuery, @Session() session: Record<string, any>) {
+        return this.dbMetadataHandlerService.getTableMetadata(tableQuery, session);
     }
 
     @Put("fields")
-    async getFieldMetadata(@Body() fieldQuery: FieldQuery){
-        return this.dbMetadataHandlerService.getFieldMetadata(fieldQuery);
+    async getFieldMetadata(@Body() fieldQuery: FieldQuery, @Session() session: Record<string, any>){
+        return this.dbMetadataHandlerService.getFieldMetadata(fieldQuery, session);
     }
 
     @Put("foreign-keys")
-    async getForeignKeyMetadata(@Body() foreignKeyQuery: ForeignKeyQuery){
-        return this.dbMetadataHandlerService.getForeignKeyMetadata(foreignKeyQuery);
+    async getForeignKeyMetadata(@Body() foreignKeyQuery: ForeignKeyQuery, @Session() session: Record<string, any>){
+        return this.dbMetadataHandlerService.getForeignKeyMetadata(foreignKeyQuery, session);
     }
 
 }

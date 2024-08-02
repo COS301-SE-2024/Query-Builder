@@ -106,7 +106,8 @@ export default function Authentication() {
 
     //sign into QBee server
     //call the sign-in API endpoint
-    let response = await fetch("http://localhost:55555/api/user-management/sign-in", {
+    let response = await fetch("http://localhost:55555/api/user-management/gen-session-key", {
+      credentials: "include",
       method: "PUT",
       headers: {
           'Accept': 'application/json',
@@ -116,9 +117,6 @@ export default function Authentication() {
       })
   
     let responseData = await response.json();
-
-    //save the session key into local storage, move to server-side session variable once we have implemented persistent backend sessions
-    window.localStorage.setItem('qbee_session_key', responseData.sessionKey);
     
     login(email, password);
     

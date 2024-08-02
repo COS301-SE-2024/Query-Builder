@@ -62,10 +62,18 @@ export class UserManagementService {
       throw new NotFoundException('User not found');
     }
 
-    return { profile_data };
+    return { data: profile_data };
   }
 
-  async signIn(user: Sign_In_User_Dto) {
+  async genSessionKey(user: Sign_In_User_Dto, session: Record<string, any>) {
+    const key = (await promisify(scrypt)(user.password, 'salt', 32)) as Buffer;
+
+    session.sessionKey = key.toString('base64');
+
+    return { data: { success: true } };
+  }
+
+  async signIn(user: Sign_In_User_Dto){
     const { data, error } = await this.supabase
       .getClient()
       .auth.signInWithPassword({
@@ -77,14 +85,7 @@ export class UserManagementService {
       throw error;
     }
 
-    //generate a session key using a key derivation function
-    // The key length is dependent on the algorithm.
-    // In this case for aes256, it is 32 bytes.
-    const key = (await promisify(scrypt)(user.password, 'salt', 32)) as Buffer;
-    console.log(key);
-    console.log('first key length' + key.length);
-
-    return { data, sessionKey: key.toString('base64') };
+    return { data };
   }
 
   async signUp(user: Create_User_Dto) {

@@ -6,6 +6,9 @@ import {
   Patch,
   Post,
   Put,
+  Session,
+  UploadedFile,
+  UseInterceptors,
   ValidationPipe,
 } from "@nestjs/common";
 import { Supabase } from "../supabase";
@@ -24,6 +27,11 @@ import { Get_Members_Dto } from "./dto/get-members.dto";
 import { Get_Dbs_Dto } from "./dto/get-dbs.dto";
 import { Give_Db_Access_Dto } from "./dto/give-db-access.dto";
 import { Remove_Db_Access_Dto } from "./dto/remove-db-access.dto";
+import { Save_Db_Secrets_Dto } from "./dto/save-db-secrets.dto";
+import { Upload_Org_Logo_Dto } from "./dto/upload-org-logo.dto";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { Express } from "express";
+
 
 @Controller("org-management")
 export class OrgManagementController {
@@ -49,6 +57,12 @@ export class OrgManagementController {
     return this.org_management_service.getDbs(get_dbs_dto);
   }
 
+  @Post('upload-org-logo')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadOrgLogo(@UploadedFile() file: Express.Multer.File, @Body() body: Upload_Org_Logo_Dto) {
+    return this.org_management_service.uploadOrgLogo(file, body)
+  }
+
   @Post("create-org")
   async createOrg(@Body(ValidationPipe) create_org_dto: Create_Org_Dto) {
     return this.org_management_service.createOrg(create_org_dto);
@@ -67,6 +81,11 @@ export class OrgManagementController {
   @Post("give-db-access")
   async giveDbAccess(@Body(ValidationPipe) give_db_access_dto: Give_Db_Access_Dto) {
     return this.org_management_service.giveDbAccess(give_db_access_dto);
+  }
+
+  @Post('save-db-secrets')
+  async saveDbSecrets(@Body(ValidationPipe) save_db_secrets_dto: Save_Db_Secrets_Dto, @Session() session: Record<string, any>) {
+    return this.org_management_service.saveDbSecrets(save_db_secrets_dto, session);
   }
 
   @Patch("update-org")

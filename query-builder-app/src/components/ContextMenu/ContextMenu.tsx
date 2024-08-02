@@ -1,6 +1,7 @@
 import React from "react";
 import { ScrollShadow, Divider } from "@nextui-org/react";
 import ContextMenuCard from "../ContextMenuCard/ContextMenuCard";
+import { createClient } from "./../../utils/supabase/client";
 
 export default function ContextMenu() {
 
@@ -11,8 +12,28 @@ export default function ContextMenu() {
     parameters: any
   }
 
+    // This function gets the token from local storage.
+    // Supabase stores the token in local storage so we can access it from there.
+    const getToken = async () => {
+
+      const supabase = createClient();
+      const token = (await supabase.auth.getSession()).data.session?.access_token
+  
+      console.log(token)
+  
+      return token;
+  };
+
   async function getSavedQueries() {
-    const response = await fetch("http://localhost:3001/query-management/get-queries");
+    const response = await fetch("http://localhost:55555/query-management/get-queries", {
+      credentials: "include",
+      method: "GET",
+      headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + await getToken()
+      }
+  });
     console.log("response---------------------------------");
     console.log(response);
     const data = await response.json();

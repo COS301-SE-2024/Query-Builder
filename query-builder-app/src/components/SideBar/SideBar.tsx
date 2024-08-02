@@ -35,7 +35,7 @@ const Sidebar = () => {
             <div className="sidebar-nav">
                 <nav className="nav-links">
                     <div className="sidebar-item">
-                        <Link href="/">
+                        <Link href="/" data-testid="homeNav">
                             <span className="sidebar-item-icon"></span>
                             <span className="sidebar-item-title">Home</span>
                         </Link>
@@ -52,13 +52,13 @@ const Sidebar = () => {
                 <nav className="nav-links">
 
                     <div className="sidebar-item">
-                        <Link href="/settings">
+                        <Link href="/settings" data-testid="settingsNav">
                             <span className="sidebar-item-icon"></span>
                             <span className="sidebar-item-title">Settings</span>
                         </Link>
                     </div>
                     <div className="sidebar-item">
-                        <a target="_blank" href="https://cos301-se-2024.github.io/Query-Builder/docs/category/user-manual">
+                        <a target="_blank" data-testid="helpNav" href="https://cos301-se-2024.github.io/Query-Builder/docs/category/user-manual">
                             <span className="sidebar-item-icon"></span>
                             <span className="sidebar-item-title">Help</span>
                         </a>

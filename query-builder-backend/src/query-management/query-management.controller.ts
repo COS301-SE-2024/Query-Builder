@@ -1,4 +1,4 @@
-import { Body, Controller, Post, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Post, ValidationPipe } from '@nestjs/common';
 import { Save_Query_Dto } from './dto/save-query.dto';
 import { QueryManagementService } from './query-management.service';
 
@@ -12,8 +12,8 @@ export class QueryManagementController {
       return this.query_management_service.saveQuery(save_query_dto);
     }
 
-    @Post("get-queries")
-    async getQ(@Body(ValidationPipe)save_query_dto: Save_Query_Dto) {
+    @Get("get-queries")
+    async getQ() {
       return this.query_management_service.getQueries();
     }
 
