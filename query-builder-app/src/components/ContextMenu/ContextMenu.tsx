@@ -12,36 +12,50 @@ export default function ContextMenu() {
     parameters: any
   }
 
-    // This function gets the token from local storage.
-    // Supabase stores the token in local storage so we can access it from there.
-    const getToken = async () => {
+  // This function gets the token from local storage.
+  // Supabase stores the token in local storage so we can access it from there.
+  const getToken = async () => {
 
-      const supabase = createClient();
-      const token = (await supabase.auth.getSession()).data.session?.access_token
-  
-      console.log(token)
-  
-      return token;
+    const supabase = createClient();
+    const token = (await supabase.auth.getSession()).data.session?.access_token
+
+    console.log(token)
+
+    return token;
   };
 
   async function getSavedQueries() {
-    const response = await fetch("http://localhost:55555/query-management/get-queries", {
-      credentials: "include",
-      method: "GET",
-      headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + await getToken()
-      }
-  });
-    console.log("response---------------------------------");
-    console.log(response);
-    const data = await response.json();
-    setSavedQueries(data);
-  }
+    try {
+        const response = await fetch("http://localhost:55555/api/query-management/get-queries", {
+            credentials: "include",
+            method: "GET",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + await getToken()
+            }
+        });
+
+        console.log("Response-------------------", response);
+
+        if (!response.ok) {
+            throw new Error("Network response was not ok");
+        }
+
+        const data = await response.json();
+
+        console.log("Data-------------------", data)
+        setSavedQueries(data.query_data);
+    } catch (error) {
+        console.error("Failed to fetch saved queries:", error);
+        setSavedQueries([]);
+    }
+}
+
 
   //React hook to hold the user's organisations
   const [savedQueries, setSavedQueries] = React.useState<ContextMenuCardProps[]>([]);
+
 
   //React hook to fetch the user's organisations upon rerender of the component
   React.useEffect(() => {
@@ -50,19 +64,18 @@ export default function ContextMenu() {
 
   }, [])
 
-  return (
-
-    <ScrollShadow className="w-[300px] h-[500px]">
-      {savedQueries && savedQueries.map((queryData: ContextMenuCardProps, index: number) => (
-        <React.Fragment key={index}>
-          <ContextMenuCard
-            queryTitle={queryData.queryTitle}
-            saved_at={queryData.saved_at}
-            parameters={queryData.parameters}
-          />
-          <Divider className="my-1" key={`divider-${index}`} />
-        </React.Fragment>
-      ))}
+return (
+    <ScrollShadow className=" h-[500px]">
+        {Array.isArray(savedQueries) && savedQueries.map((queryData: ContextMenuCardProps, index: number) => (
+            <React.Fragment key={index}>
+                <ContextMenuCard
+                    queryTitle={queryData.queryTitle}
+                    saved_at={queryData.saved_at}
+                    parameters={queryData.parameters}
+                />
+                <Divider className="my-1" key={`divider-${index}`} />
+            </React.Fragment>
+        ))}
     </ScrollShadow>
-  );
+);
 }
