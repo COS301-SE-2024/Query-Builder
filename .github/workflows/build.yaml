@@ -32,6 +32,7 @@ jobs:
             - name: App Build
               run: |
                 pnpm run build
+              working-directory: query-builder-app
     backend-build:
         runs-on: ubuntu-latest
         steps: 
@@ -54,3 +55,4 @@ jobs:
             - name: Backend Build
               run: |
                 pnpm run build
+              working-directory: query-builder-backend
