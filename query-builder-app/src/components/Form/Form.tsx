@@ -113,6 +113,7 @@ export default function Form(){
             user: "root",
             password: "testPassword"
         },
+        databaseServerID: databaseServerID,
         queryParams: {
             language: "sql",
             query_type: "select",

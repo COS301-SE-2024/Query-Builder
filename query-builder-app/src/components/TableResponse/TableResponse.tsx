@@ -7,6 +7,7 @@ import Report from "../Report/Report";
 import csvDownload from 'json-to-csv-export'
 import { Query } from "@/interfaces/intermediateJSON";
 import { createClient } from "./../../utils/supabase/client";
+import SaveQueryModal from "../SaveQueryModal/SaveQueryModal";
 
 interface Column {
   key: string,
@@ -63,27 +64,6 @@ export default function TableResponse(props: TableResponseProps){
 
   //A loading state that will initially be true and later false once data has been loaded
   const [loading, setLoading] = useState(true);
-
-  async function saveQuery(){
-
-    //save the query to the query-management/save-query endpoint
-    let response = await fetch("http://localhost:55555/api/query-management/save-query", {
-      credentials: "include",
-      method: "POST",
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + await getToken()
-      },
-      body: JSON.stringify({
-        db_id: props.query.databaseServerID,
-        parameters: props.query.queryParams
-      })
-    })
-
-    let json = (await response.json()).data;
-
-  }
 
   async function downloadCSV(){
 
@@ -239,7 +219,7 @@ export default function TableResponse(props: TableResponseProps){
           </label>
         </div>
         <div></div>
-        <Button color="primary" className="mx-1" onClick={() => {saveQuery()}}>Save Query</Button>
+        <SaveQueryModal query={props.query}/>
         <Button color="primary" className="mx-1" onClick={() => {downloadCSV()}}>Export Data</Button>
         <Button onPress={onOpen} color="primary" className="mx-1">Generate Report</Button>
         <Modal 

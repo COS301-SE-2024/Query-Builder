@@ -22,7 +22,8 @@ export class QueryManagementService {
         const saved_query_fields = {
             parameters: save_query_dto.parameters,
             user_id: user_data.user.id,
-            db_id: save_query_dto.db_id
+            db_id: save_query_dto.db_id,
+            queryTitle: save_query_dto.queryTitle
         }
 
         const { data: save_data, error: save_error } = await this.supabase

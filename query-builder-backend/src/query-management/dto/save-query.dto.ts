@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsUUID } from "class-validator";
+import { IsNotEmpty, IsString, IsUUID } from "class-validator";
 
 export class Save_Query_Dto {
 
@@ -8,5 +8,9 @@ export class Save_Query_Dto {
 
     @IsNotEmpty()
     parameters: string;
+
+    @IsString()
+    @IsNotEmpty()
+    queryTitle: string
 
 }
