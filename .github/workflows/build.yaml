@@ -1,0 +1,58 @@
+name: Build Test
+on:
+    workflow_dispatch:
+    pull_request:
+        branches:
+            - main
+            - dev
+        paths:
+            - 'query-builder-app/**'
+            - 'query-builder-backend/**'
+
+jobs:
+    app-build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: App Checkout
+              uses: actions/checkout@v4
+            - name: App Install pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                version: '9.1.2'
+            - name: App Setup Node
+              uses: actions/setup-node@v4
+              with:
+                node-version: 20
+                cache: 'pnpm'
+                cache-dependency-path: query-builder-app/pnpm-lock.yaml
+            - name: App Install Dependencies
+              run: |
+                pnpm install --frozen-lockfile
+              working-directory: query-builder-app
+            - name: App Build
+              run: |
+                pnpm run build
+              working-directory: query-builder-app
+    backend-build:
+        runs-on: ubuntu-latest
+        steps: 
+            - name: Backend Checkout
+              uses: actions/checkout@v4
+            - name: App Install pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                version: '9.1.2'
+            - name: Backend Setup Node
+              uses: actions/setup-node@v4
+              with:
+                node-version: 20
+                cache: 'pnpm'
+                cache-dependency-path: query-builder-backend/pnpm-lock.yaml
+            - name: Backend Install Dependencies
+              run: |
+                pnpm install --frozen-lockfile
+              working-directory: query-builder-backend
+            - name: Backend Build
+              run: |
+                pnpm run build
+              working-directory: query-builder-backend
