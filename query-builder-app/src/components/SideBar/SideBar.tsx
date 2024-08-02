@@ -42,6 +42,8 @@ const Sidebar = () => {
                     </div>
                 </nav>
             </div>
+
+            {/* Context Menu */}
             <div className = "sidebar-item">
                     <ContextMenu/>
             </div>
