@@ -266,10 +266,10 @@ export class OrgManagementService {
 
   async uploadOrgLogo(
     file: Express.Multer.File,
-    upload_org_logo_dto: Upload_Org_Logo_Dto
+    body: Upload_Org_Logo_Dto
   ) {
     const bucket_name = 'org_logos';
-    const file_path = `${upload_org_logo_dto.org_id}/${file.originalname}`;
+    const file_path = `${body.org_id}/${file.originalname}`;
 
     const { data, error } = await this.supabase
       .getClient()

@@ -28,6 +28,14 @@ jobs:
             - name: Install Dependencies
               run: pnpm install --frozen-lockfile
               working-directory: query-builder-app
+            - name: App Make env file
+              run: |
+                touch .env
+                echo NEXT_PUBLIC_SUPABASE_URL = ${{ secrets.SUPABASE_URL }} >> .env
+                echo NEXT_PUBLIC_SUPABASE_ANON_KEY = ${{ secrets.SUPABASE_ANON_KEY }} >> .env
+                echo NEXT_PUBLIC_SUPABASE_PROJECT_ID = ${{ secrets.SUPABASE_SERVICE_ROLE_KEY}} >> .env
+                cat .env
+              working-directory: query-builder-app
             - name: Test
               run: pnpm test
               working-directory: query-builder-app
