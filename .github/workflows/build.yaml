@@ -29,6 +29,14 @@ jobs:
               run: |
                 pnpm install --frozen-lockfile
               working-directory: query-builder-app
+            - name: App Make env file
+              run: |
+                touch .env
+                echo NEXT_PUBLIC_SUPABASE_URL = ${{ env.SUPABASE_URL }} >> .env
+                echo NEXT_PUBLIC_SUPABASE_ANON_KEY = ${{ env.SUPABASE_ANON_KEY }} >> .env
+                echo NEXT_PUBLIC_SUPABASE_PROJECT_ID = ${{ env.SUPABASE_SERVICE_ROLE_KEY}} >> .env
+                cat .env
+              working-directory: query-builder-app
             - name: App Build
               run: |
                 pnpm run build
@@ -51,6 +59,15 @@ jobs:
             - name: Backend Install Dependencies
               run: |
                 pnpm install --frozen-lockfile
+              working-directory: query-builder-backend
+            - name: Make env file
+              run: |
+                touch .env
+                echo SUPABASE_URL = ${{ env.SUPABASE_URL }} >> .env
+                echo SUPABASE_KEY = ${{ env.SUPABASE_ANON_KEY }} >> .env
+                echo SUPABASE_SERVICE_KEY = ${{ env.SUPABASE_SERVICE_ROLE_KEY}} >> .env
+                echo SUPABASE_JWT_SECRET = ${{ env.SUPABASE_JWT_SECRET }} >> .env
+                cat .env
               working-directory: query-builder-backend
             - name: Backend Build
               run: |
