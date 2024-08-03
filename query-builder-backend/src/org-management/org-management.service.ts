@@ -79,16 +79,30 @@ export class OrgManagementService {
 
     const user_id = data.user.id;
 
-    const { data: org_data, error: org_error } = await this.supabase
+    const { data: org_ids, error: org_error } = await this.supabase
       .getClient()
-      .from('organisations')
-      .select('org_id, created_at, name, logo, org_members(*), db_envs(*)')
-      .eq('owner_id', user_id);
+      .from('org_members')
+      .select('org_id')
+      // .select('org_id, created_at, name, logo, org_members(*), db_envs(*)')
+      .eq('user_id', user_id);
 
     if (org_error) {
       throw org_error;
     }
-    if (org_data.length === 0) {
+    if (org_ids.length === 0) {
+      throw new NotFoundException('Organisation not found');
+    }
+
+    const { data: org_data, error: org_data_error } = await this.supabase
+      .getClient()
+      .from('organisations')
+      .select('org_id, created_at, name, logo, org_members(*), db_envs(*)')
+      .in('org_id', org_ids.map((org) => org.org_id));
+
+    if (org_data_error) {
+      throw org_data_error;
+    }
+    if(org_data.length === 0) {
       throw new NotFoundException('Organisation not found');
     }
 
@@ -264,10 +278,7 @@ export class OrgManagementService {
     return { data };
   }
 
-  async uploadOrgLogo(
-    file: Express.Multer.File,
-    body: Upload_Org_Logo_Dto
-  ) {
+  async uploadOrgLogo(file: Express.Multer.File, body: Upload_Org_Logo_Dto) {
     const bucket_name = 'org_logos';
     const file_path = `${body.org_id}/${file.originalname}`;
 
@@ -444,9 +455,9 @@ export class OrgManagementService {
       db_id: db_data[0].db_id,
       org_id: add_db_dto.org_id,
       user_id: user_data.user.id
-    }
+    };
 
-    await this.giveDbAccess(give_db_access_dto)
+    await this.giveDbAccess(give_db_access_dto);
 
     return { data: db_data };
   }
@@ -503,7 +514,10 @@ export class OrgManagementService {
   }
 
   // TODO: Test this function
-  async saveDbSecrets(save_db_secrets_dto: Save_Db_Secrets_Dto, session: Record<string, any>) {
+  async saveDbSecrets(
+    save_db_secrets_dto: Save_Db_Secrets_Dto,
+    session: Record<string, any>
+  ) {
     const { data: user_data, error: user_error } = await this.supabase
       .getClient()
       .auth.getUser(this.supabase.getJwt());

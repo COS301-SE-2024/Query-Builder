@@ -1,46 +1,42 @@
 name: Backend Test
 on:
-    pull_request:
-        branches:
-            - dev
-            - main
-        paths:
-            - 'query-builder-backend/**'
+  pull_request:
+    branches:
+      - dev
+      - main
+    paths:
+      - "query-builder-backend/**"
 jobs:
-    test:
-        runs-on: ubuntu-latest
-        defaults:
-           run:
-             working-directory: ./query-builder-backend/
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-            - name: Install pnpm
-              uses: pnpm/action-setup@v4
-              with:
-                version: '9.1.2'
-            - name: Setup Node.js
-              uses: actions/setup-node@v4
-              with:
-                cache: 'pnpm'
-                cache-dependency-path: './query-builder-backend/pnpm-lock.yaml'
-            - name: Install Dependencies
-              run: pnpm install --frozen-lockfile
-            - name: Make env file
-              working-directory: query-builder-backend
-              run: |
-                touch .env
-                echo SUPABASE_URL = ${{ env.SUPABASE_URL }} >> .env
-                echo SUPABASE_KEY = ${{ env.SUPABASE_ANON_KEY }} >> .env
-                echo SUPABASE_SERVICE_KEY = ${{ env.SUPABASE_SERVICE_ROLE_KEY}} >> .env
-                echo SUPABASE_JWT_SECRET = ${{ env.SUPABASE_JWT_SECRET }} >> .env
-                cat .env
-            - name: Test
-              env: 
-                SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-                SUPABASE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-                SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-                SUPABASE_JWT_SECRET: ${{ secrets.SUPABASE_JWT_SECRET }}
-                UNI_KEY: ${{ secrets.UNI_KEY }}
-              run: pnpm test
-              working-directory: query-builder-backend
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./query-builder-backend/
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: "9.1.2"
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          cache: "pnpm"
+          cache-dependency-path: "./query-builder-backend/pnpm-lock.yaml"
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Make env file
+        working-directory: query-builder-backend
+        run: |
+          touch .env
+          echo SUPABASE_URL = ${{ secrets.SUPABASE_URL }} >> .env
+          echo SUPABASE_KEY = ${{ secrets.SUPABASE_ANON_KEY }} >> .env
+          echo SUPABASE_SERVICE_KEY = ${{ secrets.SUPABASE_SERVICE_ROLE_KEY}} >> .env
+          echo SUPABASE_JWT_SECRET = ${{ secrets.SUPABASE_JWT_SECRET }} >> .env
+          echo UNI_KEY = ${{ secrets.UNI_KEY }} >> .env
+          echo SESSION_SECRET = ${{ secrets.SESSION_SECRET }} >> .env
+          cat .env
+      - name: Test
+        run: pnpm test
+        working-directory: query-builder-backend
