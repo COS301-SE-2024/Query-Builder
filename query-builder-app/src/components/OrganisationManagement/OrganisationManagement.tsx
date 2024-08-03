@@ -120,9 +120,7 @@ export default function OrganisationManagement(){
         getOrganisationInfo();
       }, []);
 
-    // TODO: get members
-    
-   
+
     // // Updated fields
     const updateQuery = async() => {
 
