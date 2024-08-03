@@ -38,11 +38,5 @@ jobs:
           echo SESSION_SECRET = ${{ secrets.SESSION_SECRET }} >> .env
           cat .env
       - name: Test
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          SUPABASE_JWT_SECRET: ${{ secrets.SUPABASE_JWT_SECRET }}
-          UNI_KEY: ${{ secrets.UNI_KEY }}
         run: pnpm test
         working-directory: query-builder-backend
