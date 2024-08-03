@@ -67,6 +67,8 @@ jobs:
                 echo SUPABASE_KEY = ${{ env.SUPABASE_ANON_KEY }} >> .env
                 echo SUPABASE_SERVICE_KEY = ${{ env.SUPABASE_SERVICE_ROLE_KEY}} >> .env
                 echo SUPABASE_JWT_SECRET = ${{ env.SUPABASE_JWT_SECRET }} >> .env
+                echo UNI_KEY = ${{ env.UNI_KEY }} >> .env
+                echo SESSION_SECRET = ${{ env.SESSION_SECRET }} >> .env
                 cat .env
               working-directory: query-builder-backend
             - name: Backend Build
