@@ -1,7 +1,9 @@
 import "../../app/globals.css"
 import "../Authentication/Authentication.css"
+import './UserSettings.css';
 import React, { useState, useEffect } from "react";
-import {Button, Card, CardBody, CardHeader, Input, input} from "@nextui-org/react";
+import {Button, Card, CardBody, CardFooter, CardHeader, Input, Image} from "@nextui-org/react";
+import {EditIcon} from "../OrganisationManagement/EditIcon";
 import PhoneInput, { formatPhoneNumber, formatPhoneNumberIntl, isValidPhoneNumber } from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import { createClient } from "./../../utils/supabase/client";
@@ -26,44 +28,55 @@ export default function UserSettings(){
     const [initialLastName, setInitialLastName] = useState('');
     const [initialEmail, setInitialEmail] = useState('');
     const [initialPhone, setInitialPhone] = useState('');
+    const [initialProfilePicture, setInitialProfilePicture] = useState('');
+    const [updateFirstName, setUpdateFirstName] = useState('');
+    const [updateLastName, setUpdateLastName] = useState('');
+    const [updatePhone, setUpdatePhone] = useState('');
+    const [updateEmail, setUpdateEmail] = useState('');
+
     // get user information with JWT token
-    const getUserInfo = async () => {
-
-        try {
-            let response = await fetch("http://localhost:55555/api/user-management/get-user", {
-                method: "GET",
-                headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + await getToken()
-                },
-            })
-            
-            if (!response.ok) {
-                throw new Error("Network response was not ok");
-            }
-
-            //   console.log((await response.json()));
-            let json = (await response.json()).data[0];
-            console.log(json);
-            setInitialFirstName(json.first_name);
-            setInitialLastName(json.last_name);
-            setInitialPhone(json.phone);
-            setInitialEmail(json.email);
-        } catch (error) {
-            console.error("Failed to fetch user info:", error);
-        }
-    }
+   
 
     useEffect(() => {
+        async function getUserInfo() {
+
+            try {
+                let response = await fetch("http://localhost:55555/api/user-management/get-user", {
+                    method: "GET",
+                    headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + await getToken()
+                    },
+                })
+                
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+    
+                //   console.log((await response.json()));
+                let json = (await response.json()).data[0];
+                console.log(json);
+                setInitialFirstName(json.first_name);
+                setUpdateFirstName(json.first_name);
+                setInitialLastName(json.last_name);
+                setUpdateLastName(json.last_name);
+                setInitialPhone(json.phone);
+                setUpdatePhone(json.phone);
+                setInitialEmail(json.email);
+                setUpdateEmail(json.email);
+                setInitialProfilePicture(json.profile_photo);
+                setProfilePicURL(json.profile_photo);
+            } catch (error) {
+                console.error("Failed to fetch user info:", error);
+            }
+        }
+
         getUserInfo();
     }, []);
 
     // Updated fields
-    const [updateFirstName, setUpdateFirstName] = useState(initialFirstName);
-    const [updateLastName, setUpdateLastName] = useState(initialLastName);
-    const [updatePhone, setUpdatePhone] = useState(initialPhone);
-    const [updateEmail, setUpdateEmail] = useState(initialEmail);
+    
 
     const [updateFirstNameHasBeenFocused, setUpdateFirstNameHasBeenFocused] = useState(false);
     const [updateLastNameHasBeenFocused, setUpdateLastNameHasBeenFocused] = useState(false);
@@ -87,7 +100,7 @@ export default function UserSettings(){
     const updateQuery = async() => {    
         let updatedDetails: UpdateUserPersonalDetails = {};
 
-        if (updateFirstName === initialFirstName && updateLastName === initialLastName) {
+        if (updateFirstName === initialFirstName && updateLastName === initialLastName && initialProfilePicture == profilePicURL ) {
             return;
         }
         
@@ -98,10 +111,15 @@ export default function UserSettings(){
         if (updateLastName !==  initialLastName){
             updatedDetails.last_name = updateLastName;
         }
+
+        if (profilePicURL !== initialProfilePicture){
+            updatedDetails.profile_photo = profilePicURL;
+        }
+
         console.log(updatedDetails);
 
         let response = await fetch("http://localhost:55555/api/user-management/update-user", {
-            credentials: "include",
+            // credentials: "include",
             method: "PATCH",
             headers: {
               'Accept': 'application/json',
@@ -218,11 +236,39 @@ export default function UserSettings(){
         }
     };
 
-    return (
-        <>
+    const renderUserDetails = React.useCallback(() => {
+        return(<>
             <Card
-            fullWidth>
-                <CardHeader><div className="user-management-options">Change Personal Details</div></CardHeader>
+            fullWidth
+            className="m-1 lg:pl-10 lg:pr-20">
+                <CardBody className="mt-2 mb-2">
+                    <div className="flex flex-col">
+                        <div className="infield flex justify-center relative pb-4"  >
+                            <Image
+                                className="orgLogo rounded-full"
+                                width={200}
+                                height={100}
+                                alt="User Profile Picture"
+                                src={profilePicURL}
+                            />
+                    
+                            <div className="flex flex-col justify-end absolute bottom-0">
+                                <label className="custom-file-upload bg-white p-1 border-2 border-slate-600 rounded-full">
+                                    <input
+                                        data-testid="file-input"
+                                        type="file"
+                                        accept=".jpg,.jpeg,.png"
+                                        onInput={(event) => handleProfilePicChange(event)}
+                                    />
+                                    <EditIcon/>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+            
+                </CardBody>
+
+                <CardHeader><div className="user-management-options">Personal Details</div></CardHeader>
                 <CardBody>
                         <div className="infield">
                             <Input
@@ -243,6 +289,7 @@ export default function UserSettings(){
                                 isRequired
                                 label="Last Name"
                                 variant="bordered"
+                                defaultValue={initialLastName}
                                 placeholder={initialLastName}
                                 onValueChange={setUpdateLastName}
                                 onFocus={() => {setUpdateFirstNameHasBeenFocused(false);setUpdateLastNameHasBeenFocused(true);setUpdatePhoneHasBeenFocused(false)}}
@@ -251,18 +298,8 @@ export default function UserSettings(){
                                 errorMessage="Please enter a last name"
                             />
                         </div>
-                        <Button 
-                            color="primary"  
-                            onClick={() => updateQuery()}
-                        >
-                            Update personal details
-                        </Button>
                 </CardBody>
-            </Card>
-
-            <Card
-            fullWidth>
-                <CardHeader><div className="user-management-options">Change User&apos;s Contact Details</div></CardHeader>
+                <CardHeader><div className="user-management-options">Contact Details</div></CardHeader>
                 <CardBody>
                     <div className="infield">
                         <PhoneInput
@@ -293,18 +330,9 @@ export default function UserSettings(){
                             errorMessage="Please enter a valid phone number"
                         />
                     </div>
-                        <Button 
-                            color="primary"  
-                            onClick={() => updatePhoneNumber()}
-                        >
-                            Update phone number
-                        </Button>
                 </CardBody>
-            </Card>
 
-            <Card
-            fullWidth>
-                <CardHeader><div className="user-management-options">Change User&apos;s Email</div></CardHeader>
+                <CardHeader><div className="user-management-options">Email Address</div></CardHeader>
                 <CardBody>
                     <div className="infield">
                     <Input
@@ -312,6 +340,7 @@ export default function UserSettings(){
                         label="Email"
                         variant="bordered"
                         type="email"
+                        placeholder={initialEmail}
                         onValueChange={setUpdateEmail}
                         onFocus={() => {
                             setUpdateEmailHasBeenFocused(true);
@@ -329,33 +358,28 @@ export default function UserSettings(){
                         errorMessage="Please enter a valid email"
                     />
                     </div>
+
+                </CardBody>
+                <CardBody>
                         <Button 
                             color="primary"  
-                            onClick={() => updateEmailFunction()}
+                            onClick={() => {
+                                updateQuery();
+                                updatePhoneNumber();
+                                updateEmailFunction();
+                            }}
                         >
-                            Update email
+                            Update
                         </Button>
                 </CardBody>
             </Card>
-            <Card
-            fullWidth>
-                <CardHeader><div className="user-management-options">Profile Picture</div></CardHeader>
-                <CardBody>
-                    <div className="infield">
-                        {/* {<>profilePicURL == "" ? (setProfilePicURL("https://img.icons8.com/?size=100&id=ABBSjQJK83zf&format=png&color=000000")):()</>} */}
-                        <img className="profilePicture" src={profilePicURL} alt="Profilepic" />
-                        <input
-                            data-testid="file-input"
-                            type="file"
-                            accept=".jpg,.jpeg"
-                            onInput={(event) => handleProfilePicChange(event)}
-                        />
+        </>);
 
-                    </div>
-            
-                </CardBody>
-            </Card>
-        </>
-    )
+    }, [initialFirstName, initialLastName, initialEmail, initialPhone, profilePicURL]);
+
+    return (
+        <>{renderUserDetails()}</>
+        
+    );
 
 }
