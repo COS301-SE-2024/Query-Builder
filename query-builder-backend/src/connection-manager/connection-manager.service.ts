@@ -41,56 +41,38 @@ export class ConnectionManagerService {
       if(!db_data) {
         return reject(new UnauthorizedException('You do not have access to this database'));
       }
-      
-      let { user, password } = await this.decryptDbSecrets(db_id, session);
 
-      let credentials = {
-        host: db_data.host,
-        user: user,
-        password: password,
-      }
+      let host = db_data.host;
 
       if (
-        session.host === credentials.host &&
-        session.user === credentials.user
+        session.host === host
       ) {
-        //---------------------------------EXISTING CONNECTION---------------------------------//
+        //-----------------------------EXISTING CONNECTION TO THE RIGHT HOST---------------------//
         //check if the hashed version of the password stored in the session matches the hash of the password in the query
-        if (
-          session.pass ===
-          createHash('sha256').update(credentials.password).digest('hex')
-        ) {
           //Print out that you are reconnecting to an existing session and not a new one
           console.log(
-            `[Reconnecting] ${credentials.user} connected to ${credentials.host}`,
+            `[Reconnecting] ${session.id} connected to ${host}`,
           );
           return resolve({
             success: true,
             connectionID: this.sessionStore.get(session.id).conn.threadID
           });
-        } else {
-          return reject(
-            new UnauthorizedException(
-              'Please ensure that your database credentials are correct.',
-            ),
-          ); // Reject with an error object
-        }
       } else {
-        //---------------------------------NO EXISTING CONNECTION---------------------------------//
-        if (session.connected === true) {
+        //-------------------------NO EXISTING CONNECTION TO THE RIGHT HOST-------------------//
+        if (session.host !== undefined) {
+          //if there is an existing connection that needs to be changed to a different host
           this.sessionStore.get(session.id).conn.end();
           this.sessionStore.remove(session.id);
           console.log(`[Connection Disconnected] ${session.id}`);
-          session.connected = false;
           session.host = undefined;
-          session.user = undefined;
-          session.pass = undefined;
         }
 
+        let { user, password } = await this.decryptDbSecrets(db_id, session);
+
         const connection = require('mysql').createConnection({
-          host: credentials.host,
-          user: credentials.user,
-          password: credentials.password,
+          host: host,
+          user: user,
+          password: password,
         });
 
         connection.connect((err) => {
@@ -115,21 +97,15 @@ export class ConnectionManagerService {
             }
           } else {
             //query the connected database if the connection is successful
-            session.connected = true;
-            session.host = credentials.host;
-            session.user = credentials.user;
-            session.pass = createHash('sha256')
-              .update(credentials.password)
-              .digest('hex');
+            session.host = host;
 
             this.sessionStore.add({
               id: session.id,
-              pass: credentials.password,
-              conn: connection,
+              conn: connection
             });
 
             console.log(
-              `[Inital Connection] ${credentials.user} connected to ${credentials.host}`,
+              `[Inital Connection] ${session.id} connected to ${host}`,
             );
             return resolve({ success: true, connectionID: connection.threadID });
           }
