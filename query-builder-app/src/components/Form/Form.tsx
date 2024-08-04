@@ -173,13 +173,26 @@ export default function Form(){
 
                     </CardBody>
                 </Card>
+                
                 <Spacer y={2}/>
+
                 {/* Select tables */}
-                {(query.queryParams.databaseName != "") && (<TableList 
+                {   
+                    (query.queryParams.databaseName != "") && (
+                        <TableList 
                             databaseName={query.queryParams.databaseName} 
                             table={query.queryParams.table} 
                             onChange={updateTable}
                         />
+                    )
+                }
+                
+                <Spacer y={2}/>
+
+                {/* Add filters */}
+                {
+                    (query.queryParams.table.name != "") && (
+                        <h2>Add filters:</h2>
                     )
                 }
                 

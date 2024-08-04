@@ -146,7 +146,7 @@ export default function TableList(props: TableListProps){
     }
     
     //async function to fetch the joinable tables
-    async function fetchJoinableTables(database: string, table: string) {
+    async function fetchJoinableTables(database: string, tableName: string) {
 
         let response = await fetch("http://localhost:55555/api/metadata/foreign-keys", {
             credentials: "include",
@@ -163,11 +163,19 @@ export default function TableList(props: TableListProps){
                     password: "testPassword"
                 },
                 schema: database,
-                table: table
+                table: tableName
             })
         });
 
         let json = await response.json();
+
+        //remove any tables already in the query to prevent circular joins
+        let tableRef: table = table;
+        json = json.filter((obj: JoinableTable) => {return obj.table_name != tableRef.name});
+        while(tableRef.join){
+            tableRef = tableRef.join.table2;
+            json = json.filter((obj: JoinableTable) => {return obj.table_name != tableRef.name});
+        }
 
         //set the joinable tables hook
         setJoinableTables(json);
