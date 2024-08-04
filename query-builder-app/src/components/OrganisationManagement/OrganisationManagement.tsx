@@ -26,7 +26,7 @@ const getToken = async () => {
 const getUser = async () => {
     const supabase = createClient();
     const loggedInUser = (await supabase.auth.getSession()).data.session?.user.id;
-    // console.log(loggedInUser);
+    // console.log((await supabase.auth.getSession()).data.session);
     return loggedInUser;
 };
 
@@ -34,6 +34,7 @@ export default function OrganisationManagement(){
 
     const {orgServerID} = useParams<{orgServerID: string}>();
     let [loggedInUserID, setLoggedInUserID] = useState('');
+    let [loggedInUserRole, setLoggedInUserRole] = useState('');
     let [initialOrgName, setInitialOrgName] = useState('');
     let [initialOrgLogo, setInitialOrgLogo] = useState('');
     let [orgMembers, setOrgMembers] = useState([]);
@@ -67,9 +68,10 @@ export default function OrganisationManagement(){
           setLoggedInUserID(user as string);
           console.log(orgMembers);
           console.log(membersData);
-          let loggedInUserRole = (membersData.find((orgMember:any) => orgMember.profiles.user_id === user).user_role);
-          console.log(loggedInUserRole);
-          if (loggedInUserRole == "owner" || loggedInUserRole == "admin") {
+          let role = membersData.find((orgMember:any) => orgMember.profiles.user_id === user).user_role;
+          setLoggedInUserRole(role);
+          // console.log(membersData.find((orgMember:any) => orgMember.profiles.user_id === user).user_role);
+          if (role == "owner" || role == "admin") {
             setHasAdminPermission(true);
           }
         });
@@ -167,6 +169,19 @@ export default function OrganisationManagement(){
       console.log(response);
     }
 
+    async function deleteOrganisation(){
+      let response = await fetch("http://localhost:55555/api/org-management/remove-org", {
+          method: "DELETE",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + await getToken(),
+          },
+          body: JSON.stringify({ org_id: orgServerID })
+      })
+      console.log(response);
+    }
+
     const renderCell = React.useCallback((user:any, columnKey:any) => {
         switch (columnKey) {
           case "name":
@@ -214,6 +229,166 @@ export default function OrganisationManagement(){
         }
       }, [hasAdminPermission]);
 
+      const renderUpdatePage = React.useCallback(() => {
+        console.log(loggedInUserRole);
+        if  (hasAdminPermission && (loggedInUserRole == "owner" || loggedInUserRole == "Owner")) {
+          return(
+          <>
+            <div className="flex flex-col">
+              <div className="infield flex justify-center relative pb-4"  >
+                <Image
+                    className="orgLogo rounded-full"
+                    width={200}
+                    height={100}
+                    alt="Organisation Logo"
+                    src={profilePicURL}
+                />
+          
+                <div className="flex flex-col justify-end absolute bottom-0">
+                    <label className="custom-file-upload bg-white p-1 border-2 border-slate-600 rounded-full">
+                        <input
+                            data-testid="file-input"
+                            type="file"
+                            accept=".jpg,.jpeg,.png"
+                            onInput={(event) => handleProfilePicChange(event)}
+                        />
+                        <EditIcon/>
+                    </label>
+                </div>
+              </div>
+              <Spacer y={2}/>
+              <div className="infield">
+                <Input
+                    // isRequired
+                    label="Organisation Name"
+                    defaultValue={updateOrgName}
+                    variant="bordered"
+                    placeholder={updateOrgName}
+                    onValueChange={setUpdateOrgName}
+                    onFocus={() => {setUpdateOrgNameHasBeenFocused(true);}}
+                    isInvalid={isUpdateOrgNameInvalid && updateOrgNameHasBeenFocused}
+                    color={!updateOrgNameHasBeenFocused ? "primary" : isUpdateOrgNameInvalid ? "danger" : "success"}
+                    errorMessage="Please enter the Organisation's name"
+                />
+              </div>
+            </div>
+            <Spacer y={2}/>
+            <Button 
+                color="primary"  
+                onClick={() => updateQuery()}
+            >
+                Update
+            </Button>
+            <Spacer y={2}/>
+            <Button 
+                color="danger"  
+                onClick={() => deleteOrganisation()}
+            >
+                Delete Organisation
+            </Button>
+          </>
+          );
+        }
+        else{
+          if(hasAdminPermission && loggedInUserRole == "admin"){
+          return(
+            <>
+            <div className="flex flex-col">
+              <div className="infield flex justify-center relative pb-4"  >
+                <Image
+                    className="orgLogo rounded-full"
+                    width={200}
+                    height={100}
+                    alt="Organisation Logo"
+                    src={profilePicURL}
+                />
+          
+                <div className="flex flex-col justify-end absolute bottom-0">
+                    <label className="custom-file-upload bg-white p-1 border-2 border-slate-600 rounded-full">
+                        <input
+                            data-testid="file-input"
+                            type="file"
+                            accept=".jpg,.jpeg,.png"
+                            onInput={(event) => handleProfilePicChange(event)}
+                        />
+                        <EditIcon/>
+                    </label>
+                </div>
+              </div>
+              <Spacer y={2}/>
+              <div className="infield">
+                <Input
+                    // isRequired
+                    label="Organisation Name"
+                    defaultValue={updateOrgName}
+                    variant="bordered"
+                    placeholder={updateOrgName}
+                    onValueChange={setUpdateOrgName}
+                    onFocus={() => {setUpdateOrgNameHasBeenFocused(true);}}
+                    isInvalid={isUpdateOrgNameInvalid && updateOrgNameHasBeenFocused}
+                    color={!updateOrgNameHasBeenFocused ? "primary" : isUpdateOrgNameInvalid ? "danger" : "success"}
+                    errorMessage="Please enter the Organisation's name"
+                />
+              </div>
+            </div>
+            <Spacer y={2}/>
+            <Button 
+                color="primary"  
+                onClick={() => updateQuery()}
+            >
+                Update
+            </Button>
+            <Spacer y={2}/>
+            <Button 
+                color="danger"  
+                onClick={() => deleteUserFromOrg(loggedInUserID)}
+            >
+                Leave Organisation
+            </Button>
+          </>
+          );
+        }
+        else{
+          return(<>
+            <div className="flex flex-col">
+              <div className="infield flex justify-center relative pb-4"  >
+                <Image
+                    className="orgLogo rounded-full"
+                    width={200}
+                    height={100}
+                    alt="Organisation Logo"
+                    src={profilePicURL}
+                />
+              </div>
+              <Spacer y={2}/>
+              <div className="infield">
+                <Input
+                    // isRequired
+                    isDisabled
+                    label="Organisation Name"
+                    defaultValue={updateOrgName}
+                    variant="bordered"
+                    placeholder={updateOrgName}
+                    onValueChange={setUpdateOrgName}
+                    onFocus={() => {setUpdateOrgNameHasBeenFocused(true);}}
+                    isInvalid={isUpdateOrgNameInvalid && updateOrgNameHasBeenFocused}
+                    color={!updateOrgNameHasBeenFocused ? "primary" : isUpdateOrgNameInvalid ? "danger" : "success"}
+                    errorMessage="Please enter the Organisation's name"
+                />
+              </div>
+            </div>
+            <Spacer y={2}/>
+            <Button 
+                color="danger"  
+                onClick={() => deleteUserFromOrg(loggedInUserID)}
+            >
+                Leave Organisation
+            </Button>
+          </>);
+          }
+        }
+      }, [loggedInUserRole, hasAdminPermission]);
+
       const columns = [
         {name: "NAME", uid: "name"},
         {name: "ROLE", uid: "role"},
@@ -244,9 +419,9 @@ export default function OrganisationManagement(){
         const updateProfilePicture = async() => {
             if(file != null) {
                 const formData = new FormData();
-                formData.append('file', file);
-                console.log(formData.get('file'));
                 formData.append('org_id', orgServerID);
+                formData.append('file', file);
+                // console.log(formData.get('file'));
       
                 let response = await fetch("http://localhost:55555/api/org-management/upload-org-logo", {
                     method: "POST",
@@ -287,57 +462,9 @@ export default function OrganisationManagement(){
                             Organisation Settings
                         </CardHeader>
                         <CardBody>
-                          <div className="flex flex-col">
-                            {hasAdminPermission ? 
-                              (<>
-                                  <div className="infield flex justify-center relative pb-4"  >
-                                      <Image
-                                          className="orgLogo rounded-full"
-                                          width={200}
-                                          height={100}
-                                          alt="Organisation Logo"
-                                          src={profilePicURL}
-                                      />
-                                  
-                                      <div className="flex flex-col justify-end absolute bottom-0">
-                                          <label className="custom-file-upload bg-white p-1 border-2 border-slate-600 rounded-full">
-                                              <input
-                                                  data-testid="file-input"
-                                                  type="file"
-                                                  accept=".jpg,.jpeg,.png"
-                                                  onInput={(event) => handleProfilePicChange(event)}
-                                              />
-                                              <EditIcon/>
-                                          </label>
-                                      </div>
-
-                                  </div>
-                                  <Spacer y={2}/>
-                                </>):(<></>)}
-                            
-                                <div className="infield">
-                                    <Input
-                                        // isRequired
-                                        isDisabled = {!hasAdminPermission}
-                                        label="Organisation Name"
-                                        defaultValue={updateOrgName}
-                                        variant="bordered"
-                                        placeholder={updateOrgName}
-                                        onValueChange={setUpdateOrgName}
-                                        onFocus={() => {setUpdateOrgNameHasBeenFocused(true);}}
-                                        isInvalid={isUpdateOrgNameInvalid && updateOrgNameHasBeenFocused}
-                                        color={!updateOrgNameHasBeenFocused ? "primary" : isUpdateOrgNameInvalid ? "danger" : "success"}
-                                        errorMessage="Please enter the Organisation's name"
-                                    />
-                                </div>
-                            </div>
-                            <Spacer y={2}/>
-                            <Button 
-                                color="primary"  
-                                onClick={() => updateQuery()}
-                            >
-                                Update
-                            </Button>
+                          
+                          {renderUpdatePage()}
+                          
                         </CardBody>
                     </Card>  
                     </Tab>
