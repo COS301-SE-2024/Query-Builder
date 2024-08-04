@@ -305,7 +305,7 @@ export default function TableList(props: TableListProps){
 
     return(
         <>
-            <h2>Select a table:</h2>
+            <h2>Select some tables:</h2>
             <Spacer y={2}/>
             <div className="flex space-x-4">
                 {tables}
