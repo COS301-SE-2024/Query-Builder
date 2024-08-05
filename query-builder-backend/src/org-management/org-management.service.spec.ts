@@ -1,23 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { OrgManagementService } from './org-management.service';
-import { Supabase } from '../supabase';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { SupabaseModule } from '../supabase/supabase.module';
+import { ConfigModule } from '@nestjs/config';
 import {
   NotFoundException,
-  HttpException,
   UnauthorizedException,
   InternalServerErrorException
 } from '@nestjs/common';
 import { AppService } from '../app.service';
-import { createClient, UserResponse } from '@supabase/supabase-js';
-import { match, rejects } from 'assert';
-import { error, log } from 'console';
-import { resolve } from 'dns';
-import { get } from 'http';
 import { describe, mock } from 'node:test';
-import { from } from 'rxjs';
-import exp from 'constants';
-import e from 'express';
 
 const SELECT = 0;
 const UPDATE = 1;
@@ -124,9 +115,6 @@ jest.mock('../supabase/supabase.ts', () => {
 
 describe('OrgManagementService', () => {
   let service: OrgManagementService;
-  let supabase: Supabase;
-  let configService: ConfigService;
-  let appService: AppService;
 
   let testUser = {
     user_id: 'eef0f46d-8a43-4b8c-81eb-dd8a31a3ad38',
@@ -165,26 +153,20 @@ describe('OrgManagementService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [ConfigModule.forRoot({ isGlobal: true })],
-      providers: [OrgManagementService, Supabase, ConfigService, AppService]
+      imports: [SupabaseModule, ConfigModule.forRoot({ isGlobal: true })],
+      providers: [OrgManagementService, AppService]
     }).compile();
 
     service = module.get<OrgManagementService>(OrgManagementService);
-    supabase = await module.resolve<Supabase>(Supabase);
-    configService = module.get<ConfigService>(ConfigService);
-    appService = module.get<AppService>(AppService);
   });
 
   afterEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [ConfigModule.forRoot({ isGlobal: true })],
-      providers: [OrgManagementService, Supabase, ConfigService, AppService]
+      imports: [SupabaseModule, ConfigModule.forRoot({ isGlobal: true })],
+      providers: [OrgManagementService, AppService]
     }).compile();
 
     service = module.get<OrgManagementService>(OrgManagementService);
-    supabase = await module.resolve<Supabase>(Supabase);
-    configService = module.get<ConfigService>(ConfigService);
-    appService = module.get<AppService>(AppService);
   });
 
   it('should be defined', async () => {
