@@ -1,148 +1,147 @@
-import { Injectable } from '@nestjs/common';
-import { JsonConverterService } from './../jsonConverter/jsonConverter.service';
+import {
+  BadGatewayException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { SessionStore } from '../session-store/session-store.service';
+import { createHash } from 'crypto';
+import { Supabase } from '../supabase';
+import { AppService } from '../app.service';
+import { ConfigService } from '@nestjs/config';
 
-interface DatabaseCredentials {
-    host: string,
-    user: string,
-    password: string
-}
-
-interface SortParams {
-  column: string,
-  direction?: "ascending"|"descending"
-}
-
-interface PageParams {
-  pageNumber: number,
-  rowsPerPage: number
-}
-
-interface QueryParams {
-  language: string,
-  query_type: string,
-  table: string,
-  columns: string[],
-  condition?: string,
-  sortParams?: SortParams,
-  pageParams?: PageParams
-}
-
-interface Query {
-  credentials: DatabaseCredentials,
-  databaseName: string,
-  queryParams: QueryParams
+interface ConnectRequest{
+  databaseServerID: string
 }
 
 export interface ConnectionStatus {
-    success: boolean,
-    connectionID?: number 
+  success: boolean;
+  connectionID?: number;
 }
 
 @Injectable()
 export class ConnectionManagerService {
+  constructor(private readonly sessionStore: SessionStore, private readonly supabase: Supabase, private readonly config_service: ConfigService, private readonly app_service: AppService) {}
 
-    constructor(private readonly jsonConverterService: JsonConverterService){}
-
-    connectToDatabase(credentials: DatabaseCredentials): Promise<ConnectionStatus> {
-
-        return new Promise((resolve, reject) => {
-          const connection = require('mysql').createConnection({
-            host: credentials.host,
-            user: credentials.user,
-            password: credentials.password,
-          });
-    
-          connection.connect((err) => {
-            if (err) {
-                console.log(err)
-                if(err.code == "ER_ACCESS_DENIED_ERROR" || err.code == "ER_NOT_SUPPORTED_AUTH_MODE"){
-                  reject({ errorCode: "Access Denied" }); // Reject with an error object
-                }
-                else{
-                  reject({ errorCode: "Could not Connect" }); // Reject with an error object
-                }
-            } else {
-                resolve({ success: true, connectionID: connection.threadID }); // Resolve with connection info
-            }
-          });
-        });
+  async connectToDatabase(
+    db_id: string,
+    session: Record<string, any>,
+  ): Promise<ConnectionStatus> {
+    return new Promise(async (resolve, reject) => {
+      const { data: user_data, error: user_error } = await this.supabase.getClient().auth.getUser(this.supabase.getJwt());
+      if (user_error) {
+        return reject(user_error);
       }
 
-      queryDatabase(query: Query): Promise<any> {
+      const { data: db_data, error: error } = await this.supabase.getClient().from('db_envs').select('host').eq('db_id', db_id).single();
+      if(error) {
+        console.log(error);
+        return reject(error);
+      }
 
-        const parser = this.jsonConverterService;
+      if(!db_data) {
+        return reject(new UnauthorizedException('You do not have access to this database'));
+      }
 
-        return new Promise(async (resolve, reject) => {
+      let host = db_data.host;
 
-          console.log(query);
-
-          const connection = require('mysql').createConnection({
-            host: query.credentials.host,
-            user: query.credentials.user,
-            password: query.credentials.password
+      if (
+        session.host === host
+      ) {
+        //-----------------------------EXISTING CONNECTION TO THE RIGHT HOST---------------------//
+        //check if the hashed version of the password stored in the session matches the hash of the password in the query
+          //Print out that you are reconnecting to an existing session and not a new one
+          console.log(
+            `[Reconnecting] ${session.id} connected to ${host}`,
+          );
+          return resolve({
+            success: true,
+            connectionID: this.sessionStore.get(session.id).conn.threadID
           });
-    
-          connection.connect((err) => {
+      } else {
+        //-------------------------NO EXISTING CONNECTION TO THE RIGHT HOST-------------------//
+        if (session.host !== undefined) {
+          //if there is an existing connection that needs to be changed to a different host
+          this.sessionStore.get(session.id).conn.end();
+          this.sessionStore.remove(session.id);
+          console.log(`[Connection Disconnected] ${session.id}`);
+          session.host = undefined;
+        }
 
-            //if there is an error with the connection, reject
-            if (err) {
-                console.log(err)
-                if(err.code == "ER_ACCESS_DENIED_ERROR" || err.code == "ER_NOT_SUPPORTED_AUTH_MODE"){
-                  reject({ errorCode: "Access Denied" }); // Reject with an error object
-                }
-                else{
-                  reject({ errorCode: "Could not Connect" }); // Reject with an error object
-                }
+        let { user, password } = await this.decryptDbSecrets(db_id, session);
+
+        const connection = require('mysql').createConnection({
+          host: host,
+          user: user,
+          password: password,
+        });
+
+        connection.connect((err) => {
+          //if there is an error with the connection, reject
+          if (err) {
+            console.log(err);
+            if (
+              err.code == 'ER_ACCESS_DENIED_ERROR' ||
+              err.code == 'ER_NOT_SUPPORTED_AUTH_MODE'
+            ) {
+              return reject(
+                new UnauthorizedException(
+                  'Please ensure that your database credentials are correct.',
+                ),
+              ); // Reject with an error object
+            } else {
+              return reject(
+                new BadGatewayException(
+                  'Could not connect to the external database - are the host and port correct?',
+                ),
+              ); // Reject with an error object
             }
-          });
+          } else {
+            //query the connected database if the connection is successful
+            session.host = host;
 
-          //query the connected database if the connection is successful
-
-          //first, use the correct database as specified in query
-          const databaseToQuery: string = query.databaseName;
-          const useCommand: string = "USE " + databaseToQuery + ";";
-
-          connection.query(useCommand, function (error, results, fields) {
-            if (error) throw error;
-          });
-
-          //secondly, get the number of rows of data
-          const countCommand: string = `SELECT COUNT(*) AS numRows FROM ${query.queryParams.table}`;
-          connection.query(countCommand, async function(error, results, fields){
-            if (error) throw error;
-
-            const numRows = results[0].numRows;
-
-            console.log(numRows);
-
-            //thirdly, query the database
-            const queryCommand: string = await parser.convertJsonToQuery(query.queryParams);
-            console.log(queryCommand);
-            connection.query(queryCommand, function (error, results, fields) {
-              if (error) throw error;
-
-              //terminate the database connection
-              connection.end();
-
-              //add a unique key field to each returned row
-              for (var i = 0; i < results.length; i++) {
-                results[i].qbee_id = i; // Add "total": 2 to all objects in array
-              }
-
-              //return a response object with numRows and results
-              const response = {
-                totalNumRows: numRows,
-                data: results
-              }
-
-              resolve(response);
-
+            this.sessionStore.add({
+              id: session.id,
+              conn: connection
             });
 
-          })
-
+            console.log(
+              `[Inital Connection] ${session.id} connected to ${host}`,
+            );
+            return resolve({ success: true, connectionID: connection.threadID });
+          }
         });
-
       }
+    });
+  }
 
+  async decryptDbSecrets(db_id: string, session: Record<string, any>) {
+    const { data: user_data, error: user_error } = await this.supabase.getClient().auth.getUser(this.supabase.getJwt());
+
+    if (user_error) {
+      throw user_error;
+    }
+    
+    const user_id = user_data.user.id;
+
+    const { data: db_secrets_data, error: db_error } = await this.supabase.getClient().from('db_access').select('db_secrets').eq('user_id', user_id).eq('db_id', db_id);
+
+    if(db_error) {
+      throw db_error;
+    }
+    if(db_secrets_data.length === 0) {
+      throw new UnauthorizedException('Database secret not found, you do not have access to this database');
+    }
+
+    const db_secrets = db_secrets_data[0].db_secrets;
+
+    const uni_key = this.config_service.get('UNI_KEY');
+
+    const decryptedText = this.app_service.decrypt(db_secrets, uni_key);
+
+    const decryptedText2 = this.app_service.decrypt(decryptedText, session.sessionKey);
+
+    let decryptedSecrets = JSON.parse(decryptedText2);
+
+    return { user: decryptedSecrets.user, password: decryptedSecrets.password };
+  }
 }

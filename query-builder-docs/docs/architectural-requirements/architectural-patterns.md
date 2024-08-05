@@ -2,7 +2,7 @@
 sidebar_position: 4
 ---
 
-# Architectural Styles and Patterns
+# Architectural Styles/Patterns
 
 Architectural Patterns are well-known compositions of architectural elements which allow a system to effectively meet its quality requirements.
 

@@ -1,11 +1,51 @@
-import { NestFactory } from "@nestjs/core";
-import { AppModule } from "./app.module";
+import { NestFactory, HttpAdapterHost } from '@nestjs/core';
+import { AppModule } from './app.module';
+import { AllExceptionsFilter } from './all-exceptions.filter';
+import * as session from 'express-session';
+import { createClient } from 'redis';
+import RedisStore from 'connect-redis';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix("api");
 
-  app.enableCors();
+  const { httpAdapter } = app.get(HttpAdapterHost);
+  app.setGlobalPrefix('api');
+
+  let redisClient = await createClient(
+    {
+      socket: {
+        host: 'localhost',
+        port: 6379,
+      }
+    }
+  )
+    .on('error', (err) => console.log('Redis Client Error', err))
+    .connect();
+
+  redisClient.flushAll()
+
+  let redisStore = new RedisStore({
+    client: redisClient,
+    ttl: 3600
+  });
+
+  app.use(
+    session({
+      store: redisStore,
+      secret: process.env.SESSION_SECRET,
+      resave: false,
+      saveUninitialized: false,
+    }),
+  );
+
+  app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
+
+  app.enableCors({
+    //change in production
+    origin: [
+      'http://localhost:3000',],
+    credentials: true
+  });
   await app.listen(55555);
 }
 bootstrap();

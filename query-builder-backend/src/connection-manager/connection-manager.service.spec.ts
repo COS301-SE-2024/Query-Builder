@@ -1,13 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConnectionManagerService } from './connection-manager.service';
-import { JsonConverterService } from './../jsonConverter/jsonConverter.service';
+import { SessionStoreModule } from '../session-store/session-store.module';
+import { SupabaseModule } from '../supabase/supabase.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AppService } from '../app.service';
 
 describe('ConnectionManagerService', () => {
   let service: ConnectionManagerService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [ConnectionManagerService, JsonConverterService],
+      imports: [SupabaseModule, ConfigModule.forRoot({ isGlobal: true }), SessionStoreModule],
+      providers: [ConnectionManagerService, AppService, ConfigService]
     }).compile();
 
     service = module.get<ConnectionManagerService>(ConnectionManagerService);

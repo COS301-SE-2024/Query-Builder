@@ -1,7 +1,7 @@
 "use client"
 import "../../app/globals.css"
 import React, { useState } from "react";
-import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Spacer} from "@nextui-org/react";
+import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Checkbox, Tooltip} from "@nextui-org/react";
 import { createClient } from "./../../utils/supabase/client";
 import jwt from "jsonwebtoken"
 
@@ -31,6 +31,9 @@ export default function DatabaseConnectionModal(props: DatabaseConnectionModalPr
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
 
     const [databaseConnectionStatus, setDatabaseConnectionStatus] = useState('Not connected to a database');
+
+    //React hook to store whether the user wants QBee to remember their database credentials or not
+    const [rememberDatabaseCredentials, setRememberDatabaseCredentials] = useState(false);
 
     const [url, setUrl] = useState('');
     const [username, setUsername] = useState('');
@@ -71,18 +74,17 @@ export default function DatabaseConnectionModal(props: DatabaseConnectionModalPr
 
     async function addDatabase(name: String, host:String, user:String, password:String){
 
-      //create a db_info object
-      const db_info = {
-        host: host,
-        user: user,
-        password: password
-      }
-
-      //stringify and base64 encode it
-      const db_info_string = btoa(JSON.stringify(db_info));     
+      //log request body
+      console.log("BODY OF REQUEST: " + JSON.stringify({
+        org_id: props.org_id,
+        name: name,
+        type: "mysql",
+        host: host
+      }))
 
       //call the add-db API endpoint
       let response = await fetch("http://localhost:55555/api/org-management/add-db", {
+        credentials: "include",
         method: "POST",
         headers: {
           'Accept': 'application/json',
@@ -93,13 +95,56 @@ export default function DatabaseConnectionModal(props: DatabaseConnectionModalPr
             org_id: props.org_id,
             name: name,
             type: "mysql",
-            db_info: db_info_string
+            host: host
         })
       })
 
-      console.log("ADD DB RESPONSE " + response)
+      //log response body
+      let addDBResponse = await response.json();
+      console.log("ADD DB RESPONSE " + JSON.stringify(addDBResponse));
 
+      //call the on_add callback so parent component can refetch the modified databases
       props.on_add();
+
+      //if rememberDatabaseCredentials is set, save the db_secrets
+      //change this later - for now always save
+      if(true){
+
+        //create a db_secrets object
+        const db_secrets = {
+          user: user,
+          password: password
+        }
+
+        //stringify the db_secrets
+        const db_secrets_string = JSON.stringify(db_secrets);   
+
+        //log request body
+        console.log("BODY OF REQUEST: " + JSON.stringify({
+          db_id: addDBResponse.data[0].db_id,
+          db_secrets: db_secrets_string
+        }))
+
+        //call the save-db-secrets API endpoint
+        let response = await fetch("http://localhost:55555/api/org-management/save-db-secrets", {
+          credentials: "include",
+          method: "POST",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + await getToken()
+          },
+          body: JSON.stringify({
+              db_id: addDBResponse.data[0].db_id,
+              db_secrets: db_secrets_string
+          })
+        })
+
+        //log response body
+        let json = await response.json();
+        console.log("ADD DB RESPONSE " + JSON.stringify(json));
+
+      }
 
     }
 
@@ -163,6 +208,15 @@ export default function DatabaseConnectionModal(props: DatabaseConnectionModalPr
                     color={!passwordBeenFocused ? "primary" : isPasswordInvalid ? "danger" : "success"}
                     errorMessage="Please enter a password"
                   />
+                  <Checkbox
+                    isSelected={rememberDatabaseCredentials}
+                    onValueChange={setRememberDatabaseCredentials}
+                    classNames={{
+                      label: "text-small",
+                    }}
+                  >
+                    Remember my database credentials
+                  </Checkbox>
                 </ModalBody>
                 <ModalFooter>
                   <Button 

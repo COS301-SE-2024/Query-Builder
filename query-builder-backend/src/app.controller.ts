@@ -14,4 +14,10 @@ export class AppController {
   signJWT(@Body() data: {}): string {
     return this.appService.signJWT(data);
   }
+
+  @Put('derive-key')
+  async deriveKey(@Body() body: {text: string}){
+    return await this.appService.deriveKey(body.text);
+  }
+
 }

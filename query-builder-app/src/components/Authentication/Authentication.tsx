@@ -103,6 +103,20 @@ export default function Authentication() {
   };
 
   const loginUser = async (email: string, password: string) => {
+
+    //sign into QBee server
+    //call the sign-in API endpoint
+    let response = await fetch("http://localhost:55555/api/user-management/gen-session-key", {
+      credentials: "include",
+      method: "PUT",
+      headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({email: email, password: password})
+      })
+  
+    let responseData = await response.json();
     
     login(email, password);
     
