@@ -1,15 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DbMetadataHandlerService } from './db-metadata-handler.service';
-import { QueryHandlerService } from '../query-handler/query-handler.service';
-import { JsonConverterService } from '../jsonConverter/jsonConverter.service';
-import { SessionStore } from '../session-store/session-store.service';
+import { QueryHandlerModule } from '../query-handler/query-handler.module';
 
 describe('DbMetadataHandlerService', () => {
   let service: DbMetadataHandlerService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [DbMetadataHandlerService, QueryHandlerService, JsonConverterService, SessionStore],
+      imports: [QueryHandlerModule],
+      providers: [DbMetadataHandlerService]
     }).compile();
 
     service = module.get<DbMetadataHandlerService>(DbMetadataHandlerService);

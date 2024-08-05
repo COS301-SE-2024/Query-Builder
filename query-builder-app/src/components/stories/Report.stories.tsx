@@ -112,5 +112,7 @@ const data = [
 // Can have multiple different variants of a component
 export const DefaultReport = {
   render: () =>
-  <Report/>,
+  <Report
+  data={JSON.parse((data as unknown) as string)}
+  />,
 };

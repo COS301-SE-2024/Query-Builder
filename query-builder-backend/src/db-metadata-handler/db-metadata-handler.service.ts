@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { QueryHandlerService } from '../query-handler/query-handler.service';
-import { Query, DatabaseCredentials, ComparisonOperator, LogicalOperator, QueryParams } from '../interfaces/intermediateJSON';
+import { Query, ComparisonOperator, LogicalOperator} from '../interfaces/intermediateJSON';
 
 interface Database {
     key: string,
@@ -12,19 +12,23 @@ interface Table {
     columns: string[]
 }
 
+interface SchemaQuery {
+    databaseServerID: string
+}
+
 interface TableQuery {
-    credentials: DatabaseCredentials;
+    databaseServerID: string,
     schema: string;
 }
 
 interface FieldQuery {
-    credentials: DatabaseCredentials;
+    databaseServerID: string,
     schema: string;
     table: string;
 }
 
 interface ForeignKeyQuery {
-    credentials: DatabaseCredentials;
+    databaseServerID: string,
     schema: string;
     table: string;
 }
@@ -34,7 +38,7 @@ export class DbMetadataHandlerService {
 
     constructor(private readonly queryHandlerService: QueryHandlerService) {}
 
-    async getSchemaMetadata(databaseCredentials: DatabaseCredentials, session: Record<string, any>): Promise<any> {
+    async getSchemaMetadata(schemaQuery: SchemaQuery, session: Record<string, any>): Promise<any> {
 
         /*
         SELECT schema_name
@@ -43,7 +47,7 @@ export class DbMetadataHandlerService {
         ORDER BY schema_name;
         */
         const query: Query = {
-            credentials: databaseCredentials,
+            databaseServerID: schemaQuery.databaseServerID,
             queryParams: {
                 language: "sql",
                 query_type: "select",
@@ -92,7 +96,7 @@ export class DbMetadataHandlerService {
         */
 
         const query: Query = {
-            credentials: tableQuery.credentials,
+            databaseServerID: tableQuery.databaseServerID,
             queryParams: {
                 language: "sql",
                 query_type: "select",
@@ -125,7 +129,7 @@ export class DbMetadataHandlerService {
         ;
         */
         const query: Query = {
-            credentials: fieldQuery.credentials,
+            databaseServerID: fieldQuery.databaseServerID,
             queryParams: {
                 language: "sql",
                 query_type: "select",
@@ -160,7 +164,7 @@ export class DbMetadataHandlerService {
         ;
         */
         const fromQuery: Query = {
-            credentials: foreignKeyQuery.credentials,
+            databaseServerID: foreignKeyQuery.databaseServerID,
             queryParams: {
                 language: "sql",
                 query_type: "select",
@@ -192,7 +196,7 @@ export class DbMetadataHandlerService {
         ;
         */
         const toQuery: Query = {
-            credentials: foreignKeyQuery.credentials,
+            databaseServerID: foreignKeyQuery.databaseServerID,
             queryParams: {
                 language: "sql",
                 query_type: "select",

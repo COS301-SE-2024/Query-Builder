@@ -1,44 +1,33 @@
-name: Code Coverage
-on: 
+name: Build Test
+on:
     workflow_dispatch:
     pull_request:
         branches:
-            - dev
             - main
+            - dev
         paths:
             - 'query-builder-app/**'
             - 'query-builder-backend/**'
-            - 'coverage/**'
-            - '.github/workflows/**'
-    push:
-        branches:
-            - dev
-            - main
-        paths:
-            - 'query-builder-app/**'
-            - 'query-builder-backend/**'
-            - 'coverage/**'
-            - '.github/workflows/**'
 
 jobs:
-    coverage:
+    app-build:
         runs-on: ubuntu-latest
         steps:
-            - name: Checkout
+            - name: App Checkout
               uses: actions/checkout@v4
-            - name: Install pnpm
+            - name: App Install pnpm
               uses: pnpm/action-setup@v4
               with:
                 version: '9.1.2'
-            - name: Setup Node.js
+            - name: App Setup Node
               uses: actions/setup-node@v4
               with:
                 node-version: 20
                 cache: 'pnpm'
                 cache-dependency-path: query-builder-app/pnpm-lock.yaml
-            - name: Install Dependencies App
+            - name: App Install Dependencies
               run: |
-                  pnpm install --frozen-lockfile
+                pnpm install --frozen-lockfile
               working-directory: query-builder-app
             - name: App Make env file
               run: |
@@ -48,32 +37,41 @@ jobs:
                 echo NEXT_PUBLIC_SUPABASE_PROJECT_ID = ${{ secrets.SUPABASE_SERVICE_ROLE_KEY}} >> .env
                 cat .env
               working-directory: query-builder-app
-            - name: Coverage Test Frontend
-              run: pnpm run coverage
-              working-directory: query-builder-app
-            - name: Install Dependencies Backend
+            - name: App Build
               run: |
-                  pnpm install --frozen-lockfile
+                pnpm run build
+              working-directory: query-builder-app
+    backend-build:
+        runs-on: ubuntu-latest
+        steps: 
+            - name: Backend Checkout
+              uses: actions/checkout@v4
+            - name: App Install pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                version: '9.1.2'
+            - name: Backend Setup Node
+              uses: actions/setup-node@v4
+              with:
+                node-version: 20
+                cache: 'pnpm'
+                cache-dependency-path: query-builder-backend/pnpm-lock.yaml
+            - name: Backend Install Dependencies
+              run: |
+                pnpm install --frozen-lockfile
               working-directory: query-builder-backend
             - name: Make env file
               run: |
                 touch .env
                 echo SUPABASE_URL = ${{ secrets.SUPABASE_URL }} >> .env
                 echo SUPABASE_KEY = ${{ secrets.SUPABASE_ANON_KEY }} >> .env
-                echo SUPABASE_SERVICE_KEY = ${{ secrets.SUPABASE_SERVICE_ROLE_KEY}} >> .env
+                echo SUPABASE_SERVICE_KEY = ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }} >> .env
                 echo SUPABASE_JWT_SECRET = ${{ secrets.SUPABASE_JWT_SECRET }} >> .env
+                echo UNI_KEY = ${{ secrets.UNI_KEY }} >> .env
+                echo SESSION_SECRET = ${{ secrets.SESSION_SECRET }} >> .env
                 cat .env
               working-directory: query-builder-backend
-            - name: Coverage Test Backend
-              run: pnpm run test:cov
-              working-directory: query-builder-backend
-            - name: Combining coverage data
+            - name: Backend Build
               run: |
-                pnpm install -g lcov
-                mkdir -p coverage  # Create the 'coverage' directory if it doesn't exist
-                touch coverage/combined-lcov.info
-                lcov -a ./query-builder-app/coverage/lcov.info -a ./query-builder-backend/coverage/lcov.info -o ./coverage/combined-lcov.info
-            - name: Upload coverage reports to Codecov
-              uses: codecov/codecov-action@v4.0.1
-              with:
-                  token: ${{ secrets.CODECOV_TOKEN }}
+                pnpm run build
+              working-directory: query-builder-backend

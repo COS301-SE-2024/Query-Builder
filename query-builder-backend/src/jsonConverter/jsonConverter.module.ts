@@ -4,6 +4,7 @@ import { JsonConverterService } from '../jsonConverter/jsonConverter.service';
 
 @Module({
   controllers: [JsonConverterController],
-  providers: [JsonConverterService]
+  providers: [JsonConverterService],
+  exports: [JsonConverterService],
 })
 export class JsonConverterModule {}
