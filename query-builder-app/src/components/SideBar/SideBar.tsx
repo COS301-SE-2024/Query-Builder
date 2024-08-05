@@ -66,7 +66,7 @@ const Sidebar = () => {
                         </a>
                     </div>
                     <div className="sidebar-item">
-                        <Button
+                        <Button variant="solid" color="danger"
                          onClick={() => signOut()}>
                             Log out
                         </Button>
