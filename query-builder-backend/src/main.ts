@@ -11,7 +11,14 @@ async function bootstrap() {
   const { httpAdapter } = app.get(HttpAdapterHost);
   app.setGlobalPrefix('api');
 
-  let redisClient = await createClient()
+  let redisClient = await createClient(
+    {
+      socket: {
+        host: 'localhost',
+        port: 6379,
+      }
+    }
+  )
     .on('error', (err) => console.log('Redis Client Error', err))
     .connect();
 
