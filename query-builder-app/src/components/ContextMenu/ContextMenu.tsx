@@ -70,7 +70,7 @@ export default function ContextMenu() {
     }, [])
 
     return (
-        <ScrollShadow className=" h-[500px]">
+        <ScrollShadow className=" h-full size-full  pl-3 pr-3 mt-2">
             {Array.isArray(savedQueries) && savedQueries.map((queryData: ContextMenuCardProps, index: number) => (
                 <React.Fragment key={index}>
                     <ContextMenuCard
