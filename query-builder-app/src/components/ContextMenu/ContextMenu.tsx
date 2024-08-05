@@ -12,6 +12,7 @@ export default function ContextMenu() {
         parameters: any,
         query_id: any,
         db_id: string,
+        onDelete: () => void;
     }
 
     // This function gets the token from local storage.
@@ -25,6 +26,11 @@ export default function ContextMenu() {
 
         return token;
     };
+
+    function reload()
+    {
+        getSavedQueries();
+    }
 
     async function getSavedQueries() {
         try {
@@ -56,6 +62,7 @@ export default function ContextMenu() {
     const [savedQueries, setSavedQueries] = React.useState<ContextMenuCardProps[]>([]);
 
 
+
     //React hook to fetch the user's organisations upon rerender of the component
     React.useEffect(() => {
         getSavedQueries();
@@ -72,6 +79,7 @@ export default function ContextMenu() {
                         parameters={queryData.parameters}
                         query_id={queryData.query_id}
                         db_id={queryData.db_id}
+                        onDelete={reload}
                     />
                     <Spacer x={4} />
 
