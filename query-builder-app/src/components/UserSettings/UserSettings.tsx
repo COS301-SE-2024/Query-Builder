@@ -276,7 +276,7 @@ export default function UserSettings(){
                                 label="First Name"
                                 defaultValue={initialFirstName}
                                 variant="bordered"
-                                placeholder={initialFirstName}
+                                placeholder="First Name"
                                 onValueChange={setUpdateFirstName}
                                 onFocus={() => {setUpdateFirstNameHasBeenFocused(true);setUpdateLastNameHasBeenFocused(false);setUpdatePhoneHasBeenFocused(false)}}
                                 isInvalid={isUpdateFirstNameInvalid && updateFirstNameHasBeenFocused}
@@ -290,7 +290,7 @@ export default function UserSettings(){
                                 label="Last Name"
                                 variant="bordered"
                                 defaultValue={initialLastName}
-                                placeholder={initialLastName}
+                                placeholder="Last Name"
                                 onValueChange={setUpdateLastName}
                                 onFocus={() => {setUpdateFirstNameHasBeenFocused(false);setUpdateLastNameHasBeenFocused(true);setUpdatePhoneHasBeenFocused(false)}}
                                 isInvalid={isUpdateLastNameInvalid && updateLastNameHasBeenFocused}
@@ -375,7 +375,7 @@ export default function UserSettings(){
             </Card>
         </>);
 
-    }, [initialFirstName, initialLastName, initialEmail, initialPhone, profilePicURL]);
+    }, [initialFirstName, initialLastName, initialEmail, initialPhone]);
 
     return (
         <>{renderUserDetails()}</>
