@@ -192,7 +192,15 @@ export default function Form(){
                 {/* Add filters */}
                 {
                     (query.queryParams.table.name != "") && (
-                        <h2>Add filters:</h2>
+                        <>
+                            <h2>Add filters:</h2>
+                            <Spacer y={2}/>
+                            <Card className="w-full">
+                                <CardBody className="flex flex-row items-center space-x-2">
+                                    
+                                </CardBody>
+                            </Card>
+                        </>
                     )
                 }
                 
