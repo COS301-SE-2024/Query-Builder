@@ -10,6 +10,7 @@ import TableResponse from "../TableResponse/TableResponse";
 import { createClient } from "./../../utils/supabase/client";
 import { Query, table} from "@/interfaces/intermediateJSON";
 import TableList from "../TableList/TableList";
+import FilterList from "../FilterList/FilterList";
 
 //----------------------------INTERFACES------------------------------------//
 
@@ -190,23 +191,15 @@ export default function Form(){
                 <Spacer y={2}/>
 
                 {/* Add filters */}
-                {
+                {/* {
                     (query.queryParams.table.name != "") && (
-                        <>
-                            <h2>Add filters:</h2>
-                            <Spacer y={2}/>
-                            <Card className="w-full">
-                                <CardBody className="flex flex-row items-center space-x-2">
-                                    
-                                </CardBody>
-                            </Card>
-                        </>
+                        <></>
                     )
-                }
+                } */}
                 
-                <h1>
+                {/* <h1>
                     {JSON.stringify(query)}
-                </h1>
+                </h1> */}
             </CardBody>
             <CardFooter>
                 <>
