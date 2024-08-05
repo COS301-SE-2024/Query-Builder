@@ -88,7 +88,7 @@ export default function ContextMenuCard({
             <DropdownTrigger>
                 <Button
                     variant="flat"
-                    className="w-[235px]"
+                    className="size-full pl-1 pr-1"
                     color="primary"
                     disabled={loading}
                 >
