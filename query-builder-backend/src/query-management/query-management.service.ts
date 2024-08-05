@@ -1,20 +1,22 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Supabase } from '../supabase';
 import { Save_Query_Dto } from './dto/save-query.dto';
+import { Delete_Query_Dto } from './dto/delete-query.dto';
+import { query } from 'express';
 
 @Injectable()
 export class QueryManagementService {
 
-    constructor(private readonly supabase: Supabase,) {}
+    constructor(private readonly supabase: Supabase,) { }
 
-    async saveQuery(save_query_dto: Save_Query_Dto){
+    async saveQuery(save_query_dto: Save_Query_Dto) {
 
         //Firstly get the user who is saving the query
         const { data: user_data, error: user_error } = await this.supabase
-        .getClient()
-        .auth.getUser(this.supabase.getJwt());
+            .getClient()
+            .auth.getUser(this.supabase.getJwt());
 
-        if(user_error){
+        if (user_error) {
             throw user_error;
         }
 
@@ -29,7 +31,7 @@ export class QueryManagementService {
         const { data: save_data, error: save_error } = await this.supabase
             .getClient()
             .from('saved_queries')
-            .insert({...saved_query_fields})
+            .insert({ ...saved_query_fields })
             .select();
 
         if (save_error) {
@@ -43,28 +45,31 @@ export class QueryManagementService {
 
     }
 
-    async getQueries(){
-            
-            //Firstly get the user who is saving the query
-            const { data: user_data, error: user_error } = await this.supabase
+    async getQueries() {
+
+        //Firstly get the user who is saving the query
+        const { data: user_data, error: user_error } = await this.supabase
             .getClient()
             .auth.getUser(this.supabase.getJwt());
-    
-            if(user_error){
-                throw user_error;
-            }
-    
-            //Secondly get the queries saved by the user
-            const { data: query_data, error: query_error } = await this.supabase
-                .getClient()
-                .from('saved_queries')
-                .select('parameters, queryTitle, saved_at')
-                .eq('user_id', user_data.user.id);
-            if (query_error) {
-                throw query_error;//
-            }
-    
-            return { query_data };
+
+        if (user_error) {
+            throw user_error;
+        }
+
+        //Secondly get the queries saved by the user
+        const { data: query_data, error: query_error } = await this.supabase
+            .getClient()
+            .from('saved_queries')
+            .select('parameters, queryTitle, saved_at, query_id, db_id')
+            .eq('user_id', user_data.user.id);
+        if (query_error) {
+            throw query_error;
+        }
+
+        return { query_data };
     }
+
+
+    
 
 }
