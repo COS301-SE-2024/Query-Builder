@@ -15,6 +15,7 @@ interface ContextMenuCardProps {
     parameters: any;
     query_id: any;
     db_id: string;
+    onDelete: () => void;
 }
 
 // This function gets the token from local storage.
@@ -56,6 +57,7 @@ export default function ContextMenuCard({
     parameters,
     query_id,
     db_id,
+    onDelete,
 }: ContextMenuCardProps) {
     const [loading, setLoading] = useState(false);
 
@@ -68,6 +70,7 @@ export default function ContextMenuCard({
             console.error("Error during deletion:", error);
         } finally {
             setLoading(false);
+            onDelete();
         }
     };
 
@@ -76,6 +79,7 @@ export default function ContextMenuCard({
 
         console.log(query);
         //Here we will send the query to the query builder
+        //Plugg and play Keanu
         
     };
 
