@@ -76,6 +76,37 @@ export default function ContextMenuCard({
     };
 
     return (
-        
+        <Dropdown>
+            <DropdownTrigger>
+                <Button
+                    variant="flat"
+                    className="w-[235px]"
+                    color="primary"
+                    disabled={loading}
+                >
+                    {loading ? "Processing..." : queryTitle}
+                </Button>
+            </DropdownTrigger>
+            <DropdownMenu aria-label="Static Actions">
+                <DropdownSection title={saved_at}>
+                    <DropdownItem
+                        key="retrieve"
+                        description="Retrieve saved query"
+                        onClick={handleRetrieve}
+                    >
+                        Retrieve Query
+                    </DropdownItem>
+                    <DropdownItem
+                        key="delete"
+                        className="text-danger"
+                        color="danger"
+                        description="Delete query from saved queries"
+                        onClick={handleDelete}
+                    >
+                        Delete Query
+                    </DropdownItem>
+                </DropdownSection>
+            </DropdownMenu>
+        </Dropdown>
     );
 }
