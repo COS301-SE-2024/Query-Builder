@@ -70,6 +70,25 @@ export class QueryManagementService {
     }
 
 
-    
+    async deleteQuery(delete_query_dto: Delete_Query_Dto) {
+        try {
+            // Deleting the query from the saved_queries table
+            const { data: delete_data, error: delete_error } = await this.supabase
+                .getClient()
+                .from('saved_queries')
+                .delete()
+                .eq('query_id', delete_query_dto.query_id);
+
+            if (delete_error) {
+                throw new Error(`Query deletion error: ${delete_error.message}`);
+            }
+
+            return { delete_data };
+
+        } catch (error) {
+            console.error("Error deleting query:", error);
+            throw error;
+        }
+    }
 
 }
