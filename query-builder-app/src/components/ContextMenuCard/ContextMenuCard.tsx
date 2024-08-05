@@ -73,6 +73,10 @@ export default function ContextMenuCard({
 
     const handleRetrieve = async () => {
         let query = parameters;
+
+        console.log(query);
+        //Here we will send the query to the query builder
+        
     };
 
     return (
