@@ -14,7 +14,7 @@ async function bootstrap() {
   let redisClient = await createClient(
     {
       socket: {
-        host: 'localhost',
+        host: 'redis',
         port: 6379,
       }
     }
