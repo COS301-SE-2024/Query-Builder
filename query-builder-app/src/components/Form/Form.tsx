@@ -129,14 +129,14 @@ export default function Form(){
     return (
 
         <>
-        <div className="app">
-        <Card>
+        <div className="app overflow-visible">
+        <Card className="overflow-visible">
             <CardHeader>
                 <div className="flex">
                     <h1>Create a query</h1>
                 </div>
             </CardHeader>
-            <CardBody> 
+            <CardBody className="overflow-visible"> 
                 {/* Select a database */}
                 <h2>Select a database:</h2>
                 <Spacer y={2}/>
@@ -197,9 +197,9 @@ export default function Form(){
                     )
                 } */}
                 
-                {/* <h1>
+                <h1>
                     {JSON.stringify(query)}
-                </h1> */}
+                </h1>
             </CardBody>
             <CardFooter>
                 <>

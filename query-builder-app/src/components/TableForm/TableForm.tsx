@@ -125,8 +125,8 @@ export default function TableForm(props: TableFormProps){
         <div className="w-full">
             <h2>Select the columns to display from {table.name}:</h2>
             <Spacer y={2}/>
-            <Card>
-                <CardBody>
+            <Card className="overflow-visible">
+                <CardBody className="overflow-visible">
                     <div className="flex items-center space-x-2">
                         {table.columns.map((column) => <ColumnChip column={column} key={column.name} onChange={updateColumns}></ColumnChip>)}
                         <div className="flex justify-end flex-1">
