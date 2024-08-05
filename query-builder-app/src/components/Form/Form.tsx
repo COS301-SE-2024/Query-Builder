@@ -36,15 +36,6 @@ export default function Form(){
     //React hook for URL params
     const {databaseServerID} = useParams<{databaseServerID: string}>();
 
-    //async function to get the database credentials, either from supabase, or prompt the user
-    async function getDatabaseCredentials() {
-
-        //query the appropriate endpoint to get the credentials for the database, passing through the session key
-
-        console.log(databaseServerID);
-
-    }
-
     //callback function for TableList
     function updateTable(updatedTable: table) {
 
@@ -63,8 +54,6 @@ export default function Form(){
 
     //async function to fetch the database server's databases
     async function fetchDatabases() {
-
-        let databaseCredentials = await getDatabaseCredentials();
     
         let response = await fetch("http://localhost:55555/api/metadata/schemas", {
             credentials: "include",
@@ -75,9 +64,7 @@ export default function Form(){
             'Authorization': 'Bearer ' + await getToken()
             },
             body: JSON.stringify({
-                host: "127.0.0.1",
-                user: "root",
-                password: "testPassword"
+                databaseServerID: databaseServerID
             })
         });
 
@@ -108,11 +95,7 @@ export default function Form(){
 
     //React hook containing the Query the user is busy building
     const [query, setQuery] = useState<Query>({
-        credentials: {
-            host: "127.0.0.1",
-            user: "root",
-            password: "testPassword"
-        },
+        databaseServerID: databaseServerID,
         queryParams: {
             language: "sql",
             query_type: "select",
@@ -192,7 +175,7 @@ export default function Form(){
                 <Spacer y={2}/>
                 {/* Select tables */}
                 {!selectedDatabases.has("Select database") ? 
-                    (<TableList databaseName={selectedDatabasesLabel} table={query.queryParams.table} onChange={updateTable}></TableList>) : null}
+                    (<TableList databaseServerID={databaseServerID} databaseName={selectedDatabasesLabel} table={query.queryParams.table} onChange={updateTable}></TableList>) : null}
                 
                 <h1>
                     {JSON.stringify(query)}

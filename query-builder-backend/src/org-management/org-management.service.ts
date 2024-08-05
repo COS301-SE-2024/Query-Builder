@@ -31,7 +31,7 @@ import { Upload_Org_Logo_Dto } from './dto/upload-org-logo.dto';
 export class OrgManagementService {
   constructor(
     private readonly supabase: Supabase,
-    private readonly configService: ConfigService,
+    private readonly config_service: ConfigService,
     private readonly app_service: AppService
   ) {}
 
@@ -538,7 +538,7 @@ export class OrgManagementService {
       session.sessionKey
     );
 
-    const uni_key = this.configService.get('UNI_KEY');
+    const uni_key = this.config_service.get('UNI_KEY');
 
     const second_encryptedText = this.app_service.encrypt(
       encryptedText,
@@ -561,6 +561,8 @@ export class OrgManagementService {
 
     return { data: db_data };
   }
+
+  
 
   // TODO: Test this function
   async updateOrg(update_org_dto: Update_Org_Dto) {

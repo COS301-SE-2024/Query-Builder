@@ -9,6 +9,7 @@ import { createClient } from "./../../utils/supabase/client";
 //----------------------------INTERFACES------------------------------------//
 
 interface TableListProps {
+    databaseServerID: string,
     databaseName: string,
     table: table
     onChange?: (table: table) => void
@@ -127,11 +128,7 @@ export default function TableList(props: TableListProps){
             'Authorization': 'Bearer ' + await getToken()
             },
             body: JSON.stringify({
-                credentials: {
-                    host: "127.0.0.1",
-                    user: "root",
-                    password: "testPassword"
-                },
+                databaseServerID: props.databaseServerID,
                 schema: database
             })
         });
@@ -157,11 +154,7 @@ export default function TableList(props: TableListProps){
             'Authorization': 'Bearer ' + await getToken()
             },
             body: JSON.stringify({
-                credentials: {
-                    host: "127.0.0.1",
-                    user: "root",
-                    password: "testPassword"
-                },
+                databaseServerID: props.databaseServerID,
                 schema: database,
                 table: table
             })
@@ -290,7 +283,7 @@ export default function TableList(props: TableListProps){
     //add the table for the first (compulsory) table
     tables.push(createTableCard(tableRef));
     //add the TableForm for the first (compulsory) table
-    tableForms.push(<TableForm table={tableRef} onChange={updateTable} ></TableForm>)
+    tableForms.push(<TableForm databaseServerID={props.databaseServerID} table={tableRef} onChange={updateTable} ></TableForm>)
 
     //iterate over the linked list of joined tables
     while(tableRef.join != null){
@@ -298,7 +291,7 @@ export default function TableList(props: TableListProps){
         //add the table for the next table
         tables.push(createTableCard(tableRef));
         //add the TableForm for the next table
-        tableForms.push(<TableForm table={tableRef} onChange={updateTable} ></TableForm>)
+        tableForms.push(<TableForm databaseServerID={props.databaseServerID} table={tableRef} onChange={updateTable} ></TableForm>)
     }
 
     //----------------------------RENDER THE COMPONENT------------------------------------//

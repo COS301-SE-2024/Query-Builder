@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { DbMetadataHandlerController } from './db-metadata-handler.controller';
 import { DbMetadataHandlerService } from './db-metadata-handler.service';
-import { QueryHandlerService } from 'src/query-handler/query-handler.service';
-import { JsonConverterService } from 'src/jsonConverter/jsonConverter.service';
+import { QueryHandlerModule } from '../query-handler/query-handler.module';
 
 @Module({
+  imports: [QueryHandlerModule],
   controllers: [DbMetadataHandlerController],
-  providers: [DbMetadataHandlerService, QueryHandlerService, JsonConverterService]
+  providers: [DbMetadataHandlerService]
 })
 export class DbMetadataHandlerModule {}
