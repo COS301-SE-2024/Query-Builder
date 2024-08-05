@@ -63,6 +63,20 @@ export default function ContextMenu() {
     }, [])
 
     return (
+        <ScrollShadow className=" h-[500px]">
+            {Array.isArray(savedQueries) && savedQueries.map((queryData: ContextMenuCardProps, index: number) => (
+                <React.Fragment key={index}>
+                    <ContextMenuCard
+                        queryTitle={queryData.queryTitle}
+                        saved_at={queryData.saved_at}
+                        parameters={queryData.parameters}
+                        query_id={queryData.query_id}
+                        db_id={queryData.db_id}
+                    />
+                    <Spacer x={4} />
 
+                </React.Fragment>
+            ))}
+        </ScrollShadow>
     );
 }
