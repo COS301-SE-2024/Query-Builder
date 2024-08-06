@@ -1,11 +1,10 @@
 export interface Query {
-    credentials: DatabaseCredentials,
-    databaseServerID?: string,
+    credentials?: DatabaseCredentials,
+    databaseServerID: string,
     queryParams: QueryParams
 }
 
 export interface DatabaseCredentials {
-    host: string,
     user: string,
     password: string
 }

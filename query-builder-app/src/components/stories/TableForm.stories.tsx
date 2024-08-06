@@ -18,6 +18,6 @@ const tableProp: table = {
 // Can have multiple different variants of a component
 export const DefaultTableForm = {
 
-    render: () => <TableForm table={tableProp}/> // this function specifies how we want to render this variant of the component
+    render: () => <TableForm databaseServerID="mockServerID" table={tableProp}/> // this function specifies how we want to render this variant of the component
 
 };

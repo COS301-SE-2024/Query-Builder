@@ -13,11 +13,7 @@ export default {
 export const DefaultTableResponse = {
 
     render: () => <TableResponse query={{
-        credentials: {
-            host: "127.0.0.1",
-            user: "root",
-            password: "testPassword"
-        },
+        databaseServerID: "mockServerID",
         queryParams: {
             databaseName: "sakila",
             language: "sql",

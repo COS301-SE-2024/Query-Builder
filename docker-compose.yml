@@ -1,0 +1,30 @@
+services:
+  query-builder-app:
+    build:
+      context: ./query-builder-app
+      dockerfile: Dockerfile
+    ports:
+      - "80:3000" # Port 80 as this will be the public facing port
+    depends_on:
+      - query-builder-backend
+    networks:
+      - front-tier
+
+  query-builder-backend:
+    build:
+      context: ./query-builder-backend
+      dockerfile: Dockerfile
+    depends_on:
+    - redis
+    networks:
+      - back-tier
+      - front-tier
+
+  redis:
+    image: redis:latest
+    networks:
+      - back-tier
+
+networks:
+   back-tier:
+   front-tier:
