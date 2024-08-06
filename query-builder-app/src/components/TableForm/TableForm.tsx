@@ -129,7 +129,7 @@ export default function TableForm(props: TableFormProps){
                         <div className="flex justify-end flex-1">
                             <Dropdown>
                                 <DropdownTrigger>
-                                    <Button variant="bordered">+</Button>
+                                    <Button aria-label="addColumn" variant="bordered">+</Button>
                                 </DropdownTrigger>
                                 <DropdownMenu
                                     className="max-h-[50vh] overflow-y-auto"
