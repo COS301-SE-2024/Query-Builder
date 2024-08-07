@@ -83,7 +83,7 @@ export default function DatabaseConnectionModal(props: DatabaseConnectionModalPr
       }))
 
       //call the add-db API endpoint
-      let response = await fetch("http://localhost:55555/api/org-management/add-db", {
+      let response = await fetch(`http://${process.env.BACKEND_URL}/api/org-management/add-db`, {
         credentials: "include",
         method: "POST",
         headers: {
@@ -107,7 +107,8 @@ export default function DatabaseConnectionModal(props: DatabaseConnectionModalPr
       props.on_add();
 
       //if rememberDatabaseCredentials is set, save the db_secrets
-      if(rememberDatabaseCredentials){
+      //change this later - for now always save
+      if(true){
 
         //create a db_secrets object
         const db_secrets = {
@@ -120,7 +121,7 @@ export default function DatabaseConnectionModal(props: DatabaseConnectionModalPr
 
         //log request body
         console.log("BODY OF REQUEST: " + JSON.stringify({
-          db_id: addDBResponse.db_data[0].db_id,
+          db_id: addDBResponse.data[0].db_id,
           db_secrets: db_secrets_string
         }))
 
@@ -134,7 +135,7 @@ export default function DatabaseConnectionModal(props: DatabaseConnectionModalPr
             'Authorization': 'Bearer ' + await getToken()
           },
           body: JSON.stringify({
-              db_id: addDBResponse.db_data[0].db_id,
+              db_id: addDBResponse.data[0].db_id,
               db_secrets: db_secrets_string
           })
         })

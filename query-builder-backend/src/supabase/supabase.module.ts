@@ -6,7 +6,7 @@ import { SupabaseGuard } from './supabase.guard';
 import { Supabase } from './supabase';
 
 @Module({
-  imports: [ConfigModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true })],
   providers: [Supabase, SupabaseStrategy, SupabaseGuard, ConfigService],
   exports: [Supabase, SupabaseStrategy, SupabaseGuard, ConfigService],
 })

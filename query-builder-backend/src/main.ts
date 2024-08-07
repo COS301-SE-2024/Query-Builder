@@ -11,7 +11,14 @@ async function bootstrap() {
   const { httpAdapter } = app.get(HttpAdapterHost);
   app.setGlobalPrefix('api');
 
-  let redisClient = await createClient()
+  let redisClient = await createClient(
+    {
+      socket: {
+        host: `${process.env.REDIS_HOST}`,
+        port: 6379,
+      }
+    }
+  )
     .on('error', (err) => console.log('Redis Client Error', err))
     .connect();
 
@@ -36,7 +43,7 @@ async function bootstrap() {
   app.enableCors({
     //change in production
     origin: [
-      'http://localhost:3000',],
+      `http://${process.env.FRONTEND_URL}`,],
     credentials: true
   });
   await app.listen(55555);

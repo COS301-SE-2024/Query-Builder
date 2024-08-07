@@ -5,6 +5,7 @@ import ColumnChip from "../ColumnChip/ColumnChip";
 import { createClient } from "./../../utils/supabase/client";
 
 interface TableFormProps {
+    databaseServerID: string,
     table: table,
     onChange?: (table: table) => void
 }
@@ -59,11 +60,7 @@ export default function TableForm(props: TableFormProps){
             'Authorization': 'Bearer ' + await getToken()
             },
             body: JSON.stringify({
-                credentials: {
-                    host: "127.0.0.1",
-                    user: "root",
-                    password: "testPassword"
-                },
+                databaseServerID: props.databaseServerID,
                 schema: "sakila",
                 table: table.name
             })
@@ -132,7 +129,7 @@ export default function TableForm(props: TableFormProps){
                         <div className="flex justify-end flex-1">
                             <Dropdown>
                                 <DropdownTrigger>
-                                    <Button variant="bordered">+</Button>
+                                    <Button aria-label="addColumn" variant="bordered">+</Button>
                                 </DropdownTrigger>
                                 <DropdownMenu
                                     className="max-h-[50vh] overflow-y-auto"

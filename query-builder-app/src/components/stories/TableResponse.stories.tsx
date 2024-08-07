@@ -13,17 +13,15 @@ export default {
 export const DefaultTableResponse = {
 
     render: () => <TableResponse query={{
-        credentials: {
-            host: "127.0.0.1",
-            user: "root",
-            password: "testPassword"
-        },
-        databaseName: "sakila",
+        databaseServerID: "mockServerID",
         queryParams: {
+            databaseName: "sakila",
             language: "sql",
             query_type: "select",
-            table: "film",
-            columns: ["title", "release_year", "rating", "rental_rate", "rental_duration", "language_id"],
+            table: {
+                name: "film",
+                columns: [{name: "title"}, {name:"release_year"}, {name:"rating"}, {name:"rental_rate"}, {name:"rental_duration"}, {name:"language_id"}],
+            },
         }
     }}/> // this function specifies how we want to render this variant of the component
 

@@ -9,8 +9,7 @@ export class Save_Query_Dto {
     @IsNotEmpty()
     parameters: string;
 
-    @IsString()
     @IsNotEmpty()
-    queryTitle: string
+    queryTitle: string;
 
 }
