@@ -68,6 +68,26 @@ export class OrgManagementService {
     return { data };
   }
 
+  async getOrgLoggedIn_H1(org_ids) {
+    const { data: org_data, error: org_data_error } = await this.supabase
+      .getClient()
+      .from('organisations')
+      .select('org_id, created_at, name, logo, org_members(*), db_envs(*)')
+      .in(
+        'org_id',
+        org_ids.map((org) => org.org_id)
+      );
+
+    if (org_data_error) {
+      throw org_data_error;
+    }
+    if (org_data.length === 0) {
+      throw new NotFoundException('Organisation not found');
+    }
+
+    return { org_data };
+  }
+
   async getOrgLoggedIn() {
     const { data, error } = await this.supabase
       .getClient()
@@ -93,18 +113,7 @@ export class OrgManagementService {
       throw new NotFoundException('Organisation not found');
     }
 
-    const { data: org_data, error: org_data_error } = await this.supabase
-      .getClient()
-      .from('organisations')
-      .select('org_id, created_at, name, logo, org_members(*), db_envs(*)')
-      .in('org_id', org_ids.map((org) => org.org_id));
-
-    if (org_data_error) {
-      throw org_data_error;
-    }
-    if(org_data.length === 0) {
-      throw new NotFoundException('Organisation not found');
-    }
+    const { org_data } = await this.getOrgLoggedIn_H1(org_ids);
 
     return { data: org_data };
   }
@@ -561,8 +570,6 @@ export class OrgManagementService {
 
     return { data: db_data };
   }
-
-  
 
   // TODO: Test this function
   async updateOrg(update_org_dto: Update_Org_Dto) {
