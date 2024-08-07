@@ -6,6 +6,7 @@ import { QueryHandlerModule } from '../query-handler/query-handler.module';
 @Module({
   imports: [QueryHandlerModule],
   controllers: [DbMetadataHandlerController],
-  providers: [DbMetadataHandlerService]
+  providers: [DbMetadataHandlerService],
+  exports: [DbMetadataHandlerService]
 })
 export class DbMetadataHandlerModule {}

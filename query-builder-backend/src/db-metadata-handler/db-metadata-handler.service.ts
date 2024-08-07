@@ -221,4 +221,57 @@ export class DbMetadataHandlerService {
 
     }
 
+    //optimised endpoint to get a summary of the entire database server's structure
+    async getSchemaSummary(schemaQuery: SchemaQuery, session: Record<string, any>) : Promise<any> {
+
+        /*
+        SELECT schema_name, table_name, column_name
+        FROM information_schema.schemata 
+        JOIN information_schema.tables ON schema_name = table_schema
+        JOIN information_schema.columns ON table_name = table_name
+        WHERE schema_name not in ('information_schema', 'mysql', 'sys', 'performance_schema');
+        */
+
+        const summaryQuery: Query = {
+            databaseServerID: schemaQuery.databaseServerID,
+            queryParams: {
+                language: "sql",
+                query_type: "select",
+                databaseName: "information_schema",
+                table: {
+                    name: "schemata",
+                    columns: [{name: "schema_name"}],
+                    join: {
+                        table1MatchingColumnName: "schema_name",
+                        table2MatchingColumnName: "table_schema",
+                        table2: {
+                            name: "tables",
+                            columns: [{name: "table_name"}],
+                            join: {
+                                table1MatchingColumnName: "table_name",
+                                table2MatchingColumnName: "table_name",
+                                table2: {
+                                    name: "columns",
+                                    columns: [{name: "column_name"}]
+                                }
+                            }
+                        }
+                    }
+                },
+                condition: {
+                    operator: LogicalOperator.AND,
+                    conditions: [
+                        {column: "schema_name", operator: ComparisonOperator.NOT_EQUAL, value: "information_schema"},
+                        {column: "schema_name", operator: ComparisonOperator.NOT_EQUAL, value: "mysql"},
+                        {column: "schema_name", operator: ComparisonOperator.NOT_EQUAL, value: "sys"},
+                        {column: "schema_name", operator: ComparisonOperator.NOT_EQUAL, value: "performance_schema"}
+                    ]
+                }
+            }
+        }
+
+        return await this.queryHandlerService.queryDatabase(summaryQuery, session);
+
+    }
+
 }
