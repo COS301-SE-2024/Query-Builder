@@ -1,5 +1,6 @@
 name: App Deploy
 on:
+    workflow_dispatch:
     push:
         branches:
             - main
@@ -24,7 +25,7 @@ jobs:
 
       - name: Deploy
         run: |
-          sshpass -p '${{ secrets.DEPLOY_PORT }}' ssh -v -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} <<'ENDSSH'
+          sshpass -p '${{ secrets.DEPLOY_PASSWORD }}' ssh -p ${{secrets.DEPLOY_PORT}} -v -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} <<'ENDSSH'
           cd ~/Query-Builder
           git pull
           docker compose down
