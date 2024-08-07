@@ -381,7 +381,11 @@ describe('OrgManagementService', () => {
 
     it('should return the organisations the user is a part of', async () => {
       let testData = [];
-      testData[SELECT] = [{ ...testOrg, db_envs: [] }];
+      testData[SELECT] = [
+        { org_id: '0000' },
+        { org_id: '0001' },
+        { org_id: '0002' }
+      ];
       testData[AUTH] = {
         user: {
           id: '0000'
@@ -389,6 +393,15 @@ describe('OrgManagementService', () => {
       };
 
       setTestData(testData);
+
+      jest.spyOn(service, 'getOrgLoggedIn_H1').mockResolvedValue({
+        org_data: [
+          {
+            ...testOrg,
+            db_envs: []
+          }
+        ]
+      });
 
       const { data } = await service.getOrgLoggedIn();
       expect(data).toBeDefined();
@@ -1987,7 +2000,9 @@ describe('OrgManagementService', () => {
       expect(data).toEqual(testData[INSERT]);
     });
   });
-  describe('saveDbSecrets', () => {});
+  describe('saveDbSecrets', () => {
+    
+  });
   describe('updateOrg', () => {});
   describe('updateMember', () => {});
   describe('updateMemberHelper', () => {});
