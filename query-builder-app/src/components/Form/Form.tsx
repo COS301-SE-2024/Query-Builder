@@ -8,7 +8,7 @@ import { useParams } from 'next/navigation'
 import {Button, Spacer, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Card, CardHeader, CardBody, CardFooter, useDisclosure, ModalContent, Modal, ModalHeader, DropdownSection} from "@nextui-org/react";
 import TableResponse from "../TableResponse/TableResponse";
 import { createClient } from "./../../utils/supabase/client";
-import { Query, table} from "@/interfaces/intermediateJSON";
+import { compoundCondition, LogicalOperator, Query, table} from "@/interfaces/intermediateJSON";
 import TableList from "../TableList/TableList";
 import FilterList from "../FilterList/FilterList";
 
@@ -46,6 +46,10 @@ export default function Form(){
             table: {
                 name: "",
                 columns: []
+            },
+            condition: {
+                conditions: [],
+                operator: LogicalOperator.AND
             }
         }
     });
@@ -191,11 +195,11 @@ export default function Form(){
                 <Spacer y={2}/>
 
                 {/* Add filters */}
-                {/* {
+                {
                     (query.queryParams.table.name != "") && (
-                        <></>
+                        <FilterList condition={query.queryParams.condition! as compoundCondition} table={query.queryParams.table}/>
                     )
-                } */}
+                }
                 
                 <h1>
                     {JSON.stringify(query)}

@@ -1,7 +1,7 @@
 // import the component you want to make a story for
 import React from "react";
 import FilterList from "../FilterList/FilterList";
-import {primitiveCondition, ComparisonOperator, compoundCondition, LogicalOperator} from "../../interfaces/intermediateJSON"
+import {primitiveCondition, ComparisonOperator, compoundCondition, LogicalOperator, table} from "../../interfaces/intermediateJSON"
 
 // A story has a lot of options, but the only required one is to specify the component we want to render
 // Setting up the story's default component
@@ -27,28 +27,18 @@ const compoundConditionProp: compoundCondition = {
             column: "age",
             operator: ComparisonOperator.LESS_THAN,
             value: 20
-        },
-        {
-            operator: LogicalOperator.OR,
-            conditions: [
-                {
-                    column: "name",
-                    operator: ComparisonOperator.EQUAL,
-                    value: "Jack"
-                },
-                {
-                    column: "name",
-                    operator: ComparisonOperator.EQUAL,
-                    value: "Jill"
-                }
-            ]
         }
     ]
+}
+
+const tableProp: table = {
+    name: "actor",
+    columns: []
 }
 
 // Can have multiple different variants of a component
 export const DefaultFilterList = {
 
-    render: () => <FilterList condition={compoundConditionProp}/> // this function specifies how we want to render this variant of the component
+    render: () => <FilterList condition={compoundConditionProp} table={tableProp}/> // this function specifies how we want to render this variant of the component
 
 };

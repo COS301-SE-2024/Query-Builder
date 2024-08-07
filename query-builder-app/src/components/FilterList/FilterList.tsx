@@ -1,14 +1,23 @@
+//This implementation makes the assumption that all conditions are simply "ADDED" together
+
 //----------------------------IMPORTS-----------------------------------//
-import { compoundCondition, condition, primitiveCondition } from "@/interfaces/intermediateJSON"
+import { compoundCondition, condition, primitiveCondition, table } from "@/interfaces/intermediateJSON"
 import { Button, Card, CardBody, Spacer } from "@nextui-org/react";
 import { useState } from "react"
+import { createClient } from "./../../utils/supabase/client";
 import FilterChip from "../FilterChip/FilterChip";
 import React from "react";
 
 //---------------------------INTERFACES---------------------------------//
 
 interface FilterListProps{
-    condition: condition
+    condition: compoundCondition,
+    table: table
+}
+
+interface PossibleCondition{
+    tableName: string,
+    column: string
 }
 
 export default function FilterList(props: FilterListProps){
@@ -16,42 +25,88 @@ export default function FilterList(props: FilterListProps){
     //----------------------------REACT HOOKS------------------------------------//
 
     //React hook for the data model
-    const [condition, setCondition] = useState<condition>(props.condition);
+    const [condition, setCondition] = useState<compoundCondition>(props.condition);
+
+    //React hook for all possible conditions
+
+    //React hook to refetch possible conditions when table changes
+    React.useEffect(() => {
+
+        fetchPossibleConditions();
+
+    },[props.table])
 
     //----------------------------HELPER FUNCTIONS------------------------------------//
 
-    //helper function that, when given the abstract syntax tree of conditions, renders the primitiveConditions'
-    //FilterChips correctly
+    // This function gets the token from local storage.
+    // Supabase stores the token in local storage so we can access it from there.
+    const getToken = async () => {
 
-    function renderFilterChips(condition: condition): JSX.Element {
+        const supabase = createClient();
+        const token = (await supabase.auth.getSession()).data.session?.access_token
+    
+        console.log(token)
+    
+        return token;
+    };
 
-        //for a compoundCondition, call renderFilterChips on each of its conditions, but render the logical
-        //operator in between
-        if('conditions' in condition){
-            const compoundCondition = condition as compoundCondition;
+    async function fetchPossibleConditions(){
+        console.log("FETCHING POSSIBLE CONDITIONS");
+
+        let response = await fetch("http://localhost:55555/api/metadata/fields", {
+            credentials: "include",
+            method: "PUT",
+            headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + await getToken()
+            },
+            body: JSON.stringify({
+                host: "127.0.0.1",
+                user: "root",
+                password: "testPassword"
+            })
+        });
+
+        let json = await response.json();
+
+        console.log(json);
+
+        //set the databases hook
+        setDatabases(json.data);
+
+    }
+
+    function renderFilterChips(compoundCondition: compoundCondition): JSX.Element {
+
             return(
                 <>
-                <span>{"("}</span>
-                {compoundCondition.conditions.map((subCondition, index) => (
-                    <React.Fragment key={index}>
-                      {renderFilterChips(subCondition)}
-                      {index < compoundCondition.conditions.length - 1 && (
-                        <span>{compoundCondition.operator}</span>
-                      )}
-                      {index == compoundCondition.conditions.length - 1 && (
-                        <Button variant="bordered">+</Button>
-                      )}
-                    </React.Fragment>
+                {compoundCondition.conditions.map((subCondition) => (
+                    <FilterChip primitiveCondition={subCondition as primitiveCondition} onChange={updateCondition} />
                 ))}
-                <span>{")"}</span>
                 </>
             );
+
+    }
+
+    //callback function for FilterChip
+    function updateCondition(updatedCondition: primitiveCondition){
+
+        // Find the index of the primitiveCondition to be updated
+        let i = 0;
+        for(let cond of condition.conditions){
+            let primitive = cond as primitiveCondition;
+            if(primitive.column == updatedCondition.column){
+                break;
+            }
+            i += 1;
         }
-        //for a primitiveCondition, render a FilterChip for the primitive condition
-        else{
-            const primitiveCondition = condition as primitiveCondition;
-            return(<FilterChip primitiveCondition={primitiveCondition} />);
-        }
+
+        const updatedConditions = [...condition.conditions];
+        updatedConditions[i] = updatedCondition;
+        setCondition((previousConditionState) => {
+            return {...previousConditionState, conditions: updatedConditions}
+        });
 
     }
 
@@ -60,8 +115,8 @@ export default function FilterList(props: FilterListProps){
         <>
             <h2>Add filters:</h2>
             <Spacer y={2}/>
-            <Card className="w-full">
-                <CardBody>
+            <Card className="w-full overflow-visible">
+                <CardBody className="overflow-visible">
                     <div className="flex items-center space-x-2">
                         {
                             /*all FilterChips here*/
@@ -73,6 +128,7 @@ export default function FilterList(props: FilterListProps){
                     </div>         
                 </CardBody>
             </Card>
+            <h1>{JSON.stringify(condition)}</h1>
         </>
 
     );
