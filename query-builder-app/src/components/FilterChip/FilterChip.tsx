@@ -1,9 +1,9 @@
 //----------------------------IMPORTS------------------------------------//
 
-import { Button, Chip, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input, Popover, PopoverContent, PopoverTrigger, Radio, RadioGroup, Spacer } from "@nextui-org/react";
+import { Button, Card, CardBody, Chip, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input, Popover, PopoverContent, PopoverTrigger, Radio, RadioGroup, Spacer } from "@nextui-org/react";
 import { AggregateFunction, column, primitiveCondition, ComparisonOperator } from "../../interfaces/intermediateJSON"
 import { FiMoreVertical } from "react-icons/fi";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import React from "react";
 
 //----------------------------INTERFACES------------------------------------//
@@ -16,6 +16,9 @@ interface FilterChipProps {
 export default function FilterChip(props: FilterChipProps){
 
     //----------------------------REACT HOOKS------------------------------------//
+
+    //React hook for whether the popup is open or not
+    const [openPopup, setOpenPopup] = useState(false);
 
     //React hook for the data model
     const [primitiveCondition, setPrimitiveCondition] = useState<primitiveCondition>(props.primitiveCondition);
@@ -38,8 +41,32 @@ export default function FilterChip(props: FilterChipProps){
 
     //----------------------------HELPER FUNCTIONS------------------------------------//
 
-    //helper function that generates a string representing the primitiveCondition
+    //helper functions for toggling the popup
+    function togglePopup(){
+        setOpenPopup((previousOpenPopup) => {
+            return !previousOpenPopup;
+        });
+    }
 
+    const menuRef = useRef<HTMLDivElement>(null)
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current != null) { // Check if menuRef.current is not null
+        if (!menuRef.current.contains(event.target as Node)) {
+          setOpenPopup(false);
+        }
+      }
+    };
+  
+    useEffect(() => {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);   
+  
+      };
+    }, []);
+
+    //helper function that generates a string representing the primitiveCondition
     function generatePrimitiveConditionString() : string {
 
         let output : string = "";
@@ -70,12 +97,10 @@ export default function FilterChip(props: FilterChipProps){
         <Chip
             size="lg"
             endContent={
-                <Popover placement="right">
-                    <PopoverTrigger>
-                        <FiMoreVertical/>
-                    </PopoverTrigger>
-                    <PopoverContent>
-                        <div>
+                <div className="relative inline-block">
+                    <FiMoreVertical onClick={togglePopup}/>
+                    {(openPopup) && (<Card ref={menuRef} className="absolute z-1 top-8">
+                        <CardBody>
                             <Spacer y={2}/>
                             <h2>Use a summary statistic</h2>
                             <Spacer y={2}/>
@@ -158,9 +183,9 @@ export default function FilterChip(props: FilterChipProps){
                                 }}
                             />
                             <Spacer y={2}/>
-                        </div>
-                    </PopoverContent>
-                </Popover>
+                        </CardBody>
+                    </Card>)}
+                </div>
             }
         >
             {primitiveConditionString}

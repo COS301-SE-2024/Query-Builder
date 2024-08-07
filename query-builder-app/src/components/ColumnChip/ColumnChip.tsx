@@ -35,7 +35,7 @@ export default function ColumnChip(props: ColumnChipProps){
 
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current != null) { // Check if menuRef.current is not null
-        if (!menuRef.current.contains(event.target)) {
+        if (!menuRef.current.contains(event.target as Node)) {
           setOpenPopup(false);
         }
       }
