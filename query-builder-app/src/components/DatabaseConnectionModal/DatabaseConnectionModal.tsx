@@ -83,7 +83,7 @@ export default function DatabaseConnectionModal(props: DatabaseConnectionModalPr
       }))
 
       //call the add-db API endpoint
-      let response = await fetch(`http://${process.env.BACKEND_URL}/api/org-management/add-db`, {
+      let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/add-db`, {
         credentials: "include",
         method: "POST",
         headers: {
@@ -126,7 +126,7 @@ export default function DatabaseConnectionModal(props: DatabaseConnectionModalPr
         }))
 
         //call the save-db-secrets API endpoint
-        let response = await fetch("http://localhost:55555/api/org-management/save-db-secrets", {
+        let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/save-db-secrets`, {
           credentials: "include",
           method: "POST",
           headers: {
