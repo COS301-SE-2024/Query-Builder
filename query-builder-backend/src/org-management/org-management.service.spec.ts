@@ -2066,7 +2066,10 @@ describe('OrgManagementService', () => {
       let mock_session = require('express-session');
       mock_session.sessionKey = '0000';
 
-      service
+      jest.spyOn(service.app_service, 'encrypt').mockReturnValueOnce('encrypted_secret_1');
+      jest.spyOn(service.app_service, 'decrypt').mockReturnValueOnce('encrypted_secret_2');
+
+      await service
         .saveDbSecrets(
           {
             db_id: '0000',
@@ -2084,7 +2087,45 @@ describe('OrgManagementService', () => {
         });
     });
     
-    it('should throw an InternalServerErrorException when the db secrets were not returned', async () => {});
+    it('should throw an InternalServerErrorException when the db secrets were not returned', async () => {
+      let testError = [];
+      let testData = [];
+
+      testData[AUTH] = {
+        user: {
+          id: '0000'
+        }
+      };
+
+      testData[UPDATE] = [];
+
+      setTestData(testData);
+      setTestError(testError);
+
+      let mock_session = require('express-session');
+      mock_session.sessionKey = '0000';
+
+      jest.spyOn(service.app_service, 'encrypt').mockReturnValueOnce('encrypted_secret_1');
+      jest.spyOn(service.app_service, 'decrypt').mockReturnValueOnce('encrypted_secret_2');
+
+      await service
+        .saveDbSecrets(
+          {
+            db_id: '0000',
+            db_secrets: JSON.stringify({
+              username: 'root',
+              password: 'password'
+            })
+          },
+          mock_session
+        )
+        .catch((error) => {
+          expect(error).toBeDefined();
+          expect(error).toBeInstanceOf(InternalServerErrorException);
+          expect(error.message).toBe('Database secrets not saved');
+        });
+    });
+    
     it('should call the app_service.encryptSecrets method twice to encrypt the secrets', async () => {});
     it('should return the updated db secrets', async () => {});
   });

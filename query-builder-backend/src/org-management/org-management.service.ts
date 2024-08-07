@@ -32,7 +32,7 @@ export class OrgManagementService {
   constructor(
     private readonly supabase: Supabase,
     private readonly config_service: ConfigService,
-    private readonly app_service: AppService
+    public readonly app_service: AppService
   ) {}
 
   async deepMerge(target, source) {
