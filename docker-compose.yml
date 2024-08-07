@@ -11,6 +11,7 @@ services:
       - front-tier
     env_file:
       - ./query-builder-app/.env.production
+    restart: unless-stopped
 
   query-builder-backend:
     build:
@@ -23,11 +24,13 @@ services:
       - front-tier
     env_file:
       - ./query-builder-backend/.env
+    restart: unless-stopped
 
   redis:
     image: redis:latest
     networks:
       - back-tier
+    restart: unless-stopped
 
 networks:
    back-tier:
