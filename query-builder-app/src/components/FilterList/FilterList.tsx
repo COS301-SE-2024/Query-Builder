@@ -28,6 +28,7 @@ export default function FilterList(props: FilterListProps){
     const [condition, setCondition] = useState<compoundCondition>(props.condition);
 
     //React hook for all possible conditions
+    const [possibleConditions, setPossibleConditions] = useState<PossibleCondition>();
 
     //React hook to refetch possible conditions when table changes
     React.useEffect(() => {
@@ -73,7 +74,7 @@ export default function FilterList(props: FilterListProps){
         console.log(json);
 
         //set the databases hook
-        setDatabases(json.data);
+        setPossibleConditions(json.data);
 
     }
 
