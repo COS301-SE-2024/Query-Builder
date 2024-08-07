@@ -14,7 +14,7 @@ async function bootstrap() {
   let redisClient = await createClient(
     {
       socket: {
-        host: 'localhost',
+        host: `${process.env.REDIS_HOST}`,
         port: 6379,
       }
     }
@@ -43,7 +43,7 @@ async function bootstrap() {
   app.enableCors({
     //change in production
     origin: [
-      'http://localhost:3000',],
+      `http://${process.env.FRONTEND_URL}`,],
     credentials: true
   });
   await app.listen(55555);
