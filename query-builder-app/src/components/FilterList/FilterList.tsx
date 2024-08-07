@@ -12,7 +12,8 @@ import React from "react";
 
 interface FilterListProps{
     condition: compoundCondition,
-    table: table
+    table: table,
+    databaseServerID: string
 }
 
 interface PossibleCondition{
@@ -28,7 +29,7 @@ export default function FilterList(props: FilterListProps){
     const [condition, setCondition] = useState<compoundCondition>(props.condition);
 
     //React hook for all possible conditions
-    const [possibleConditions, setPossibleConditions] = useState<PossibleCondition>();
+    const [possibleConditions, setPossibleConditions] = useState<PossibleCondition[]>();
 
     //React hook to refetch possible conditions when table changes
     React.useEffect(() => {
@@ -36,6 +37,12 @@ export default function FilterList(props: FilterListProps){
         fetchPossibleConditions();
 
     },[props.table])
+
+    React.useEffect(() => {
+
+        console.log(JSON.stringify(possibleConditions))
+
+    },[possibleConditions])
 
     //----------------------------HELPER FUNCTIONS------------------------------------//
 
@@ -54,27 +61,36 @@ export default function FilterList(props: FilterListProps){
     async function fetchPossibleConditions(){
         console.log("FETCHING POSSIBLE CONDITIONS");
 
-        let response = await fetch("http://localhost:55555/api/metadata/fields", {
-            credentials: "include",
-            method: "PUT",
-            headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + await getToken()
-            },
-            body: JSON.stringify({
-                host: "127.0.0.1",
-                user: "root",
-                password: "testPassword"
-            })
-        });
+        let tableRef: table = props.table;
 
-        let json = await response.json();
+        const possibleConditions: PossibleCondition[] = []; 
 
-        console.log(json);
+        while(tableRef.join){
+            tableRef = tableRef.join.table2;
+
+            let response = await fetch("http://localhost:55555/api/metadata/fields", {
+                credentials: "include",
+                method: "PUT",
+                headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + await getToken()
+                },
+                body: JSON.stringify({
+                    databaseServerID: props.databaseServerID,
+                    schema: "sakila",
+                    table: tableRef.name
+                })
+            });
+
+            let json = await response.json();
+
+            possibleConditions.push(json.data);
+
+        }
 
         //set the databases hook
-        setPossibleConditions(json.data);
+        setPossibleConditions(possibleConditions);
 
     }
 

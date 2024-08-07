@@ -33,11 +33,6 @@ export default function Form(){
 
     //React hook containing the Query the user is busy building
     const [query, setQuery] = useState<Query>({
-        credentials: {
-            host: "127.0.0.1",
-            user: "root",
-            password: "testPassword"
-        },
         databaseServerID: databaseServerID,
         queryParams: {
             language: "sql",
@@ -94,7 +89,7 @@ export default function Form(){
     //async function to fetch the database server's databases
     async function fetchDatabases() {
     
-        let response = await fetch("http://localhost:55555/api/metadata/schemas", {
+        let response = await fetch(`http://${process.env.BACKEND_URL}/api/metadata/schemas`, {
             credentials: "include",
             method: "PUT",
             headers: {
@@ -103,9 +98,7 @@ export default function Form(){
             'Authorization': 'Bearer ' + await getToken()
             },
             body: JSON.stringify({
-                host: "127.0.0.1",
-                user: "root",
-                password: "testPassword"
+                databaseServerID: databaseServerID
             })
         });
 
@@ -114,7 +107,7 @@ export default function Form(){
         console.log(json);
 
         //set the databases hook
-        setDatabases(json.data);
+        setDatabases(json);
 
     }
 
@@ -185,6 +178,7 @@ export default function Form(){
                 {   
                     (query.queryParams.databaseName != "") && (
                         <TableList 
+                            databaseServerID={databaseServerID}
                             databaseName={query.queryParams.databaseName} 
                             table={query.queryParams.table} 
                             onChange={updateTable}
@@ -197,7 +191,7 @@ export default function Form(){
                 {/* Add filters */}
                 {
                     (query.queryParams.table.name != "") && (
-                        <FilterList condition={query.queryParams.condition! as compoundCondition} table={query.queryParams.table}/>
+                        <FilterList condition={query.queryParams.condition! as compoundCondition} table={query.queryParams.table} databaseServerID={databaseServerID}/>
                     )
                 }
                 
