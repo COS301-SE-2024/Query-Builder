@@ -43,7 +43,7 @@ async function bootstrap() {
   app.enableCors({
     //change in production
     origin: [
-      'http://localhost:3000',],
+      `http://${process.env.FRONTEND_URL}`,],
     credentials: true
   });
   await app.listen(55555);
