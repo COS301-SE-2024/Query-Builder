@@ -41,7 +41,7 @@ export default function UserSettings(){
         async function getUserInfo() {
 
             try {
-                let response = await fetch(`http://${process.env.BACKEND_URL}/api/user-management/get-user`, {
+                let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user-management/get-user`, {
                     method: "GET",
                     headers: {
                     'Accept': 'application/json',
@@ -118,7 +118,7 @@ export default function UserSettings(){
 
         console.log(updatedDetails);
 
-        let response = await fetch(`http://${process.env.BACKEND_URL}/api/user-management/update-user`, {
+        let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user-management/update-user`, {
             // credentials: "include",
             method: "PATCH",
             headers: {
@@ -143,7 +143,7 @@ export default function UserSettings(){
 
         console.log(updatedDetails);
 
-        let response = await fetch(`http://${process.env.BACKEND_URL}/api/user-management/update-user-email`, {
+        let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user-management/update-user-email`, {
             method: "PATCH",
             headers: {
               'Accept': 'application/json',
@@ -172,7 +172,7 @@ export default function UserSettings(){
 
         console.log(updatedDetails);
 
-        let response = await fetch(`http://${process.env.BACKEND_URL}/api/user-management/update-user-phone`, {
+        let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user-management/update-user-phone`, {
             method: "PATCH",
             headers: {
               'Accept': 'application/json',
@@ -221,7 +221,7 @@ export default function UserSettings(){
             formData.append('file', file);
             console.log(formData.get('file'));
   
-            let response = await fetch(`http://${process.env.BACKEND_URL}/api/user-management/upload-profile-photo`, {
+            let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user-management/upload-profile-photo`, {
                 method: "POST",
                 headers: {
                 'Authorization': 'Bearer ' + await getToken()
