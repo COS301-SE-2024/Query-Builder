@@ -46,7 +46,7 @@ export default function OrganisationManagement(){
 
     async function getMembers() {
       try {
-        let response = await fetch("http://localhost:55555/api/org-management/get-members", {
+        let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/get-members`, {
           method: "PUT",
           headers: {
             'Accept': 'application/json',
@@ -92,7 +92,7 @@ export default function OrganisationManagement(){
         // Fetch organisation info on initial render
         const getOrganisationInfo = async () => {
           try {
-            let response = await fetch("http://localhost:55555/api/org-management/get-org", {
+            let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/get-org`, {
               method: "PUT",
               headers: {
                 'Accept': 'application/json',
@@ -144,7 +144,7 @@ export default function OrganisationManagement(){
         }
         console.log(updatedDetails);
 
-        let response = await fetch("http://localhost:55555/api/org-management/update-org", {
+        let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/update-org`, {
             method: "PATCH",
             headers: {
               'Accept': 'application/json',
@@ -157,7 +157,7 @@ export default function OrganisationManagement(){
     };
 
     async function deleteUserFromOrg(userId: string){
-      let response = await fetch("http://localhost:55555/api/org-management/remove-member", {
+      let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/remove-member`, {
           method: "DELETE",
           headers: {
             'Accept': 'application/json',
@@ -170,7 +170,7 @@ export default function OrganisationManagement(){
     }
 
     async function deleteOrganisation(){
-      let response = await fetch("http://localhost:55555/api/org-management/remove-org", {
+      let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/remove-org`, {
           method: "DELETE",
           headers: {
             'Accept': 'application/json',
@@ -423,7 +423,7 @@ export default function OrganisationManagement(){
                 formData.append('file', file);
                 // console.log(formData.get('file'));
       
-                let response = await fetch("http://localhost:55555/api/org-management/upload-org-logo", {
+                let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/upload-org-logo`, {
                     method: "POST",
                     headers: {
                     'Authorization': 'Bearer ' + await getToken()
