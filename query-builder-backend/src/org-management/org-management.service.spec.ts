@@ -1887,7 +1887,53 @@ describe('OrgManagementService', () => {
           expect(error).toHaveProperty('status', 500);
         });
     });
-    it('should throw an InternalServerErrorException when the db access was not returned', async () => {});
+
+    it('should throw an InternalServerErrorException when the db access was not returned', async () => {
+      let testError = [];
+      let testData = [];
+
+      testData[AUTH] = {
+        user: {
+          id: '0000'
+        }
+      };
+
+      testData[SELECT] = [
+        {
+          org_id: '0000',
+          user_role: 'admin',
+          role_permissions: {
+            add_dbs: true,
+            is_owner: false,
+            remove_dbs: true,
+            update_dbs: true,
+            invite_users: true,
+            remove_users: true,
+            view_all_dbs: true,
+            view_all_users: true,
+            update_db_access: true,
+            update_user_roles: true
+          }
+        }
+      ];
+
+      testData[INSERT] = [];
+
+      setTestData(testData);
+      setTestError(testError);
+
+      service
+        .giveDbAccess({
+          db_id: '0000',
+          user_id: '0000',
+          org_id: '0000',
+        })
+        .catch((error) => {
+          expect(error).toBeDefined();
+          expect(error).toBeInstanceOf(InternalServerErrorException);
+          expect(error.message).toBe('Db access not added');
+        });
+    });
     it('should return the updated db access', async () => {});
   });
   describe('saveDbSecrets', () => {});
