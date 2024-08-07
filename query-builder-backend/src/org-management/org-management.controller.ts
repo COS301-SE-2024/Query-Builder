@@ -11,7 +11,6 @@ import {
   UseInterceptors,
   ValidationPipe,
 } from "@nestjs/common";
-import { Supabase } from "../supabase";
 import { Get_Org_Dto } from "./dto/get-org.dto";
 import { Create_Org_Dto } from "./dto/create-org.dto";
 import { Add_Member_Dto } from "./dto/add-member.dto";
@@ -31,7 +30,6 @@ import { Save_Db_Secrets_Dto } from "./dto/save-db-secrets.dto";
 import { Upload_Org_Logo_Dto } from "./dto/upload-org-logo.dto";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Express } from "express";
-
 
 @Controller("org-management")
 export class OrgManagementController {
