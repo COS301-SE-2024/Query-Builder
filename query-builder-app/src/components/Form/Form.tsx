@@ -55,7 +55,7 @@ export default function Form(){
     //async function to fetch the database server's databases
     async function fetchDatabases() {
     
-        let response = await fetch("http://localhost:55555/api/metadata/schemas", {
+        let response = await fetch(`http://${process.env.BACKEND_URL}/api/metadata/schemas`, {
             credentials: "include",
             method: "PUT",
             headers: {

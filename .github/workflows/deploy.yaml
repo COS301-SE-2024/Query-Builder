@@ -27,7 +27,7 @@ jobs:
           sshpass -p '${{ secrets.DEPLOY_PORT }}' ssh -v -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} <<'ENDSSH'
           cd ~/Query-Builder
           git pull
-          docker stop ; get the correct container name
+          docker compose down
           docker system prune -a -f
-          docker-compose up
+          docker compose up
           ENDSSH
