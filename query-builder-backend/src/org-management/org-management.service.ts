@@ -5,7 +5,6 @@ import {
   Put,
   UnauthorizedException
 } from '@nestjs/common';
-import { createCipheriv, randomBytes, verify } from 'crypto';
 import { Supabase } from '../supabase';
 import { Get_Org_Dto } from './dto/get-org.dto';
 import { Create_Org_Dto } from './dto/create-org.dto';
