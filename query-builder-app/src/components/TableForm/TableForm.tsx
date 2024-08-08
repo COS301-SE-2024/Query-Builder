@@ -51,7 +51,7 @@ export default function TableForm(props: TableFormProps){
     //async function to fetch the table's columns
     async function fetchColumns() {
     
-        let response = await fetch("http://localhost:55555/api/metadata/fields", {
+        let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/fields`, {
             credentials: "include",
             method: "PUT",
             headers: {
