@@ -39,6 +39,6 @@ const tableProp: table = {
 // Can have multiple different variants of a component
 export const DefaultFilterList = {
 
-    render: () => <FilterList condition={compoundConditionProp} table={tableProp}/> // this function specifies how we want to render this variant of the component
+    render: () => <FilterList databaseServerID="mockDatabaseServerID" condition={compoundConditionProp} table={tableProp}/> // this function specifies how we want to render this variant of the component
 
 };
