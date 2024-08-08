@@ -8,7 +8,7 @@ import { useParams } from 'next/navigation'
 import {Button, Spacer, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Card, CardHeader, CardBody, CardFooter, useDisclosure, ModalContent, Modal, ModalHeader, DropdownSection} from "@nextui-org/react";
 import TableResponse from "../TableResponse/TableResponse";
 import { createClient } from "./../../utils/supabase/client";
-import { compoundCondition, LogicalOperator, Query, table} from "@/interfaces/intermediateJSON";
+import { compoundCondition, condition, LogicalOperator, Query, table} from "@/interfaces/intermediateJSON";
 import TableList from "../TableList/TableList";
 import FilterList from "../FilterList/FilterList";
 
@@ -41,10 +41,6 @@ export default function Form(){
             table: {
                 name: "",
                 columns: []
-            },
-            condition: {
-                conditions: [],
-                operator: LogicalOperator.AND
             }
         }
     });
@@ -85,6 +81,26 @@ export default function Form(){
 
         });
     }
+    
+    //callback function for FilterList
+    //fix infinite update loop problem
+    function updateCondition(updatedCondition: compoundCondition) {
+
+        if(updatedCondition.conditions.length > 0){
+            setQuery((previousQueryState) => {
+        
+                return {
+                    ...previousQueryState,
+                    queryParams: {
+                        ...previousQueryState.queryParams,
+                        condition: updatedCondition
+                    }
+                }
+    
+            });
+        }
+
+    }
 
     //async function to fetch the database server's databases
     async function fetchDatabases() {
@@ -107,7 +123,7 @@ export default function Form(){
         console.log(json);
 
         //set the databases hook
-        setDatabases(json);
+        setDatabases(json.data);
 
     }
 
@@ -191,13 +207,13 @@ export default function Form(){
                 {/* Add filters */}
                 {
                     (query.queryParams.table.name != "") && (
-                        <FilterList condition={query.queryParams.condition! as compoundCondition} table={query.queryParams.table} databaseServerID={databaseServerID}/>
+                        <FilterList 
+                            condition={query.queryParams.condition! as compoundCondition} 
+                            table={query.queryParams.table} 
+                            databaseServerID={databaseServerID}
+                        />
                     )
                 }
-                
-                <h1>
-                    {JSON.stringify(query)}
-                </h1>
             </CardBody>
             <CardFooter>
                 <>

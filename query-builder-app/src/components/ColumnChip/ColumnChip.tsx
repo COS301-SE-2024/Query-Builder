@@ -55,7 +55,7 @@ export default function ColumnChip(props: ColumnChipProps){
             endContent={
                 <div className="relative inline-block">
                     <FiMoreVertical onClick={togglePopup}/>
-                    {(openPopup) && (<Card ref={menuRef} className="absolute z-1 top-8">
+                    {(openPopup) && (<Card ref={menuRef} className="absolute z-10 top-8">
                         <CardBody>
                             <Spacer y={2}/>
                             <RadioGroup

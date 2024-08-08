@@ -1,8 +1,8 @@
 //This implementation makes the assumption that all conditions are simply "ADDED" together
 
 //----------------------------IMPORTS-----------------------------------//
-import { compoundCondition, condition, primitiveCondition, table } from "@/interfaces/intermediateJSON"
-import { Button, Card, CardBody, Spacer } from "@nextui-org/react";
+import { ComparisonOperator, compoundCondition, condition, LogicalOperator, primitiveCondition, table } from "@/interfaces/intermediateJSON"
+import { Button, Card, CardBody, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spacer } from "@nextui-org/react";
 import { useState } from "react"
 import { createClient } from "./../../utils/supabase/client";
 import FilterChip from "../FilterChip/FilterChip";
@@ -11,9 +11,10 @@ import React from "react";
 //---------------------------INTERFACES---------------------------------//
 
 interface FilterListProps{
-    condition: compoundCondition,
+    condition: compoundCondition | undefined,
     table: table,
     databaseServerID: string
+    onChange?: (condition: compoundCondition) => void
 }
 
 interface PossibleCondition{
@@ -25,8 +26,12 @@ export default function FilterList(props: FilterListProps){
 
     //----------------------------REACT HOOKS------------------------------------//
 
-    //React hook for the data model
-    const [condition, setCondition] = useState<compoundCondition>(props.condition);
+    const [condition, setCondition] = useState<compoundCondition>({conditions: [], operator: LogicalOperator.AND});
+
+    if(props.condition){
+        //React hook for the data model
+        setCondition(props.condition);
+    }
 
     //React hook for all possible conditions
     const [possibleConditions, setPossibleConditions] = useState<PossibleCondition[]>();
@@ -43,6 +48,16 @@ export default function FilterList(props: FilterListProps){
         console.log(JSON.stringify(possibleConditions))
 
     },[possibleConditions])
+
+    //React hook for when the data model has changed
+    React.useEffect(() => {
+
+        //inform the parent component that the data model has changed
+        if((props.onChange != null)){
+            props.onChange(condition);
+        }
+
+    },[condition])
 
     //----------------------------HELPER FUNCTIONS------------------------------------//
 
@@ -63,7 +78,30 @@ export default function FilterList(props: FilterListProps){
 
         let tableRef: table = props.table;
 
-        const possibleConditions: PossibleCondition[] = []; 
+        const newPossibleConditions: PossibleCondition[] = []; 
+
+        let response = await fetch("http://localhost:55555/api/metadata/fields", {
+            credentials: "include",
+            method: "PUT",
+            headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + await getToken()
+            },
+            body: JSON.stringify({
+                databaseServerID: props.databaseServerID,
+                schema: "sakila",
+                table: tableRef.name
+            })
+        });
+
+        let json = await response.json();
+
+        console.log(json.data)
+
+        for(let item of json.data){
+            newPossibleConditions.push({tableName: tableRef.name, column: item.name});
+        }
 
         while(tableRef.join){
             tableRef = tableRef.join.table2;
@@ -85,14 +123,42 @@ export default function FilterList(props: FilterListProps){
 
             let json = await response.json();
 
-            possibleConditions.push(json.data);
+            console.log(json.data)
+
+            for(let item of json.data){
+                newPossibleConditions.push({tableName: tableRef.name, column: item.name});
+            }
 
         }
 
         //set the databases hook
-        setPossibleConditions(possibleConditions);
+        setPossibleConditions(newPossibleConditions);
 
     }
+
+    const handleFilterSelection = (key: string) => {
+
+        const stringSplit = key.split(" - ");
+        const tableName = stringSplit[0];
+        const columnName = stringSplit[1];
+
+        const newConditionsArray = condition.conditions;
+
+        const newPrimitiveCondition: primitiveCondition = {
+            tableName: tableName,
+            column: columnName,
+            operator: ComparisonOperator.EQUAL,
+            value: 0
+        }
+
+        newConditionsArray.push(newPrimitiveCondition)
+
+        setCondition({
+            ...condition,
+            conditions: newConditionsArray
+        });
+
+    };
 
     function renderFilterChips(compoundCondition: compoundCondition): JSX.Element {
 
@@ -140,12 +206,28 @@ export default function FilterList(props: FilterListProps){
                             renderFilterChips(condition)
                         }
                         <div className="flex justify-end flex-1">
-                            <Button variant="bordered">+</Button>
+                            <Dropdown>
+                                <DropdownTrigger>
+                                    <Button variant="bordered">+</Button>
+                                </DropdownTrigger>
+                                <DropdownMenu 
+                                        className="max-h-[50vh] overflow-y-auto"
+                                        items={possibleConditions} 
+                                        onAction={(key) => handleFilterSelection(key as string)}
+                                    >
+                                        {(item:any) => (
+                                        <DropdownItem
+                                            key={item.tableName + " - " + item.column}
+                                        >
+                                            {item.tableName + " - " + item.column}
+                                        </DropdownItem>
+                                        )}
+                                    </DropdownMenu>
+                            </Dropdown>
                         </div>
                     </div>         
                 </CardBody>
             </Card>
-            <h1>{JSON.stringify(condition)}</h1>
         </>
 
     );
