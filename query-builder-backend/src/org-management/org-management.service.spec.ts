@@ -1876,7 +1876,7 @@ describe('OrgManagementService', () => {
 
       testData[AUTH] = {
         user: {
-          id: '0000'
+          id: '0001'
         }
       };
 
@@ -1923,7 +1923,7 @@ describe('OrgManagementService', () => {
 
       testData[AUTH] = {
         user: {
-          id: '0000'
+          id: '0001'
         }
       };
 
