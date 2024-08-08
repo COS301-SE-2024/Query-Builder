@@ -26,6 +26,8 @@ import { Save_Db_Secrets_Dto } from './dto/save-db-secrets.dto';
 import { Remove_Db_Access_Dto } from './dto/remove-db-access.dto';
 import { Upload_Org_Logo_Dto } from './dto/upload-org-logo.dto';
 import { Join_Org_Dto } from './dto/join-org.dto';
+import { Create_Hash_Dto } from './dto/create-hash.dto';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class OrgManagementService {
@@ -327,12 +329,12 @@ export class OrgManagementService {
       .getClient()
       .from('org_hashes')
       .select()
-      .match({...join_org_dto})
+      .match({ ...join_org_dto });
 
-    if(hash_error){
+    if (hash_error) {
       throw hash_error;
     }
-    if(hash_data.length === 0){
+    if (hash_data.length === 0) {
       throw new NotFoundException('No organisations match the provided hash');
     }
 
@@ -372,7 +374,56 @@ export class OrgManagementService {
     return { data };
   }
 
-  async createHash() {}
+  async createHash(create_hash_dto: Create_Hash_Dto) {
+    const { data: user_data, error: user_error } = await this.supabase
+      .getClient()
+      .auth.getUser(this.supabase.getJwt());
+
+    if (user_error) {
+      throw user_error;
+    }
+
+    const { data: org_data, error: org_error } = await this.supabase
+      .getClient()
+      .from('org_members')
+      .select()
+      .eq('org_id', create_hash_dto.org_id)
+      .eq('user_id', user_data.user.id);
+
+    if (org_error) {
+      throw org_error;
+    }
+    if (org_data.length === 0) {
+      throw new UnauthorizedException(
+        'You are not a member of this organisation'
+      );
+    }
+
+    if (!org_data[0].role_permissions.invite_users) {
+      throw new UnauthorizedException(
+        'You do not have permission to add members'
+      );
+    }
+
+    let salt = crypto.randomBytes(16).toString('hex');
+
+    const hash = crypto.createHash('sha256');
+    hash.update(create_hash_dto.org_id + salt);
+    let hashCode = hash.digest('hex');
+
+    const { data: hash_data, error: hash_error } = await this.supabase
+      .getClient()
+      .from('org_hashes')
+      .insert({ org_id: create_hash_dto.org_id, hash: hashCode })
+      .select();
+
+    if (hash_error) {
+      throw hash_error;
+    }
+    if (hash_data.length === 0) {
+      throw new InternalServerErrorException('Unable to save org hash');
+    }
+  }
 
   async addMember(add_member_dto: Add_Member_Dto) {
     const { data: user_data, error: user_error } = await this.supabase
@@ -409,7 +460,7 @@ export class OrgManagementService {
       .getClient()
       .from('org_members')
       .update({ verified: true })
-      .match({...add_member_dto})
+      .match({ ...add_member_dto })
       .select();
 
     if (error) {
