@@ -733,7 +733,7 @@ export class OrgManagementService {
           }
           break;
         default:
-          throw new InternalServerErrorException('Invalid user role');
+          break;
       }
     } else {
       const { data: member_data, error: member_error } = await this.supabase
