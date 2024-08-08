@@ -732,8 +732,6 @@ export class OrgManagementService {
             };
           }
           break;
-        default:
-          break;
       }
     } else {
       const { data: member_data, error: member_error } = await this.supabase
