@@ -1,7 +1,7 @@
 //This implementation makes the assumption that all conditions are simply "ADDED" together
 
 //----------------------------IMPORTS-----------------------------------//
-import { ComparisonOperator, compoundCondition, condition, LogicalOperator, primitiveCondition, table } from "@/interfaces/intermediateJSON"
+import { ComparisonOperator, compoundCondition, condition, LogicalOperator, primitiveCondition, table } from "../../interfaces/intermediateJSON"
 import { Button, Card, CardBody, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spacer } from "@nextui-org/react";
 import { useState } from "react"
 import { createClient } from "./../../utils/supabase/client";

@@ -9,12 +9,6 @@ export default {
     component: FilterList
 }
 
-const primitiveConditionProp: primitiveCondition = {
-    column: "salary",
-    operator: ComparisonOperator.GREATER_THAN,
-    value: 20000
-}
-
 const compoundConditionProp: compoundCondition = {
     operator: LogicalOperator.AND,
     conditions: [
