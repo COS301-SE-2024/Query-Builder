@@ -62,6 +62,7 @@ jobs:
                 echo SUPABASE_KEY = ${{ secrets.SUPABASE_ANON_KEY }} >> .env
                 echo SUPABASE_SERVICE_KEY = ${{ secrets.SUPABASE_SERVICE_ROLE_KEY}} >> .env
                 echo SUPABASE_JWT_SECRET = ${{ secrets.SUPABASE_JWT_SECRET }} >> .env
+                echo UNI_KEY = ${{ secrets.UNI_KEY }} >> .env
                 cat .env
               working-directory: query-builder-backend
             - name: Coverage Test Backend
