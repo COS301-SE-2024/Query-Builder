@@ -12,22 +12,23 @@ export default function NaturalLanguage() {
     };
 
     return (
-        <div className="w-full flex flex-row gap-2 max-w-[80%] items-center">
-                <Textarea
-                    label="Please enter desired data"
-                    // labelPlacement="outside"
-                    placeholder="Enter your description of desired data"
-                    value={value}
-                    onChange={(newVal) => setValue(newVal.target.value)}
-                />
-                <Button
-                    isDisabled={value.length <= 1}
-                    isLoading={loading}
-                    onClick={handleSubmit}
-                    color="primary"
-                >
-                    Query
-                </Button>
-        </div>
+        <div className="w-full h-[70%] flex flex-col gap-2 max-w-[80%] items-center">
+    <Textarea
+        className="w-[80%] h-[100%]"
+        label="Please enter desired data"
+        placeholder="Enter your description of desired data"
+        value={value}
+        onChange={(newVal) => setValue(newVal.target.value)}
+    />
+    <Button
+        isDisabled={value.length <= 1}
+        isLoading={loading}
+        onClick={handleSubmit}
+        color="primary"
+        className="w-[80%]"
+    >
+        Query
+    </Button>
+</div>
     );
 }
