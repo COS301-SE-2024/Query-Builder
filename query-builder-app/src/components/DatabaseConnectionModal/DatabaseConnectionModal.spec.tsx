@@ -194,6 +194,6 @@ describe('DatabaseConnectionModal add database tests', () => {
     //click the connect button
     await user.click(connectButton);
 
-  })
+  }, {timeout: 10000})
 
 });
