@@ -93,12 +93,39 @@ export default function FilterChip(props: FilterChipProps){
 
     }
 
+    //not handling null which causes issues
+    function setConditionValue(valueString: string){
+
+        let value: any;
+
+        if(valueString == ""){
+            value = valueString;
+        }
+        else if(valueString.toUpperCase() === "TRUE"){
+            value = true;
+        }
+        else if(valueString.toUpperCase() === "FALSE"){
+            value = false;
+        }
+        else if(isNaN(Number(valueString))){
+            value = valueString;
+        }
+        else{
+            value = Number(valueString);
+        }
+
+        setPrimitiveCondition((previousPrimitiveConditionState) => {
+            return { ...previousPrimitiveConditionState, value: value };
+        })
+
+    }
+
     return(
         <Chip
             size="lg"
             endContent={
                 <div className="relative inline-block">
-                    <FiMoreVertical onClick={togglePopup}/>
+                    <FiMoreVertical onClick={togglePopup} aria-label="edit"/>
                     {(openPopup) && (<Card ref={menuRef} className="absolute z-1 top-8">
                         <CardBody>
                             <Spacer y={2}/>
@@ -108,12 +135,13 @@ export default function FilterChip(props: FilterChipProps){
                                 <DropdownTrigger>
                                     <Button
                                         variant="bordered"
+                                        aria-label="Choose filter aggregate button"
                                     >
                                         {primitiveCondition.aggregate ? primitiveCondition.aggregate : "NONE"}
                                     </Button>
                                 </DropdownTrigger>
                                 <DropdownMenu
-                                    aria-label="Choose filter aggregate"
+                                    aria-label="Choose filter aggregate dropdown menu"
                                     variant="flat"
                                     disallowEmptySelection
                                     selectionMode="single"
@@ -145,12 +173,13 @@ export default function FilterChip(props: FilterChipProps){
                                 <DropdownTrigger>
                                     <Button
                                         variant="bordered"
+                                        aria-label="Choose comparison operator button"
                                     >
                                         {primitiveCondition.operator}
                                     </Button>
                                 </DropdownTrigger>
                                 <DropdownMenu
-                                    aria-label="Choose comparison operator"
+                                    aria-label="Choose comparison operator dropdown menu"
                                     variant="flat"
                                     disallowEmptySelection
                                     selectionMode="single"
@@ -174,12 +203,11 @@ export default function FilterChip(props: FilterChipProps){
                             <h2>Value</h2>
                             <Spacer y={2}/>
                             <Input 
+                                aria-label="Value input field"
                                 type="text" 
                                 value={primitiveCondition.value?.toString()}
                                 onValueChange={(value:string) => {
-                                    setPrimitiveCondition((previousPrimitiveConditionState) => {
-                                        return { ...previousPrimitiveConditionState, value: value };
-                                    })
+                                    setConditionValue(value)
                                 }}
                             />
                             <Spacer y={2}/>
