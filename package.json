@@ -13,5 +13,6 @@
         "install-deps": "cd query-builder-app && pnpm install && cd ../query-builder-docs && pnpm install"
     },
     "dependencies": {
+        "@nestjs/config": "^3.2.3"
     }
 }

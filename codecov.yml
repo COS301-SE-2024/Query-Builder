@@ -1,2 +1,7 @@
 ignore:
   - "**.stories.tsx"
+  - "query-builder-backend/src/all-exceptions.filter.ts"
+  - "query-builder-backend/src/main.ts"
+  - "query-builder-backend/src/app.module.ts"
+  - "query-builder-backend/src/app.controller.ts"
+  - "query-builder-backend/src/app.service.ts"
