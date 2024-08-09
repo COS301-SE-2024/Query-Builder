@@ -54,7 +54,7 @@ export default function ColumnChip(props: ColumnChipProps){
             size="lg"
             endContent={
                 <div className="relative inline-block">
-                    <FiMoreVertical onClick={togglePopup}/>
+                    <FiMoreVertical onClick={togglePopup} aria-label="edit"/>
                     {(openPopup) && (<Card ref={menuRef} className="absolute z-10 top-8">
                         <CardBody>
                             <Spacer y={2}/>
