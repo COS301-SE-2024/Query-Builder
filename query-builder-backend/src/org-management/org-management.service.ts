@@ -32,7 +32,7 @@ export class OrgManagementService {
   constructor(
     private readonly supabase: Supabase,
     private readonly config_service: ConfigService,
-    private readonly app_service: AppService
+    public readonly app_service: AppService
   ) {}
 
   async deepMerge(target, source) {
@@ -68,6 +68,26 @@ export class OrgManagementService {
     return { data };
   }
 
+  async getOrgLoggedIn_H1(org_ids) {
+    const { data: org_data, error: org_data_error } = await this.supabase
+      .getClient()
+      .from('organisations')
+      .select('org_id, created_at, name, logo, org_members(*), db_envs(*)')
+      .in(
+        'org_id',
+        org_ids.map((org) => org.org_id)
+      );
+
+    if (org_data_error) {
+      throw org_data_error;
+    }
+    if (org_data.length === 0) {
+      throw new NotFoundException('Organisation not found');
+    }
+
+    return { org_data };
+  }
+
   async getOrgLoggedIn() {
     const { data, error } = await this.supabase
       .getClient()
@@ -93,18 +113,7 @@ export class OrgManagementService {
       throw new NotFoundException('Organisation not found');
     }
 
-    const { data: org_data, error: org_data_error } = await this.supabase
-      .getClient()
-      .from('organisations')
-      .select('org_id, created_at, name, logo, org_members(*), db_envs(*)')
-      .in('org_id', org_ids.map((org) => org.org_id));
-
-    if (org_data_error) {
-      throw org_data_error;
-    }
-    if(org_data.length === 0) {
-      throw new NotFoundException('Organisation not found');
-    }
+    const { org_data } = await this.getOrgLoggedIn_H1(org_ids);
 
     return { data: org_data };
   }
@@ -376,30 +385,6 @@ export class OrgManagementService {
     return { data };
   }
 
-  async addDb_H1(add_db_dto: Add_Db_Dto) {
-    const db_fields = {
-      name: add_db_dto.name,
-      type: add_db_dto.type,
-      db_info: add_db_dto.db_info ? add_db_dto.db_info : {},
-      host: add_db_dto.host
-    };
-
-    const { data: db_data, error: db_error } = await this.supabase
-      .getClient()
-      .from('db_envs')
-      .insert({ ...db_fields })
-      .select();
-
-    if (db_error) {
-      throw db_error;
-    }
-    if (db_data.length === 0) {
-      throw new InternalServerErrorException('Database not added');
-    }
-
-    return { db_data };
-  }
-
   async addDb(add_db_dto: Add_Db_Dto) {
     const { data: user_data, error: owner_error } = await this.supabase
       .getClient()
@@ -460,6 +445,30 @@ export class OrgManagementService {
     await this.giveDbAccess(give_db_access_dto);
 
     return { data: db_data };
+  }
+
+  async addDb_H1(add_db_dto: Add_Db_Dto) {
+    const db_fields = {
+      name: add_db_dto.name,
+      type: add_db_dto.type,
+      db_info: add_db_dto.db_info ? add_db_dto.db_info : {},
+      host: add_db_dto.host
+    };
+
+    const { data: db_data, error: db_error } = await this.supabase
+      .getClient()
+      .from('db_envs')
+      .insert({ ...db_fields })
+      .select();
+
+    if (db_error) {
+      throw db_error;
+    }
+    if (db_data.length === 0) {
+      throw new InternalServerErrorException('Database not added');
+    }
+
+    return { db_data };
   }
 
   // TODO: Test this function
@@ -562,8 +571,6 @@ export class OrgManagementService {
     return { data: db_data };
   }
 
-  
-
   // TODO: Test this function
   async updateOrg(update_org_dto: Update_Org_Dto) {
     const { data: owner_data, error: owner_error } = await this.supabase
@@ -639,7 +646,7 @@ export class OrgManagementService {
       );
     }
 
-    update_member_dto = await this.updateMemberHelper(
+    update_member_dto = await this.updateMember_H1(
       update_member_dto,
       user_data
     );
@@ -663,10 +670,7 @@ export class OrgManagementService {
   }
 
   // TODO: Test this function
-  async updateMemberHelper(
-    update_member_dto: Update_Member_Dto,
-    user_data: any
-  ) {
+  async updateMember_H1(update_member_dto: Update_Member_Dto, user_data: any) {
     if (!update_member_dto.role_permissions) {
       update_member_dto.role_permissions = {};
 
@@ -728,8 +732,6 @@ export class OrgManagementService {
             };
           }
           break;
-        default:
-          throw new InternalServerErrorException('Invalid user role');
       }
     } else {
       const { data: member_data, error: member_error } = await this.supabase
