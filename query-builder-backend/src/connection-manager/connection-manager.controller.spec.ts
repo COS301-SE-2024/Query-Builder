@@ -8,21 +8,21 @@ import { AppService } from '../app.service';
 
 describe('ConnectionManagerController', () => {
   let controller: ConnectionManagerController;
-  // let supabase: SupabaseModule;
-  // let configModule: ConfigModule;
-  // let appService: AppService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [SupabaseModule, ConfigModule.forRoot({ isGlobal: true }), SessionStoreModule],
+      imports: [
+        SupabaseModule,
+        ConfigModule.forRoot({ isGlobal: true }),
+        SessionStoreModule
+      ],
       controllers: [ConnectionManagerController],
       providers: [ConnectionManagerService, AppService, ConfigService]
     }).compile();
 
-    controller = module.get<ConnectionManagerController>(ConnectionManagerController);
-    // supabase = await module.resolve<SupabaseModule>(SupabaseModule);
-    // configModule = module.get<ConfigModule>(ConfigModule);
-    // appService = module.get<AppService>(AppService);
+    controller = module.get<ConnectionManagerController>(
+      ConnectionManagerController
+    );
   });
 
   it('should be defined', () => {
