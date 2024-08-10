@@ -273,7 +273,7 @@ export default function Form(){
                 {
                     (query.queryParams.table.name != "") && (
                         <FilterList 
-                            condition={condition! as compoundCondition} 
+                            condition={query.queryParams.condition! as compoundCondition} 
                             table={query.queryParams.table} 
                             databaseServerID={databaseServerID[0]}
                             onChange={updateCondition}
