@@ -10,6 +10,7 @@ import React from "react";
 
 interface FilterChipProps {
     primitiveCondition: primitiveCondition,
+    key: React.Key,
     onChange?: (primitiveCondition: primitiveCondition) => void
   }
 

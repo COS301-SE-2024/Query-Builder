@@ -18,6 +18,6 @@ const primitiveConditionProp: primitiveCondition = {
 // Can have multiple different variants of a component
 export const DefaultFilterChip = {
 
-    render: () => <FilterChip primitiveCondition={primitiveConditionProp}/> // this function specifies how we want to render this variant of the component
+    render: () => <FilterChip primitiveCondition={primitiveConditionProp} key={1}/> // this function specifies how we want to render this variant of the component
 
 };

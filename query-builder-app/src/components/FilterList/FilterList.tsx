@@ -164,8 +164,8 @@ export default function FilterList(props: FilterListProps){
 
             return(
                 <>
-                {compoundCondition.conditions.map((subCondition) => (
-                    <FilterChip primitiveCondition={subCondition as primitiveCondition} onChange={updateCondition} />
+                {compoundCondition.conditions.map((subCondition, index) => (
+                    <FilterChip key={index} primitiveCondition={subCondition as primitiveCondition} onChange={updateCondition} />
                 ))}
                 </>
             );
