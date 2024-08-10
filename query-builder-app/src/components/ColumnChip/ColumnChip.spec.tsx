@@ -44,6 +44,13 @@ describe('Column Chip edit tests', () => {
         const text = screen.getByText("Get summary statistics");
         expect(text).toBeInTheDocument();
 
+        //click outside the popover to close it
+        await user.click(document.body);
+
+        //make sure that the text in the popover is no longer in the document
+        const text2 = screen.queryByText("Get summary statistics");
+        expect(text2).toBeNull();
+
     });
 
 });
