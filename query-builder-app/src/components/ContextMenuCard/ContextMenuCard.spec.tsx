@@ -7,6 +7,14 @@ import ContextMenuCard from './ContextMenuCard'; // Adjust the import based on y
 // Mock functions
 const mockOnDelete = vi.fn();
 
+vi.mock("next/navigation", () => ({
+    useRouter() {
+      return {
+        prefetch: () => null
+      };
+    }
+  }));
+
 describe('ContextMenuCard', () => {
     const defaultProps = {
         queryTitle: 'Test Query',
