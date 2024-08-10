@@ -45,6 +45,7 @@ export default function QueryBuilder() {
   return (
     <div className="full-application">
       <Sidebar />
+      
       <div className="flex w-full flex-col center">
         <Tabs>
           <Tab key="form" title="QueryForm">
