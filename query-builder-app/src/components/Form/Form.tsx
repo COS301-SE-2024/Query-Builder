@@ -45,6 +45,9 @@ export default function Form(){
         }
     });
 
+    //Separate React hook for the Query's condition
+    const [condition, setCondition] = useState<compoundCondition>();
+
     //React hook to fetch the database server's databases upon rerender of the Form
     React.useEffect(() => {
 
@@ -84,20 +87,32 @@ export default function Form(){
     
     //callback function for FilterList
     //fix infinite update loop problem
+    //need to only update part of queryParams, not the table part since that is not changing
+    //only the condition is changing
     function updateCondition(updatedCondition: compoundCondition) {
 
         if(updatedCondition.conditions.length > 0){
-            setQuery((previousQueryState) => {
+            setCondition(updatedCondition);
+        }
+
+    }
+
+    //merges query and condition
+    function getMergedQuery(){
         
-                return {
-                    ...previousQueryState,
-                    queryParams: {
-                        ...previousQueryState.queryParams,
-                        condition: updatedCondition
-                    }
+        if(condition != null){
+            const mergedQuery: Query = {
+                ...query,
+                queryParams: {
+                    ...query.queryParams,
+                    condition: condition
                 }
+            }
     
-            });
+            return mergedQuery; 
+        }
+        else{
+            return query;
         }
 
     }
@@ -211,6 +226,7 @@ export default function Form(){
                             condition={query.queryParams.condition! as compoundCondition} 
                             table={query.queryParams.table} 
                             databaseServerID={databaseServerID}
+                            onChange={updateCondition}
                         />
                     )
                 }
@@ -233,7 +249,7 @@ export default function Form(){
                             {(onClose : any) => (
                                 <>
                                     <ModalHeader className="flex flex-col gap-1">Query Results</ModalHeader>
-                                    <TableResponse query={query} />
+                                    <TableResponse query={getMergedQuery()} />
                                 </>
                             )}
                         </ModalContent>
