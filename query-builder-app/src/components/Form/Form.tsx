@@ -33,7 +33,7 @@ export default function Form(){
 
     //React hook containing the Query the user is busy building
     const [query, setQuery] = useState<Query>({
-        databaseServerID: databaseServerID,
+        databaseServerID: databaseServerID[0],
         queryParams: {
             language: "sql",
             query_type: "select",
@@ -47,6 +47,18 @@ export default function Form(){
 
     //Separate React hook for the Query's condition
     const [condition, setCondition] = useState<compoundCondition>();
+
+    //React hook to fetch the database server's databases upon rerender of the Form
+    React.useEffect(() => {
+
+        if(databaseServerID.length > 1){
+            console.log("Load query");
+
+            getQuery();
+
+        }
+
+    },[databaseServerID])
 
     //React hook to fetch the database server's databases upon rerender of the Form
     React.useEffect(() => {
@@ -117,6 +129,44 @@ export default function Form(){
 
     }
 
+    async function getQuery(){
+
+        let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query-management/get-single-query`, {
+            credentials: "include",
+            method: "PUT",
+            headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + await getToken()
+            },
+            body: JSON.stringify({
+                query_id: databaseServerID[1]
+            })
+        });
+
+        let json = await response.json();
+
+        console.log(json.parameters);
+
+        const newQueryParams = json.parameters;
+
+        setQuery((previousQueryState) => {
+        
+            return {
+                ...previousQueryState,
+                queryParams: {
+                    ...previousQueryState.queryParams,
+                    databaseName: newQueryParams.databaseName,
+                    language: newQueryParams.language,
+                    query_type: newQueryParams.query_type,
+                    table: newQueryParams.table
+                }
+            }
+
+        });
+
+    }
+
     //async function to fetch the database server's databases
     async function fetchDatabases() {
     
@@ -129,7 +179,7 @@ export default function Form(){
             'Authorization': 'Bearer ' + await getToken()
             },
             body: JSON.stringify({
-                databaseServerID: databaseServerID
+                databaseServerID: databaseServerID[0]
             })
         });
 
@@ -209,7 +259,7 @@ export default function Form(){
                 {   
                     (query.queryParams.databaseName != "") && (
                         <TableList 
-                            databaseServerID={databaseServerID}
+                            databaseServerID={databaseServerID[0]}
                             databaseName={query.queryParams.databaseName} 
                             table={query.queryParams.table} 
                             onChange={updateTable}
@@ -223,9 +273,9 @@ export default function Form(){
                 {
                     (query.queryParams.table.name != "") && (
                         <FilterList 
-                            condition={query.queryParams.condition! as compoundCondition} 
+                            condition={condition! as compoundCondition} 
                             table={query.queryParams.table} 
-                            databaseServerID={databaseServerID}
+                            databaseServerID={databaseServerID[0]}
                             onChange={updateCondition}
                         />
                     )
