@@ -1,7 +1,7 @@
-import { Chip, Input, Popover, PopoverContent, PopoverTrigger, Radio, RadioGroup, Spacer } from "@nextui-org/react";
+import { Card, CardBody, Chip, Input, Popover, PopoverContent, PopoverTrigger, Radio, RadioGroup, Spacer } from "@nextui-org/react";
 import { AggregateFunction, column } from "../../interfaces/intermediateJSON"
 import { FiMoreVertical } from "react-icons/fi";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import React from "react";
 
 interface ColumnChipProps {
@@ -14,6 +14,8 @@ export default function ColumnChip(props: ColumnChipProps){
 
     const [column, setColumn] = useState<column>(props.column);
 
+    const [openPopup, setOpenPopup] = useState(false);
+
     //React hook to inform the parent component that the data model has changed
     React.useEffect(() => {
 
@@ -23,16 +25,38 @@ export default function ColumnChip(props: ColumnChipProps){
 
     },[column])
 
+    function togglePopup(){
+        setOpenPopup((previousOpenPopup) => {
+            return !previousOpenPopup;
+        });
+    }
+
+    const menuRef = useRef<HTMLDivElement>(null)
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current != null) { // Check if menuRef.current is not null
+        if (!menuRef.current.contains(event.target as Node)) {
+          setOpenPopup(false);
+        }
+      }
+    };
+  
+    useEffect(() => {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);   
+  
+      };
+    }, []);
+
     return(
         <Chip
             size="lg"
             endContent={
-                <Popover placement="right">
-                    <PopoverTrigger>
-                        <FiMoreVertical/>
-                    </PopoverTrigger>
-                    <PopoverContent>
-                        <div>
+                <div className="relative inline-block">
+                    <FiMoreVertical onClick={togglePopup} aria-label="edit"/>
+                    {(openPopup) && (<Card ref={menuRef} className="absolute z-10 top-8">
+                        <CardBody>
                             <Spacer y={2}/>
                             <RadioGroup
                                 label="Get summary statistics"
@@ -72,9 +96,9 @@ export default function ColumnChip(props: ColumnChipProps){
                                 }}
                             />
                             <Spacer y={2}/>
-                        </div>
-                    </PopoverContent>
-                </Popover>
+                        </CardBody>
+                    </Card>)}
+                </div>
             }
         >
             {column.name}

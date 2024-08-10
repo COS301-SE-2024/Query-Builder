@@ -51,7 +51,7 @@ export default function TableForm(props: TableFormProps){
     //async function to fetch the table's columns
     async function fetchColumns() {
     
-        let response = await fetch("http://localhost:55555/api/metadata/fields", {
+        let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/fields`, {
             credentials: "include",
             method: "PUT",
             headers: {
@@ -122,14 +122,14 @@ export default function TableForm(props: TableFormProps){
         <div className="w-full">
             <h2>Select the columns to display from {table.name}:</h2>
             <Spacer y={2}/>
-            <Card>
-                <CardBody>
+            <Card className="overflow-visible">
+                <CardBody className="overflow-visible">
                     <div className="flex items-center space-x-2">
                         {table.columns.map((column) => <ColumnChip column={column} key={column.name} onChange={updateColumns}></ColumnChip>)}
                         <div className="flex justify-end flex-1">
                             <Dropdown>
                                 <DropdownTrigger>
-                                    <Button variant="bordered">+</Button>
+                                    <Button aria-label="addColumn" variant="bordered">+</Button>
                                 </DropdownTrigger>
                                 <DropdownMenu
                                     className="max-h-[50vh] overflow-y-auto"

@@ -5,7 +5,6 @@ import {
   Put,
   UnauthorizedException
 } from '@nestjs/common';
-import { createCipheriv, randomBytes } from 'crypto';
 import { Supabase } from '../supabase';
 import { Get_Org_Dto } from './dto/get-org.dto';
 import { Create_Org_Dto } from './dto/create-org.dto';
@@ -26,13 +25,16 @@ import { Give_Db_Access_Dto } from './dto/give-db-access.dto';
 import { Save_Db_Secrets_Dto } from './dto/save-db-secrets.dto';
 import { Remove_Db_Access_Dto } from './dto/remove-db-access.dto';
 import { Upload_Org_Logo_Dto } from './dto/upload-org-logo.dto';
+import { Join_Org_Dto } from './dto/join-org.dto';
+import { Create_Hash_Dto } from './dto/create-hash.dto';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class OrgManagementService {
   constructor(
     private readonly supabase: Supabase,
     private readonly config_service: ConfigService,
-    private readonly app_service: AppService
+    public readonly app_service: AppService
   ) {}
 
   async deepMerge(target, source) {
@@ -68,6 +70,26 @@ export class OrgManagementService {
     return { data };
   }
 
+  async getOrgLoggedIn_H1(org_ids) {
+    const { data: org_data, error: org_data_error } = await this.supabase
+      .getClient()
+      .from('organisations')
+      .select('org_id, created_at, name, logo, org_members(*), db_envs(*)')
+      .in(
+        'org_id',
+        org_ids.map((org) => org.org_id)
+      );
+
+    if (org_data_error) {
+      throw org_data_error;
+    }
+    if (org_data.length === 0) {
+      throw new NotFoundException('Organisation not found');
+    }
+
+    return { org_data };
+  }
+
   async getOrgLoggedIn() {
     const { data, error } = await this.supabase
       .getClient()
@@ -93,18 +115,7 @@ export class OrgManagementService {
       throw new NotFoundException('Organisation not found');
     }
 
-    const { data: org_data, error: org_data_error } = await this.supabase
-      .getClient()
-      .from('organisations')
-      .select('org_id, created_at, name, logo, org_members(*), db_envs(*)')
-      .in('org_id', org_ids.map((org) => org.org_id));
-
-    if (org_data_error) {
-      throw org_data_error;
-    }
-    if(org_data.length === 0) {
-      throw new NotFoundException('Organisation not found');
-    }
+    const { org_data } = await this.getOrgLoggedIn_H1(org_ids);
 
     return { data: org_data };
   }
@@ -229,7 +240,8 @@ export class OrgManagementService {
           org_id: org_id,
           user_id: owner_id,
           user_role: 'owner',
-          role_permissions: role_perms
+          role_permissions: role_perms,
+          verified: true
         })
         .select();
 
@@ -305,13 +317,124 @@ export class OrgManagementService {
     return img_url;
   }
 
-  async addMember(add_member_dto: Add_Member_Dto) {
-    const { data: user_data, error: owner_error } = await this.supabase
+  async joinOrg(join_org_dto: Join_Org_Dto) {
+    const { data: user_data, error: user_error } = await this.supabase
       .getClient()
       .auth.getUser(this.supabase.getJwt());
 
-    if (owner_error) {
-      throw owner_error;
+    if (user_error) {
+      throw user_error;
+    }
+
+    const { data: hash_data, error: hash_error } = await this.supabase
+      .getClient()
+      .from('org_hashes')
+      .select()
+      .match({ ...join_org_dto });
+
+    if (hash_error) {
+      throw hash_error;
+    }
+    if (hash_data.length === 0) {
+      throw new NotFoundException('No organisations match the provided hash');
+    }
+
+    const role_perms: Role = {
+      is_owner: false,
+      add_dbs: false,
+      update_dbs: false,
+      remove_dbs: false,
+      invite_users: false,
+      remove_users: false,
+      update_user_roles: false,
+      view_all_dbs: false,
+      view_all_users: true,
+      update_db_access: false
+    };
+
+    const { data, error } = await this.supabase
+      .getClient()
+      .from('org_members')
+      .insert({
+        org_id: hash_data[0].org_id,
+        user_id: user_data.user.id,
+        user_role: 'member',
+        role_permissions: role_perms
+      })
+      .select();
+
+    if (error) {
+      throw error;
+    }
+    if (data.length === 0) {
+      throw new InternalServerErrorException(
+        'Member not added to organisation'
+      );
+    }
+
+    return { data };
+  }
+
+  async createHash(create_hash_dto: Create_Hash_Dto) {
+    const { data: user_data, error: user_error } = await this.supabase
+      .getClient()
+      .auth.getUser(this.supabase.getJwt());
+
+    if (user_error) {
+      throw user_error;
+    }
+
+    const { data: org_data, error: org_error } = await this.supabase
+      .getClient()
+      .from('org_members')
+      .select()
+      .eq('org_id', create_hash_dto.org_id)
+      .eq('user_id', user_data.user.id);
+
+    if (org_error) {
+      throw org_error;
+    }
+    if (org_data.length === 0) {
+      throw new UnauthorizedException(
+        'You are not a member of this organisation'
+      );
+    }
+
+    if (!org_data[0].role_permissions.invite_users) {
+      throw new UnauthorizedException(
+        'You do not have permission to add members'
+      );
+    }
+
+    let salt = crypto.randomBytes(16).toString('hex');
+
+    const hash = crypto.createHash('sha256');
+    hash.update(create_hash_dto.org_id + salt);
+    let hashCode = hash.digest('hex');
+
+    const { data: hash_data, error: hash_error } = await this.supabase
+      .getClient()
+      .from('org_hashes')
+      .insert({ org_id: create_hash_dto.org_id, hash: hashCode })
+      .select();
+
+    if (hash_error) {
+      throw hash_error;
+    }
+    if (hash_data.length === 0) {
+      throw new InternalServerErrorException('Unable to save org hash');
+    }
+
+    return {data: hash_data}
+  }
+
+  async addMember(add_member_dto: Add_Member_Dto) {
+    const { data: user_data, error: user_error } = await this.supabase
+      .getClient()
+      .auth.getUser(this.supabase.getJwt());
+
+    if (user_error) {
+      throw user_error;
     }
 
     const { data: org_data, error: org_error } = await this.supabase
@@ -336,32 +459,11 @@ export class OrgManagementService {
       );
     }
 
-    const role_perms: Role = {
-      is_owner: false,
-      add_dbs: false,
-      update_dbs: false,
-      remove_dbs: false,
-      invite_users: false,
-      remove_users: false,
-      update_user_roles: false,
-      view_all_dbs: false,
-      view_all_users: true,
-      update_db_access: false
-    };
-
-    if (add_member_dto.user_role === 'admin') {
-      role_perms.add_dbs = true;
-      role_perms.update_dbs = true;
-      role_perms.remove_dbs = true;
-      role_perms.invite_users = true;
-      role_perms.remove_users = true;
-      role_perms.view_all_dbs = true;
-    }
-
     const { data, error } = await this.supabase
       .getClient()
       .from('org_members')
-      .insert({ ...add_member_dto, role_permissions: role_perms })
+      .update({ verified: true })
+      .match({ ...add_member_dto })
       .select();
 
     if (error) {
@@ -374,30 +476,6 @@ export class OrgManagementService {
     }
 
     return { data };
-  }
-
-  async addDb_H1(add_db_dto: Add_Db_Dto) {
-    const db_fields = {
-      name: add_db_dto.name,
-      type: add_db_dto.type,
-      db_info: add_db_dto.db_info ? add_db_dto.db_info : {},
-      host: add_db_dto.host
-    };
-
-    const { data: db_data, error: db_error } = await this.supabase
-      .getClient()
-      .from('db_envs')
-      .insert({ ...db_fields })
-      .select();
-
-    if (db_error) {
-      throw db_error;
-    }
-    if (db_data.length === 0) {
-      throw new InternalServerErrorException('Database not added');
-    }
-
-    return { db_data };
   }
 
   async addDb(add_db_dto: Add_Db_Dto) {
@@ -460,6 +538,30 @@ export class OrgManagementService {
     await this.giveDbAccess(give_db_access_dto);
 
     return { data: db_data };
+  }
+
+  async addDb_H1(add_db_dto: Add_Db_Dto) {
+    const db_fields = {
+      name: add_db_dto.name,
+      type: add_db_dto.type,
+      db_info: add_db_dto.db_info ? add_db_dto.db_info : {},
+      host: add_db_dto.host
+    };
+
+    const { data: db_data, error: db_error } = await this.supabase
+      .getClient()
+      .from('db_envs')
+      .insert({ ...db_fields })
+      .select();
+
+    if (db_error) {
+      throw db_error;
+    }
+    if (db_data.length === 0) {
+      throw new InternalServerErrorException('Database not added');
+    }
+
+    return { db_data };
   }
 
   // TODO: Test this function
@@ -562,8 +664,6 @@ export class OrgManagementService {
     return { data: db_data };
   }
 
-  
-
   // TODO: Test this function
   async updateOrg(update_org_dto: Update_Org_Dto) {
     const { data: owner_data, error: owner_error } = await this.supabase
@@ -639,7 +739,7 @@ export class OrgManagementService {
       );
     }
 
-    update_member_dto = await this.updateMemberHelper(
+    update_member_dto = await this.updateMember_H1(
       update_member_dto,
       user_data
     );
@@ -663,10 +763,7 @@ export class OrgManagementService {
   }
 
   // TODO: Test this function
-  async updateMemberHelper(
-    update_member_dto: Update_Member_Dto,
-    user_data: any
-  ) {
+  async updateMember_H1(update_member_dto: Update_Member_Dto, user_data: any) {
     if (!update_member_dto.role_permissions) {
       update_member_dto.role_permissions = {};
 
@@ -728,8 +825,6 @@ export class OrgManagementService {
             };
           }
           break;
-        default:
-          throw new InternalServerErrorException('Invalid user role');
       }
     } else {
       const { data: member_data, error: member_error } = await this.supabase

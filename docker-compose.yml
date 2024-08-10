@@ -7,13 +7,33 @@ services:
       - "80:3000" # Port 80 as this will be the public facing port
     depends_on:
       - query-builder-backend
+    networks:
+      - front-tier
+    env_file:
+      - ./query-builder-app/.env.production
+    restart: unless-stopped
 
   query-builder-backend:
     build:
       context: ./query-builder-backend
       dockerfile: Dockerfile
+    ports:
+    - "55555:55555"
     depends_on:
     - redis
+    networks:
+      - back-tier
+      - front-tier
+    env_file:
+      - ./query-builder-backend/.env
+    restart: unless-stopped
 
   redis:
     image: redis:latest
+    networks:
+      - back-tier
+    restart: unless-stopped
+
+networks:
+   back-tier:
+   front-tier:

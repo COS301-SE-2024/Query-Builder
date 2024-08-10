@@ -11,7 +11,7 @@ import PhoneInput, {
   isValidPhoneNumber,
 } from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
-import {login, signup} from '@/app/authentication/actions'
+import {login, signup} from '../../app/authentication/actions'
 
 export default function Authentication() {
 
@@ -106,7 +106,7 @@ export default function Authentication() {
 
     //sign into QBee server
     //call the sign-in API endpoint
-    let response = await fetch("http://localhost:55555/api/user-management/gen-session-key", {
+    let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user-management/gen-session-key`, {
       credentials: "include",
       method: "PUT",
       headers: {

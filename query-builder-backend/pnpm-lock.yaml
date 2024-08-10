@@ -59,6 +59,9 @@ dependencies:
   passport-jwt:
     specifier: ^4.0.1
     version: 4.0.1
+  passport-local:
+    specifier: ^1.0.0
+    version: 1.0.0
   redis:
     specifier: ^4.6.15
     version: 4.6.15
@@ -118,6 +121,9 @@ devDependencies:
   jest:
     specifier: ^29.7.0
     version: 29.7.0(@types/node@20.14.2)(ts-node@10.9.2)
+  jest-mock:
+    specifier: ^29.7.0
+    version: 29.7.0
   prettier:
     specifier: ^3.3.2
     version: 3.3.2
@@ -4525,6 +4531,13 @@ packages:
     resolution: {integrity: sha512-UCKMDYhNuGOBE9/9Ycuoyh7vP6jpeTp/+sfMJl7nLff/t6dps+iaeE0hhNkKN8/HZHcJ7lCdOyDxHdDoxoSvdQ==}
     dependencies:
       jsonwebtoken: 9.0.2
+      passport-strategy: 1.0.0
+    dev: false
+
+  /passport-local@1.0.0:
+    resolution: {integrity: sha512-9wCE6qKznvf9mQYYbgJ3sVOHmCWoUNMVFoZzNoznmISbhnNNPhN9xfY3sLmScHMetEJeoY7CXwfhCe7argfQow==}
+    engines: {node: '>= 0.4.0'}
+    dependencies:
       passport-strategy: 1.0.0
     dev: false
 
