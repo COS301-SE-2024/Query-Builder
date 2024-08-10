@@ -130,16 +130,16 @@ export default function OrganisationManagement(){
             org_id: orgServerID,
         };
 
-        if(updateOrgName === initialOrgName && profilePicURL === initialOrgLogo){
+        if(updateOrgName == initialOrgName && profilePicURL == initialOrgLogo){
             console.log("No Updates")
             return;
         }
         
-        if (updateOrgName !== initialOrgName){
+        if (updateOrgName != initialOrgName){
             updatedDetails.name = updateOrgName;   
         }
 
-        if (profilePicURL !== initialOrgLogo){
+        if (profilePicURL != initialOrgLogo){
             updatedDetails.logo = profilePicURL;
         }
         console.log(updatedDetails);
@@ -152,8 +152,8 @@ export default function OrganisationManagement(){
               'Authorization': 'Bearer ' + await getToken()
             },
             body: JSON.stringify(updatedDetails)
-        })
-        console.log(response)
+        });
+        console.log(response);
     };
 
     async function deleteUserFromOrg(userId: string){
@@ -227,7 +227,7 @@ export default function OrganisationManagement(){
           default:
             return user.profiles.phone;
         }
-      }, [hasAdminPermission]);
+      }, [hasAdminPermission, orgMembers]);
 
       const renderUpdatePage = React.useCallback(() => {
         console.log(loggedInUserRole);
@@ -387,7 +387,7 @@ export default function OrganisationManagement(){
           </>);
           }
         }
-      }, [loggedInUserRole, hasAdminPermission]);
+      }, [loggedInUserRole, hasAdminPermission, profilePicURL]);
 
       const columns = [
         {name: "NAME", uid: "name"},
@@ -429,11 +429,9 @@ export default function OrganisationManagement(){
                     'Authorization': 'Bearer ' + await getToken()
                     },
                     body: formData
-                }).then((response) => {
+                }).then(async (response) => {
                     console.log(response);
-                    response.json().then((data) => {
-                        setProfilePicURL(data.publicUrl);
-                    });
+                    setProfilePicURL((await response.json()).publicUrl);
                 });
             }
         };
@@ -471,24 +469,27 @@ export default function OrganisationManagement(){
                     <Tab key="orgMembers" aria-label="orgMembers" title="Members">
                     <Card>
                         <CardBody>
-                            <Table aria-label="Organisation Members Table">
-                                <TableHeader columns={columns}>
-                                    {(column) => (
-                                    <TableColumn key={column.uid}>
-                                        {column.name}
-                                    </TableColumn>
-                                    )}
-                                </TableHeader>
-                                <TableBody items={orgMembers}>
-                                    {(item:any) => (
-                                    <TableRow key={item.profiles.user_id} >
-                                        {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
-                                    </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>  
+
+                        <Table aria-label="Organisation Members Table">
+                          <TableHeader columns={columns}>
+                              {(column) => (
+                              <TableColumn key={column.uid}>
+                                  {column.name}
+                              </TableColumn>
+                              )}
+                          </TableHeader>
+                          <TableBody items={orgMembers}>
+                              {(item:any) => (
+                              <TableRow key={item.profiles.user_id} >
+                                  {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
+                              </TableRow>
+                              )}
+                          </TableBody>
+                        </Table> 
+
                         </CardBody>
-                    </Card>  
+
+                    </Card> 
                     </Tab>
                     <Tab key="orgDatabases" title="Databases">
                     <Card>
