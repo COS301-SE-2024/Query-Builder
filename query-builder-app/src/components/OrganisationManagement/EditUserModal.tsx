@@ -55,7 +55,7 @@ export default function EditUserModal(props: EditUserModalProps){
         <>
         {/* <label  className="custom-file-upload bg-white p-1 border-2 border-slate-600 rounded-full">
         </label> */}
-          <EditIcon  onClick={onOpen}/>                              
+          <EditIcon aria-label="editUserIcon" onClick={onOpen}/>                              
         
         <Modal 
           isOpen={isOpen} 

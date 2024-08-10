@@ -456,7 +456,7 @@ export default function OrganisationManagement(){
                 <Spacer y={2}/>
 
                 <Tabs aria-label="Options" className="m-auto mb-0 mt-0 md:m-0 md:ml-1">
-                    <Tab key="orgInfo" title="Organisation Information">
+                    <Tab key="orgInfo" aria-label="orgInfo" title="Organisation Information">
                     <Card>
                         <CardHeader>
                             Organisation Settings
@@ -468,10 +468,10 @@ export default function OrganisationManagement(){
                         </CardBody>
                     </Card>  
                     </Tab>
-                    <Tab key="orgMembers" title="Members">
+                    <Tab key="orgMembers" aria-label="orgMembers" title="Members">
                     <Card>
                         <CardBody>
-                            <Table aria-label="Example table with custom cells">
+                            <Table aria-label="Organisation Members Table">
                                 <TableHeader columns={columns}>
                                     {(column) => (
                                     <TableColumn key={column.uid}>
