@@ -144,22 +144,8 @@ export class NaturalLanguageService {
             const result = await this.geminiModel.generateContent(prompt);
 
             const response = await result.response;
-            //const textResponse = response.text();
-            const textResponse = `{
-  "databaseServerID": "dcbc434f-64cd-4881-a2a4-85d9a3eb53a0",
-  "queryParams": {
-    "language": "sql",
-    "query_type": "select",
-    "databaseName": "sakila",
-    "table": {
-      "name": "city",
-      "columns": [
-          {"name": "city"}
-        ],
-      "join": undefined
-    }
-  }
-}`
+            const textResponse = response.text();
+
             console.log(textResponse);
 
             //-------------------Do some potential cleanup of the text response--------------------------//
