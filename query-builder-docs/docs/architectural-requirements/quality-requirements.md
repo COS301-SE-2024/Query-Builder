@@ -73,8 +73,6 @@ QBee needs to be reliable since its target market will largely consist of execut
 - Error rates are kept below **0.5%**.
 - Error recovery time is kept below **2 second**.
 
-
-
 ## Additional Quality Requirements
 
 In addition to our top five quality requirements, we also plan to design our system such that it meets the following quality requirements.
