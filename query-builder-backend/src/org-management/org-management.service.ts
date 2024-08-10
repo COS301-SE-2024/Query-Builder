@@ -240,7 +240,8 @@ export class OrgManagementService {
           org_id: org_id,
           user_id: owner_id,
           user_role: 'owner',
-          role_permissions: role_perms
+          role_permissions: role_perms,
+          verified: true
         })
         .select();
 
@@ -423,6 +424,8 @@ export class OrgManagementService {
     if (hash_data.length === 0) {
       throw new InternalServerErrorException('Unable to save org hash');
     }
+
+    return {data: hash_data}
   }
 
   async addMember(add_member_dto: Add_Member_Dto) {
