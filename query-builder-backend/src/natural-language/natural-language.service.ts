@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { QueryHandlerService } from 'src/query-handler/query-handler.service';
 import { Natural_Language_Query_Dto } from './dto/natural-language-query.dto';
 import { ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
@@ -13,7 +12,7 @@ export class NaturalLanguageService {
     private openAiService: OpenAI;
     private geminiModel: GenerativeModel
 
-    constructor(private readonly queryHandlerService: QueryHandlerService, private readonly dbMetadataHandlerService: DbMetadataHandlerService, private configService: ConfigService){
+    constructor(private readonly dbMetadataHandlerService: DbMetadataHandlerService, private configService: ConfigService){
 
         // Inject the OpenAIApi instance
         // Initialize OpenAIApi with the provided API key from the environment
@@ -161,7 +160,7 @@ export class NaturalLanguageService {
                 queryParams: jsonResponse
             }
 
-            return await this.queryHandlerService.queryDatabase(query, session);
+            return query;
 
         }
     }
