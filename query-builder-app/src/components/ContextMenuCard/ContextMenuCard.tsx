@@ -8,6 +8,7 @@ import {
     DropdownSection,
 } from "@nextui-org/react";
 import { createClient } from "./../../utils/supabase/client";
+import { useRouter } from 'next/navigation'
 
 interface ContextMenuCardProps {
     queryTitle: string;
@@ -61,6 +62,8 @@ export default function ContextMenuCard({
 }: ContextMenuCardProps) {
     const [loading, setLoading] = useState(false);
 
+    const router = useRouter();
+
     const handleDelete = async () => {
         setLoading(true);
 
@@ -79,7 +82,8 @@ export default function ContextMenuCard({
 
         console.log(query);
         //Here we will send the query to the query builder
-        //Plugg and play Keanu
+        
+        router.push("/" + db_id + "/" + query_id);
         
     };
 

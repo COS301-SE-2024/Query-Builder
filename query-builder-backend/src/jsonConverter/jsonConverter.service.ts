@@ -231,7 +231,14 @@ export class JsonConverterService {
         else if (this.isPrimitiveCondition(condition)) 
         {
             const primCondition = condition as primitiveCondition;
-            let sql = `\`${primCondition.column}\` ${primCondition.operator} `;
+
+            let sql = '';
+
+            if(primCondition.tableName){
+                sql += `\`${primCondition.tableName}\`.`;
+            }
+
+            sql += `\`${primCondition.column}\` ${primCondition.operator} `;
     
             if (typeof primCondition.value === 'string') 
             {

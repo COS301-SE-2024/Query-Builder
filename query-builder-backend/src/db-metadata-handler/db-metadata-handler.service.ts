@@ -68,21 +68,7 @@ export class DbMetadataHandlerService {
             },
         };
 
-        const response = await this.queryHandlerService.queryDatabase(query, session);
-
-        //return in the form the frontend is expecting
-        var responseToReturn: Database[] = [];
-
-        for(var database of response.data){
-            console.log(database);
-            const newDatabase: Database = {
-                key: database.SCHEMA_NAME,
-                label: database.SCHEMA_NAME
-            }
-            responseToReturn.push(newDatabase);
-        }
-
-        return responseToReturn;
+        return await this.queryHandlerService.queryDatabase(query, session);
 
     }
 

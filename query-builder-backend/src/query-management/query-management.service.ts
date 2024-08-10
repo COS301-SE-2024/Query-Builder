@@ -3,6 +3,7 @@ import { Supabase } from '../supabase';
 import { Save_Query_Dto } from './dto/save-query.dto';
 import { Delete_Query_Dto } from './dto/delete-query.dto';
 import { query } from 'express';
+import { Get_Single_Query_Dto } from './dto/get-single-query.dto';
 
 @Injectable()
 export class QueryManagementService {
@@ -67,6 +68,30 @@ export class QueryManagementService {
         }
 
         return { query_data };
+    }
+
+    async getSingleQuery(get_single_query_dto: Get_Single_Query_Dto) {
+
+        //Firstly get the user who is saving the query
+        const { data: user_data, error: user_error } = await this.supabase
+            .getClient()
+            .auth.getUser(this.supabase.getJwt());
+
+        if (user_error) {
+            throw user_error;
+        }
+
+        //Secondly get the query saved by the user
+        const { data: query_data, error: query_error } = await this.supabase
+            .getClient()
+            .from('saved_queries')
+            .select('parameters, queryTitle, saved_at, query_id, db_id')
+            .eq('user_id', user_data.user.id).eq('query_id', get_single_query_dto.query_id).single();
+        if (query_error) {
+            throw query_error;
+        }
+
+        return query_data;
     }
 
 
