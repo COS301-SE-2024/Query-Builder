@@ -1,7 +1,7 @@
 "use client"
 import Form from "@/components/Form/Form";
 import TableResponse from "@/components/TableResponse/TableResponse";
-import { Button, Image, Spacer, Card, CardBody, CardHeader, Input, Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, User, Chip, Tooltip, getKeyValue } from "@nextui-org/react";
+import {Tabs, Tab} from "@nextui-org/react";
 import { useState } from "react";
 import Sidebar from "../../components/SideBar/SideBar";
 import NaturalLanguage from "@/components/NaturalLanguage/NaturalLanguage";
