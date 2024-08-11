@@ -26,16 +26,7 @@ export class Update_Db_Dto {
     @IsNotEmpty()
     host?: string;
 
-    @IsString()
-    @IsNotEmpty()
-    session_key: string;
-
     @IsOptional()
     @IsNotEmpty()
     db_info?: string;
-
-    @IsOptional()
-    @IsString()
-    @IsNotEmpty()
-    db_secrets?: string;
 }
