@@ -1,8 +1,12 @@
 ---
-sidebar_position: 1
+sidebar_position: 4
 ---
 
-# Cloning the system from Github
+# Technical Installation Manual
+
+To run the QBee system yourself, you will need to firstly clone the system's source code from our Github repository. Then the system can be run inside Docker, and you can setup your own Supabase instance to act as your system's datastore.
+
+## Cloning the system from Github
 
 To clone the system from Github, you will need to have Git installed on your machine. If you do not have Git installed, you can download it from the [Git website](https://git-scm.com/downloads).
 
@@ -62,7 +66,7 @@ cd query-builder-docs && pnpm start
 
 You have now successfully cloned the system from Github and started the frontend, backend, and documentation. You can now start using the system.
 
-# Running the system using Docker
+## Running the system using Docker
 
 To run the system using Docker, you will need to have Docker installed on your machine. If you do not have Docker installed, you can download it from the [Docker website](https://www.docker.com/products/docker-desktop).
 
@@ -81,7 +85,7 @@ docker-compose up
     - The backend can be accessed on `http://localhost:55555`.
     - The documentation can be accessed on `http://localhost:3001`.
 
-# Setting up Supabase with the system
+## Setting up Supabase with the system
 
 To set up Supabase with the system, follow these steps:
 

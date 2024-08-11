@@ -30,7 +30,7 @@
 ## Project Introduction
 <div align='left'>
 
-QBee is an innovative solution that transforms how users interact with databases, regardless of their technical skill level. By replacing traditional query methods with an intuitive drag-and-drop GUI, QBee makes database manipulation effortless and enables real-time query collaboration. 
+QBee is an innovative solution that transforms how users interact with databases, regardless of their technical skill level. By replacing traditional query methods with a user-friendly form interface, as well as natural language querying, QBee makes database querying effortless. 
 It ensures robust data privacy and integrity, providing a secure environment for users.
 
 Beyond basic query building, QBee offers tools to visualize data through generated graphs, facilitating deeper insights and enhancing user experience and efficiency.
@@ -47,11 +47,12 @@ QBee is the ultimate tool for modern database management and analysis.
 
 | Resource                        | Link                                       |
 |---------------------------------|--------------------------------------------|
+| Project Board                   | [Project Tracking](https://github.com/orgs/COS301-SE-2024/projects/55)|
+| User Manual/Help Centre           | [Help for QBee Users](https://cos301-se-2024.github.io/Query-Builder/docs/category/user-manual)                 |
+| Technical Installation Manual           | [A guide to running the system yourself](https://cos301-se-2024.github.io/Query-Builder/docs/technical-installation-manual/)                 |
+| Coding Standards                | [See Coding Standards](https://cos301-se-2024.github.io/Query-Builder/docs/guides-and-standards/coding-standards)                   |
 | Software Requirements Specification | [See our complete SRS](https://cos301-se-2024.github.io/Query-Builder/docs/category/software-requirements-specification)            |
 | Architectural Requirements Document                    | [See our architecture document](https://cos301-se-2024.github.io/Query-Builder/docs/category/architectural-requirements-document)                   |
-| User Manual/Help Centre           | [Help for QBee Users](https://cos301-se-2024.github.io/Query-Builder/docs/category/user-manual)                 |
-| Coding Standards                | [See Coding Standards](https://cos301-se-2024.github.io/Query-Builder/docs/guides-and-standards/coding-standards)                   |
-| Project Board                   | [Project Tracking](https://github.com/orgs/COS301-SE-2024/projects/55)|
 
   
 </div>
