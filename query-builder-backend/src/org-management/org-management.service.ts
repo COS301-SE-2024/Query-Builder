@@ -1158,7 +1158,7 @@ export class OrgManagementService {
 
     if (!org_data[0].role_permissions.add_dbs) {
       throw new UnauthorizedException(
-        'You do not have permission to remove database access from other users'
+        'You do not have permission to remove database access for other users'
       );
     }
 
