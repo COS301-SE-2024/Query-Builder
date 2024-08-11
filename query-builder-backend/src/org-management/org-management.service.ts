@@ -28,6 +28,7 @@ import { Upload_Org_Logo_Dto } from './dto/upload-org-logo.dto';
 import { Join_Org_Dto } from './dto/join-org.dto';
 import { Create_Hash_Dto } from './dto/create-hash.dto';
 import * as crypto from 'crypto';
+import { createHash } from 'crypto';
 
 @Injectable()
 export class OrgManagementService {
@@ -218,6 +219,55 @@ export class OrgManagementService {
     return { data };
   }
 
+  async getOrgHash(create_hash_dto: Create_Hash_Dto) {
+    const { data, error } = await this.supabase
+      .getClient()
+      .from('org_hashes')
+      .select()
+      .match({ ...create_hash_dto });
+
+    if (error) {
+      throw error;
+    }
+    if (data.length === 0) {
+      throw new NotFoundException('No organisations match the provided hash');
+    }
+
+    return { data };
+  }
+
+  async createOrg(create_org_dto: Create_Org_Dto) {
+    if (create_org_dto.owner_id === undefined) {
+      const { data: org_owner, error: org_owner_error } = await this.supabase
+        .getClient()
+        .auth.getUser(this.supabase.getJwt());
+
+      if (org_owner_error) {
+        throw org_owner_error;
+      }
+
+      let owner_id = org_owner.user.id;
+      create_org_dto.owner_id = owner_id;
+    }
+
+    const { data, error } = await this.supabase
+      .getClient()
+      .from('organisations')
+      .insert({ ...create_org_dto })
+      .select();
+
+    if (error) {
+      throw error;
+    }
+    if (data.length === 0) {
+      throw new InternalServerErrorException('Organisation not created');
+    }
+
+    await this.createOrg_H1(create_org_dto.owner_id, data[0].org_id);
+
+    return { data };
+  }
+
   async createOrg_H1(owner_id, org_id) {
     const role_perms: Role = {
       is_owner: true,
@@ -256,38 +306,6 @@ export class OrgManagementService {
         .eq('org_id', org_id);
       throw new InternalServerErrorException('Owner not added to organisation');
     }
-  }
-
-  async createOrg(create_org_dto: Create_Org_Dto) {
-    if (create_org_dto.owner_id === undefined) {
-      const { data: org_owner, error: org_owner_error } = await this.supabase
-        .getClient()
-        .auth.getUser(this.supabase.getJwt());
-
-      if (org_owner_error) {
-        throw org_owner_error;
-      }
-
-      let owner_id = org_owner.user.id;
-      create_org_dto.owner_id = owner_id;
-    }
-
-    const { data, error } = await this.supabase
-      .getClient()
-      .from('organisations')
-      .insert({ ...create_org_dto })
-      .select();
-
-    if (error) {
-      throw error;
-    }
-    if (data.length === 0) {
-      throw new InternalServerErrorException('Organisation not created');
-    }
-
-    await this.createOrg_H1(create_org_dto.owner_id, data[0].org_id);
-
-    return { data };
   }
 
   async uploadOrgLogo(file: Express.Multer.File, body: Upload_Org_Logo_Dto) {
@@ -406,22 +424,14 @@ export class OrgManagementService {
       );
     }
 
-    let hashCode = await this.createHash_H1(create_hash_dto.org_id)
+    let hashCode = await this.createHash_H1(create_hash_dto.org_id);
 
-    const { data: hash_data, error: hash_error } = await this.supabase
-      .getClient()
-      .from('org_hashes')
-      .upsert({ org_id: create_hash_dto.org_id, hash: hashCode })
-      .select();
+    const { data: hash_data, error: hash_error } = await this.createHash_H3(
+      create_hash_dto,
+      hashCode
+    );
 
-    if (hash_error) {
-      throw hash_error;
-    }
-    if (hash_data.length === 0) {
-      throw new InternalServerErrorException('Unable to save org hash');
-    }
-
-    return {data: hash_data}
+    return { data: hash_data };
   }
 
   async createHash_H1(org_id: string) {
@@ -432,6 +442,58 @@ export class OrgManagementService {
     let hashCode = hash.digest('hex');
 
     return hashCode;
+  }
+
+  async createHash_H2(org_id: string) {
+    const { data, error } = await this.supabase
+      .getClient()
+      .from('org_hashes')
+      .select()
+      .eq('org_id', org_id);
+
+    if (error) {
+      throw error;
+    }
+    if (data.length === 0) {
+      return false;
+    }
+
+    return true;
+  }
+
+  async createHash_H3(create_hash_dto: Create_Hash_Dto, hashCode: string) {
+    if (await this.createHash_H2(create_hash_dto.org_id)) {
+      const { data, error } = await this.supabase
+        .getClient()
+        .from('org_hashes')
+        .update({ hash: hashCode })
+        .eq('org_id', create_hash_dto.org_id)
+        .select();
+
+      if (error) {
+        throw error;
+      }
+      if (data.length === 0) {
+        throw new InternalServerErrorException('Unable to save org hash');
+      }
+
+      return { data, error };
+    } else {
+      const { data, error } = await this.supabase
+        .getClient()
+        .from('org_hashes')
+        .insert({ org_id: create_hash_dto.org_id, hash: hashCode })
+        .select();
+
+      if (error) {
+        throw error;
+      }
+      if (data.length === 0) {
+        throw new InternalServerErrorException('Unable to save org hash');
+      }
+
+      return { data, error };
+    }
   }
 
   async addMember(add_member_dto: Add_Member_Dto) {
@@ -476,9 +538,7 @@ export class OrgManagementService {
       throw error;
     }
     if (data.length === 0) {
-      throw new InternalServerErrorException(
-        'Member not verified'
-      );
+      throw new InternalServerErrorException('Member not verified');
     }
 
     return { data };
@@ -570,7 +630,6 @@ export class OrgManagementService {
     return { db_data };
   }
 
-  // TODO: Test this function
   async giveDbAccess(give_db_access_dto: Give_Db_Access_Dto) {
     const { data: user_data, error: owner_error } = await this.supabase
       .getClient()
@@ -621,7 +680,6 @@ export class OrgManagementService {
     return { data: db_data };
   }
 
-  // TODO: Test this function
   async saveDbSecrets(
     save_db_secrets_dto: Save_Db_Secrets_Dto,
     session: Record<string, any>
@@ -670,7 +728,6 @@ export class OrgManagementService {
     return { data: db_data };
   }
 
-  // TODO: Test this function
   async updateOrg(update_org_dto: Update_Org_Dto) {
     const { data: owner_data, error: owner_error } = await this.supabase
       .getClient()
@@ -713,7 +770,6 @@ export class OrgManagementService {
     return { data };
   }
 
-  // TODO: Test this function
   async updateMember(update_member_dto: Update_Member_Dto) {
     const { data: user_data, error: owner_error } = await this.supabase
       .getClient()
@@ -768,7 +824,6 @@ export class OrgManagementService {
     return { data };
   }
 
-  // TODO: Test this function
   async updateMember_H1(update_member_dto: Update_Member_Dto, user_data: any) {
     if (!update_member_dto.role_permissions) {
       update_member_dto.role_permissions = {};
@@ -882,7 +937,6 @@ export class OrgManagementService {
     return update_member_dto;
   }
 
-  // TODO: Test this function, allow for updating db_secrets
   async updateDb(update_db_dto: Update_Db_Dto) {
     const { data: user_data, error: owner_error } = await this.supabase
       .getClient()
@@ -910,7 +964,7 @@ export class OrgManagementService {
 
     if (!org_data[0].role_permissions.update_dbs) {
       throw new UnauthorizedException(
-        'You do not have permission to update dbs'
+        'You do not have permission to update databases'
       );
     }
 
@@ -924,7 +978,7 @@ export class OrgManagementService {
     const { data: db_data, error: db_error } = await this.supabase
       .getClient()
       .from('db_envs')
-      .update({ ...update_db_dto })
+      .update({ ...db_fields})
       .match({ db_id: update_db_dto.db_id })
       .select();
 
@@ -938,7 +992,6 @@ export class OrgManagementService {
     return { data: db_data };
   }
 
-  // TODO: Test this function
   async removeOrg(remove_org_dto: Remove_Org_Dto) {
     const { data: owner_data, error: owner_error } = await this.supabase
       .getClient()
@@ -981,7 +1034,6 @@ export class OrgManagementService {
     return { data };
   }
 
-  // TODO: Test this function
   async removeMember(remove_member_dto: Remove_Member_Dto) {
     const { data: user_data, error: owner_error } = await this.supabase
       .getClient()
@@ -1031,7 +1083,6 @@ export class OrgManagementService {
     return { data };
   }
 
-  // TODO: Test this function
   async removeDb(remove_db_dto: Remove_Db_Dto) {
     const { data: user_data, error: owner_error } = await this.supabase
       .getClient()
@@ -1080,7 +1131,6 @@ export class OrgManagementService {
     return { data };
   }
 
-  // TODO: Test this function
   async removeDbAccess(remove_db_access_dto: Remove_Db_Access_Dto) {
     const { data: user_data, error: owner_error } = await this.supabase
       .getClient()
@@ -1108,7 +1158,7 @@ export class OrgManagementService {
 
     if (!org_data[0].role_permissions.add_dbs) {
       throw new UnauthorizedException(
-        'You do not have permission to remove database access from other users'
+        'You do not have permission to remove database access for other users'
       );
     }
 

@@ -58,6 +58,11 @@ export class OrgManagementController {
     return this.org_management_service.getDbs(get_dbs_dto);
   }
 
+  @Put('get-org-hash')
+  async getOrgHash(@Body(ValidationPipe) get_org_hash_dto: Create_Hash_Dto) {
+    return this.org_management_service.getOrgHash(get_org_hash_dto);
+  }
+
   @Post('upload-org-logo')
   @UseInterceptors(FileInterceptor('file'))
   async uploadOrgLogo(
