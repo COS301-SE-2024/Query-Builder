@@ -109,6 +109,7 @@ jest.mock('../supabase/supabase.ts', () => {
                 error: testError[AUTH_ADMIN]
               },
               getUser: jest.fn().mockReturnThis(),
+              signUp: jest.fn().mockReturnThis(),
               signInWithPassword: jest.fn().mockReturnThis(),
               data: testData[AUTH],
               error: testError[AUTH]
@@ -388,7 +389,7 @@ describe('UserManagementService', () => {
       expect(data).toEqual(testData[AUTH]);
     });
   });
-  
+
   describe('createUser', () => {});
   describe('updateUser', () => {});
   describe('uploadProfilePicture', () => {});
