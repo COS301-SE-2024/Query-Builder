@@ -436,8 +436,8 @@ export default function OrganisationManagement(){
                 },
                 body: JSON.stringify({org_id: orgServerID})
             });
-            console.log((await response.json()));
-            hashCode = (await response.json()).data;
+            // console.log((await response.json()));
+            hashCode = (await response.json()).data[0];
             try{
               await navigator.clipboard.writeText(hashCode);
               console.log('Content copied to clipboard');
