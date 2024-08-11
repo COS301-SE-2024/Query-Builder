@@ -57,7 +57,8 @@ The system should maintain a certain performance standard. Users will not want t
 
 **Quantification:** We will ensure the system's performance by making sure that the system:
 
-- Has an **average API response time of under 1 second**.
+- Has an **average API response time of under 1 second** for regular API requests.
+- Has an **average API response time of under 5 seconds** for API requests involving Natural Language Processing
 - Can handle **50 user requests per second**.
 
 ### 5 - Reliability

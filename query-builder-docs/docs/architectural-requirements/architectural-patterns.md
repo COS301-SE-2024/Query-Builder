@@ -11,6 +11,7 @@ Architectural Patterns are well-known compositions of architectural elements whi
 ### Usability
 
 - Model-View-Controller (MVC)
+- Flux
 - Client-Server
 
 ### Security
@@ -52,9 +53,9 @@ This is an ideal pattern to design QBee's frontend interface. For example, QBee'
 
 *The layered architectural pattern arranges a software system into distinct layers, with each layer responsible for its own functionality. This ensures separation of concerns and modularisation of code*
 
-This is an ideal pattern to structure QBee's entire stack of technologies. Our presentation layer consists of our frontend progressive web app (PWA), whilst our business logic layer consists of our API and server-side application. Lastly, QBee will effectively make use of two persistence layers - our own data store to store user data and queries, as well as the data stores that can be connected by users to the app for querying.
+This is an ideal pattern to structure QBee's entire stack of technologies. Our presentation layer consists of our frontend progressive web app (PWA), whilst our business logic layer consists of our API and server-side application. In between those two layers we have a security layer to handle data and user validation. Lastly, QBee will effectively make use of two persistence layers - our own data store to store user data and queries, as well as the data stores that can be connected by users to the app for querying.
 
-### Microservices
+### Service-oriented
 
 *The microservices architectural pattern arranges a software system as a loosely-coupled collection of granular services, allowing for high scalability and maintainability*
 
