@@ -219,7 +219,7 @@ export class OrgManagementService {
     return { data };
   }
 
-  async getOrgHash(create_hash_dto: Create_Hash_Dto){
+  async getOrgHash(create_hash_dto: Create_Hash_Dto) {
     const { data, error } = await this.supabase
       .getClient()
       .from('org_hashes')
@@ -232,6 +232,38 @@ export class OrgManagementService {
     if (data.length === 0) {
       throw new NotFoundException('No organisations match the provided hash');
     }
+
+    return { data };
+  }
+
+  async createOrg(create_org_dto: Create_Org_Dto) {
+    if (create_org_dto.owner_id === undefined) {
+      const { data: org_owner, error: org_owner_error } = await this.supabase
+        .getClient()
+        .auth.getUser(this.supabase.getJwt());
+
+      if (org_owner_error) {
+        throw org_owner_error;
+      }
+
+      let owner_id = org_owner.user.id;
+      create_org_dto.owner_id = owner_id;
+    }
+
+    const { data, error } = await this.supabase
+      .getClient()
+      .from('organisations')
+      .insert({ ...create_org_dto })
+      .select();
+
+    if (error) {
+      throw error;
+    }
+    if (data.length === 0) {
+      throw new InternalServerErrorException('Organisation not created');
+    }
+
+    await this.createOrg_H1(create_org_dto.owner_id, data[0].org_id);
 
     return { data };
   }
@@ -274,38 +306,6 @@ export class OrgManagementService {
         .eq('org_id', org_id);
       throw new InternalServerErrorException('Owner not added to organisation');
     }
-  }
-
-  async createOrg(create_org_dto: Create_Org_Dto) {
-    if (create_org_dto.owner_id === undefined) {
-      const { data: org_owner, error: org_owner_error } = await this.supabase
-        .getClient()
-        .auth.getUser(this.supabase.getJwt());
-
-      if (org_owner_error) {
-        throw org_owner_error;
-      }
-
-      let owner_id = org_owner.user.id;
-      create_org_dto.owner_id = owner_id;
-    }
-
-    const { data, error } = await this.supabase
-      .getClient()
-      .from('organisations')
-      .insert({ ...create_org_dto })
-      .select();
-
-    if (error) {
-      throw error;
-    }
-    if (data.length === 0) {
-      throw new InternalServerErrorException('Organisation not created');
-    }
-
-    await this.createOrg_H1(create_org_dto.owner_id, data[0].org_id);
-
-    return { data };
   }
 
   async uploadOrgLogo(file: Express.Multer.File, body: Upload_Org_Logo_Dto) {
@@ -426,14 +426,10 @@ export class OrgManagementService {
 
     let hashCode = await this.createHash_H1(create_hash_dto.org_id);
 
-    const { data: hash_data, error: hash_error } = await this.createHash_H3(create_hash_dto, hashCode);
-
-    if (hash_error) {
-      throw hash_error;
-    }
-    if (hash_data.length === 0) {
-      throw new InternalServerErrorException('Unable to save org hash');
-    }
+    const { data: hash_data, error: hash_error } = await this.createHash_H3(
+      create_hash_dto,
+      hashCode
+    );
 
     return { data: hash_data };
   }
@@ -458,7 +454,7 @@ export class OrgManagementService {
     if (error) {
       throw error;
     }
-    if(data.length === 0) {
+    if (data.length === 0) {
       return false;
     }
 
@@ -466,7 +462,7 @@ export class OrgManagementService {
   }
 
   async createHash_H3(create_hash_dto: Create_Hash_Dto, hashCode: string) {
-    if(await this.createHash_H2(create_hash_dto.org_id)){
+    if (await this.createHash_H2(create_hash_dto.org_id)) {
       const { data, error } = await this.supabase
         .getClient()
         .from('org_hashes')
@@ -474,14 +470,27 @@ export class OrgManagementService {
         .eq('org_id', create_hash_dto.org_id)
         .select();
 
+      if (error) {
+        throw error;
+      }
+      if (data.length === 0) {
+        throw new InternalServerErrorException('Unable to save org hash');
+      }
+
       return { data, error };
-    }
-    else{
+    } else {
       const { data, error } = await this.supabase
         .getClient()
         .from('org_hashes')
         .insert({ org_id: create_hash_dto.org_id, hash: hashCode })
         .select();
+
+      if (error) {
+        throw error;
+      }
+      if (data.length === 0) {
+        throw new InternalServerErrorException('Unable to save org hash');
+      }
 
       return { data, error };
     }
