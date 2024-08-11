@@ -1,20 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserManagementService } from './user-management.service';
-import { Supabase, SupabaseModule } from '../supabase';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { createClient } from '@supabase/supabase-js';
+import { SupabaseModule } from '../supabase';
 import {
-  HttpException,
-  Injectable,
   InternalServerErrorException,
-  Module,
   NotFoundException
 } from '@nestjs/common';
-import { Create_User_Dto } from './dto/create-user.dto';
-import { Get_User_Dto } from './dto/get-user.dto';
-import { Sign_In_User_Dto } from './dto/sign-in-user.dto';
-import { Update_User_Dto } from './dto/update-user.dto';
-import exp from 'constants';
 
 const SELECT = 0;
 const UPDATE = 1;
@@ -617,8 +607,64 @@ describe('UserManagementService', () => {
         expect(error.message).toBe('Failed to upload file');
       });
     });
+
+    it('should return the image URL when the profile photo is uploaded', async () => {
+      const file: Express.Multer.File = {
+        fieldname: 'file',
+        originalname: 'test.jpg',
+        encoding: '7bit',
+        mimetype: 'image/jpeg',
+        size: 1024,
+        buffer: Buffer.from('file content'),
+        destination: '/path/to/destination',
+        filename: 'test.jpg',
+        path: '/path/to/destination/test.jpg',
+        stream: null
+      };
+
+      let testData = [];
+      let testError = [];
+
+      testData[AUTH] = { user: { id: 'test_user_id' } };
+      testData[STORAGE] = { url: 'https://example.com/test.jpg' };
+
+      setTestData(testData);
+      setTestError(testError);
+
+      const img_url = await service.uploadProfilePhoto(file);
+      expect(img_url).toBeDefined();
+
+      expect(img_url).toEqual(testData[STORAGE]);
+    })
   });
-  describe('updateUserPassword', () => {});
-  describe('updateUserEmail', () => {});
-  describe('updateUserPhone', () => {});
+
+  describe('updateUserPassword', () => {
+    it('should return a message stating it is not implemented', async () => {
+      const { data } = await service.updateUserPassword({
+        user_id: 'test_user_id'
+      });
+      expect(data).toBeDefined();
+      expect(data).toBe('Not implemented');
+    })
+  });
+
+  describe('updateUserEmail', () => {
+    it('should return a message stating it is not implemented', async () => {
+      const { data } = await service.updateUserEmail({
+        user_id: 'test_user_id'
+      });
+      expect(data).toBeDefined();
+      expect(data).toBe('Not implemented');
+    });
+  });
+
+  describe('updateUserPhone', () => {
+    it('should return a message stating it is not implemented', async () => {
+      const { data } = await service.updateUserPhone({
+        user_id: 'test_user_id'
+      });
+      expect(data).toBeDefined();
+      expect(data).toBe('Not implemented');
+    });
+  });
 });
