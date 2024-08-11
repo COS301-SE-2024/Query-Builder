@@ -630,7 +630,6 @@ export class OrgManagementService {
     return { db_data };
   }
 
-  // TODO: Test this function
   async giveDbAccess(give_db_access_dto: Give_Db_Access_Dto) {
     const { data: user_data, error: owner_error } = await this.supabase
       .getClient()
@@ -681,7 +680,6 @@ export class OrgManagementService {
     return { data: db_data };
   }
 
-  // TODO: Test this function
   async saveDbSecrets(
     save_db_secrets_dto: Save_Db_Secrets_Dto,
     session: Record<string, any>
@@ -730,7 +728,6 @@ export class OrgManagementService {
     return { data: db_data };
   }
 
-  // TODO: Test this function
   async updateOrg(update_org_dto: Update_Org_Dto) {
     const { data: owner_data, error: owner_error } = await this.supabase
       .getClient()
@@ -773,7 +770,6 @@ export class OrgManagementService {
     return { data };
   }
 
-  // TODO: Test this function
   async updateMember(update_member_dto: Update_Member_Dto) {
     const { data: user_data, error: owner_error } = await this.supabase
       .getClient()
@@ -828,7 +824,6 @@ export class OrgManagementService {
     return { data };
   }
 
-  // TODO: Test this function
   async updateMember_H1(update_member_dto: Update_Member_Dto, user_data: any) {
     if (!update_member_dto.role_permissions) {
       update_member_dto.role_permissions = {};
@@ -942,7 +937,6 @@ export class OrgManagementService {
     return update_member_dto;
   }
 
-  // TODO: Test this function, allow for updating db_secrets
   async updateDb(update_db_dto: Update_Db_Dto) {
     const { data: user_data, error: owner_error } = await this.supabase
       .getClient()
@@ -998,7 +992,6 @@ export class OrgManagementService {
     return { data: db_data };
   }
 
-  // TODO: Test this function
   async removeOrg(remove_org_dto: Remove_Org_Dto) {
     const { data: owner_data, error: owner_error } = await this.supabase
       .getClient()
@@ -1041,7 +1034,6 @@ export class OrgManagementService {
     return { data };
   }
 
-  // TODO: Test this function
   async removeMember(remove_member_dto: Remove_Member_Dto) {
     const { data: user_data, error: owner_error } = await this.supabase
       .getClient()
@@ -1091,7 +1083,6 @@ export class OrgManagementService {
     return { data };
   }
 
-  // TODO: Test this function
   async removeDb(remove_db_dto: Remove_Db_Dto) {
     const { data: user_data, error: owner_error } = await this.supabase
       .getClient()
@@ -1140,7 +1131,6 @@ export class OrgManagementService {
     return { data };
   }
 
-  // TODO: Test this function
   async removeDbAccess(remove_db_access_dto: Remove_Db_Access_Dto) {
     const { data: user_data, error: owner_error } = await this.supabase
       .getClient()
