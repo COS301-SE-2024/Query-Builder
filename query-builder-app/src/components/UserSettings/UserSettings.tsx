@@ -4,8 +4,6 @@ import './UserSettings.css';
 import React, { useState, useEffect } from "react";
 import {Button, Card, CardBody, CardFooter, CardHeader, Input, Image} from "@nextui-org/react";
 import {EditIcon} from "../OrganisationManagement/EditIcon";
-import PhoneInput, { formatPhoneNumber, formatPhoneNumberIntl, isValidPhoneNumber } from 'react-phone-number-input';
-import 'react-phone-number-input/style.css';
 import { createClient } from "./../../utils/supabase/client";
 
 interface UpdateUserPersonalDetails {
@@ -27,12 +25,13 @@ export default function UserSettings(){
     const [initialFirstName, setInitialFirstName] = useState('');
     const [initialLastName, setInitialLastName] = useState('');
     const [initialEmail, setInitialEmail] = useState('');
-    const [initialPhone, setInitialPhone] = useState('');
     const [initialProfilePicture, setInitialProfilePicture] = useState('');
     const [updateFirstName, setUpdateFirstName] = useState('');
     const [updateLastName, setUpdateLastName] = useState('');
-    const [updatePhone, setUpdatePhone] = useState('');
     const [updateEmail, setUpdateEmail] = useState('');
+    const [profilePic, setProfilePic] = useState('');
+    const [file, setFile] = useState(null);
+    const [profilePicURL, setProfilePicURL] = useState('');
 
     // get user information with JWT token
    
@@ -61,8 +60,6 @@ export default function UserSettings(){
                 setUpdateFirstName(json.first_name);
                 setInitialLastName(json.last_name);
                 setUpdateLastName(json.last_name);
-                setInitialPhone(json.phone);
-                setUpdatePhone(json.phone);
                 setInitialEmail(json.email);
                 setUpdateEmail(json.email);
                 setInitialProfilePicture(json.profile_photo);
@@ -80,7 +77,6 @@ export default function UserSettings(){
 
     const [updateFirstNameHasBeenFocused, setUpdateFirstNameHasBeenFocused] = useState(false);
     const [updateLastNameHasBeenFocused, setUpdateLastNameHasBeenFocused] = useState(false);
-    const [updatePhoneHasBeenFocused, setUpdatePhoneHasBeenFocused] = useState(false);
     const [updateEmailHasBeenFocused, setUpdateEmailHasBeenFocused] = useState(false);
     // const [updatePasswordBeenFocused, setUpdatePasswordHasBeenFocused] = useState(false);
 
@@ -100,19 +96,41 @@ export default function UserSettings(){
     const updateQuery = async() => {    
         let updatedDetails: UpdateUserPersonalDetails = {};
 
-        if (updateFirstName === initialFirstName && updateLastName === initialLastName && initialProfilePicture == profilePicURL ) {
+        if (updateFirstName == initialFirstName && updateLastName == initialLastName) {
             return;
         }
         
-        if (updateFirstName !== initialFirstName){
+        if (updateFirstName != initialFirstName){
             updatedDetails.first_name = updateFirstName;
         }
 
-        if (updateLastName !==  initialLastName){
+        if (updateLastName !=  initialLastName){
             updatedDetails.last_name = updateLastName;
         }
 
-        if (profilePicURL !== initialProfilePicture){
+        console.log(updatedDetails);
+
+        let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user-management/update-user`, {
+            // credentials: "include",
+            method: "PATCH",
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + await getToken()
+            },
+            body: JSON.stringify(updatedDetails)
+        })
+        console.log(response)
+    };
+
+    const updateProfileUrl = async () => {
+        let updatedDetails: UpdateUserPersonalDetails = {};
+
+        if (initialProfilePicture == profilePicURL ) {
+            return;
+        }
+
+        if (profilePicURL != initialProfilePicture){
             updatedDetails.profile_photo = profilePicURL;
         }
 
@@ -155,35 +173,6 @@ export default function UserSettings(){
         console.log(response)
     };
 
-    const updatePhoneNumber = async() => {
-        let phoneNumber;
-        
-        if (updatePhone == initialPhone){
-            phoneNumber = initialPhone;
-        }
-        else {
-            phoneNumber = updatePhone;
-        }
-
-
-        let updatedDetails = {
-            phone: phoneNumber
-        };
-
-        console.log(updatedDetails);
-
-        let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user-management/update-user-phone`, {
-            method: "PATCH",
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ' + await getToken()
-            },
-            body: JSON.stringify(updatedDetails)
-        })
-        console.log(response)
-    };
-
     const validateEmail = (value: any) =>
         value.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$/i);
 
@@ -193,9 +182,7 @@ export default function UserSettings(){
         return validateEmail(updateEmail) ? false : true;
     }, [updateEmail]);
 
-    const [profilePic, setProfilePic] = useState('');
-    const [file, setFile] = useState(null);
-    const [profilePicURL, setProfilePicURL] = useState('');
+   
 
     useEffect(() => {
         if (file) {
@@ -227,11 +214,13 @@ export default function UserSettings(){
                 'Authorization': 'Bearer ' + await getToken()
                 },
                 body: formData
-            }).then((response) => {
-                console.log(response);
-                response.json().then((data) => {
-                    setProfilePicURL(data.publicUrl);
-                });
+            }).then(async (response) => {
+                // console.log((await response.json()).publicUrl);
+                setProfilePicURL((await response.json()).publicUrl);
+                // response.json().then((data) => {
+                //     console.log(data);
+                //     setProfilePicURL(data.publicUrl);
+                // });
             });
         }
     };
@@ -276,9 +265,9 @@ export default function UserSettings(){
                                 label="First Name"
                                 defaultValue={initialFirstName}
                                 variant="bordered"
-                                placeholder="First Name"
+                                placeholder={initialFirstName}
                                 onValueChange={setUpdateFirstName}
-                                onFocus={() => {setUpdateFirstNameHasBeenFocused(true);setUpdateLastNameHasBeenFocused(false);setUpdatePhoneHasBeenFocused(false)}}
+                                onFocus={() => {setUpdateFirstNameHasBeenFocused(true);setUpdateLastNameHasBeenFocused(false);}}
                                 isInvalid={isUpdateFirstNameInvalid && updateFirstNameHasBeenFocused}
                                 color={!updateFirstNameHasBeenFocused ? "primary" : isUpdateFirstNameInvalid ? "danger" : "success"}
                                 errorMessage="Please enter a first name"
@@ -290,48 +279,15 @@ export default function UserSettings(){
                                 label="Last Name"
                                 variant="bordered"
                                 defaultValue={initialLastName}
-                                placeholder="Last Name"
+                                placeholder={initialLastName}
                                 onValueChange={setUpdateLastName}
-                                onFocus={() => {setUpdateFirstNameHasBeenFocused(false);setUpdateLastNameHasBeenFocused(true);setUpdatePhoneHasBeenFocused(false)}}
+                                onFocus={() => {setUpdateFirstNameHasBeenFocused(false);setUpdateLastNameHasBeenFocused(true);}}
                                 isInvalid={isUpdateLastNameInvalid && updateLastNameHasBeenFocused}
                                 color={!updateLastNameHasBeenFocused ? "primary" : isUpdateLastNameInvalid ? "danger" : "success"}
                                 errorMessage="Please enter a last name"
                             />
                         </div>
                 </CardBody>
-                <CardHeader><div className="user-management-options">Contact Details</div></CardHeader>
-                <CardBody>
-                    <div className="infield">
-                        <PhoneInput
-                            international
-                            label="Phone Number"
-                            variant="bordered"
-                            inputComponent={Input}
-                            value={initialPhone}
-                            onValueChange={setUpdatePhone}
-                            onChange={(value) => setUpdatePhone(value as string)}
-                            withCountryCallingCode
-                            color={
-                            !updatePhoneHasBeenFocused
-                                ? 'primary'
-                                : updatePhone
-                                ? !isValidPhoneNumber(updatePhone)
-                                    ? 'danger'
-                                    : 'success'
-                                : 'danger'
-                            }
-                            onFocus={() => {
-                            setUpdatePhoneHasBeenFocused(true);
-                            }}
-                            isInvalid={
-                            (updatePhone ? !isValidPhoneNumber(updatePhone) : true) &&
-                            updatePhoneHasBeenFocused
-                            }
-                            errorMessage="Please enter a valid phone number"
-                        />
-                    </div>
-                </CardBody>
-
                 <CardHeader><div className="user-management-options">Email Address</div></CardHeader>
                 <CardBody>
                     <div className="infield">
@@ -365,8 +321,8 @@ export default function UserSettings(){
                             color="primary"  
                             onClick={() => {
                                 updateQuery();
-                                updatePhoneNumber();
                                 updateEmailFunction();
+                                updateProfileUrl();
                             }}
                         >
                             Update
@@ -375,7 +331,7 @@ export default function UserSettings(){
             </Card>
         </>);
 
-    }, [initialFirstName, initialLastName, initialEmail, initialPhone]);
+    }, [initialFirstName, initialLastName, initialEmail, profilePicURL]);
 
     return (
         <>{renderUserDetails()}</>

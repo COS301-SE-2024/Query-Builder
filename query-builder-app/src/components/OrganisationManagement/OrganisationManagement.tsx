@@ -8,7 +8,8 @@ import {DeleteIcon} from "./DeleteIcon";
 import { useParams } from 'next/navigation'
 import EditUserModal from "./EditUserModal";
 import {EditIcon} from "./EditIcon";
-
+import {CheckIcon} from "./CheckIcon";
+import { verify } from "crypto";
 
 interface UpdateOrganisation {
     org_id: string;
@@ -130,16 +131,16 @@ export default function OrganisationManagement(){
             org_id: orgServerID,
         };
 
-        if(updateOrgName === initialOrgName && profilePicURL === initialOrgLogo){
+        if(updateOrgName == initialOrgName && profilePicURL == initialOrgLogo){
             console.log("No Updates")
             return;
         }
         
-        if (updateOrgName !== initialOrgName){
+        if (updateOrgName != initialOrgName){
             updatedDetails.name = updateOrgName;   
         }
 
-        if (profilePicURL !== initialOrgLogo){
+        if (profilePicURL != initialOrgLogo){
             updatedDetails.logo = profilePicURL;
         }
         console.log(updatedDetails);
@@ -152,8 +153,8 @@ export default function OrganisationManagement(){
               'Authorization': 'Bearer ' + await getToken()
             },
             body: JSON.stringify(updatedDetails)
-        })
-        console.log(response)
+        });
+        console.log(response);
     };
 
     async function deleteUserFromOrg(userId: string){
@@ -182,6 +183,20 @@ export default function OrganisationManagement(){
       console.log(response);
     }
 
+    async function verifyUser(userId: string){
+      let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/add-member`, {
+          method: "POST",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + await getToken(),
+          },
+          body: JSON.stringify({ org_id: orgServerID, user_id: userId })
+      })
+      console.log(response);
+      getMembers();
+    }
+
     const renderCell = React.useCallback((user:any, columnKey:any) => {
         switch (columnKey) {
           case "name":
@@ -203,20 +218,35 @@ export default function OrganisationManagement(){
           case "actions":
             if (hasAdminPermission) {
               
-              if((user.user_role == "admin" || user.user_role == "member") && user.profiles.user_id !== loggedInUserID){
+              if((user.user_role == "admin" || user.user_role == "member") && user.profiles.user_id !== loggedInUserID ){
+                let editControls = (<>
+                      <Tooltip content="Edit user">
+                        <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                          <EditUserModal org_id={orgServerID} user_id={user.profiles.user_id} on_add={getMembers} />
+                        </span>
+                      </Tooltip>
+                      <Tooltip color="danger" content="Delete user">
+                        <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                          <DeleteIcon onClick={() => deleteUserFromOrg(user.profiles.user_id)}/>
+                        </span>
+                      </Tooltip>
+                      
+                    </>
+                  );
+
+                if(!user.verified){
+                  editControls = (<>  
+                  {editControls}
+                  <Tooltip color="success" content="Verify user">
+                    <span className="text-lg text-success cursor-pointer active:opacity-50">
+                      <CheckIcon onClick={() => verifyUser(user.profiles.user_id)}/>
+                    </span>
+                  </Tooltip>
+                </>);
+                }
                 return (
-                  
                   <div className="relative flex items-center gap-2">
-                    <Tooltip content="Edit user">
-                      <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                        <EditUserModal org_id={orgServerID} user_id={user.profiles.user_id} on_add={getMembers} />
-                      </span>
-                    </Tooltip>
-                    <Tooltip color="danger" content="Delete user">
-                      <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                        <DeleteIcon onClick={() => deleteUserFromOrg(user.profiles.user_id)}/>
-                      </span>
-                    </Tooltip>
+                    {editControls}
                   </div>
                 );
               }
@@ -227,7 +257,7 @@ export default function OrganisationManagement(){
           default:
             return user.profiles.phone;
         }
-      }, [hasAdminPermission]);
+      }, [hasAdminPermission, orgMembers]);
 
       const renderUpdatePage = React.useCallback(() => {
         console.log(loggedInUserRole);
@@ -387,7 +417,51 @@ export default function OrganisationManagement(){
           </>);
           }
         }
-      }, [loggedInUserRole, hasAdminPermission]);
+      }, [loggedInUserRole, hasAdminPermission, profilePicURL]);
+
+      async function copyHashCode() {
+        navigator.permissions.query({name: "notifications"}).then((result) => {
+          if (result.state == "granted" || result.state == "prompt") {
+            alert("Write access granted!");
+          }
+        });
+        try {
+          let hashCode;
+          let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/create-hash`, {
+            method: "POST",
+            headers: {
+                  'Authorization': 'Bearer ' + await getToken()
+                },
+                body: JSON.stringify({org_id: orgServerID})
+            });
+            console.log((await response.json()));
+            hashCode = (await response.json()).data;
+            try{
+              await navigator.clipboard.writeText(hashCode);
+              console.log('Content copied to clipboard');
+            } catch (err) {
+              console.error('Failed to copy: ', err);
+              
+            } 
+        } catch(fetchError){
+          console.error("Fetch error", fetchError);
+        }
+      }
+
+      const renderJoinOrgHash = React.useCallback(() => {
+        if(hasAdminPermission && (loggedInUserRole === 'admin' || loggedInUserRole === "owner")){
+          return(
+            <div className="m-auto mb-0 mt-0">
+              <Button 
+                color="primary"  
+                onClick={() => copyHashCode()}
+            >
+                Share Organisation Code
+            </Button>
+            </div>
+          );
+        }
+      },[hasAdminPermission]);
 
       const columns = [
         {name: "NAME", uid: "name"},
@@ -429,11 +503,9 @@ export default function OrganisationManagement(){
                     'Authorization': 'Bearer ' + await getToken()
                     },
                     body: formData
-                }).then((response) => {
+                }).then(async (response) => {
                     console.log(response);
-                    response.json().then((data) => {
-                        setProfilePicURL(data.publicUrl);
-                    });
+                    setProfilePicURL((await response.json()).publicUrl);
                 });
             }
         };
@@ -442,7 +514,8 @@ export default function OrganisationManagement(){
         <>
             <div className="flex w-full flex-col">
                 <Spacer y={2}/>
-                <div className="organisationHeader m-auto mt-0 mb-0 md:ml-10 flex flex-col md:flex-row justify-center content-center md:justify-start">
+                <div className="flex w-full flex-col">
+                <div className="organisationHeader m-auto mt-0 mb-0 flex flex-col justify-center content-center ">
                     <Image
                       className="orgLogo md:rounded-1"
                       width={200}
@@ -451,12 +524,14 @@ export default function OrganisationManagement(){
                       src={profilePicURL}
                     />
                     <Spacer y={2}/>
-                    <span className="m-auto md:ml-10 justify-center content-center text-2xl ">{updateOrgName}</span>
+                    <span className="m-auto justify-center content-center text-2xl ">{updateOrgName}</span>
                 </div>
                 <Spacer y={2}/>
-
-                <Tabs aria-label="Options" className="m-auto mb-0 mt-0 md:m-0 md:ml-1">
-                    <Tab key="orgInfo" title="Organisation Information">
+                    {renderJoinOrgHash()}
+                <Spacer y={2}/>
+                </div>
+                <Tabs aria-label="Options" className="m-auto mb-0 mt-0">
+                    <Tab key="orgInfo" aria-label="orgInfo" title="Organisation Information">
                     <Card>
                         <CardHeader>
                             Organisation Settings
@@ -468,27 +543,30 @@ export default function OrganisationManagement(){
                         </CardBody>
                     </Card>  
                     </Tab>
-                    <Tab key="orgMembers" title="Members">
+                    <Tab key="orgMembers" aria-label="orgMembers" title="Members">
                     <Card>
                         <CardBody>
-                            <Table aria-label="Example table with custom cells">
-                                <TableHeader columns={columns}>
-                                    {(column) => (
-                                    <TableColumn key={column.uid}>
-                                        {column.name}
-                                    </TableColumn>
-                                    )}
-                                </TableHeader>
-                                <TableBody items={orgMembers}>
-                                    {(item:any) => (
-                                    <TableRow key={item.profiles.user_id} >
-                                        {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
-                                    </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>  
+
+                        <Table aria-label="Organisation Members Table">
+                          <TableHeader columns={columns}>
+                              {(column) => (
+                              <TableColumn key={column.uid}>
+                                  {column.name}
+                              </TableColumn>
+                              )}
+                          </TableHeader>
+                          <TableBody items={orgMembers}>
+                              {(item:any) => (
+                              <TableRow key={item.profiles.user_id} >
+                                  {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
+                              </TableRow>
+                              )}
+                          </TableBody>
+                        </Table> 
+
                         </CardBody>
-                    </Card>  
+
+                    </Card> 
                     </Tab>
                     <Tab key="orgDatabases" title="Databases">
                     <Card>

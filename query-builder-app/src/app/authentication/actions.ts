@@ -25,14 +25,12 @@ export async function signup(
     firstName: string,
     lastName: string,
     email: string,
-    phone: string,
     password: string,
 ) {
     const supabase = createClient();
 
     const data = {
         email: email,
-        phone: phone,
         password: password,
         options: {
             data: {
