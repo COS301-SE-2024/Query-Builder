@@ -389,6 +389,50 @@ export default function OrganisationManagement(){
         }
       }, [loggedInUserRole, hasAdminPermission, profilePicURL]);
 
+      async function copyHashCode() {
+        navigator.permissions.query({name: "notifications"}).then((result) => {
+          if (result.state == "granted" || result.state == "prompt") {
+            alert("Write access granted!");
+          }
+        });
+        try {
+          let hashCode;
+          let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/create-hash`, {
+            method: "POST",
+            headers: {
+                  'Authorization': 'Bearer ' + await getToken()
+                },
+                body: JSON.stringify({org_id: orgServerID})
+            });
+            console.log((await response.json()));
+            hashCode = (await response.json()).data;
+            try{
+              await navigator.clipboard.writeText(hashCode);
+              console.log('Content copied to clipboard');
+            } catch (err) {
+              console.error('Failed to copy: ', err);
+              
+            } 
+        } catch(fetchError){
+          console.error("Fetch error", fetchError);
+        }
+      }
+
+      const renderJoinOrgHash = React.useCallback(() => {
+        if(hasAdminPermission && (loggedInUserRole === 'admin' || loggedInUserRole === "owner")){
+          return(
+            <div className="m-auto mb-0 mt-0">
+              <Button 
+                color="primary"  
+                onClick={() => copyHashCode()}
+            >
+                Share Organisation Code
+            </Button>
+            </div>
+          );
+        }
+      },[hasAdminPermission]);
+
       const columns = [
         {name: "NAME", uid: "name"},
         {name: "ROLE", uid: "role"},
@@ -440,7 +484,8 @@ export default function OrganisationManagement(){
         <>
             <div className="flex w-full flex-col">
                 <Spacer y={2}/>
-                <div className="organisationHeader m-auto mt-0 mb-0 md:ml-10 flex flex-col md:flex-row justify-center content-center md:justify-start">
+                <div className="flex w-full flex-col">
+                <div className="organisationHeader m-auto mt-0 mb-0 flex flex-col justify-center content-center ">
                     <Image
                       className="orgLogo md:rounded-1"
                       width={200}
@@ -449,11 +494,13 @@ export default function OrganisationManagement(){
                       src={profilePicURL}
                     />
                     <Spacer y={2}/>
-                    <span className="m-auto md:ml-10 justify-center content-center text-2xl ">{updateOrgName}</span>
+                    <span className="m-auto justify-center content-center text-2xl ">{updateOrgName}</span>
                 </div>
                 <Spacer y={2}/>
-
-                <Tabs aria-label="Options" className="m-auto mb-0 mt-0 md:m-0 md:ml-1">
+                    {renderJoinOrgHash()}
+                <Spacer y={2}/>
+                </div>
+                <Tabs aria-label="Options" className="m-auto mb-0 mt-0">
                     <Tab key="orgInfo" aria-label="orgInfo" title="Organisation Information">
                     <Card>
                         <CardHeader>
