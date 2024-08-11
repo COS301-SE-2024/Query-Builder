@@ -5,14 +5,13 @@ import {
   NotFoundException,
   Session,
 } from '@nestjs/common';
-import { createCipheriv, randomBytes, scrypt } from 'crypto';
+import { scrypt } from 'crypto';
 import { promisify } from 'util';
 import { Get_User_Dto } from './dto/get-user.dto';
 import { Supabase } from '../supabase';
 import { Create_User_Dto } from './dto/create-user.dto';
 import { Sign_In_User_Dto } from './dto/sign-in-user.dto';
 import { Update_User_Dto } from './dto/update-user.dto';
-import { Express } from 'express';
 
 @Injectable()
 export class UserManagementService {

@@ -3,59 +3,62 @@ import { Natural_Language_Query_Dto } from './dto/natural-language-query.dto';
 import { ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
 import { GenerativeModel, GoogleGenerativeAI } from '@google/generative-ai';
-import { Query } from "../interfaces/intermediateJSON"
+import { Query } from '../interfaces/intermediateJSON';
 import { DbMetadataHandlerService } from '../db-metadata-handler/db-metadata-handler.service';
 
 @Injectable()
 export class NaturalLanguageService {
+  private openAiService: OpenAI;
+  private geminiModel: GenerativeModel;
 
-    private openAiService: OpenAI;
-    private geminiModel: GenerativeModel
+  constructor(
+    private readonly dbMetadataHandlerService: DbMetadataHandlerService,
+    private configService: ConfigService
+  ) {
+    // Inject the OpenAIApi instance
+    // Initialize OpenAIApi with the provided API key from the environment
+    this.openAiService = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY
+    });
 
-    constructor(private readonly dbMetadataHandlerService: DbMetadataHandlerService, private configService: ConfigService){
+    //Initialise the Gemini instance
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    this.geminiModel = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  }
 
-        // Inject the OpenAIApi instance
-        // Initialize OpenAIApi with the provided API key from the environment
-        this.openAiService = new OpenAI({
-            apiKey: process.env.OPENAI_API_KEY,
-        });
+  async query(
+    naturalLanguageQuery: Natural_Language_Query_Dto,
+    session: Record<string, any>
+  ) {
+    if (naturalLanguageQuery.llm === 'openAI') {
+      const openAiResponse = this.openAiService.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [{ role: 'user', content: naturalLanguageQuery.query }]
+      });
 
-        //Initialise the Gemini instance
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        this.geminiModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
+      return openAiResponse;
 
-    }
+      //--------------------Send the JSON intermediate form to the QueryHandler--------------------//
+    } else {
+      //-----------Fetch DB metadata to inform the LLM of the database server's structure-----------//
+      const metadataSummary =
+        await this.dbMetadataHandlerService.getSchemaSummary(
+          { databaseServerID: naturalLanguageQuery.databaseServerID },
+          session
+        );
+      const metadataSummaryString = JSON.stringify(metadataSummary);
 
-    async query(naturalLanguageQuery: Natural_Language_Query_Dto, session: Record<string, any>){
+      //-------------------------------Create the prompt for the LLM-------------------------------//
 
-        if(naturalLanguageQuery.llm === "openAI"){
-            
-            const openAiResponse = this.openAiService.chat.completions.create({
-                model: "gpt-4o-mini",
-                messages: [
-                    {role: "user", content: naturalLanguageQuery.query}
-                ]
-            });
-    
-            return openAiResponse;
+      let prompt: string =
+        'Given the following QueryParams interface, write a QueryParams object for the natural language query ' +
+        naturalLanguageQuery.query +
+        '\n\n';
 
-            //--------------------Send the JSON intermediate form to the QueryHandler--------------------//
+      prompt +=
+        'Return only the object not in a code block without any comments or other text. Language should be sql and query type should be select \n\n';
 
-        }
-        else{
-
-            //-----------Fetch DB metadata to inform the LLM of the database server's structure-----------//
-
-            const metadataSummary = await this.dbMetadataHandlerService.getSchemaSummary({databaseServerID: naturalLanguageQuery.databaseServerID}, session);
-            const metadataSummaryString = JSON.stringify(metadataSummary);
-
-            //-------------------------------Create the prompt for the LLM-------------------------------//
-
-            let prompt: string = "Given the following QueryParams interface, write a QueryParams object for the natural language query " + naturalLanguageQuery.query + "\n\n";
-
-            prompt += "Return only the object not in a code block without any comments or other text. Language should be sql and query type should be select \n\n";
-
-            prompt += `export interface QueryParams {
+      prompt += `export interface QueryParams {
                             language: string,
                             query_type: string,
                             databaseName: string,
@@ -136,33 +139,35 @@ export class NaturalLanguageService {
                             IS_NOT = "IS NOT"
                         }`;
 
-            prompt += "\n\n The database structure is as follows: " + metadataSummaryString;
+      prompt +=
+        '\n\n The database structure is as follows: ' + metadataSummaryString;
 
-            //--------------------Get the JSON intermediate form result from the LLM---------------------//
+      //--------------------Get the JSON intermediate form result from the LLM---------------------//
 
-            const result = await this.geminiModel.generateContent(prompt);
+      const result = await this.geminiModel.generateContent(prompt);
 
-            const response = await result.response;
-            const textResponse = response.text();
+      const response = await result.response;
+      const textResponse = response.text();
 
-            console.log(textResponse);
+      // console.log(textResponse);
 
-            //-------------------Do some potential cleanup of the text response--------------------------//
-            const cleanedTextResponse = textResponse.replaceAll(/(: |:)undefined/g, ": null");
-            console.log(cleanedTextResponse);
+      //-------------------Do some potential cleanup of the text response--------------------------//
+      const cleanedTextResponse = textResponse.replaceAll(
+        /(: |:)undefined/g,
+        ': null'
+      );
+      // console.log(cleanedTextResponse);
 
-            const jsonResponse = JSON.parse(cleanedTextResponse);
+      const jsonResponse = JSON.parse(cleanedTextResponse);
 
-            //--------------------Send the JSON intermediate form to the QueryHandler--------------------//
+      //--------------------Send the JSON intermediate form to the QueryHandler--------------------//
 
-            const query: Query = {
-                databaseServerID: naturalLanguageQuery.databaseServerID,
-                queryParams: jsonResponse
-            }
+      const query: Query = {
+        databaseServerID: naturalLanguageQuery.databaseServerID,
+        queryParams: jsonResponse
+      };
 
-            return query;
-
-        }
+      return query;
     }
-
+  }
 }
