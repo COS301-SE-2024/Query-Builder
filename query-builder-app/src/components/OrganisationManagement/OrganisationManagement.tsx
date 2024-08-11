@@ -184,8 +184,8 @@ export default function OrganisationManagement(){
     }
 
     async function verifyUser(userId: string){
-      let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/verify-member`, {
-          method: "PATCH",
+      let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/add-member`, {
+          method: "POST",
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
@@ -194,6 +194,7 @@ export default function OrganisationManagement(){
           body: JSON.stringify({ org_id: orgServerID, user_id: userId })
       })
       console.log(response);
+      getMembers();
     }
 
     const renderCell = React.useCallback((user:any, columnKey:any) => {
