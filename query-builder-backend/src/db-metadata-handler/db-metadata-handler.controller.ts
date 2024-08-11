@@ -47,4 +47,8 @@ export class DbMetadataHandlerController {
         return this.dbMetadataHandlerService.getForeignKeyMetadata(foreignKeyQuery, session);
     }
 
+    @Put("summary")
+    async getSchemaSummary(@Body() schemaQuery: SchemaQuery, @Session() session: Record<string, any>){
+        return this.dbMetadataHandlerService.getSchemaSummary(schemaQuery, session);
+    }
 }

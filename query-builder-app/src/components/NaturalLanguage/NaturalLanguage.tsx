@@ -1,22 +1,57 @@
-import React from "react";
+import React, { useState } from "react";
 import { Textarea, Button, ButtonGroup, useDisclosure, Modal, ModalContent, ModalHeader, Card, CardHeader, CardBody, CardFooter } from "@nextui-org/react";
 import TableResponse from "../TableResponse/TableResponse";
+import { useParams } from "next/navigation";
+import { createClient } from "./../../utils/supabase/client";
+import { Query } from "@/interfaces/intermediateJSON";
 
 export default function NaturalLanguage() {
-    const [value, setValue] = React.useState("");
-    const [loading, setLoading] = React.useState(false);
+    const [value, setValue] = useState("");
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
-    const [query, setQuery] = React.useState("");
+    const [queryLoaded, setQueryLoaded] = useState(false);
+    const [query, setQuery] = useState<Query>();
+    const [loading, setLoading] = useState(false);
 
-    const handleSubmit = () => {
+    // This function gets the token from local storage.
+    // Supabase stores the token in local storage so we can access it from there.
+    const getToken = async () => {
+
+        const supabase = createClient();
+        const token = (await supabase.auth.getSession()).data.session?.access_token
+    
+        console.log(token)
+    
+        return token;
+    };
+
+    //React hook for URL params
+    const {databaseServerID} = useParams<{databaseServerID: string}>();
+
+    async function getQuery(){
+
         setLoading(true);
-        //Here we will do chatGPT stuff
-        //give value to chatGPT
 
+        let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/natural-language/query`, {
+            credentials: "include",
+            method: "POST",
+            headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + await getToken()
+            },
+            body: JSON.stringify({
+                databaseServerID: databaseServerID[0],
+                query: value
+            })
+        });
 
+        let query = await response.json();
+        console.log(query);
 
-        //get query from chatGPT
-        { onOpen }
+        setLoading(false);
+        setQuery(query);
+        setQueryLoaded(true);
+
     };
 
     return (
@@ -35,12 +70,15 @@ export default function NaturalLanguage() {
                 isDisabled={value.length <= 1}
                 isLoading={loading}
                 color="primary"
-                onClick={handleSubmit}
+                onPress={()=>{
+                    getQuery();
+                    onOpen();
+                }} 
             >
                 Query
             </Button>
             <Modal
-                isOpen={isOpen}
+                isOpen={isOpen && queryLoaded}
                 onOpenChange={onOpenChange}
                 placement="top-center"
                 className="text-black h-100vh"
@@ -49,7 +87,7 @@ export default function NaturalLanguage() {
                     {(onClose: any) => (
                         <>
                             <ModalHeader className="flex flex-col gap-1">Query Results</ModalHeader>
-                            {/* <TableResponse query={query} /> */}
+                            <TableResponse query={query!} />
                         </>
                     )}
                 </ModalContent>

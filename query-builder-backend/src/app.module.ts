@@ -14,6 +14,7 @@ import { QueryHandlerModule } from './query-handler/query-handler.module';
 import { DbMetadataHandlerModule } from './db-metadata-handler/db-metadata-handler.module';
 import { QueryManagementModule } from './query-management/query-management.module';
 import { SessionStoreModule } from './session-store/session-store.module';
+import { NaturalLanguageModule } from './natural-language/natural-language.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { SessionStoreModule } from './session-store/session-store.module';
     DbMetadataHandlerModule,
     QueryManagementModule,
     SessionStoreModule,
+    NaturalLanguageModule,
   ],
   controllers: [AppController],
   providers: [AppService]})
