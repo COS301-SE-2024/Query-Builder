@@ -67,8 +67,11 @@ The system should maintain a certain performance standard. Users will not want t
 QBee needs to be reliable since its target market will largely consist of executives and managers that need easy and continual access to their company data. If a report is needed and the system is down the user will be unable to query their database for information. Observability tools will allows for continuous monitoring of the system to detect failures. The system should not fluctuate in terms of its performance and responses when identical queries are performed.
 
 **Quantification:** We will ensure that the system is reliable by making sure that it:
-
 - Has at least **99.5% uptime**
+- Has a Mean Time Between Failures (MTBF) of at least **1 month**.
+- Has a Mean Time To Repair (MTTR) of at most **3 hours**.
+- Error rates are kept below **0.5%**.
+- Error recovery time is kept below **2 second**.
 
 ## Additional Quality Requirements
 
