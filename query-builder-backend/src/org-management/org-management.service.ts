@@ -158,7 +158,7 @@ export class OrgManagementService {
     const { data, error } = await this.supabase
       .getClient()
       .from('org_members')
-      .select('org_id, user_role, role_permissions, profiles(*)')
+      .select('org_id, user_role, role_permissions, verified, profiles(*)')
       .match({ ...get_members_dto });
 
     if (error) {

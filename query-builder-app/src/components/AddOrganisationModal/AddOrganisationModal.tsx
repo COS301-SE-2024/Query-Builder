@@ -30,12 +30,20 @@ export default function AddOrganisationModal(props: AddOrganisationModalProps){
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
     const [orgName, setOrgName] = useState('');
     const [orgNameBeenFocused, setOrgNameHasBeenFocused] = useState(false);
+    const [orgHash, setOrgHash] = useState('');
+    const [orgHashBeenFocused, setOrgHashHasBeenFocused] = useState(false);
 
     const isOrgNameInvalid = React.useMemo(() => {
       if (orgName === "") return true;
   
       return false;
     }, [orgName]);
+
+    const isOrgHashInvalid = React.useMemo(() => {
+      if (orgHash === "") return true;
+  
+      return false;
+    }, [orgHash]);
 
     async function addOrganisation(name: String){
 
@@ -56,6 +64,30 @@ export default function AddOrganisationModal(props: AddOrganisationModalProps){
       let json = await response.json();
 
       console.log("CREATE ORG RESPONSE " + JSON.stringify(json));
+
+      props.on_add();
+
+    }
+
+    async function joinOrganisation(hashCode: String){
+
+      //call the create-org API endpoint
+      let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/join-org`, {
+        credentials: "include",
+        method: "POST",
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + await getToken()
+        },
+        body: JSON.stringify({
+            hash: hashCode,
+        })
+      })
+
+      let json = await response.json();
+
+      console.log("JOIN ORG RESPONSE " + JSON.stringify(json));
 
       props.on_add();
 
@@ -82,7 +114,7 @@ export default function AddOrganisationModal(props: AddOrganisationModalProps){
                     placeholder="Enter a name for your organisation"
                     variant="bordered"
                     onValueChange={setOrgName}
-                    onFocus={() => setOrgNameHasBeenFocused(true)}
+                    onFocus={() => {setOrgNameHasBeenFocused(true); setOrgHashHasBeenFocused(false);}}
                     isInvalid={isOrgNameInvalid && orgNameBeenFocused}
                     color={orgNameBeenFocused ? "primary" : isOrgNameInvalid ? "danger" : "success"}
                     errorMessage="Please enter a name for your organisation"
@@ -96,6 +128,31 @@ export default function AddOrganisationModal(props: AddOrganisationModalProps){
                     isDisabled={isOrgNameInvalid}
                     >
                     Add
+                  </Button>
+                </ModalFooter>
+
+                <ModalHeader className="flex flex-col gap-1">Join an existing organisation</ModalHeader>
+                <ModalBody>
+                  <Input
+                    isRequired
+                    label="Organisation Hash Code"
+                    placeholder="Enter a hash code for the organisation you want to join"
+                    variant="bordered"
+                    onValueChange={setOrgHash}
+                    onFocus={() => {setOrgNameHasBeenFocused(false); setOrgHashHasBeenFocused(true);}}
+                    isInvalid={isOrgHashInvalid && orgHashBeenFocused}
+                    color={orgHashBeenFocused ? "primary" : isOrgHashInvalid ? "danger" : "success"}
+                    errorMessage="Please enter a name for your organisation"
+                  />
+                </ModalBody>
+                <ModalFooter>
+                  <Button 
+                    color="primary" 
+                    onPress={onClose}  
+                    onClick={() => joinOrganisation(orgHash)}
+                    isDisabled={isOrgHashInvalid}
+                    >
+                    Join
                   </Button>
                 </ModalFooter>
               </>

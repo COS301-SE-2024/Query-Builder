@@ -5,12 +5,6 @@ import React, { useState, useEffect } from 'react';
 import { Button, Card, CardBody, Input, input } from '@nextui-org/react';
 import { EyeFilledIcon } from './EyeFilledIcon';
 import { EyeSlashFilledIcon } from './EyeSlashFilledIcon';
-import PhoneInput, {
-  formatPhoneNumber,
-  formatPhoneNumberIntl,
-  isValidPhoneNumber,
-} from 'react-phone-number-input';
-import 'react-phone-number-input/style.css';
 import {login, signup} from '../../app/authentication/actions'
 
 export default function Authentication() {
@@ -47,15 +41,12 @@ export default function Authentication() {
   const [signUpFirstName, setSignUpFirstName] = useState('');
   const [signUpLastName, setSignUpLastName] = useState('');
   const [signUpEmail, setSignUpEmail] = useState('');
-  const [signUpPhone, setSignUpPhone] = useState('');
   const [signUpPassword, setSignUpPassword] = useState('');
   const [signUpFirstNameHasBeenFocused, setSignUpFirstNameHasBeenFocused] =
     useState(false);
   const [signUpLastNameHasBeenFocused, setSignUpLastNameHasBeenFocused] =
     useState(false);
   const [signUpEmailHasBeenFocused, setSignUpEmailHasBeenFocused] =
-    useState(false);
-  const [signUpPhoneHasBeenFocused, setSignUpPhoneHasBeenFocused] =
     useState(false);
   const [signUpPasswordBeenFocused, setSignUpPasswordHasBeenFocused] =
     useState(false);
@@ -119,57 +110,16 @@ export default function Authentication() {
     let responseData = await response.json();
     
     login(email, password);
-    
-      // try {
-      // const { data, error } = await supabase.auth.signInWithPassword({
-      //   email: email,
-      //   password: password,
-      // });
-
-      // if (error) {
-      //   throw error;
-      // }
-
-      // add cookie here
-      // console.log(session);
-      //   } catch (error) {
-      //     console.log(error);
-      //   }
       };
 
   const signUpUser = async (
     firstName: string,
     lastName: string,
     email: string,
-    phone: string,
     password: string,
   ) => {
 
-    signup(firstName, lastName, email, phone, password);
-
-    // try {
-    //   const { data, error } = await supabase.auth.signUp({
-    //     email: email,
-    //     phone: phone,
-    //     password: password,
-    //     options: {
-    //       data: {
-    //         first_name: firstName,
-    //         last_name: lastName,
-    //       },
-    //       channel: 'sms',
-    //     },
-    //   });
-
-    //   if (error) {
-    //     throw error;
-    //   }
-      // console.log(data);
-      // add cookie here
-      // console.log(session);
-    // } catch (error) {
-    //   console.log(error);
-    // }
+    signup(firstName, lastName, email, password);
   };
 
   return (
@@ -198,7 +148,6 @@ export default function Authentication() {
                       setSignUpLastNameHasBeenFocused(false);
                       setLoginPasswordHasBeenFocused(false);
                       setLoginEmailHasBeenFocused(false);
-                      setSignUpPhoneHasBeenFocused(false);
                     }}
                     isInvalid={
                       isSignUpFirstNameInvalid && signUpFirstNameHasBeenFocused
@@ -226,7 +175,6 @@ export default function Authentication() {
                       setSignUpLastNameHasBeenFocused(true);
                       setLoginPasswordHasBeenFocused(false);
                       setLoginEmailHasBeenFocused(false);
-                      setSignUpPhoneHasBeenFocused(false);
                     }}
                     isInvalid={
                       isSignUpLastNameInvalid && signUpLastNameHasBeenFocused
@@ -255,7 +203,6 @@ export default function Authentication() {
                       setSignUpLastNameHasBeenFocused(false);
                       setLoginPasswordHasBeenFocused(false);
                       setLoginEmailHasBeenFocused(false);
-                      setSignUpPhoneHasBeenFocused(false);
                     }}
                     isInvalid={
                       isSignUpEmailInvalid && signUpEmailHasBeenFocused
@@ -271,41 +218,6 @@ export default function Authentication() {
                   />
                 </div>
                 <div className="infield">
-                  <PhoneInput
-                    international
-                    label="Phone Number"
-                    variant="bordered"
-                    inputComponent={Input}
-                    value={signUpPhone}
-                    onValueChange={setSignUpPhone}
-                    onChange={(value) => setSignUpPhone(value as string)}
-                    withCountryCallingCode
-                    color={
-                      !signUpPhoneHasBeenFocused
-                        ? 'primary'
-                        : signUpPhone
-                          ? !isValidPhoneNumber(signUpPhone)
-                            ? 'danger'
-                            : 'success'
-                          : 'danger'
-                    }
-                    onFocus={() => {
-                      setSignUpPasswordHasBeenFocused(false);
-                      setSignUpEmailHasBeenFocused(false);
-                      setSignUpFirstNameHasBeenFocused(false);
-                      setSignUpLastNameHasBeenFocused(false);
-                      setLoginPasswordHasBeenFocused(false);
-                      setLoginEmailHasBeenFocused(false);
-                      setSignUpPhoneHasBeenFocused(true);
-                    }}
-                    isInvalid={
-                      (signUpPhone ? !isValidPhoneNumber(signUpPhone) : true) &&
-                      signUpPhoneHasBeenFocused
-                    }
-                    errorMessage="Please enter a valid phone number"
-                  />
-                </div>
-                <div className="infield">
                   <Input
                     isRequired
                     label="Password"
@@ -318,7 +230,6 @@ export default function Authentication() {
                       setSignUpLastNameHasBeenFocused(false);
                       setLoginPasswordHasBeenFocused(false);
                       setLoginEmailHasBeenFocused(false);
-                      setSignUpPhoneHasBeenFocused(false);
                     }}
                     isInvalid={
                       isSignUpPasswordInvalid && signUpPasswordBeenFocused
@@ -354,7 +265,6 @@ export default function Authentication() {
                       signUpFirstName,
                       signUpLastName,
                       signUpEmail,
-                      signUpPhone,
                       signUpPassword,
                     );
                     
@@ -388,7 +298,6 @@ export default function Authentication() {
                       setSignUpEmailHasBeenFocused(false);
                       setSignUpFirstNameHasBeenFocused(false);
                       setSignUpLastNameHasBeenFocused(false);
-                      setSignUpPhoneHasBeenFocused(false);
                     }}
                     isInvalid={isLoginEmailInvalid && loginEmailHasBeenFocused}
                     color={
@@ -414,7 +323,6 @@ export default function Authentication() {
                       setSignUpEmailHasBeenFocused(false);
                       setSignUpFirstNameHasBeenFocused(false);
                       setSignUpLastNameHasBeenFocused(false);
-                      setSignUpPhoneHasBeenFocused(false);
                     }}
                     isInvalid={
                       isLoginPasswordInvalid && loginPasswordBeenFocused

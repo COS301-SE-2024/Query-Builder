@@ -8,7 +8,8 @@ import {DeleteIcon} from "./DeleteIcon";
 import { useParams } from 'next/navigation'
 import EditUserModal from "./EditUserModal";
 import {EditIcon} from "./EditIcon";
-
+import {CheckIcon} from "./CheckIcon";
+import { verify } from "crypto";
 
 interface UpdateOrganisation {
     org_id: string;
@@ -182,6 +183,19 @@ export default function OrganisationManagement(){
       console.log(response);
     }
 
+    async function verifyUser(userId: string){
+      let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/verify-member`, {
+          method: "PATCH",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + await getToken(),
+          },
+          body: JSON.stringify({ org_id: orgServerID, user_id: userId })
+      })
+      console.log(response);
+    }
+
     const renderCell = React.useCallback((user:any, columnKey:any) => {
         switch (columnKey) {
           case "name":
@@ -203,20 +217,35 @@ export default function OrganisationManagement(){
           case "actions":
             if (hasAdminPermission) {
               
-              if((user.user_role == "admin" || user.user_role == "member") && user.profiles.user_id !== loggedInUserID){
+              if((user.user_role == "admin" || user.user_role == "member") && user.profiles.user_id !== loggedInUserID ){
+                let editControls = (<>
+                      <Tooltip content="Edit user">
+                        <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                          <EditUserModal org_id={orgServerID} user_id={user.profiles.user_id} on_add={getMembers} />
+                        </span>
+                      </Tooltip>
+                      <Tooltip color="danger" content="Delete user">
+                        <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                          <DeleteIcon onClick={() => deleteUserFromOrg(user.profiles.user_id)}/>
+                        </span>
+                      </Tooltip>
+                      
+                    </>
+                  );
+
+                if(!user.verified){
+                  editControls = (<>  
+                  {editControls}
+                  <Tooltip color="success" content="Verify user">
+                    <span className="text-lg text-success cursor-pointer active:opacity-50">
+                      <CheckIcon onClick={() => verifyUser(user.profiles.user_id)}/>
+                    </span>
+                  </Tooltip>
+                </>);
+                }
                 return (
-                  
                   <div className="relative flex items-center gap-2">
-                    <Tooltip content="Edit user">
-                      <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                        <EditUserModal org_id={orgServerID} user_id={user.profiles.user_id} on_add={getMembers} />
-                      </span>
-                    </Tooltip>
-                    <Tooltip color="danger" content="Delete user">
-                      <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                        <DeleteIcon onClick={() => deleteUserFromOrg(user.profiles.user_id)}/>
-                      </span>
-                    </Tooltip>
+                    {editControls}
                   </div>
                 );
               }
