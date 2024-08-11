@@ -970,7 +970,7 @@ export class OrgManagementService {
 
     if (!org_data[0].role_permissions.update_dbs) {
       throw new UnauthorizedException(
-        'You do not have permission to update dbs'
+        'You do not have permission to update databases'
       );
     }
 
