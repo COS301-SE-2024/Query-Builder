@@ -43,20 +43,26 @@ Architectural Patterns are well-known compositions of architectural elements whi
 
 ## Selected Architectural Patterns for QBee
 
-### Model-View-Controller (MVC)
-
-*The Model-View-Controller architectural pattern allows for the separation of software business logic from the user interface. A user uses the **controller** to manipulate the **model**, which is an internal representation of the software's information. The **model** then updates the **view**, which is the user interface that the user sees and which displays the information to the user.*
-
-This is an ideal pattern to design QBee's frontend interface. For example, QBee's input classes are **controllers** which can be used by the user to manipulate QBee's 'intermediate form' of query representation, which represents a **model** of query information. This **model** then updates the **views** that the user sees, which include the *other* inputs, and query results and reports.
-
 ### Layered
 
 *The layered architectural pattern arranges a software system into distinct layers, with each layer responsible for its own functionality. This ensures separation of concerns and modularisation of code*
 
-This is an ideal pattern to structure QBee's entire stack of technologies. Our presentation layer consists of our frontend progressive web app (PWA), whilst our business logic layer consists of our API and server-side application. In between those two layers we have a security layer to handle data and user validation. Lastly, QBee will effectively make use of two persistence layers - our own data store to store user data and queries, as well as the data stores that can be connected by users to the app for querying.
+This is an ideal pattern to structure QBee's entire stack of technologies. Our presentation layer consists of our frontend progressive web app (PWA), whilst our business logic layer consists of our API and server-side application. In between those two layers we have a security layer to handle data and user validation. Lastly, QBee has a database layer with both our own data store to store user data and queries, as well as the data stores that can be connected by users to the app for querying.
+
+### Flux
+
+*The Flux architectural pattern is a pattern used for building user interfaces which emphasises unidirectional data flow in the frontend of an application. Flux enforces a unidirectional flow of data, usually in a cycle that consists of **actions**, **dispatchers**, **stores**, and **views**. This one-way flow ensures predictability and simplifies the tracking of changes through the application.*
+
+This is an ideal pattern to design QBee's frontend interface. For example, QBee's input classes are used by users to perform **actions** on their data. **Dispatchers** then send a JSON representation of this data to the backend, and the frontend also includes a **store** to cache query results. Lastly, QBee's table and report showing query results are **views** of a user's data.
+
+### Pipe-and-filter
+
+*Pipe-and-filter is an architectural pattern which has independent entities called filters (components) which perform transformations on data and process the input they receive, and pipes, which serve as connectors for the stream of data being transformed, each connected to the next component in the pipeline.*
+
+This security-centric architectural pattern is ideal for QBee's API, since we can pass incoming data to the API through a number of filters that ensure that this data will not compromise our backend. These filters include validators of both data types as well as validators that provide user validation.
 
 ### Service-oriented
 
-*The microservices architectural pattern arranges a software system as a loosely-coupled collection of granular services, allowing for high scalability and maintainability*
+*Service-oriented Architecture is an architectural style that focuses on discrete services instead of a monolithic design.*
 
-This is an ideal pattern to design QBee's various services, such as querying, reporting and user management. They can run as separate "micro-apps" communicating through lightweight interfaces.
+This is an ideal pattern to design QBee's various services that it provides to its frontend. For example, querying, providing database metadata, and managing organisations can be modularised into distinct services for improved interoperability and scalability.
