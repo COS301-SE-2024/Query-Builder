@@ -437,7 +437,7 @@ export default function OrganisationManagement(){
                 body: JSON.stringify({org_id: orgServerID})
             });
             // console.log((await response.json()));
-            hashCode = (await response.json()).data[0];
+            hashCode = (await response.json()).data[0].hash;
             try{
               await navigator.clipboard.writeText(hashCode);
               console.log('Content copied to clipboard');
@@ -533,7 +533,7 @@ export default function OrganisationManagement(){
                 <Spacer y={2}/>
                 </div>
                 <Tabs aria-label="Options" className="m-auto mb-0 mt-0">
-                    <Tab key="orgInfo" aria-label="orgInfo" title="Organisation Information">
+                    <Tab key="orgInfo" aria-label="orgInfo" title="Information">
                     <Card>
                         <CardHeader>
                             Organisation Settings
