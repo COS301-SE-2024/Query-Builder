@@ -984,7 +984,7 @@ export class OrgManagementService {
     const { data: db_data, error: db_error } = await this.supabase
       .getClient()
       .from('db_envs')
-      .update({ ...update_db_dto })
+      .update({ ...db_fields})
       .match({ db_id: update_db_dto.db_id })
       .select();
 
