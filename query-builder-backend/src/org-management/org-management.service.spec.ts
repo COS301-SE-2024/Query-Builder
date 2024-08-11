@@ -134,7 +134,7 @@ jest.mock('express-session', () => {
 });
 
 describe('OrgManagementService', () => {
-  const { setTestData, setTestError } = require('../supabase/supabase.ts');
+const { setTestData, setTestError } = require('../supabase/supabase.ts');
   let service: OrgManagementService;
   let module: TestingModule;
 
