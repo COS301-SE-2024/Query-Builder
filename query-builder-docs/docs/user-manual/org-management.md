@@ -12,3 +12,5 @@ Users can edit organisations once they are logged in. To edit an organisation, y
 
 ### Delete Organisations
 Users can delete organisations once they are logged in. To delete an organisation, you need to click on the organisation you want to delete. You can then click on the delete button to delete the organisation.
+
+![org-management-setting-1](./../../static/img/org-management-settings-1.png) 
