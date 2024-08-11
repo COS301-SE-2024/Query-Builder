@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
 import { GenerativeModel, GoogleGenerativeAI } from '@google/generative-ai';
 import { Query } from "../interfaces/intermediateJSON"
-import { DbMetadataHandlerService } from 'src/db-metadata-handler/db-metadata-handler.service';
+import { DbMetadataHandlerService } from '../db-metadata-handler/db-metadata-handler.service';
 
 @Injectable()
 export class NaturalLanguageService {
