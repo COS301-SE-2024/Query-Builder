@@ -422,7 +422,7 @@ export default function OrganisationManagement(){
       async function copyHashCode() {
         navigator.permissions.query({name: "notifications"}).then((result) => {
           if (result.state == "granted" || result.state == "prompt") {
-            alert("Write access granted!");
+            // alert("Write access granted!");
           }
         });
         try {
@@ -430,6 +430,8 @@ export default function OrganisationManagement(){
           let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/create-hash`, {
             method: "POST",
             headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json',
                   'Authorization': 'Bearer ' + await getToken()
                 },
                 body: JSON.stringify({org_id: orgServerID})
