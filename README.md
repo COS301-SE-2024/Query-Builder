@@ -49,7 +49,7 @@ QBee is the ultimate tool for modern database management and analysis.
 |---------------------------------|--------------------------------------------|
 | Project Board                   | [Project Tracking](https://github.com/orgs/COS301-SE-2024/projects/55)|
 | User Manual/Help Centre           | [Help for QBee Users](https://cos301-se-2024.github.io/Query-Builder/docs/category/user-manual)                 |
-| Technical Installation Manual           | [A guide to running the system yourself](https://cos301-se-2024.github.io/Query-Builder/docs/category/technical-installation-manual)                 |
+| Technical Installation Manual           | [A guide to running the system yourself](https://cos301-se-2024.github.io/Query-Builder/docs/technical-installation-manual/)                 |
 | Coding Standards                | [See Coding Standards](https://cos301-se-2024.github.io/Query-Builder/docs/guides-and-standards/coding-standards)                   |
 | Software Requirements Specification | [See our complete SRS](https://cos301-se-2024.github.io/Query-Builder/docs/category/software-requirements-specification)            |
 | Architectural Requirements Document                    | [See our architecture document](https://cos301-se-2024.github.io/Query-Builder/docs/category/architectural-requirements-document)                   |
