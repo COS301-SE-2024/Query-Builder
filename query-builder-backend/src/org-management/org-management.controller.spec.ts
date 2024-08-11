@@ -13,6 +13,7 @@ describe('OrgManagementController', () => {
     getOrg: jest.fn().mockResolvedValue('0000'),
     getMembers: jest.fn().mockResolvedValue('0000'),
     getDbs: jest.fn().mockResolvedValue('0000'),
+    getOrgHash: jest.fn().mockResolvedValue('0000'),
     uploadOrgLogo: jest.fn().mockResolvedValue('0000'),
     createOrg: jest.fn().mockResolvedValue('0000'),
     joinOrg: jest.fn().mockResolvedValue('0000'),
@@ -71,6 +72,12 @@ describe('OrgManagementController', () => {
   describe('getDbs', () => {
     it('should return dbs', async () => {
       expect(await controller.getDbs({ org_id: '0000' })).toBe('0000');
+    });
+  });
+
+  describe('getOrgHash', () => {
+    it('should return hash', async () => {
+      expect(await controller.getOrgHash({ org_id: '0000' })).toBe('0000');
     });
   });
 

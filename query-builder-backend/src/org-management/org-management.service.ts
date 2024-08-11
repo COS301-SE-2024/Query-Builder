@@ -28,6 +28,7 @@ import { Upload_Org_Logo_Dto } from './dto/upload-org-logo.dto';
 import { Join_Org_Dto } from './dto/join-org.dto';
 import { Create_Hash_Dto } from './dto/create-hash.dto';
 import * as crypto from 'crypto';
+import { createHash } from 'crypto';
 
 @Injectable()
 export class OrgManagementService {
@@ -213,6 +214,23 @@ export class OrgManagementService {
     }
     if (data.length === 0) {
       throw new NotFoundException('Databases not found');
+    }
+
+    return { data };
+  }
+
+  async getOrgHash(create_hash_dto: Create_Hash_Dto){
+    const { data, error } = await this.supabase
+      .getClient()
+      .from('org_hashes')
+      .select()
+      .match({ ...create_hash_dto });
+
+    if (error) {
+      throw error;
+    }
+    if (data.length === 0) {
+      throw new NotFoundException('No organisations match the provided hash');
     }
 
     return { data };
@@ -406,13 +424,9 @@ export class OrgManagementService {
       );
     }
 
-    let hashCode = await this.createHash_H1(create_hash_dto.org_id)
+    let hashCode = await this.createHash_H1(create_hash_dto.org_id);
 
-    const { data: hash_data, error: hash_error } = await this.supabase
-      .getClient()
-      .from('org_hashes')
-      .upsert({ org_id: create_hash_dto.org_id, hash: hashCode })
-      .select();
+    const { data: hash_data, error: hash_error } = await this.createHash_H3(create_hash_dto, hashCode);
 
     if (hash_error) {
       throw hash_error;
@@ -421,7 +435,7 @@ export class OrgManagementService {
       throw new InternalServerErrorException('Unable to save org hash');
     }
 
-    return {data: hash_data}
+    return { data: hash_data };
   }
 
   async createHash_H1(org_id: string) {
@@ -432,6 +446,45 @@ export class OrgManagementService {
     let hashCode = hash.digest('hex');
 
     return hashCode;
+  }
+
+  async createHash_H2(org_id: string) {
+    const { data, error } = await this.supabase
+      .getClient()
+      .from('org_hashes')
+      .select()
+      .eq('org_id', org_id);
+
+    if (error) {
+      throw error;
+    }
+    if(data.length === 0) {
+      return false;
+    }
+
+    return true;
+  }
+
+  async createHash_H3(create_hash_dto: Create_Hash_Dto, hashCode: string) {
+    if(await this.createHash_H2(create_hash_dto.org_id)){
+      const { data, error } = await this.supabase
+        .getClient()
+        .from('org_hashes')
+        .update({ hash: hashCode })
+        .eq('org_id', create_hash_dto.org_id)
+        .select();
+
+      return { data, error };
+    }
+    else{
+      const { data, error } = await this.supabase
+        .getClient()
+        .from('org_hashes')
+        .insert({ org_id: create_hash_dto.org_id, hash: hashCode })
+        .select();
+
+      return { data, error };
+    }
   }
 
   async addMember(add_member_dto: Add_Member_Dto) {
@@ -476,9 +529,7 @@ export class OrgManagementService {
       throw error;
     }
     if (data.length === 0) {
-      throw new InternalServerErrorException(
-        'Member not verified'
-      );
+      throw new InternalServerErrorException('Member not verified');
     }
 
     return { data };
