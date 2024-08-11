@@ -15,18 +15,137 @@ import { Get_User_Dto } from './dto/get-user.dto';
 import { Sign_In_User_Dto } from './dto/sign-in-user.dto';
 import { Update_User_Dto } from './dto/update-user.dto';
 
-describe('UserManagementService', () => {
-  let service: UserManagementService;
-  let supabase: Supabase;
-  let configService: ConfigService;
-  let testUser;
+const SELECT = 0;
+const UPDATE = 1;
+const AUTH_ADMIN = 2;
+const AUTH = 3;
+const INSERT = 4;
+const DELETE = 5;
+const STORAGE = 6;
 
-  let SupabaseMock = {
-    getClient: jest.fn(),
-    getJwt: jest.fn()
+jest.mock('../supabase/supabase.ts', () => {
+  let testData: any[] = [];
+  let testError: any[] = [];
+
+  return {
+    Supabase: jest.fn().mockImplementation(() => {
+      return {
+        getJwt: jest.fn(),
+        getClient: jest.fn().mockImplementation(() => {
+          return {
+            from: jest.fn().mockReturnThis(),
+            select: jest.fn().mockImplementation(() => ({
+              eq: jest.fn().mockReturnThis(),
+              in: jest.fn().mockReturnThis(),
+              is: jest.fn().mockReturnThis(),
+              order: jest.fn().mockReturnThis(),
+              gte: jest.fn().mockReturnThis(),
+              lte: jest.fn().mockReturnThis(),
+              match: jest.fn().mockReturnThis(),
+              data: testData[SELECT], // Use the data variable here
+              error: testError[SELECT]
+            })),
+            update: jest.fn().mockImplementation(() => ({
+              eq: jest.fn().mockReturnThis(),
+              in: jest.fn().mockReturnThis(),
+              is: jest.fn().mockReturnThis(),
+              order: jest.fn().mockReturnThis(),
+              gte: jest.fn().mockReturnThis(),
+              lte: jest.fn().mockReturnThis(),
+              match: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              data: testData[UPDATE], // Use the data variable here
+              error: testError[UPDATE]
+            })),
+            insert: jest.fn().mockImplementation(() => ({
+              eq: jest.fn().mockReturnThis(),
+              in: jest.fn().mockReturnThis(),
+              is: jest.fn().mockReturnThis(),
+              order: jest.fn().mockReturnThis(),
+              gte: jest.fn().mockReturnThis(),
+              lte: jest.fn().mockReturnThis(),
+              match: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              data: testData[INSERT],
+              error: testError[INSERT]
+            })),
+            upsert: jest.fn().mockImplementation(() => ({
+              eq: jest.fn().mockReturnThis(),
+              in: jest.fn().mockReturnThis(),
+              is: jest.fn().mockReturnThis(),
+              order: jest.fn().mockReturnThis(),
+              gte: jest.fn().mockReturnThis(),
+              lte: jest.fn().mockReturnThis(),
+              match: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              data: testData[INSERT],
+              error: testError[INSERT]
+            })),
+            delete: jest.fn().mockImplementation(() => ({
+              eq: jest.fn().mockReturnThis(),
+              in: jest.fn().mockReturnThis(),
+              is: jest.fn().mockReturnThis(),
+              order: jest.fn().mockReturnThis(),
+              gte: jest.fn().mockReturnThis(),
+              lte: jest.fn().mockReturnThis(),
+              match: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              data: testData[DELETE],
+              error: testError[DELETE]
+            })),
+            storage: {
+              from: jest.fn().mockReturnThis(),
+              upload: jest.fn().mockReturnThis(),
+              getPublicUrl: jest.fn().mockReturnThis(),
+              data: testData[STORAGE],
+              error: testError[STORAGE]
+            },
+            auth: {
+              admin: {
+                createUser: jest.fn().mockReturnThis(),
+                deleteUser: jest.fn().mockReturnThis(),
+                data: testData[AUTH_ADMIN],
+                error: testError[AUTH_ADMIN]
+              },
+              getUser: jest.fn().mockReturnThis(),
+              data: testData[AUTH],
+              error: testError[AUTH]
+            }
+          };
+        })
+      };
+    }),
+    setTestData: (newData: any[]) => {
+      testData = newData;
+    },
+    setTestError: (newError: any[]) => {
+      testError = newError;
+    },
+    getTestData: () => {
+      return testData;
+    },
+    getTestError: () => {
+      return testError;
+    }
   };
+});
 
-  testUser = {
+jest.mock('express-session', () => {
+  return {
+    session: jest.fn((req, res, next) => {
+      req.session = {};
+      next();
+    })
+  };
+});
+
+describe('UserManagementService', () => {
+  const { setTestData, setTestError } = require('../supabase/supabase.ts');
+
+  let service: UserManagementService;
+  let module: TestingModule;
+
+  let testUser = {
     email: null,
     password: 'password',
     first_name: 'Test',
@@ -35,206 +154,56 @@ describe('UserManagementService', () => {
   };
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      imports: [ConfigModule.forRoot({ isGlobal: true })],
-      providers: [
-        UserManagementService,
-        {
-          provide: Supabase,
-          useValue: SupabaseMock
-        },
-        ConfigService
-      ]
+    module = await Test.createTestingModule({
+      imports: [SupabaseModule],
+      providers: [UserManagementService]
     }).compile();
 
     service = module.get<UserManagementService>(UserManagementService);
-    supabase = await module.resolve<Supabase>(Supabase);
-    configService = module.get<ConfigService>(ConfigService);
   });
 
   afterEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      imports: [ConfigModule.forRoot({ isGlobal: true })],
-      providers: [
-        UserManagementService,
-        {
-          provide: Supabase,
-          useValue: SupabaseMock
-        },
-        ConfigService
-      ]
-    }).compile();
+    await module.close();
+  });
 
-    service = module.get<UserManagementService>(UserManagementService);
-    configService = module.get<ConfigService>(ConfigService);
+  afterAll(async () => {
+    jest.clearAllMocks();
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
-  // describe('getUser', () => {
-  //   it('should get a user (user_id)', async () => {
-  //     const get_user_dto = {
-  //       user_id: testUser.user_id
-  //     };
+  describe('getUser', () => {
+    beforeEach(() => {
+      setTestData([]);
+      setTestError([]);
+    });
 
-  //     const supabaseUrl = configService.get<string>('SUPABASE_URL');
-  //     const supabaseKey = configService.get<string>('SUPABASE_KEY');
+    it('should rethrow the error generated by the Supabase client when getting a user', async () => {
+      let testData = [];
+      let testError = [];
 
-  //     SupabaseMock.getClient.mockReturnValue(
-  //       createClient(supabaseUrl, supabaseKey, {
-  //         auth: {
-  //           autoRefreshToken: false,
-  //           persistSession: false,
-  //           detectSessionInUrl: false
-  //         }
-  //       })
-  //     );
+      testError[SELECT] = { message: 'Internal Server Error', status: 500 };
 
-  //     const user = await service.getUser(get_user_dto);
-  //     expect(user).toBeDefined();
-  //     expect(user.data[0].user_id).toEqual(testUser.user_id);
-  //     expect(user.data[0].email).toEqual(testUser.email);
-  //     expect(user.data[0].first_name).toEqual(testUser.first_name);
-  //     expect(user.data[0].last_name).toEqual(testUser.last_name);
-  //   });
+      setTestData(testData);
+      setTestError(testError);
 
-  //   it('should not get a user (user_id)', async () => {
-  //     const get_user_dto = {
-  //       user_id: '123'
-  //     };
-
-  //     expect(service.getUser(get_user_dto)).rejects.toThrow(NotFoundException);
-  //   });
-  // });
-
-  // describe('getLoggedInUser', () => {
-  //   beforeEach(async () => {
-  //     const supabaseUrl = configService.get<string>('SUPABASE_URL');
-  //     const supabaseKey = configService.get<string>('SUPABASE_KEY');
-
-  //     SupabaseMock.getClient.mockReturnValue(
-  //       createClient(supabaseUrl, supabaseKey, {
-  //         auth: {
-  //           autoRefreshToken: false,
-  //           persistSession: false,
-  //           detectSessionInUrl: false
-  //         }
-  //       })
-  //     );
-
-  //     const { data } = await SupabaseMock.getClient().auth.signInWithPassword({
-  //       email: testUser.email,
-  //       password: testUser.password
-  //     });
-
-  //     const jwt = data.session.access_token;
-
-  //     SupabaseMock.getJwt.mockReturnValue(jwt);
-  //     SupabaseMock.getClient.mockReturnValue(
-  //       createClient(supabaseUrl, supabaseKey, {
-  //         auth: {
-  //           autoRefreshToken: false,
-  //           persistSession: false,
-  //           detectSessionInUrl: false
-  //         },
-  //         global: {
-  //           headers: {
-  //             Authorization: `Bearer ${jwt}`
-  //           }
-  //         }
-  //       })
-  //     );
-  //   });
-
-  //   it('should get the logged in user', async () => {
-  //     const user = await service.getLoggedInUser();
-  //     expect(user).toBeDefined();
-  //     expect(user.profile_data[0].user_id).toEqual(testUser.user_id);
-  //     expect(user.profile_data[0].email).toEqual(testUser.email);
-  //     expect(user.profile_data[0].first_name).toEqual(testUser.first_name);
-  //     expect(user.profile_data[0].last_name).toEqual(testUser.last_name);
-  //   });
-
-  //   it('should throw HttpException', async () => {
-  //     SupabaseMock.getJwt.mockReturnValue(null);
-  //     expect(service.getLoggedInUser()).rejects.toThrow(NotFoundException);
-  //   });
-  // });
-
-  // describe('updateUser', () => {
-  //   beforeEach(async () => {
-  //     const supabaseUrl = configService.get<string>('SUPABASE_URL');
-  //     const supabaseKey = configService.get<string>('SUPABASE_KEY');
-
-  //     SupabaseMock.getClient.mockReturnValue(
-  //       createClient(supabaseUrl, supabaseKey, {
-  //         auth: {
-  //           autoRefreshToken: false,
-  //           persistSession: false,
-  //           detectSessionInUrl: false
-  //         }
-  //       })
-  //     );
-
-  //     const { data } = await SupabaseMock.getClient().auth.signInWithPassword({
-  //       email: testUser.email,
-  //       password: testUser.password
-  //     });
-
-  //     const jwt = data.session.access_token;
-
-  //     SupabaseMock.getJwt.mockReturnValue(jwt);
-  //     SupabaseMock.getClient.mockReturnValue(
-  //       createClient(supabaseUrl, supabaseKey, {
-  //         auth: {
-  //           autoRefreshToken: false,
-  //           persistSession: false,
-  //           detectSessionInUrl: false
-  //         },
-  //         global: {
-  //           headers: {
-  //             Authorization: `Bearer ${jwt}`
-  //           }
-  //         }
-  //       })
-  //     );
-  //   });
-
-  //   it('should update a user', async () => {
-  //     const update_user_dto = {
-  //       user_id: testUser.user_id,
-  //       email: testUser.email,
-  //       username: 'NewUsername',
-  //       first_name: 'John',
-  //       last_name: 'Doe'
-  //     };
-
-  //     const updated_user = await service.updateUser(update_user_dto);
-  //     expect(updated_user).toBeDefined();
-  //     expect(updated_user.data[0].user_id).toEqual(testUser.user_id);
-  //     expect(updated_user.data[0].email).toEqual(testUser.email);
-  //     expect(updated_user.data[0].first_name).toEqual(
-  //       update_user_dto.first_name
-  //     );
-  //     expect(updated_user.data[0].last_name).toEqual(update_user_dto.last_name);
-  //     expect(updated_user.data[0].username).toEqual(update_user_dto.username);
-  //   });
-
-  //   it('should throw HttpException', async () => {
-  //     const update_user_dto = {
-  //       user_id: '123',
-  //       email: testUser.email,
-  //       first_name: 'John',
-  //       last_name: 'Doe'
-  //     };
-
-  //     SupabaseMock.getJwt.mockReturnValue(null);
-
-  //     expect(service.updateUser(update_user_dto)).rejects.toThrow(
-  //       HttpException
-  //     );
-  //   });
-  // });
+      await service.getUser({ user_id: 'test_user_id' }).catch((error) => {
+        expect(error).toBeDefined();
+        expect(error).toHaveProperty('message', 'Internal Server Error');
+        expect(error).toHaveProperty('status', 500);
+      });
+    });
+  });
+  describe('getLoggedInUser', () => {});
+  describe('genSessionKey', () => {});
+  describe('signIn', () => {});
+  describe('signUp', () => {});
+  describe('createUser', () => {});
+  describe('updateUser', () => {});
+  describe('uploadProfilePicture', () => {});
+  describe('updateUserPassword', () => {});
+  describe('updateUserEmail', () => {});
+  describe('updateUserPhone', () => {});
 });

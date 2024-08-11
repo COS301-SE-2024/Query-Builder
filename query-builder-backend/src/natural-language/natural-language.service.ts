@@ -149,14 +149,14 @@ export class NaturalLanguageService {
       const response = await result.response;
       const textResponse = response.text();
 
-      console.log(textResponse);
+      // console.log(textResponse);
 
       //-------------------Do some potential cleanup of the text response--------------------------//
       const cleanedTextResponse = textResponse.replaceAll(
         /(: |:)undefined/g,
         ': null'
       );
-      console.log(cleanedTextResponse);
+      // console.log(cleanedTextResponse);
 
       const jsonResponse = JSON.parse(cleanedTextResponse);
 
