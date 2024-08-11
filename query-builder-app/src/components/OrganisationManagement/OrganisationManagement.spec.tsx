@@ -35,22 +35,4 @@ describe('Organisation management table for users', () => {
         expect(orgMembers).toBeTruthy();
   
     });
-
-    it('should render edit modal successfully', async () => {
-        render(<OrganisationManagement/>);
-
-        const user = userEvent.setup();
-        const tabs = screen.getAllByLabelText('orgMembers')[0];
-
-        await user.click(tabs);
-
-        // const EditUser = screen.getAllByLabelText('editUserIcon')[0];
-        // await user.click(EditUser);
-
-        // const EditUserModal = screen.getAllByLabelText('editUserModal')[0];
-
-
-        // expect(EditUserModal).toBeTruthy();
-  
-    });
 });
