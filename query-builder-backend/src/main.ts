@@ -41,9 +41,8 @@ async function bootstrap() {
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
 
   app.enableCors({
-    //change in production
-    origin: [
-      `http://${process.env.FRONTEND_URL}`,],
+    origin: `http://${process.env.FRONTEND_URL}`,
+    methods: 'GET,PUT,PATCH,POST,DELETE', 
     credentials: true
   });
   await app.listen(55555);
