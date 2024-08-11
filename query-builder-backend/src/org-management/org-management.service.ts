@@ -5,7 +5,6 @@ import {
   Put,
   UnauthorizedException
 } from '@nestjs/common';
-import { createCipheriv, randomBytes } from 'crypto';
 import { Supabase } from '../supabase';
 import { Get_Org_Dto } from './dto/get-org.dto';
 import { Create_Org_Dto } from './dto/create-org.dto';
@@ -26,6 +25,9 @@ import { Give_Db_Access_Dto } from './dto/give-db-access.dto';
 import { Save_Db_Secrets_Dto } from './dto/save-db-secrets.dto';
 import { Remove_Db_Access_Dto } from './dto/remove-db-access.dto';
 import { Upload_Org_Logo_Dto } from './dto/upload-org-logo.dto';
+import { Join_Org_Dto } from './dto/join-org.dto';
+import { Create_Hash_Dto } from './dto/create-hash.dto';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class OrgManagementService {
@@ -238,7 +240,8 @@ export class OrgManagementService {
           org_id: org_id,
           user_id: owner_id,
           user_role: 'owner',
-          role_permissions: role_perms
+          role_permissions: role_perms,
+          verified: true
         })
         .select();
 
@@ -314,13 +317,124 @@ export class OrgManagementService {
     return img_url;
   }
 
-  async addMember(add_member_dto: Add_Member_Dto) {
-    const { data: user_data, error: owner_error } = await this.supabase
+  async joinOrg(join_org_dto: Join_Org_Dto) {
+    const { data: user_data, error: user_error } = await this.supabase
       .getClient()
       .auth.getUser(this.supabase.getJwt());
 
-    if (owner_error) {
-      throw owner_error;
+    if (user_error) {
+      throw user_error;
+    }
+
+    const { data: hash_data, error: hash_error } = await this.supabase
+      .getClient()
+      .from('org_hashes')
+      .select()
+      .match({ ...join_org_dto });
+
+    if (hash_error) {
+      throw hash_error;
+    }
+    if (hash_data.length === 0) {
+      throw new NotFoundException('No organisations match the provided hash');
+    }
+
+    const role_perms: Role = {
+      is_owner: false,
+      add_dbs: false,
+      update_dbs: false,
+      remove_dbs: false,
+      invite_users: false,
+      remove_users: false,
+      update_user_roles: false,
+      view_all_dbs: false,
+      view_all_users: true,
+      update_db_access: false
+    };
+
+    const { data, error } = await this.supabase
+      .getClient()
+      .from('org_members')
+      .insert({
+        org_id: hash_data[0].org_id,
+        user_id: user_data.user.id,
+        user_role: 'member',
+        role_permissions: role_perms
+      })
+      .select();
+
+    if (error) {
+      throw error;
+    }
+    if (data.length === 0) {
+      throw new InternalServerErrorException(
+        'Member not added to organisation'
+      );
+    }
+
+    return { data };
+  }
+
+  async createHash(create_hash_dto: Create_Hash_Dto) {
+    const { data: user_data, error: user_error } = await this.supabase
+      .getClient()
+      .auth.getUser(this.supabase.getJwt());
+
+    if (user_error) {
+      throw user_error;
+    }
+
+    const { data: org_data, error: org_error } = await this.supabase
+      .getClient()
+      .from('org_members')
+      .select()
+      .eq('org_id', create_hash_dto.org_id)
+      .eq('user_id', user_data.user.id);
+
+    if (org_error) {
+      throw org_error;
+    }
+    if (org_data.length === 0) {
+      throw new UnauthorizedException(
+        'You are not a member of this organisation'
+      );
+    }
+
+    if (!org_data[0].role_permissions.invite_users) {
+      throw new UnauthorizedException(
+        'You do not have permission to add members'
+      );
+    }
+
+    let salt = crypto.randomBytes(16).toString('hex');
+
+    const hash = crypto.createHash('sha256');
+    hash.update(create_hash_dto.org_id + salt);
+    let hashCode = hash.digest('hex');
+
+    const { data: hash_data, error: hash_error } = await this.supabase
+      .getClient()
+      .from('org_hashes')
+      .insert({ org_id: create_hash_dto.org_id, hash: hashCode })
+      .select();
+
+    if (hash_error) {
+      throw hash_error;
+    }
+    if (hash_data.length === 0) {
+      throw new InternalServerErrorException('Unable to save org hash');
+    }
+
+    return {data: hash_data}
+  }
+
+  async addMember(add_member_dto: Add_Member_Dto) {
+    const { data: user_data, error: user_error } = await this.supabase
+      .getClient()
+      .auth.getUser(this.supabase.getJwt());
+
+    if (user_error) {
+      throw user_error;
     }
 
     const { data: org_data, error: org_error } = await this.supabase
@@ -345,32 +459,11 @@ export class OrgManagementService {
       );
     }
 
-    const role_perms: Role = {
-      is_owner: false,
-      add_dbs: false,
-      update_dbs: false,
-      remove_dbs: false,
-      invite_users: false,
-      remove_users: false,
-      update_user_roles: false,
-      view_all_dbs: false,
-      view_all_users: true,
-      update_db_access: false
-    };
-
-    if (add_member_dto.user_role === 'admin') {
-      role_perms.add_dbs = true;
-      role_perms.update_dbs = true;
-      role_perms.remove_dbs = true;
-      role_perms.invite_users = true;
-      role_perms.remove_users = true;
-      role_perms.view_all_dbs = true;
-    }
-
     const { data, error } = await this.supabase
       .getClient()
       .from('org_members')
-      .insert({ ...add_member_dto, role_permissions: role_perms })
+      .update({ verified: true })
+      .match({ ...add_member_dto })
       .select();
 
     if (error) {

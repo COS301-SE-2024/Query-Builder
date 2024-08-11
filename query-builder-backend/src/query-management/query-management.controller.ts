@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Post, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Post, Put, ValidationPipe } from '@nestjs/common';
 import { Save_Query_Dto } from './dto/save-query.dto';
 import { Delete_Query_Dto } from './dto/delete-query.dto';
 import { QueryManagementService } from './query-management.service';
+import { Get_Single_Query_Dto } from './dto/get-single-query.dto';
 
 @Controller('query-management')
 export class QueryManagementController {
@@ -16,6 +17,11 @@ export class QueryManagementController {
   @Get("get-queries")
   async getQ() {
     return this.query_management_service.getQueries();
+  }
+
+  @Put("get-single-query")
+  async getSingleQuery(@Body(ValidationPipe) get_single_query_dto: Get_Single_Query_Dto) {
+    return this.query_management_service.getSingleQuery(get_single_query_dto);
   }
 
   @Post("delete-query")

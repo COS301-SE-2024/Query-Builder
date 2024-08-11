@@ -7,6 +7,7 @@ import Report from "../Report/Report";
 import csvDownload from 'json-to-csv-export'
 import { Query } from "@/interfaces/intermediateJSON";
 import { createClient } from "./../../utils/supabase/client";
+import SaveQueryModal from "../SaveQueryModal/SaveQueryModal";
 
 interface Column {
   key: string,
@@ -239,7 +240,7 @@ export default function TableResponse(props: TableResponseProps){
           </label>
         </div>
         <div></div>
-        <Button color="primary" className="mx-1" onClick={() => {saveQuery()}}>Save Query</Button>
+        <SaveQueryModal query={props.query}/>
         <Button color="primary" className="mx-1" onClick={() => {downloadCSV()}}>Export Data</Button>
         <Button onPress={onOpen} color="primary" className="mx-1">Generate Report</Button>
         <Modal 
