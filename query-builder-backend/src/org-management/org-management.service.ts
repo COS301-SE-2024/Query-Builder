@@ -406,11 +406,7 @@ export class OrgManagementService {
       );
     }
 
-    let salt = crypto.randomBytes(16).toString('hex');
-
-    const hash = crypto.createHash('sha256');
-    hash.update(create_hash_dto.org_id + salt);
-    let hashCode = hash.digest('hex');
+    let hashCode = await this.createHash_H1(create_hash_dto.org_id)
 
     const { data: hash_data, error: hash_error } = await this.supabase
       .getClient()
@@ -426,6 +422,16 @@ export class OrgManagementService {
     }
 
     return {data: hash_data}
+  }
+
+  async createHash_H1(org_id: string) {
+    let salt = crypto.randomBytes(16).toString('hex');
+
+    const hash = crypto.createHash('sha256');
+    hash.update(org_id + salt);
+    let hashCode = hash.digest('hex');
+
+    return hashCode;
   }
 
   async addMember(add_member_dto: Add_Member_Dto) {
