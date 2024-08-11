@@ -411,7 +411,7 @@ export class OrgManagementService {
     const { data: hash_data, error: hash_error } = await this.supabase
       .getClient()
       .from('org_hashes')
-      .insert({ org_id: create_hash_dto.org_id, hash: hashCode })
+      .upsert({ org_id: create_hash_dto.org_id, hash: hashCode })
       .select();
 
     if (hash_error) {
@@ -477,7 +477,7 @@ export class OrgManagementService {
     }
     if (data.length === 0) {
       throw new InternalServerErrorException(
-        'Member not added to organisation'
+        'Member not verified'
       );
     }
 
