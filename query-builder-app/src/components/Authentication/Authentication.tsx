@@ -13,6 +13,7 @@ export default function Authentication() {
   const toggleVisibility = () => setIsVisible(!isVisible);
   const [isLoginVisible, setLoginIsVisible] = useState(false);
   const toggleLoginVisibility = () => setLoginIsVisible(!isLoginVisible);
+  const [loading, setLoading] = useState(false);
 
   // Sign in
   const [loginEmail, setLoginEmail] = useState('');
@@ -85,6 +86,7 @@ export default function Authentication() {
     setSignUpLastNameHasBeenFocused(false);
     setIsVisible(false);
     setLoginIsVisible(false);
+    setLoading(false);
 
     if (view == '') {
       setView('right-panel-active');
@@ -97,6 +99,7 @@ export default function Authentication() {
 
     //sign into QBee server
     //call the sign-in API endpoint
+    setLoading(true);
     let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user-management/gen-session-key`, {
       credentials: "include",
       method: "PUT",
@@ -108,9 +111,8 @@ export default function Authentication() {
       })
   
     let responseData = await response.json();
-    
     login(email, password);
-      };
+  };
 
   const signUpUser = async (
     firstName: string,
@@ -118,7 +120,7 @@ export default function Authentication() {
     email: string,
     password: string,
   ) => {
-
+    setLoading(true);
     signup(firstName, lastName, email, password);
   };
 
@@ -260,6 +262,7 @@ export default function Authentication() {
                   />
                 </div>
                 <Button
+                  isLoading={loading}
                   onClick={() => {
                     signUpUser(
                       signUpFirstName,
@@ -354,6 +357,7 @@ export default function Authentication() {
                 </div>
 
                 <Button
+                  isLoading={loading}
                   onClick={() => loginUser(loginEmail, loginPassword)}
                   variant="bordered"
                   isDisabled={isLoginEmailInvalid || isLoginPasswordInvalid}

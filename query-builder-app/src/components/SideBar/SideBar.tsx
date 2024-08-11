@@ -11,8 +11,11 @@ const Sidebar = () => {
   // State to manage the open/close state of the sidebar
   const supabase = createClient();
   const router = useRouter();
+  const [loading, setLoading] = React.useState(false);
+
     
     const signOut = async () => {
+        setLoading(true);
         const { error } = await supabase.auth.signOut();
         console.log(error);
         router.push("/");
@@ -67,7 +70,9 @@ const Sidebar = () => {
                     </div>
                     <div className="sidebar-item">
                         <Button variant="solid" color="danger"
-                         onClick={() => signOut()}>
+                            isLoading={loading}
+                            onClick={() => signOut()}
+                         >
                             Log out
                         </Button>
                     </div>
