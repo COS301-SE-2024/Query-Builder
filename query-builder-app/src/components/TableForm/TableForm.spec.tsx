@@ -40,7 +40,7 @@ describe('TableForm basic rendering tests', () => {
           columns: []
       }
   
-      const { baseElement } = render(<TableForm table={tableProp} />);
+      const { baseElement } = render(<TableForm databaseServerID='1234' table={tableProp} />);
       expect(baseElement).toBeTruthy();
   
     });
@@ -110,7 +110,7 @@ describe('TableForm column selection tests', () => {
         const user = userEvent.setup();
     
         //render the TableForm
-        render(<TableForm table={tableProp} onChange={updateTable} />);
+        render(<TableForm databaseServerID='1234' table={tableProp} onChange={updateTable} />);
 
         //get the add button
         const button = screen.getAllByLabelText('addColumn')[0];
