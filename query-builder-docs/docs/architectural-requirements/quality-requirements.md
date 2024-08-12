@@ -72,7 +72,7 @@ The system makes use of JWTs when querying the backend. This ensures provides a 
 **Software and Data Integrity Failures:**  
 The system should implement digital signatures and tamper-evident mechanisms to ensure data integrity.
 
-Encryption makes decryption makes use of a digital signature that is only accessible to the user who encrypted the data. This ensures that data is not tampered with.
+Encryption and decryption makes use of a digital signature that is only accessible to the user who encrypted the data. This ensures that data is not tampered with.
 
 **Security Logging and Monitoring Failures:**  
 The system should implement comprehensive logging and monitoring practices to detect suspicious activity.
