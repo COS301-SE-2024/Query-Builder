@@ -18,6 +18,7 @@ describe('Landing Page', () => {
         //render the component
       render(<LandingPage/>);
 
+
       const title = screen.getByText("Welcome to QBee");
       expect(title).toBeInTheDocument();
 

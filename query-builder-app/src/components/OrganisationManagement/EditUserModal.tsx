@@ -34,7 +34,6 @@ interface Role {
 }
 
 const getToken = async () => {
-
     const supabase = createClient();
     const token = (await supabase.auth.getSession()).data.session?.access_token
   
@@ -109,8 +108,8 @@ export default function EditUserModal(props: EditUserModalProps){
         <>
         {/* <label  className="custom-file-upload bg-white p-1 border-2 border-slate-600 rounded-full">
         </label> */}
-        <div aria-label="editUserIcon">
-          <EditIcon aria-label="editUserIcon" onClick={onOpen}/>                              
+        <div>
+          <EditIcon data-testid="editUserIcon" onClick={onOpen}/>                              
         </div>
         <Modal 
           isOpen={isOpen} 
@@ -129,6 +128,7 @@ export default function EditUserModal(props: EditUserModalProps){
                             <Button 
                             variant="bordered" 
                             className="capitalize"
+                            data-testid="roleDropdown"
                             >
                             {selectedRoleValue}
                             </Button>
@@ -145,6 +145,7 @@ export default function EditUserModal(props: EditUserModalProps){
                             {(item:any) => (
                             <DropdownItem
                                 key={item.role.toLowerCase()}
+                                data-testid={item.role.toLowerCase() + 'Role'}
                             >
                                 {item.role}
                             </DropdownItem>
@@ -158,6 +159,7 @@ export default function EditUserModal(props: EditUserModalProps){
                     // onPress={() => onClose}  
                     onClick={() => {onClose(); updateRole();}}
                     isDisabled={isRoleInvalid}
+                    data-testid="updateRoleButton" 
                     >
                     Update
                   </Button>

@@ -9,7 +9,6 @@ import { useParams } from 'next/navigation'
 import EditUserModal from "./EditUserModal";
 import {EditIcon} from "./EditIcon";
 import {CheckIcon} from "./CheckIcon";
-import { verify } from "crypto";
 
 interface UpdateOrganisation {
     org_id: string;
@@ -422,7 +421,7 @@ export default function OrganisationManagement(){
       async function copyHashCode() {
         navigator.permissions.query({name: "notifications"}).then((result) => {
           if (result.state == "granted" || result.state == "prompt") {
-            alert("Write access granted!");
+            // alert("Write access granted!");
           }
         });
         try {
@@ -430,12 +429,14 @@ export default function OrganisationManagement(){
           let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/create-hash`, {
             method: "POST",
             headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json',
                   'Authorization': 'Bearer ' + await getToken()
                 },
                 body: JSON.stringify({org_id: orgServerID})
             });
-            console.log((await response.json()));
-            hashCode = (await response.json()).data;
+            // console.log((await response.json()));
+            hashCode = (await response.json()).data[0].hash;
             try{
               await navigator.clipboard.writeText(hashCode);
               console.log('Content copied to clipboard');
@@ -531,7 +532,7 @@ export default function OrganisationManagement(){
                 <Spacer y={2}/>
                 </div>
                 <Tabs aria-label="Options" className="m-auto mb-0 mt-0">
-                    <Tab key="orgInfo" aria-label="orgInfo" title="Organisation Information">
+                    <Tab key="orgInfo" aria-label="orgInfo" title="Information">
                     <Card>
                         <CardHeader>
                             Organisation Settings
