@@ -9,7 +9,6 @@ import { useParams } from 'next/navigation'
 import EditUserModal from "./EditUserModal";
 import {EditIcon} from "./EditIcon";
 import {CheckIcon} from "./CheckIcon";
-import { verify } from "crypto";
 
 interface UpdateOrganisation {
     org_id: string;
