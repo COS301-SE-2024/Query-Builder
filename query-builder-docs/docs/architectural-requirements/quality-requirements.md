@@ -20,6 +20,8 @@ Our target market consists largely of non-technical users that do not have the t
 - an **overall successful completion rate** of at least 80% for simple tasks that users are invited to perform on the app
 - a [**System Usability Scale (SUS)**](https://usabilitygeek.com/how-to-use-the-system-usability-scale-sus-to-evaluate-the-usability-of-your-website/) of at least 90% when gauging satisfaction of users using the system
 
+We will have two User Experience (UX) Surveys with the same target group. The first one will be given released 13 August and will complete on 19 August. After which modifications will be made if needed to improve usability. We then send new surveys to the same group to see if their experience has improved. At the end of each survey you give a usability rating from 0%-100%. This is how we will quantify and see if our UX improves over time.
+
 ### 2 - Security
 
 *How capable the system is at protecting regular users and their data from those with malicious intent.*
