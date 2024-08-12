@@ -43,6 +43,7 @@ export default function OrganisationManagement(){
     let [profilePicURL, setProfilePicURL] = useState('');
     let [hasAdminPermission, setHasAdminPermission] = useState(false);
     let [table, setTable] = useState('');
+    let [hashCodeCopyText, setHashCodeCopyText] = useState('Share Organisation Code');
 
     async function getMembers() {
       try {
@@ -444,6 +445,10 @@ export default function OrganisationManagement(){
               console.error('Failed to copy: ', err);
               
             } 
+            setHashCodeCopyText("Copied!");
+            setTimeout(() => {
+              setHashCodeCopyText("Share Organisation Code");
+            },2000);
         } catch(fetchError){
           console.error("Fetch error", fetchError);
         }
@@ -457,12 +462,12 @@ export default function OrganisationManagement(){
                 color="primary"  
                 onClick={() => copyHashCode()}
             >
-                Share Organisation Code
+                {hashCodeCopyText}
             </Button>
             </div>
           );
         }
-      },[hasAdminPermission]);
+      },[hasAdminPermission, hashCodeCopyText]);
 
       const columns = [
         {name: "NAME", uid: "name"},
