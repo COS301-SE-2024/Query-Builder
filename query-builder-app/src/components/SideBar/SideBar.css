@@ -26,7 +26,7 @@
     width: 100%;
 }
 
-.sidebar-item a {
+.sidebar-item a  {
     text-decoration: none;
     color: var(--text-colour);
     width: 100%;
@@ -42,7 +42,7 @@
 }
     
 
-.sidebar-item a:hover {
+.sidebar-item a:hover :not(.logoutButton) {
     background-color: var(--sidebar-item-hover);
 }
 

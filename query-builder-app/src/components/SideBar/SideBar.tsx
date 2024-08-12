@@ -69,12 +69,18 @@ const Sidebar = () => {
                         </a>
                     </div>
                     <div className="sidebar-item">
-                        <Button variant="solid" color="danger"
-                            isLoading={loading}
-                            onClick={() => signOut()}
-                         >
-                            Log out
-                        </Button>
+                        <Link href="/authentication" className="logoutButton" data-testid="logoutNav">
+                            <Button 
+                                variant="solid" 
+                                color="danger" 
+                                className="logoutButton"
+                                isLoading={loading}
+                                onClick={() => signOut()}
+                            >
+                                Log out
+                            </Button>
+                        </Link>
+                        
                     </div>
                 </nav>
             </div>
