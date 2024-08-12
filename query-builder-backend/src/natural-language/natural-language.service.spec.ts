@@ -87,19 +87,19 @@ describe('NaturalLanguageService', () => {
     expect(service).toBeDefined();
   });
 
-  // describe('query', () => {
-  //   describe('openAI', () => {
-  //     it('should return openAI response', async () => {
-  //       expect(
-  //         await service.query(
-  //           { llm: 'openAI', query: 'test', databaseServerID: '0000' },
-  //           {}
-  //         )
-  //       ).toStrictEqual({
-  //         choices: [{ message: { content: {name: "sakila"} } }]
-  //       });
-  //     });
-  //   });
+  describe('query', () => {
+    // describe('openAI', () => {
+    //   it('should return openAI response', async () => {
+    //     expect(
+    //       await service.query(
+    //         { llm: 'openAI', query: 'test', databaseServerID: '0000' },
+    //         {}
+    //       )
+    //     ).toStrictEqual({
+    //       choices: [{ message: { content: {name: "sakila"} } }]
+    //     });
+    //   });
+    // });
 
     describe('gemini', () => {
       it('should return openAI response', async () => {
