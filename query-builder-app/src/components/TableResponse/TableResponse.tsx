@@ -47,7 +47,12 @@ export default function TableResponse(props: TableResponseProps){
 
   const columns: Column[] = [];
   for(const columnObject of columnObjects){
-    columns.push({key: columnObject.name, label: columnObject.name});
+    if(columnObject.alias){
+      columns.push({key: columnObject.alias, label: columnObject.alias});
+    }
+    else{
+      columns.push({key: columnObject.name, label: columnObject.name});
+    }
   }
 
   //React hook for report modal
