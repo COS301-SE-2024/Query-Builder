@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Textarea, Button, ButtonGroup, useDisclosure, Modal, ModalContent, ModalHeader, Card, CardHeader, CardBody, CardFooter } from "@nextui-org/react";
+import { Textarea, Button, ButtonGroup, useDisclosure, Modal, ModalContent, ModalHeader, Card, CardHeader, CardBody, CardFooter, Spacer } from "@nextui-org/react";
 import TableResponse from "../TableResponse/TableResponse";
 import { useParams } from "next/navigation";
 import { createClient } from "./../../utils/supabase/client";
@@ -11,6 +11,7 @@ export default function NaturalLanguage() {
     const [queryLoaded, setQueryLoaded] = useState(false);
     const [query, setQuery] = useState<Query>();
     const [loading, setLoading] = useState(false);
+    const [showError, setShowError] = useState(false);
 
     // This function gets the token from local storage.
     // Supabase stores the token in local storage so we can access it from there.
@@ -45,12 +46,19 @@ export default function NaturalLanguage() {
             })
         });
 
-        let query = await response.json();
-        console.log(query);
-
-        setLoading(false);
-        setQuery(query);
-        setQueryLoaded(true);
+        if(response.ok){
+            let query = await response.json();
+        
+            console.log(query);
+            setShowError(false);
+            setLoading(false);
+            setQuery(query);
+            setQueryLoaded(true);
+        }
+        else{
+            setLoading(false);
+            setShowError(true);
+        }
 
     };
 
@@ -77,6 +85,10 @@ export default function NaturalLanguage() {
             >
                 Query
             </Button>
+            <Spacer x={5}/>
+            {showError && (
+                <h2>This feature is still in Beta - try again?</h2>
+            )}
             <Modal
                 isOpen={isOpen && queryLoaded}
                 onOpenChange={onOpenChange}
