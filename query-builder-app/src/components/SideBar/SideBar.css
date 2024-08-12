@@ -30,14 +30,20 @@
     text-decoration: none;
     color: var(--text-colour);
     width: 100%;
-    padding: 0.5rem  1rem;}
+    padding: 0.5rem  1rem;
+    justify-content: center;
+    text-align: center;
+}
+
+.sidebar-item button {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+}
     
 
 .sidebar-item a:hover {
     background-color: var(--sidebar-item-hover);
-    display: flex;
-    justify-content: center; 
-    align-items: center;
 }
 
 .sidebar-separator {
