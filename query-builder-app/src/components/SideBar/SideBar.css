@@ -31,7 +31,16 @@
     color: var(--text-colour);
     width: 100%;
     padding: 0.5rem  1rem;
+    justify-content: center;
+    text-align: center;
 }
+
+.sidebar-item button {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+}
+    
 
 .sidebar-item a:hover {
     background-color: var(--sidebar-item-hover);
@@ -60,7 +69,11 @@
     fill: var(--text-colour);
 }
 
+
 .sidebar-footer {
     margin-top: auto;
     margin-bottom: 3rem;
+    display: flex;
+    justify-content: center; 
+    align-items: center;
 }
