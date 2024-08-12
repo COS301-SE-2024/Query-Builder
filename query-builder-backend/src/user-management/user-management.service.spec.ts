@@ -1,32 +1,144 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserManagementService } from './user-management.service';
-import { Supabase, SupabaseModule } from '../supabase';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { createClient } from '@supabase/supabase-js';
+import { SupabaseModule } from '../supabase';
 import {
-  HttpException,
-  Injectable,
   InternalServerErrorException,
-  Module,
   NotFoundException
 } from '@nestjs/common';
-import { Create_User_Dto } from './dto/create-user.dto';
-import { Get_User_Dto } from './dto/get-user.dto';
-import { Sign_In_User_Dto } from './dto/sign-in-user.dto';
-import { Update_User_Dto } from './dto/update-user.dto';
+
+const SELECT = 0;
+const UPDATE = 1;
+const AUTH_ADMIN = 2;
+const AUTH = 3;
+const INSERT = 4;
+const DELETE = 5;
+const STORAGE = 6;
+
+jest.mock('../supabase/supabase.ts', () => {
+  let testData: any[] = [];
+  let testError: any[] = [];
+
+  return {
+    Supabase: jest.fn().mockImplementation(() => {
+      return {
+        getJwt: jest.fn(),
+        getClient: jest.fn().mockImplementation(() => {
+          return {
+            from: jest.fn().mockReturnThis(),
+            select: jest.fn().mockImplementation(() => ({
+              eq: jest.fn().mockReturnThis(),
+              in: jest.fn().mockReturnThis(),
+              is: jest.fn().mockReturnThis(),
+              order: jest.fn().mockReturnThis(),
+              gte: jest.fn().mockReturnThis(),
+              lte: jest.fn().mockReturnThis(),
+              match: jest.fn().mockReturnThis(),
+              data: testData[SELECT], // Use the data variable here
+              error: testError[SELECT]
+            })),
+            update: jest.fn().mockImplementation(() => ({
+              eq: jest.fn().mockReturnThis(),
+              in: jest.fn().mockReturnThis(),
+              is: jest.fn().mockReturnThis(),
+              order: jest.fn().mockReturnThis(),
+              gte: jest.fn().mockReturnThis(),
+              lte: jest.fn().mockReturnThis(),
+              match: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              data: testData[UPDATE], // Use the data variable here
+              error: testError[UPDATE]
+            })),
+            insert: jest.fn().mockImplementation(() => ({
+              eq: jest.fn().mockReturnThis(),
+              in: jest.fn().mockReturnThis(),
+              is: jest.fn().mockReturnThis(),
+              order: jest.fn().mockReturnThis(),
+              gte: jest.fn().mockReturnThis(),
+              lte: jest.fn().mockReturnThis(),
+              match: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              data: testData[INSERT],
+              error: testError[INSERT]
+            })),
+            upsert: jest.fn().mockImplementation(() => ({
+              eq: jest.fn().mockReturnThis(),
+              in: jest.fn().mockReturnThis(),
+              is: jest.fn().mockReturnThis(),
+              order: jest.fn().mockReturnThis(),
+              gte: jest.fn().mockReturnThis(),
+              lte: jest.fn().mockReturnThis(),
+              match: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              data: testData[INSERT],
+              error: testError[INSERT]
+            })),
+            delete: jest.fn().mockImplementation(() => ({
+              eq: jest.fn().mockReturnThis(),
+              in: jest.fn().mockReturnThis(),
+              is: jest.fn().mockReturnThis(),
+              order: jest.fn().mockReturnThis(),
+              gte: jest.fn().mockReturnThis(),
+              lte: jest.fn().mockReturnThis(),
+              match: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              data: testData[DELETE],
+              error: testError[DELETE]
+            })),
+            storage: {
+              from: jest.fn().mockReturnThis(),
+              upload: jest.fn().mockReturnThis(),
+              getPublicUrl: jest.fn().mockReturnThis(),
+              data: testData[STORAGE],
+              error: testError[STORAGE]
+            },
+            auth: {
+              admin: {
+                createUser: jest.fn().mockReturnThis(),
+                deleteUser: jest.fn().mockReturnThis(),
+                data: testData[AUTH_ADMIN],
+                error: testError[AUTH_ADMIN]
+              },
+              getUser: jest.fn().mockReturnThis(),
+              signUp: jest.fn().mockReturnThis(),
+              signInWithPassword: jest.fn().mockReturnThis(),
+              data: testData[AUTH],
+              error: testError[AUTH]
+            }
+          };
+        })
+      };
+    }),
+    setTestData: (newData: any[]) => {
+      testData = newData;
+    },
+    setTestError: (newError: any[]) => {
+      testError = newError;
+    },
+    getTestData: () => {
+      return testData;
+    },
+    getTestError: () => {
+      return testError;
+    }
+  };
+});
+
+jest.mock('express-session', () => {
+  return {
+    session: jest.fn((req, res, next) => {
+      req.session = {};
+      next();
+    })
+  };
+});
 
 describe('UserManagementService', () => {
+  const { setTestData, setTestError } = require('../supabase/supabase.ts');
+
   let service: UserManagementService;
-  let supabase: Supabase;
-  let configService: ConfigService;
-  let testUser;
+  let module: TestingModule;
 
-  let SupabaseMock = {
-    getClient: jest.fn(),
-    getJwt: jest.fn()
-  };
-
-  testUser = {
+  let testUser = {
     email: null,
     password: 'password',
     first_name: 'Test',
@@ -35,206 +147,524 @@ describe('UserManagementService', () => {
   };
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      imports: [ConfigModule.forRoot({ isGlobal: true })],
-      providers: [
-        UserManagementService,
-        {
-          provide: Supabase,
-          useValue: SupabaseMock
-        },
-        ConfigService
-      ]
+    module = await Test.createTestingModule({
+      imports: [SupabaseModule],
+      providers: [UserManagementService]
     }).compile();
 
     service = module.get<UserManagementService>(UserManagementService);
-    supabase = await module.resolve<Supabase>(Supabase);
-    configService = module.get<ConfigService>(ConfigService);
   });
 
   afterEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      imports: [ConfigModule.forRoot({ isGlobal: true })],
-      providers: [
-        UserManagementService,
-        {
-          provide: Supabase,
-          useValue: SupabaseMock
-        },
-        ConfigService
-      ]
-    }).compile();
+    await module.close();
+  });
 
-    service = module.get<UserManagementService>(UserManagementService);
-    configService = module.get<ConfigService>(ConfigService);
+  afterAll(async () => {
+    jest.clearAllMocks();
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
-  // describe('getUser', () => {
-  //   it('should get a user (user_id)', async () => {
-  //     const get_user_dto = {
-  //       user_id: testUser.user_id
-  //     };
+  describe('getUser', () => {
+    beforeEach(() => {
+      setTestData([]);
+      setTestError([]);
+    });
 
-  //     const supabaseUrl = configService.get<string>('SUPABASE_URL');
-  //     const supabaseKey = configService.get<string>('SUPABASE_KEY');
+    it('should rethrow the error generated by the Supabase client when getting a user', async () => {
+      let testData = [];
+      let testError = [];
 
-  //     SupabaseMock.getClient.mockReturnValue(
-  //       createClient(supabaseUrl, supabaseKey, {
-  //         auth: {
-  //           autoRefreshToken: false,
-  //           persistSession: false,
-  //           detectSessionInUrl: false
-  //         }
-  //       })
-  //     );
+      testError[SELECT] = { message: 'Internal Server Error', status: 500 };
 
-  //     const user = await service.getUser(get_user_dto);
-  //     expect(user).toBeDefined();
-  //     expect(user.data[0].user_id).toEqual(testUser.user_id);
-  //     expect(user.data[0].email).toEqual(testUser.email);
-  //     expect(user.data[0].first_name).toEqual(testUser.first_name);
-  //     expect(user.data[0].last_name).toEqual(testUser.last_name);
-  //   });
+      setTestData(testData);
+      setTestError(testError);
 
-  //   it('should not get a user (user_id)', async () => {
-  //     const get_user_dto = {
-  //       user_id: '123'
-  //     };
+      await service.getUser({ user_id: 'test_user_id' }).catch((error) => {
+        expect(error).toBeDefined();
+        expect(error).toHaveProperty('message', 'Internal Server Error');
+        expect(error).toHaveProperty('status', 500);
+      });
+    });
 
-  //     expect(service.getUser(get_user_dto)).rejects.toThrow(NotFoundException);
-  //   });
-  // });
+    it('should throw a NotFoundException when the user is not found', async () => {
+      let testData = [];
 
-  // describe('getLoggedInUser', () => {
-  //   beforeEach(async () => {
-  //     const supabaseUrl = configService.get<string>('SUPABASE_URL');
-  //     const supabaseKey = configService.get<string>('SUPABASE_KEY');
+      testData[SELECT] = [];
 
-  //     SupabaseMock.getClient.mockReturnValue(
-  //       createClient(supabaseUrl, supabaseKey, {
-  //         auth: {
-  //           autoRefreshToken: false,
-  //           persistSession: false,
-  //           detectSessionInUrl: false
-  //         }
-  //       })
-  //     );
+      setTestData(testData);
 
-  //     const { data } = await SupabaseMock.getClient().auth.signInWithPassword({
-  //       email: testUser.email,
-  //       password: testUser.password
-  //     });
+      await service.getUser({ user_id: 'test_user_id' }).catch((error) => {
+        expect(error).toBeDefined();
+        expect(error).toBeInstanceOf(NotFoundException);
+        expect(error.message).toBe('User not found');
+      });
+    });
 
-  //     const jwt = data.session.access_token;
+    it('should return the user data when the user is found', async () => {
+      let testData = [];
+      testData[SELECT] = [{ user_id: 'test_user_id' }];
 
-  //     SupabaseMock.getJwt.mockReturnValue(jwt);
-  //     SupabaseMock.getClient.mockReturnValue(
-  //       createClient(supabaseUrl, supabaseKey, {
-  //         auth: {
-  //           autoRefreshToken: false,
-  //           persistSession: false,
-  //           detectSessionInUrl: false
-  //         },
-  //         global: {
-  //           headers: {
-  //             Authorization: `Bearer ${jwt}`
-  //           }
-  //         }
-  //       })
-  //     );
-  //   });
+      setTestData(testData);
 
-  //   it('should get the logged in user', async () => {
-  //     const user = await service.getLoggedInUser();
-  //     expect(user).toBeDefined();
-  //     expect(user.profile_data[0].user_id).toEqual(testUser.user_id);
-  //     expect(user.profile_data[0].email).toEqual(testUser.email);
-  //     expect(user.profile_data[0].first_name).toEqual(testUser.first_name);
-  //     expect(user.profile_data[0].last_name).toEqual(testUser.last_name);
-  //   });
+      const { data } = await service.getUser({ user_id: 'test_user_id' });
+      expect(data).toBeDefined();
+      expect(data).toEqual(testData[SELECT]);
+    });
+  });
 
-  //   it('should throw HttpException', async () => {
-  //     SupabaseMock.getJwt.mockReturnValue(null);
-  //     expect(service.getLoggedInUser()).rejects.toThrow(NotFoundException);
-  //   });
-  // });
+  describe('getLoggedInUser', () => {
+    beforeEach(() => {
+      setTestData([]);
+      setTestError([]);
+    });
 
-  // describe('updateUser', () => {
-  //   beforeEach(async () => {
-  //     const supabaseUrl = configService.get<string>('SUPABASE_URL');
-  //     const supabaseKey = configService.get<string>('SUPABASE_KEY');
+    it('should rethrow the error generated by the Supabase client when getting the logged in user', async () => {
+      let testData = [];
+      let testError = [];
 
-  //     SupabaseMock.getClient.mockReturnValue(
-  //       createClient(supabaseUrl, supabaseKey, {
-  //         auth: {
-  //           autoRefreshToken: false,
-  //           persistSession: false,
-  //           detectSessionInUrl: false
-  //         }
-  //       })
-  //     );
+      testError[AUTH] = { message: 'Internal Server Error', status: 500 };
 
-  //     const { data } = await SupabaseMock.getClient().auth.signInWithPassword({
-  //       email: testUser.email,
-  //       password: testUser.password
-  //     });
+      setTestData(testData);
+      setTestError(testError);
 
-  //     const jwt = data.session.access_token;
+      await service.getLoggedInUser().catch((error) => {
+        expect(error).toBeDefined();
+        expect(error).toHaveProperty('message', 'Internal Server Error');
+        expect(error).toHaveProperty('status', 500);
+      });
+    });
 
-  //     SupabaseMock.getJwt.mockReturnValue(jwt);
-  //     SupabaseMock.getClient.mockReturnValue(
-  //       createClient(supabaseUrl, supabaseKey, {
-  //         auth: {
-  //           autoRefreshToken: false,
-  //           persistSession: false,
-  //           detectSessionInUrl: false
-  //         },
-  //         global: {
-  //           headers: {
-  //             Authorization: `Bearer ${jwt}`
-  //           }
-  //         }
-  //       })
-  //     );
-  //   });
+    it('should rethrow the error generated by the Supabase client when getting the logged in user profile', async () => {
+      let testData = [];
+      let testError = [];
 
-  //   it('should update a user', async () => {
-  //     const update_user_dto = {
-  //       user_id: testUser.user_id,
-  //       email: testUser.email,
-  //       username: 'NewUsername',
-  //       first_name: 'John',
-  //       last_name: 'Doe'
-  //     };
+      testData[AUTH] = { user: { id: 'test_user_id' } };
+      testError[SELECT] = { message: 'Internal Server Error', status: 500 };
 
-  //     const updated_user = await service.updateUser(update_user_dto);
-  //     expect(updated_user).toBeDefined();
-  //     expect(updated_user.data[0].user_id).toEqual(testUser.user_id);
-  //     expect(updated_user.data[0].email).toEqual(testUser.email);
-  //     expect(updated_user.data[0].first_name).toEqual(
-  //       update_user_dto.first_name
-  //     );
-  //     expect(updated_user.data[0].last_name).toEqual(update_user_dto.last_name);
-  //     expect(updated_user.data[0].username).toEqual(update_user_dto.username);
-  //   });
+      setTestData(testData);
+      setTestError(testError);
 
-  //   it('should throw HttpException', async () => {
-  //     const update_user_dto = {
-  //       user_id: '123',
-  //       email: testUser.email,
-  //       first_name: 'John',
-  //       last_name: 'Doe'
-  //     };
+      await service.getLoggedInUser().catch((error) => {
+        expect(error).toBeDefined();
+        expect(error).toHaveProperty('message', 'Internal Server Error');
+        expect(error).toHaveProperty('status', 500);
+      });
+    });
 
-  //     SupabaseMock.getJwt.mockReturnValue(null);
+    it('should throw a NotFoundException when the user is not found', async () => {
+      let testData = [];
 
-  //     expect(service.updateUser(update_user_dto)).rejects.toThrow(
-  //       HttpException
-  //     );
-  //   });
-  // });
+      testData[AUTH] = { user: { id: 'test_user_id' } };
+      testData[SELECT] = [];
+
+      setTestData(testData);
+
+      await service.getLoggedInUser().catch((error) => {
+        expect(error).toBeDefined();
+        expect(error).toBeInstanceOf(NotFoundException);
+        expect(error.message).toBe('User not found');
+      });
+    });
+
+    it('should return the user data when the user is found', async () => {
+      let testData = [];
+      testData[AUTH] = { user: { id: 'test_user_id' } };
+      testData[SELECT] = [{ user_id: 'test_user_id' }];
+
+      setTestData(testData);
+
+      const { data } = await service.getLoggedInUser();
+      expect(data).toBeDefined();
+      expect(data).toEqual(testData[SELECT]);
+    });
+  });
+
+  describe('genSessionKey', () => {
+    beforeEach(() => {
+      setTestData([]);
+      setTestError([]);
+    });
+
+    it('should return a success message when the session key is generated', async () => {
+      const session = {};
+      const { data } = await service.genSessionKey(
+        { email: 'test@example.com', password: 'password' },
+        session
+      );
+      expect(data).toBeDefined();
+      expect(data).toHaveProperty('success', true);
+    });
+  });
+
+  describe('signIn', () => {
+    beforeEach(() => {
+      setTestData([]);
+      setTestError([]);
+    });
+
+    it('should rethrow the error generated by the Supabase client when signing in', async () => {
+      let testError = [];
+
+      testError[AUTH] = { message: 'Internal Server Error', status: 500 };
+
+      setTestError(testError);
+
+      await service
+        .signIn({ email: 'test@example.com', password: 'password' })
+        .catch((error) => {
+          expect(error).toBeDefined();
+          expect(error).toHaveProperty('message', 'Internal Server Error');
+          expect(error).toHaveProperty('status', 500);
+        });
+    });
+
+    it('should return the user data when the user is signed in', async () => {
+      let testData = [];
+      testData[AUTH] = { user: { id: 'test_user_id' } };
+
+      setTestData(testData);
+
+      const { data } = await service.signIn({
+        email: 'test@example,com',
+        password: 'password'
+      });
+      expect(data).toBeDefined();
+      expect(data).toEqual(testData[AUTH]);
+    });
+  });
+
+  describe('signUp', () => {
+    beforeEach(() => {
+      setTestData([]);
+      setTestError([]);
+    });
+
+    it('should rethrow the error generated by the Supabase client when signing up', async () => {
+      let testError = [];
+
+      testError[AUTH] = { message: 'Internal Server Error', status: 500 };
+
+      setTestError(testError);
+
+      await service
+        .signUp({
+          email: 'test@example.com',
+          password: 'password',
+          first_name: 'John',
+          last_name: 'Doe'
+        })
+        .catch((error) => {
+          expect(error).toBeDefined();
+          expect(error).toHaveProperty('message', 'Internal Server Error');
+          expect(error).toHaveProperty('status', 500);
+        });
+    });
+
+    it('should return the user data when the user is signed up', async () => {
+      let testData = [];
+      testData[AUTH] = { user: { id: 'test_user_id' } };
+
+      setTestData(testData);
+
+      const { data } = await service.signUp({
+        email: 'test@example.com',
+        password: 'password',
+        first_name: 'John',
+        last_name: 'Doe'
+      });
+      expect(data).toBeDefined();
+      expect(data).toEqual(testData[AUTH]);
+    });
+  });
+
+  describe('createUser', () => {
+    beforeEach(() => {
+      setTestData([]);
+      setTestError([]);
+    });
+
+    it('should rethrow the error generated by the Supabase client when creating a user', async () => {
+      let testError = [];
+
+      testError[AUTH_ADMIN] = { message: 'Internal Server Error', status: 500 };
+
+      setTestError(testError);
+
+      await service
+        .createUser({
+          email: 'test@example.com',
+          password: 'password',
+          first_name: 'John',
+          last_name: 'Doe'
+        })
+        .catch((error) => {
+          expect(error).toBeDefined();
+          expect(error).toHaveProperty('message', 'Internal Server Error');
+          expect(error).toHaveProperty('status', 500);
+        });
+    });
+
+    it('should return the user data when the user is created', async () => {
+      let testData = [];
+      testData[AUTH_ADMIN] = { id: 'test_user_id' };
+
+      setTestData(testData);
+
+      const { data } = await service.createUser({
+        email: 'test@example.com',
+        password: 'password',
+        first_name: 'John',
+        last_name: 'Doe'
+      });
+
+      expect(data).toBeDefined();
+      expect(data).toEqual(testData[AUTH_ADMIN]);
+    });
+  });
+
+  describe('updateUser', () => {
+    beforeEach(() => {
+      setTestData([]);
+      setTestError([]);
+    });
+
+    it('should rethrow the error generated by the Supabase client when the user is not logged in', async () => {
+      let testError = [];
+      let testData = [];
+
+      testError[AUTH] = { message: 'Internal Server Error', status: 500 };
+      testData[AUTH] = { user: null };
+
+      setTestError(testError);
+      setTestData(testData);
+
+      await service
+        .updateUser({
+          first_name: 'John',
+          last_name: 'Doe'
+        })
+        .catch((error) => {
+          expect(error).toBeDefined();
+          expect(error).toHaveProperty('message', 'Internal Server Error');
+          expect(error).toHaveProperty('status', 500);
+        });
+    });
+
+    it('should rethrow the error generated by the Supabase client when updating the user', async () => {
+      let testData = [];
+      let testError = [];
+
+      testData[AUTH] = { user: { id: 'test_user_id' } };
+      testError[UPDATE] = { message: 'Internal Server Error', status: 500 };
+
+      setTestData(testData);
+      setTestError(testError);
+
+      await service
+        .updateUser({
+          first_name: 'John',
+          last_name: 'Doe'
+        })
+        .catch((error) => {
+          expect(error).toBeDefined();
+          expect(error).toHaveProperty('message', 'Internal Server Error');
+          expect(error).toHaveProperty('status', 500);
+        });
+    });
+
+    it('should throw a NotFoundException when the user is not found', async () => {
+      let testData = [];
+
+      testData[AUTH] = { user: { id: 'test_user_id' } };
+      testData[UPDATE] = [];
+
+      setTestData(testData);
+
+      await service
+        .updateUser({
+          first_name: 'John',
+          last_name: 'Doe'
+        })
+        .catch((error) => {
+          expect(error).toBeDefined();
+          expect(error).toBeInstanceOf(NotFoundException);
+          expect(error.message).toBe('User not found');
+        });
+    });
+
+    it('should return the user data when the user is updated', async () => {
+      let testData = [];
+      testData[AUTH] = { user: { id: 'test_user_id' } };
+      testData[UPDATE] = [{ user_id: 'test_user_id' }];
+
+      setTestData(testData);
+
+      const { data } = await service.updateUser({
+        first_name: 'John',
+        last_name: 'Doe'
+      });
+
+      expect(data).toBeDefined();
+      expect(data).toEqual(testData[UPDATE]);
+    });
+  });
+
+  describe('uploadProfilePhoto', () => {
+    beforeEach(() => {
+      setTestData([]);
+      setTestError([]);
+    });
+
+    it('should rethrow the error generated by the Supabase client when the user is not logged in', async () => {
+      let testError = [];
+      let testData = [];
+
+      const file: Express.Multer.File = {
+        fieldname: 'file',
+        originalname: 'test.jpg',
+        encoding: '7bit',
+        mimetype: 'image/jpeg',
+        size: 1024,
+        buffer: Buffer.from('file content'),
+        destination: '/path/to/destination',
+        filename: 'test.jpg',
+        path: '/path/to/destination/test.jpg',
+        stream: null
+      };
+
+      testError[AUTH] = { message: 'Internal Server Error', status: 500 };
+      testData[AUTH] = { user: null };
+
+      setTestError(testError);
+      setTestData(testData);
+
+      await service.uploadProfilePhoto(file).catch((error) => {
+        expect(error).toBeDefined();
+        expect(error).toHaveProperty('message', 'Internal Server Error');
+        expect(error).toHaveProperty('status', 500);
+      });
+    });
+
+    it('should rethrow the error generated by the Supabase client when uploading the profile photo', async () => {
+      let testData = [];
+      let testError = [];
+
+      const file: Express.Multer.File = {
+        fieldname: 'file',
+        originalname: 'test.jpg',
+        encoding: '7bit',
+        mimetype: 'image/jpeg',
+        size: 1024,
+        buffer: Buffer.from('file content'),
+        destination: '/path/to/destination',
+        filename: 'test.jpg',
+        path: '/path/to/destination/test.jpg',
+        stream: null
+      };
+
+      testData[AUTH] = { user: { id: 'test_user_id' } };
+      testError[STORAGE] = { message: 'Internal Server Error', status: 500 };
+
+      setTestData(testData);
+      setTestError(testError);
+
+      await service.uploadProfilePhoto(file).catch((error) => {
+        expect(error).toBeDefined();
+        expect(error).toHaveProperty('message', 'Internal Server Error');
+        expect(error).toHaveProperty('status', 500);
+      });
+    });
+
+    it('should throw an InternalServerErrorException when the data is null', async () => {
+      const file: Express.Multer.File = {
+        fieldname: 'file',
+        originalname: 'test.jpg',
+        encoding: '7bit',
+        mimetype: 'image/jpeg',
+        size: 1024,
+        buffer: Buffer.from('file content'),
+        destination: '/path/to/destination',
+        filename: 'test.jpg',
+        path: '/path/to/destination/test.jpg',
+        stream: null
+      };
+
+      let testData = [];
+      let testError = [];
+
+      testData[AUTH] = { user: { id: 'test_user_id' } };
+      testData[STORAGE] = null;
+
+      setTestData(testData);
+      setTestError(testError);
+
+      await service.uploadProfilePhoto(file).catch((error) => {
+        expect(error).toBeDefined();
+        expect(error).toBeInstanceOf(InternalServerErrorException);
+        expect(error.message).toBe('Failed to upload file');
+      });
+    });
+
+    it('should return the image URL when the profile photo is uploaded', async () => {
+      const file: Express.Multer.File = {
+        fieldname: 'file',
+        originalname: 'test.jpg',
+        encoding: '7bit',
+        mimetype: 'image/jpeg',
+        size: 1024,
+        buffer: Buffer.from('file content'),
+        destination: '/path/to/destination',
+        filename: 'test.jpg',
+        path: '/path/to/destination/test.jpg',
+        stream: null
+      };
+
+      let testData = [];
+      let testError = [];
+
+      testData[AUTH] = { user: { id: 'test_user_id' } };
+      testData[STORAGE] = { url: 'https://example.com/test.jpg' };
+
+      setTestData(testData);
+      setTestError(testError);
+
+      const img_url = await service.uploadProfilePhoto(file);
+      expect(img_url).toBeDefined();
+
+      expect(img_url).toEqual(testData[STORAGE]);
+    })
+  });
+
+  describe('updateUserPassword', () => {
+    it('should return a message stating it is not implemented', async () => {
+      const { data } = await service.updateUserPassword({
+        user_id: 'test_user_id'
+      });
+      expect(data).toBeDefined();
+      expect(data).toBe('Not implemented');
+    })
+  });
+
+  describe('updateUserEmail', () => {
+    it('should return a message stating it is not implemented', async () => {
+      const { data } = await service.updateUserEmail({
+        user_id: 'test_user_id'
+      });
+      expect(data).toBeDefined();
+      expect(data).toBe('Not implemented');
+    });
+  });
+
+  describe('updateUserPhone', () => {
+    it('should return a message stating it is not implemented', async () => {
+      const { data } = await service.updateUserPhone({
+        user_id: 'test_user_id'
+      });
+      expect(data).toBeDefined();
+      expect(data).toBe('Not implemented');
+    });
+  });
 });

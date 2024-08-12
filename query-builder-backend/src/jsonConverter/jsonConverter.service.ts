@@ -69,20 +69,17 @@ export class JsonConverterService {
 
         let tableColumns = '';
 
+        //don't need to select columns from every table in the case of joins
         //the below was changed to throw an error - as not specifying any columns at all causes issues when figuring out which columns to group by when working with aggregate conditions
         //if the columns array is empty return all the columns for the table
-        if(table.columns.length == 0){
-            //tableColumns = '`' + table.name + '`.' + '*';
-            throw new Error('No columns specified for table \'' + table.name + '\'');
-        }
+        //tableColumns = '`' + table.name + '`.' + '*';
+        //throw new Error('No columns specified for table \'' + table.name + '\'');
         //otherwise concatenate the column strings together
-        else{
-            //first add tick symbols around each column name to deal with names with spaces
-            for(let columnIndex = 0; columnIndex < table.columns.length-1; columnIndex++){
-                tableColumns += this.generateColumnString(table.columns[columnIndex], table.name) + ', ';
-            }
-            tableColumns += this.generateColumnString(table.columns[table.columns.length-1], table.name);
+        //first add tick symbols around each column name to deal with names with spaces
+        for(let columnIndex = 0; columnIndex < table.columns.length-1; columnIndex++){
+            tableColumns += this.generateColumnString(table.columns[columnIndex], table.name) + ', ';
         }
+        tableColumns += this.generateColumnString(table.columns[table.columns.length-1], table.name);
 
         return tableColumns;
 
@@ -96,15 +93,19 @@ export class JsonConverterService {
         let tableRef = queryParams.table;
 
         //concatenate the first table's columns
-        selectClause += this.generateListOfColumns(tableRef);
+        if(tableRef.columns.length > 0){
+            selectClause += this.generateListOfColumns(tableRef);
+        }
 
         //traverse the table linked list and add columns for each table until tableRef.join is null
         while(tableRef.join){
 
             //move the table reference one on
             tableRef = tableRef.join.table2;
-
-            selectClause += ', ' + this.generateListOfColumns(tableRef);
+            
+            if(tableRef.columns.length > 0){
+                selectClause += ', ' + this.generateListOfColumns(tableRef);
+            }
 
         }
         

@@ -20,24 +20,70 @@ Our target market consists largely of non-technical users that do not have the t
 - an **overall successful completion rate** of at least 80% for simple tasks that users are invited to perform on the app
 - a [**System Usability Scale (SUS)**](https://usabilitygeek.com/how-to-use-the-system-usability-scale-sus-to-evaluate-the-usability-of-your-website/) of at least 90% when gauging satisfaction of users using the system
 
+We will have two User Experience (UX) Surveys with the same target group. The first one will be given released 13 August and will complete on 19 August. After which modifications will be made if needed to improve usability. We then send new surveys to the same group to see if their experience has improved. At the end of each survey you give a usability rating from 0%-100%. This is how we will quantify and see if our UX improves over time.
+
 ### 2 - Security
 
 *How capable the system is at protecting regular users and their data from those with malicious intent.*
 
 Being a data-intensive application, QBee need to uphold high security standards when it comes to protecting user data. The system should be secure when storing users’ data and handling database connection links and passwords. It should also prevent malicious users from sending queries that can negatively impact databases.
 
-**Quantification:** We have decided to address the following [**OWasp Top 10 cybersecurity risks**](https://owasp.org/www-project-top-ten/) in order to quantify that we have met our security requirement:
+#### Quantification:
+>We have decided to address the following [**OWasp Top 10 cybersecurity risks**](https://owasp.org/www-project-top-ten/) in order to quantify that we have met our security requirement:
 
-- **Broken Access Control:** The system should implement strong authorization rules to restrict access to resources based on user roles and permissions.
-- **Cryptographic Failures:** The system should encrypt data at rest and in transit using strong algorithms and protocols. Regularly rotate cryptographic keys.
-- **Injection:** The system should validate and sanitize all user inputs to prevent malicious code from being executed.
-- **Insecure Design:** The system should follow secure coding practices and employ threat modeling techniques throughout the development lifecycle.
-- **Security Misconfiguration:** The system should implement security best practices for all system components and follow vendor patching recommendations.
-- **Vulnerable and Outdated Components:** The system should use software composition analysis tools to identify and update vulnerable components.
-- **Identification and Authentication Failures:** The system should enforce multi-factor authentication and strong password policies.
-- **Software and Data Integrity Failures:** The system should implement digital signatures and tamper-evident mechanisms to ensure data integrity.
-- **Security Logging and Monitoring Failures:** The system should implement comprehensive logging and monitoring practices to detect suspicious activity.
-- **Server-Side Request Forgery (SSRF):** The system should validate and restrict user-supplied URLs to prevent unauthorized requests to external systems.
+**Broken Access Control:**  
+The system should implement strong authorization rules to restrict access to resources based on user roles and permissions.
+
+The QBEE database has row level security enabled to ensure that users can only access the data they are allowed to see as defined in the RLS policy.
+
+Furthermore, users have different permissions to access the system. These permissions are split up into "Owner", "Admin" and "User" roles. Only users authorized with a respective role can access the parts of the system they are intended to.
+
+**Cryptographic Failures:**  
+The system should encrypt data at rest and in transit using strong algorithms and protocols. Regularly rotate cryptographic keys.
+
+The QBEE system makes use of the AES-256 encryption algorithm to ensure that data is secure. AES-256 is the industry standard and provides bank-grade security.
+
+**Injection:**  
+The system should validate and sanitize all user inputs to prevent malicious code from being executed.
+
+No plaintext queries are executed on the database, rather Supabase functions are used to execute queries. This ensures that no SQL injection attacks can be executed on the database.
+
+**Insecure Design:**  
+The system should follow secure coding practices and employ threat modeling techniques throughout the development lifecycle.
+
+During the design of the system, possible threats were analyzed and while developing the system, the aim was to mitigate the identified threats.
+
+**Security Misconfiguration:**  
+The system should implement security best practices for all system components and follow vendor patching recommendations.
+
+The system is hosted on Supabase, which is a secure platform that follows best practices for security. The system is also regularly updated to ensure that it is secure.
+
+**Vulnerable and Outdated Components:**  
+The system should use software composition analysis tools to identify and update vulnerable components.
+
+The system makes use of Supabase which is a secure platform that is regularly updated to ensure that it is secure.
+Furthermore, the packages are regularly updated to the latest versions to ensure the system is stable, secure and has the latest bug fixes.
+
+**Identification and Authentication Failures:**  
+The system should enforce multi-factor authentication and strong password policies.
+
+The system makes use of JWTs when querying the backend. This ensures provides a form of multi-factor authentication, ensuring that users are who they say they are.
+
+**Software and Data Integrity Failures:**  
+The system should implement digital signatures and tamper-evident mechanisms to ensure data integrity.
+
+Encryption and decryption makes use of a digital signature that is only accessible to the user who encrypted the data. This ensures that data is not tampered with.
+
+**Security Logging and Monitoring Failures:**  
+The system should implement comprehensive logging and monitoring practices to detect suspicious activity.
+
+This will be implemented when the deploy issues are resolved.
+<!-- TODO -->
+
+**Server-Side Request Forgery (SSRF):**  
+The system should validate and restrict user-supplied URLs to prevent unauthorized requests to external systems.
+
+Users are only able to query databases that they have connected to the system. This ensures that users cannot query databases that they are not authorized to query.
 
 ### 3 - Scalability
 
@@ -57,7 +103,8 @@ The system should maintain a certain performance standard. Users will not want t
 
 **Quantification:** We will ensure the system's performance by making sure that the system:
 
-- Has an **average API response time of under 1 second**.
+- Has an **average API response time of under 1 second** for regular API requests.
+- Has an **average API response time of under 5 seconds** for API requests involving Natural Language Processing
 - Can handle **50 user requests per second**.
 
 ### 5 - Reliability
