@@ -79,9 +79,10 @@ export default function SignedInHomePage(){
         <Spacer y={10}/>
         {organisations ? organisations.map((org: Organisation) => (
             <>
-                <div className="flex justify-between">
-                    <h1 className="text-3xl">{org.name}</h1>
+                <div className="flex">
+                    <h1 className="text-3xl flex-1">{org.name}</h1>
                     <DatabaseConnectionModal org_id={org.org_id} on_add={fetchOrgs}/>
+                    <Spacer x={5} />
                     <Link href={"/organisation/" + org.org_id}>settings</Link>
                 </div>
 
