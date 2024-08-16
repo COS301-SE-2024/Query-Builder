@@ -48,7 +48,7 @@ export class ConnectionManagerService {
         .eq('db_id', db_id)
         .single();
       if (error) {
-        this.logger.log(error);
+        this.logger.error(error, ConnectionManagerService.name);
         return reject(error);
       }
 
@@ -64,7 +64,7 @@ export class ConnectionManagerService {
         //-----------------------------EXISTING CONNECTION TO THE RIGHT HOST---------------------//
         //check if the hashed version of the password stored in the session matches the hash of the password in the query
         //Print out that you are reconnecting to an existing session and not a new one
-        this.logger.log(`[Reconnecting] ${session.id} connected to ${host}`);
+        this.logger.log(`[Reconnecting] ${session.id} connected to ${host}`, ConnectionManagerService.name);
         return resolve({
           success: true,
           connectionID: this.sessionStore.get(session.id).conn.threadID
@@ -75,7 +75,7 @@ export class ConnectionManagerService {
           //if there is an existing connection that needs to be changed to a different host
           this.sessionStore.get(session.id).conn.end();
           this.sessionStore.remove(session.id);
-          this.logger.log(`[Connection Disconnected] ${session.id}`);
+          this.logger.log(`[Connection Disconnected] ${session.id}`, ConnectionManagerService.name);
           session.host = undefined;
         }
 
@@ -90,7 +90,7 @@ export class ConnectionManagerService {
         connection.connect((err) => {
           //if there is an error with the connection, reject
           if (err) {
-            this.logger.log(err);
+            this.logger.error(err, ConnectionManagerService.name);
             if (
               err.code == 'ER_ACCESS_DENIED_ERROR' ||
               err.code == 'ER_NOT_SUPPORTED_AUTH_MODE'
@@ -118,7 +118,7 @@ export class ConnectionManagerService {
 
             this.logger.log(
               `[Inital Connection] ${session.id} connected to ${host}`
-            );
+            , ConnectionManagerService.name);
             return resolve({
               success: true,
               connectionID: connection.threadID

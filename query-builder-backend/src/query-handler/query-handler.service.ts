@@ -64,7 +64,7 @@ export class QueryHandlerService {
 
         const numRows = results[0].numRows;
 
-        console.log(numRows);
+        this.logger.log(numRows, QueryHandlerService.name);
 
         //thirdly, query the database
 
@@ -76,7 +76,7 @@ export class QueryHandlerService {
           return reject(e);
         }
 
-        console.log(queryCommand);
+        this.logger.log(queryCommand, QueryHandlerService.name);
         connection.query(queryCommand, function (error, results, fields) {
           if (error) {
             return reject(error);
