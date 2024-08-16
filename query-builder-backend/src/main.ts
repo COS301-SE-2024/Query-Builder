@@ -41,10 +41,10 @@ async function bootstrap() {
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
 
   app.enableCors({
-    origin: `http://${process.env.FRONTEND_URL}`,
+    origin: `http://localhost`,
     methods: 'GET,PUT,PATCH,POST,DELETE', 
     credentials: true
   });
-  await app.listen(55555, '0.0.0.0');
+  await app.listen(55555);
 }
 bootstrap();
