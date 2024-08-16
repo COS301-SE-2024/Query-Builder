@@ -9,6 +9,7 @@ import { ConnectionManagerService } from "./../connection-manager/connection-man
 import { Query } from '../interfaces/intermediateJSON';
 import { SessionStore } from '../session-store/session-store.service';
 import { createHash } from 'crypto';
+import { MyLoggerService } from 'src/my-logger/my-logger.service';
 
 @Injectable()
 export class QueryHandlerService {
@@ -17,6 +18,8 @@ export class QueryHandlerService {
     private readonly connectionManagerService: ConnectionManagerService,
     private readonly sessionStore: SessionStore,
   ) {}
+
+  private readonly logger = new MyLoggerService(QueryHandlerService.name);
 
   queryDatabase(query: Query, session: Record<string, any>): Promise<any> {
     return new Promise(async (resolve, reject) => {

@@ -4,9 +4,11 @@ import { AllExceptionsFilter } from './all-exceptions.filter';
 import * as session from 'express-session';
 import { createClient } from 'redis';
 import RedisStore from 'connect-redis';
+import { MyLoggerService } from './my-logger/my-logger.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const logger = new MyLoggerService('Main');
 
   const { httpAdapter } = app.get(HttpAdapterHost);
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
@@ -19,7 +21,7 @@ async function bootstrap() {
       port: 6379
     }
   })
-    .on('error', (err) => console.log('Redis Client Error', err))
+    .on('error', (err) => logger.log('Redis Client Error', err))
     .connect();
 
   redisClient.flushAll();
