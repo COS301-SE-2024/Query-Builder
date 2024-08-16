@@ -9,20 +9,20 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const { httpAdapter } = app.get(HttpAdapterHost);
+  app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
+
   app.setGlobalPrefix('api');
 
-  let redisClient = await createClient(
-    {
-      socket: {
-        host: `${process.env.REDIS_HOST}`,
-        port: 6379,
-      }
+  let redisClient = await createClient({
+    socket: {
+      host: `${process.env.REDIS_HOST}`,
+      port: 6379
     }
-  )
+  })
     .on('error', (err) => console.log('Redis Client Error', err))
     .connect();
 
-  redisClient.flushAll()
+  redisClient.flushAll();
 
   let redisStore = new RedisStore({
     client: redisClient,
@@ -34,15 +34,13 @@ async function bootstrap() {
       store: redisStore,
       secret: process.env.SESSION_SECRET,
       resave: false,
-      saveUninitialized: false,
-    }),
+      saveUninitialized: false
+    })
   );
-
-  app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
 
   app.enableCors({
     origin: `http://${process.env.FRONTEND_URL}`,
-    methods: 'GET,PUT,PATCH,POST,DELETE', 
+    methods: 'GET,PUT,PATCH,POST,DELETE',
     credentials: true
   });
   await app.listen(55555, '0.0.0.0');
