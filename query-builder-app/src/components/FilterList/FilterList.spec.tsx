@@ -1,8 +1,9 @@
 import FilterList from "./FilterList";
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import { describe, it, expect, vi, Mock} from 'vitest';
-import { table } from "../../interfaces/intermediateJSON";
+import { ComparisonOperator, compoundCondition, LogicalOperator, table } from "../../interfaces/intermediateJSON";
+import userEvent from '@testing-library/user-event'
 import React from 'react';
 
 //Mock out Supabase access token retrieval
@@ -56,4 +57,66 @@ describe('FilterList basic rendering tests', () => {
       expect(baseElement).toBeTruthy();
   
     });
+});
+
+describe('FilterList filter selection tests', () => {
+
+  it('should allow the user to select a filter', async () => {
+
+    const tableProp: table = {
+      name: "actor",
+      columns: [{name: "first_name"}],
+      join: {
+        table1MatchingColumnName: "actor_id",
+        table2MatchingColumnName: "actor_id",
+        table2: {
+          name: "film_actor",
+          columns: [{name: "film_id"}]
+        }
+      }
+    }
+
+    let conditionProp: compoundCondition | undefined = undefined;
+
+    //callback function for FilterList to modify the condition
+    function updateCondition(condition: compoundCondition){
+
+      //modify conditionProp
+      conditionProp = condition;
+
+    }
+
+    render(<FilterList databaseServerID="1234" table={tableProp} condition={conditionProp} onChange={updateCondition}/>);
+  
+    //create a user that can perform actions
+    const user = userEvent.setup();
+
+    //get the add button
+    const button = screen.getAllByLabelText('add filter')[0];
+
+    //click the add button
+    await user.click(button);
+
+    //find the last_name column
+    const userSelection = await screen.findByLabelText("actor - last_name");
+
+    //select the last_name column
+    await user.click(userSelection);
+
+    //check that conditionProp now matches the expectedCondition
+    const expectedCondition: compoundCondition = {
+      operator: LogicalOperator.AND,
+      conditions: [
+        {
+          tableName: "actor",
+          column: "last_name",
+          operator: ComparisonOperator.EQUAL,
+          value: 0
+        }
+      ]
+    }
+
+    expect(conditionProp).toEqual(expectedCondition);
+
+  });
 });
