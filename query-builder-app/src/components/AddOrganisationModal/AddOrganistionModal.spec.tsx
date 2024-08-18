@@ -94,4 +94,36 @@ describe('add organisation tests', () => {
   
     })
   
-  });
+});
+
+describe('join organisation tests', () => {
+
+  it('Should be able to fill out the Organisation Hash Code field and join an organisation', async () => {
+
+    //create a user that can perform actions
+    const user = userEvent.setup()
+
+    //render the component
+    render(<AddOrganisationModal on_add={()=>{}}/>);
+
+    //get the button to add an organisation
+    const button = screen.getByText("+ Add");
+
+    //click the button to add an organisation
+    await user.click(button);
+
+    //Get the Organisation Hash Code Field
+    const organisationHashCodeField = screen.getByLabelText("Organisation Hash Code");
+  
+    //type an Organisation Name into the Organisation Name field
+    await user.type(organisationHashCodeField, "Mock Hash Code");
+
+    //get the join button
+    const joinButton = screen.getByText("Join");
+
+    //click the join button
+    await user.click(joinButton);
+
+  })
+
+});
