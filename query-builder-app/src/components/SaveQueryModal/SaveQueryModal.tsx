@@ -55,8 +55,6 @@ export default function SaveQueryModal(props: SaveQueryModalProps){
         })
       })
 
-      let json = await response.json();
-
     }
 
     return (
