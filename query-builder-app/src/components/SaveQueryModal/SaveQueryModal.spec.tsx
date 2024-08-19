@@ -27,7 +27,7 @@ vitest.mock("./../../utils/supabase/client", () => {
 //Mock out the API calls
 global.fetch = vi.fn((url: string, config: any) => {
 
-    if(url == `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query-management/save-query`){
+    if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query-management/save-query`){
         return Promise.resolve({
             json: () => Promise.resolve({}),
         })

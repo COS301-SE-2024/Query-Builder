@@ -27,7 +27,7 @@ vi.mock("./../../utils/supabase/client", () => {
 //Mock out the API calls
 global.fetch = vi.fn((url: string, config: any) => {
 
-  if(url == `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/fields`){
+  if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/fields`){
       return Promise.resolve({
           json: () => Promise.resolve({ data: [{name: "first_name"}, {name: "last_name"}] }),
       })
