@@ -4,25 +4,27 @@ import { AllExceptionsFilter } from './all-exceptions.filter';
 import * as session from 'express-session';
 import { createClient } from 'redis';
 import RedisStore from 'connect-redis';
+import { MyLoggerService } from './my-logger/my-logger.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const logger = new MyLoggerService('Main');
 
   const { httpAdapter } = app.get(HttpAdapterHost);
+  app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
+
   app.setGlobalPrefix('api');
 
-  let redisClient = await createClient(
-    {
-      socket: {
-        host: `${process.env.REDIS_HOST}`,
-        port: 6379,
-      }
+  let redisClient = await createClient({
+    socket: {
+      host: `${process.env.REDIS_HOST}`,
+      port: 6379
     }
-  )
-    .on('error', (err) => console.log('Redis Client Error', err))
+  })
+    .on('error', (err) => logger.log('Redis Client Error', err))
     .connect();
 
-  redisClient.flushAll()
+  redisClient.flushAll();
 
   let redisStore = new RedisStore({
     client: redisClient,
@@ -34,17 +36,15 @@ async function bootstrap() {
       store: redisStore,
       secret: process.env.SESSION_SECRET,
       resave: false,
-      saveUninitialized: false,
-    }),
+      saveUninitialized: false
+    })
   );
 
-  app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
-
   app.enableCors({
-    origin: `http://${process.env.FRONTEND_URL}`,
+    origin: `http://localhost`,
     methods: 'GET,PUT,PATCH,POST,DELETE', 
     credentials: true
   });
-  await app.listen(55555, '0.0.0.0');
+  await app.listen(55555);
 }
 bootstrap();

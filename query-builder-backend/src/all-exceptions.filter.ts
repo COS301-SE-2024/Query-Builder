@@ -2,11 +2,12 @@ import {
   Catch,
   ArgumentsHost,
   HttpStatus,
-  HttpException,
+  HttpException
 } from '@nestjs/common';
 import { BaseExceptionFilter } from '@nestjs/core';
 import { isAuthApiError } from '@supabase/supabase-js';
 import { Request, Response } from 'express';
+import { MyLoggerService } from './my-logger/my-logger.service';
 
 type MyErrorObject = {
   response: string | object;
@@ -17,6 +18,8 @@ type MyErrorObject = {
 
 @Catch()
 export class AllExceptionsFilter extends BaseExceptionFilter {
+  private readonly logger = new MyLoggerService(AllExceptionsFilter.name);
+
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
@@ -26,7 +29,7 @@ export class AllExceptionsFilter extends BaseExceptionFilter {
       response: '',
       statusCode: 200,
       path: request.url,
-      timestamp: new Date().toISOString(),
+      timestamp: new Date().toISOString()
     };
 
     if (exception instanceof HttpException) {
@@ -35,7 +38,7 @@ export class AllExceptionsFilter extends BaseExceptionFilter {
     } else if (isAuthApiError(exception)) {
       myResponse.response = {
         message: exception.message,
-        code: exception.code,
+        code: exception.code
       };
       myResponse.statusCode = exception.status;
     } else {
@@ -47,6 +50,12 @@ export class AllExceptionsFilter extends BaseExceptionFilter {
     }
 
     response.status(myResponse.statusCode).json(myResponse);
+
+    const responseString =
+      typeof myResponse.response === 'string'
+        ? myResponse.response
+        : JSON.stringify(myResponse.response);
+    this.logger.error(responseString, AllExceptionsFilter.name);
 
     super.catch(exception, host);
   }

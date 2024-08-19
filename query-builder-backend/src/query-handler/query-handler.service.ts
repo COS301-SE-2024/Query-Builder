@@ -1,38 +1,42 @@
 import {
   BadGatewayException,
   Injectable,
-  UnauthorizedException,
+  UnauthorizedException
 } from '@nestjs/common';
 import { JsonConverterService } from './../jsonConverter/jsonConverter.service';
-import { OrgManagementService } from './../org-management/org-management.service'
-import { ConnectionManagerService } from "./../connection-manager/connection-manager.service"
+import { OrgManagementService } from './../org-management/org-management.service';
+import { ConnectionManagerService } from './../connection-manager/connection-manager.service';
 import { Query } from '../interfaces/intermediateJSON';
 import { SessionStore } from '../session-store/session-store.service';
 import { createHash } from 'crypto';
+import { MyLoggerService } from '../my-logger/my-logger.service';
 
 @Injectable()
 export class QueryHandlerService {
   constructor(
     private readonly jsonConverterService: JsonConverterService,
     private readonly connectionManagerService: ConnectionManagerService,
-    private readonly sessionStore: SessionStore,
+    private readonly sessionStore: SessionStore
   ) {}
+
+  private readonly logger = new MyLoggerService(QueryHandlerService.name);
 
   queryDatabase(query: Query, session: Record<string, any>): Promise<any> {
     return new Promise(async (resolve, reject) => {
-
-      const {success, connectionID} = await this.connectionManagerService.connectToDatabase(query.databaseServerID, session);
-      if(!success) {
+      const { success, connectionID } =
+        await this.connectionManagerService.connectToDatabase(
+          query.databaseServerID,
+          session
+        );
+      if (!success) {
         return reject(
           new UnauthorizedException(
-            'Please ensure that your database credentials are correct.',
-          ),
+            'Please ensure that your database credentials are correct.'
+          )
         );
-      }
-      else{
+      } else {
         return resolve(this.queryHelper(query, session));
       }
-
     });
   }
 
@@ -61,7 +65,7 @@ export class QueryHandlerService {
 
         const numRows = results[0].numRows;
 
-        console.log(numRows);
+        this.logger.log(numRows, QueryHandlerService.name);
 
         //thirdly, query the database
 
@@ -73,7 +77,7 @@ export class QueryHandlerService {
           return reject(e);
         }
 
-        console.log(queryCommand);
+        this.logger.log(queryCommand, QueryHandlerService.name);
         connection.query(queryCommand, function (error, results, fields) {
           if (error) {
             return reject(error);
@@ -87,7 +91,7 @@ export class QueryHandlerService {
           //return a response object with numRows and results
           const response = {
             totalNumRows: numRows,
-            data: results,
+            data: results
           };
 
           return resolve(response);
