@@ -6,7 +6,7 @@ import * as path from 'path';
 @Injectable()
 export class MyLoggerService extends ConsoleLogger {
   constructor(context?: string) {
-    super();
+    super(context);
   }
 
   log(message: any, context?: string) {
