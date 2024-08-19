@@ -9,7 +9,8 @@ import { promisify } from 'util';
 
 @Injectable()
 export class AppService {
-  constructor(private readonly configService: ConfigService) {}
+  constructor(private readonly configService: ConfigService) {
+  }
 
   getHello(): string {
     return 'Hello World!';

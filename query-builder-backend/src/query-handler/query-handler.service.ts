@@ -4,7 +4,6 @@ import {
   UnauthorizedException
 } from '@nestjs/common';
 import { JsonConverterService } from './../jsonConverter/jsonConverter.service';
-import { OrgManagementService } from './../org-management/org-management.service';
 import { ConnectionManagerService } from './../connection-manager/connection-manager.service';
 import { Query } from '../interfaces/intermediateJSON';
 import { SessionStore } from '../session-store/session-store.service';
@@ -16,10 +15,11 @@ export class QueryHandlerService {
   constructor(
     private readonly jsonConverterService: JsonConverterService,
     private readonly connectionManagerService: ConnectionManagerService,
-    private readonly sessionStore: SessionStore
-  ) {}
-
-  private readonly logger = new MyLoggerService(QueryHandlerService.name);
+    private readonly sessionStore: SessionStore,
+    private logger: MyLoggerService
+  ) {
+    this.logger.setContext(QueryHandlerService.name);
+  }
 
   queryDatabase(query: Query, session: Record<string, any>): Promise<any> {
     return new Promise(async (resolve, reject) => {

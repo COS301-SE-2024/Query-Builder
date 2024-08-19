@@ -5,12 +5,13 @@ import { SupabaseModule } from '../supabase/supabase.module';
 import { AppService } from 'src/app.service';
 import { ConfigModule } from '@nestjs/config';
 import { SessionStoreModule } from 'src/session-store/session-store.module';
+import { MyLoggerModule } from 'src/my-logger/my-logger.module';
 
 @Module({
   imports: [
     SupabaseModule,
     ConfigModule.forRoot({ isGlobal: true }),
-    SessionStoreModule
+    SessionStoreModule,
   ],
   controllers: [OrgManagementController],
   providers: [OrgManagementService, AppService],

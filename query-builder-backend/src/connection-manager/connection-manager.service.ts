@@ -25,9 +25,11 @@ export class ConnectionManagerService {
     private readonly sessionStore: SessionStore,
     private readonly supabase: Supabase,
     private readonly config_service: ConfigService,
-    private readonly app_service: AppService
-  ) {}
-  private readonly logger = new MyLoggerService(ConnectionManagerService.name);
+    private readonly app_service: AppService,
+    private logger: MyLoggerService
+  ) {
+    this.logger.setContext(ConnectionManagerService.name);
+  }
 
   async connectToDatabase(
     db_id: string,
