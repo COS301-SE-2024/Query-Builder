@@ -5,6 +5,10 @@ import * as path from 'path';
 
 @Injectable()
 export class MyLoggerService extends ConsoleLogger {
+  constructor(context?: string) {
+    super();
+  }
+
   log(message: any, context?: string) {
     const entry = `${context}\t${message}`;
     this.logToFile(entry);
