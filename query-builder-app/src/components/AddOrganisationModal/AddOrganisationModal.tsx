@@ -48,7 +48,7 @@ export default function AddOrganisationModal(props: AddOrganisationModalProps){
     async function addOrganisation(name: String){
 
       //call the create-org API endpoint
-      let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/create-org`, {
+      let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/create-org`, {
         credentials: "include",
         method: "POST",
         headers: {
@@ -72,7 +72,7 @@ export default function AddOrganisationModal(props: AddOrganisationModalProps){
     async function joinOrganisation(hashCode: String){
 
       //call the create-org API endpoint
-      let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/join-org`, {
+      let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/join-org`, {
         credentials: "include",
         method: "POST",
         headers: {
