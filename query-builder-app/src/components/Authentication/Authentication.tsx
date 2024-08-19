@@ -100,7 +100,7 @@ export default function Authentication() {
     //sign into QBee server
     //call the sign-in API endpoint
     setLoading(true);
-    let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user-management/gen-session-key`, {
+    let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user-management/gen-session-key`, {
       credentials: "include",
       method: "PUT",
       headers: {

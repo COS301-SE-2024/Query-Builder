@@ -84,7 +84,7 @@ export default function EditUserModal(props: EditUserModalProps){
 
       console.log(updatedDetails);
 
-      let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/update-member`, {
+      let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/update-member`, {
           method: "PATCH",
           headers: {
             'Accept': 'application/json',

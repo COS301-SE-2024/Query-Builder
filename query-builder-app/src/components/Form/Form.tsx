@@ -131,7 +131,7 @@ export default function Form(){
 
     async function getQuery(){
 
-        let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query-management/get-single-query`, {
+        let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query-management/get-single-query`, {
             credentials: "include",
             method: "PUT",
             headers: {
@@ -170,7 +170,7 @@ export default function Form(){
     //async function to fetch the database server's databases
     async function fetchDatabases() {
     
-        let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/schemas`, {
+        let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/schemas`, {
             credentials: "include",
             method: "PUT",
             headers: {
