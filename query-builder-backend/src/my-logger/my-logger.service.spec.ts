@@ -12,7 +12,7 @@ describe('MyLoggerService', () => {
       providers: [MyLoggerService]
     }).compile();
 
-    service = module.get<MyLoggerService>(MyLoggerService);
+    service = await module.resolve<MyLoggerService>(MyLoggerService);
   });
 
   it('should be defined', () => {

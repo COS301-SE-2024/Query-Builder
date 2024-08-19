@@ -18,7 +18,7 @@ type MyErrorObject = {
 
 @Catch()
 export class AllExceptionsFilter extends BaseExceptionFilter {
-  private readonly logger = new MyLoggerService(AllExceptionsFilter.name);
+  private logger = new MyLoggerService(BaseExceptionFilter.name);
 
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();

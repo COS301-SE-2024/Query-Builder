@@ -7,8 +7,11 @@ import RedisStore from 'connect-redis';
 import { MyLoggerService } from './my-logger/my-logger.service';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  const logger = new MyLoggerService('Main');
+  const app = await NestFactory.create(AppModule, {
+    bufferLogs: true
+  });
+
+  app.useLogger(new MyLoggerService());
 
   const { httpAdapter } = app.get(HttpAdapterHost);
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
@@ -21,7 +24,9 @@ async function bootstrap() {
       port: 6379
     }
   })
-    .on('error', (err) => logger.log('Redis Client Error', err))
+    .on('error', (err) => {
+      throw err;
+    })
     .connect();
 
   redisClient.flushAll();
@@ -42,7 +47,7 @@ async function bootstrap() {
 
   app.enableCors({
     origin: `${process.env.FRONTEND_URL}`,
-    methods: 'GET,PUT,PATCH,POST,DELETE', 
+    methods: 'GET,PUT,PATCH,POST,DELETE',
     credentials: true
   });
   await app.listen(55555);
