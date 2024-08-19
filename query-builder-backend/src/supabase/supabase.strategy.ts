@@ -4,7 +4,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AuthUser } from '@supabase/supabase-js';
-import { MyLoggerService } from 'src/my-logger/my-logger.service';
+import { MyLoggerService } from '../my-logger/my-logger.service';
 
 @Injectable()
 export class SupabaseStrategy extends PassportStrategy(Strategy) {
