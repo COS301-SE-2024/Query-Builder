@@ -119,7 +119,7 @@ export default function TableList(props: TableListProps){
     //async function to fetch all the database's tables
     async function fetchAllTables(database: string) {
 
-        let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/tables`, {
+        let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/tables`, {
             credentials: "include",
             method: "PUT",
             headers: {
@@ -145,7 +145,7 @@ export default function TableList(props: TableListProps){
     //async function to fetch the joinable tables
     async function fetchJoinableTables(database: string, tableName: string) {
 
-        let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/foreign-keys`, {
+        let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/foreign-keys`, {
             credentials: "include",
             method: "PUT",
             headers: {

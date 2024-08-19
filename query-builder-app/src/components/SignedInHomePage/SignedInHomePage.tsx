@@ -40,7 +40,7 @@ export default function SignedInHomePage(){
     async function fetchOrgs() {
         
         //Get the orgs of the logged-in user
-        let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/get-org`, {
+        let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/get-org`, {
             credentials: "include",
             method: "GET",
             headers: {

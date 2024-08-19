@@ -28,12 +28,12 @@ vi.mock("./../../utils/supabase/client", () => {
 //Mock out the API calls
 global.fetch = vi.fn((url: string, config: any) => {
 
-  if(url == `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/schemas`){
+  if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/schemas`){
       return Promise.resolve({
           json: () => Promise.resolve({data: [{SCHEMA_NAME: "sakila"}]}),
       })
   }
-  else if(url == `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query-management/get-single-query`){
+  else if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query-management/get-single-query`){
       return Promise.resolve({
           json: () => Promise.resolve({parameters: {language: "sql", query_type: "select", databaseName: "sakila", table: {name: "actor", columns: [{name: "first_name"}]}}}),
       })

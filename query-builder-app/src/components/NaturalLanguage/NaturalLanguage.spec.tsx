@@ -40,7 +40,7 @@ describe('NaturalLanguage make a query', () => {
     //Mock out the API calls
     global.fetch = vi.fn((url: string, config: any) => {
 
-      if(url == `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/natural-language/query`){
+      if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/natural-language/query`){
           return Promise.resolve({
               ok: true,
               json: () => Promise.resolve({
@@ -81,7 +81,7 @@ describe('NaturalLanguage make a query', () => {
     //Mock out the API calls
     global.fetch = vi.fn((url: string, config: any) => {
 
-      if(url == `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/natural-language/query`){
+      if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/natural-language/query`){
           return Promise.resolve({
               ok: false,
           })

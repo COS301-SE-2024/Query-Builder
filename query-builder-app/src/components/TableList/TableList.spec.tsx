@@ -27,17 +27,17 @@ vitest.mock("./../../utils/supabase/client", () => {
 //Mock out the API calls
 global.fetch = vi.fn((url: string, config: any) => {
 
-    if(url == `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/tables`){
+    if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/tables`){
         return Promise.resolve({
             json: () => Promise.resolve([{table_name: "users", qbee_id: 0}, {table_name: "payments", qbee_id: 1}]),
         })
     }
-    else if(url == `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/foreign-keys`){
+    else if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/foreign-keys`){
         return Promise.resolve({
             json: () => Promise.resolve([{table_name: "payments", qbee_id: 1, REFERENCED_COLUMN_NAME: "id", COLUMN_NAME: "user_id", TABLE_SCHEMA: "sakila"}]),
         })
     }
-    else if(url == `http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/fields`){
+    else if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/fields`){
         return Promise.resolve({
             json: () => Promise.resolve({ data: [{name: "first_name"}, {name: "last_name"}] }),
         })

@@ -90,7 +90,7 @@ export default function TableResponse(props: TableResponseProps){
   async function getAllData() {
     
     //fetch the data from the endpoint
-    let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query`, {
+    let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query`, {
       credentials: "include",
       method: "POST",
       headers: {
@@ -140,7 +140,7 @@ export default function TableResponse(props: TableResponseProps){
       }
 
       //fetch the data from the endpoint
-      let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query`, {
+      let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query`, {
         credentials: "include",
         method: "POST",
         headers: {

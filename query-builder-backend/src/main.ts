@@ -41,7 +41,7 @@ async function bootstrap() {
   );
 
   app.enableCors({
-    origin: `http://localhost`,
+    origin: `${process.env.FRONTEND_URL}`,
     methods: 'GET,PUT,PATCH,POST,DELETE', 
     credentials: true
   });

@@ -32,7 +32,7 @@ export default function NaturalLanguage() {
 
         setLoading(true);
 
-        let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/natural-language/query`, {
+        let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/natural-language/query`, {
             credentials: "include",
             method: "POST",
             headers: {
