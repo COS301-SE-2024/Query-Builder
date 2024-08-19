@@ -253,7 +253,7 @@ export default function TableList(props: TableListProps){
                     (tableRef.join == null) && (joinableTables.length > 0) && (
                         <Dropdown>
                             <DropdownTrigger>
-                                <Button variant="bordered">+</Button>
+                                <Button variant="bordered" aria-label="add table button">+</Button>
                             </DropdownTrigger>
                             <DropdownMenu 
                                     className="max-h-[50vh] overflow-y-auto"

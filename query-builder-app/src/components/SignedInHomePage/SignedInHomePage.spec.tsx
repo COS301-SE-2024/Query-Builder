@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import SignedInHomePage from './SignedInHomePage';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeAll, afterAll, Mock } from 'vitest';
 
 // Mock the necessary components and modules
 vi.mock('./../../utils/supabase/client', () => ({
@@ -54,7 +54,7 @@ describe('SignedInHomePage', () => {
           ]
         })
       })
-    ) as jest.Mock;
+    ) as Mock;
   });
 
   afterAll(() => {

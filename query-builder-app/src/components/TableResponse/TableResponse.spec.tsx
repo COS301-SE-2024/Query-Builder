@@ -10,11 +10,7 @@ describe('TableResponse basic rendering tests', () => {
     it('should render successfully', () => {
 
         const queryProp: Query = {
-            credentials: {
-                host: "127.0.0.1",
-                user: "root",
-                password: "testPassword"
-            },
+            databaseServerID: "1234",
             queryParams: {
                 language: "sql",
                 query_type: "select",
