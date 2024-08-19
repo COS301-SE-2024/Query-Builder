@@ -70,27 +70,6 @@ export default function TableResponse(props: TableResponseProps){
   //A loading state that will initially be true and later false once data has been loaded
   const [loading, setLoading] = useState(true);
 
-  async function saveQuery(){
-
-    //save the query to the query-management/save-query endpoint
-    let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query-management/save-query`, {
-      credentials: "include",
-      method: "POST",
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + await getToken()
-      },
-      body: JSON.stringify({
-        db_id: props.query.databaseServerID,
-        parameters: props.query.queryParams
-      })
-    })
-
-    let json = (await response.json()).data;
-
-  }
-
   async function downloadCSV(){
 
     let data = await getAllData();
@@ -111,7 +90,7 @@ export default function TableResponse(props: TableResponseProps){
   async function getAllData() {
     
     //fetch the data from the endpoint
-    let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query`, {
+    let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query`, {
       credentials: "include",
       method: "POST",
       headers: {
@@ -161,7 +140,7 @@ export default function TableResponse(props: TableResponseProps){
       }
 
       //fetch the data from the endpoint
-      let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query`, {
+      let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query`, {
         credentials: "include",
         method: "POST",
         headers: {

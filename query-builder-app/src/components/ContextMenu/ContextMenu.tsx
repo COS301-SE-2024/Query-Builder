@@ -34,7 +34,7 @@ export default function ContextMenu() {
 
     async function getSavedQueries() {
         try {
-            const response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query-management/get-queries`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query-management/get-queries`, {
                 credentials: "include",
                 method: "GET",
                 headers: {

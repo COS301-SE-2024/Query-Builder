@@ -10,7 +10,7 @@ import { SessionStoreModule } from 'src/session-store/session-store.module';
   imports: [
     SupabaseModule,
     ConfigModule.forRoot({ isGlobal: true }),
-    SessionStoreModule
+    SessionStoreModule,
   ],
   controllers: [OrgManagementController],
   providers: [OrgManagementService, AppService],

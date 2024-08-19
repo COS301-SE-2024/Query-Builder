@@ -80,7 +80,7 @@ export default function FilterList(props: FilterListProps){
 
         const newPossibleConditions: PossibleCondition[] = []; 
 
-        let response = await fetch("http://localhost:55555/api/metadata/fields", {
+        let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/fields`, {
             credentials: "include",
             method: "PUT",
             headers: {
@@ -106,7 +106,7 @@ export default function FilterList(props: FilterListProps){
         while(tableRef.join){
             tableRef = tableRef.join.table2;
 
-            let response = await fetch("http://localhost:55555/api/metadata/fields", {
+            let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/fields`, {
                 credentials: "include",
                 method: "PUT",
                 headers: {
@@ -208,7 +208,7 @@ export default function FilterList(props: FilterListProps){
                         <div className="flex justify-end flex-1">
                             <Dropdown>
                                 <DropdownTrigger>
-                                    <Button variant="bordered">+</Button>
+                                    <Button aria-label="add filter" variant="bordered">+</Button>
                                 </DropdownTrigger>
                                 <DropdownMenu 
                                         className="max-h-[50vh] overflow-y-auto"

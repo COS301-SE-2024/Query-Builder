@@ -5,6 +5,7 @@ import { SessionStoreModule } from '../session-store/session-store.module';
 import { SupabaseModule } from '../supabase/supabase.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppService } from '../app.service';
+import { MyLoggerModule } from '../my-logger/my-logger.module';
 
 describe('ConnectionManagerController', () => {
   let controller: ConnectionManagerController;
@@ -14,7 +15,8 @@ describe('ConnectionManagerController', () => {
       imports: [
         SupabaseModule,
         ConfigModule.forRoot({ isGlobal: true }),
-        SessionStoreModule
+        SessionStoreModule,
+        MyLoggerModule
       ],
       controllers: [ConnectionManagerController],
       providers: [ConnectionManagerService, AppService, ConfigService]

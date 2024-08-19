@@ -31,7 +31,7 @@ const getToken = async () => {
 };
 
 async function removeQuery(query_id: string) {
-    let response = await fetch(`http://${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query-management/delete-query`, {
+    let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query-management/delete-query`, {
         credentials: "include",
         method: "POST",
         headers: {

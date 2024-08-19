@@ -40,7 +40,7 @@ export default function SaveQueryModal(props: SaveQueryModalProps){
     async function saveQuery(queryTitle: String){
 
       //save the query to the query-management/save-query endpoint
-      let response = await fetch("http://localhost:55555/api/query-management/save-query", {
+      let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query-management/save-query`, {
         credentials: "include",
         method: "POST",
         headers: {
@@ -54,8 +54,6 @@ export default function SaveQueryModal(props: SaveQueryModalProps){
           queryTitle: queryTitle
         })
       })
-
-      let json = await response.json();
 
     }
 
