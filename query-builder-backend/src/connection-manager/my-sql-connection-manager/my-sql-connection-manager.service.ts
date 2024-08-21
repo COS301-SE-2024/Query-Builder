@@ -21,7 +21,7 @@ export class MySqlConnectionManagerService extends ConnectionManagerService {
                 .eq('db_id', db_id)
                 .single();
               if (error) {
-                this.logger.error(error, ConnectionManagerService.name);
+                this.logger.error(error, MySqlConnectionManagerService.name);
                 return reject(error);
               }
         
@@ -37,7 +37,7 @@ export class MySqlConnectionManagerService extends ConnectionManagerService {
                 //-----------------------------EXISTING CONNECTION TO THE RIGHT HOST---------------------//
                 //check if the hashed version of the password stored in the session matches the hash of the password in the query
                 //Print out that you are reconnecting to an existing session and not a new one
-                this.logger.log(`[Reconnecting] ${session.id} connected to ${host}`, ConnectionManagerService.name);
+                this.logger.log(`[Reconnecting] ${session.id} connected to ${host}`, MySqlConnectionManagerService.name);
                 return resolve({
                   success: true,
                   connectionID: this.sessionStore.get(session.id).conn.threadID
@@ -48,7 +48,7 @@ export class MySqlConnectionManagerService extends ConnectionManagerService {
                   //if there is an existing connection that needs to be changed to a different host
                   this.sessionStore.get(session.id).conn.end();
                   this.sessionStore.remove(session.id);
-                  this.logger.log(`[Connection Disconnected] ${session.id}`, ConnectionManagerService.name);
+                  this.logger.log(`[Connection Disconnected] ${session.id}`, MySqlConnectionManagerService.name);
                   session.host = undefined;
                 }
         
@@ -63,7 +63,7 @@ export class MySqlConnectionManagerService extends ConnectionManagerService {
                 connection.connect((err) => {
                   //if there is an error with the connection, reject
                   if (err) {
-                    this.logger.error(err, ConnectionManagerService.name);
+                    this.logger.error(err, MySqlConnectionManagerService.name);
                     if (
                       err.code == 'ER_ACCESS_DENIED_ERROR' ||
                       err.code == 'ER_NOT_SUPPORTED_AUTH_MODE'
@@ -91,7 +91,7 @@ export class MySqlConnectionManagerService extends ConnectionManagerService {
         
                     this.logger.log(
                       `[Inital Connection] ${session.id} connected to ${host}`
-                    , ConnectionManagerService.name);
+                    , MySqlConnectionManagerService.name);
                     return resolve({
                       success: true,
                       connectionID: connection.threadID
