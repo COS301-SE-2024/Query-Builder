@@ -189,6 +189,8 @@ export class OrgManagementService {
         'You are not a member of this organisation'
       );
     }
+
+    return org_data;
   }
 
   async getDbs(get_dbs_dto: Get_Dbs_Dto) {
@@ -200,24 +202,60 @@ export class OrgManagementService {
       throw owner_error;
     }
 
-    await this.getDbs_H1(get_dbs_dto.org_id, user_data.user.id);
+    const org_data = await this.getDbs_H1(
+      get_dbs_dto.org_id,
+      user_data.user.id
+    );
 
     // TODO: Add functionality to show only the databases that the user has access to
 
-    const { data, error } = await this.supabase
-      .getClient()
-      .from('org_dbs')
-      .select('org_id, db_id, db_envs(created_at, name, type)')
-      .match({ ...get_dbs_dto });
+    if (org_data[0].role_permissions.view_all_dbs === true) {
+      const { data, error } = await this.supabase
+        .getClient()
+        .from('org_dbs')
+        .select('org_id, db_id, db_envs(created_at, name, type)')
+        .match({ ...get_dbs_dto });
 
-    if (error) {
-      throw error;
-    }
-    if (data.length === 0) {
-      throw new NotFoundException('Databases not found');
-    }
+      if (error) {
+        throw error;
+      }
+      if (data.length === 0) {
+        throw new NotFoundException('Databases not found');
+      }
 
-    return { data };
+      return { data };
+    } else {
+      const { data: db_data, error: db_error } = await this.supabase
+        .getClient()
+        .from('db_access')
+        .select('db_id')
+        .eq('user_id', user_data.user.id);
+
+      if (db_error) {
+        throw db_error;
+      }
+      if (db_data.length === 0) {
+        throw new NotFoundException('Databases not found');
+      }
+
+      const db_ids = db_data.map((db) => db.db_id);
+
+      const { data, error } = await this.supabase
+        .getClient()
+        .from('org_dbs')
+        .select('org_id, db_id, db_envs(created_at, name, type)')
+        .eq('org_id', get_dbs_dto.org_id)
+        .in('db_id', db_ids);
+
+      if (error) {
+        throw error;
+      }
+      if (data.length === 0) {
+        throw new NotFoundException('Databases not found');
+      }
+
+      return { data };
+    }
   }
 
   async getOrgHash(create_hash_dto: Create_Hash_Dto) {
