@@ -193,6 +193,23 @@ export class OrgManagementService {
     return org_data;
   }
 
+  async getDbs_H2(user_id) {
+    const { data: db_data, error: db_error } = await this.supabase
+      .getClient()
+      .from('db_access')
+      .select('db_id')
+      .eq('user_id', user_id);
+
+    if (db_error) {
+      throw db_error;
+    }
+    if (db_data.length === 0) {
+      throw new NotFoundException('Databases not found');
+    }
+
+    return db_data;
+  }
+
   async getDbs(get_dbs_dto: Get_Dbs_Dto) {
     const { data: user_data, error: owner_error } = await this.supabase
       .getClient()
@@ -223,18 +240,7 @@ export class OrgManagementService {
 
       return { data };
     } else {
-      const { data: db_data, error: db_error } = await this.supabase
-        .getClient()
-        .from('db_access')
-        .select('db_id')
-        .eq('user_id', user_data.user.id);
-
-      if (db_error) {
-        throw db_error;
-      }
-      if (db_data.length === 0) {
-        throw new NotFoundException('Databases not found');
-      }
+      const db_data = await this.getDbs_H2(user_data.user.id);
 
       const db_ids = db_data.map((db) => db.db_id);
 
