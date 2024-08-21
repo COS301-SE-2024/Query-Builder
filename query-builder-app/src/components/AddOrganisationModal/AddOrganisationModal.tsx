@@ -3,6 +3,7 @@ import "../../app/globals.css"
 import React, { useState } from "react";
 import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Checkbox, Tooltip} from "@nextui-org/react";
 import { createClient } from "./../../utils/supabase/client";
+import toast, { Toaster } from 'react-hot-toast';
 import jwt from "jsonwebtoken"
 
 require("dotenv").config();
@@ -70,24 +71,34 @@ export default function AddOrganisationModal(props: AddOrganisationModalProps){
     }
 
     async function joinOrganisation(hashCode: String){
+      setOrgHashHasBeenFocused(false);
+      setOrgNameHasBeenFocused(false);
 
+      toast.promise(
+        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/join-org`, {
+          credentials: "include",
+          method: "POST",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + await getToken()
+          },
+          body: JSON.stringify({
+              hash: hashCode,
+          })
+        }),
+         {
+           loading: 'Joining...',
+           success: (data) => `<b>Organisation joined</b>`,
+           error: (err) => `${err}`,
+         }
+       );
       //call the create-org API endpoint
-      let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/join-org`, {
-        credentials: "include",
-        method: "POST",
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + await getToken()
-        },
-        body: JSON.stringify({
-            hash: hashCode,
-        })
-      })
+      
 
-      let json = await response.json();
+      // let json = await response.json();
 
-      console.log("JOIN ORG RESPONSE " + JSON.stringify(json));
+      // console.log("JOIN ORG RESPONSE " + JSON.stringify(json));
 
       props.on_add();
 
@@ -135,14 +146,14 @@ export default function AddOrganisationModal(props: AddOrganisationModalProps){
                 <ModalBody>
                   <Input
                     isRequired
-                    label="Organisation Hash Code"
-                    placeholder="Enter a hash code for the organisation you want to join"
+                    label="Organisation Join Code"
+                    placeholder="Enter a join code for the organisation you want to join"
                     variant="bordered"
                     onValueChange={setOrgHash}
                     onFocus={() => {setOrgNameHasBeenFocused(false); setOrgHashHasBeenFocused(true);}}
                     isInvalid={isOrgHashInvalid && orgHashBeenFocused}
                     color={orgHashBeenFocused ? "primary" : isOrgHashInvalid ? "danger" : "success"}
-                    errorMessage="Please enter a name for your organisation"
+                    errorMessage="Please enter a valid join code for your organisation"
                   />
                 </ModalBody>
                 <ModalFooter>
