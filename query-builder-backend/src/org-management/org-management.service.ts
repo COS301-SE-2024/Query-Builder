@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -369,6 +370,20 @@ export class OrgManagementService {
       view_all_users: true,
       update_db_access: false
     };
+
+    const { data: in_org, error: in_org_error } = await this.supabase
+      .getClient()
+      .from('org_members')
+      .select()
+      .eq('org_id', hash_data[0].org_id)
+      .eq('user_id', user_data.user.id);
+
+    if (in_org_error) {
+      throw in_org_error;
+    }
+    if (in_org.length !== 0) {
+      throw new BadRequestException('You are already a member of this org');
+    }
 
     const { data, error } = await this.supabase
       .getClient()
@@ -978,7 +993,7 @@ export class OrgManagementService {
     const { data: db_data, error: db_error } = await this.supabase
       .getClient()
       .from('db_envs')
-      .update({ ...db_fields})
+      .update({ ...db_fields })
       .match({ db_id: update_db_dto.db_id })
       .select();
 
