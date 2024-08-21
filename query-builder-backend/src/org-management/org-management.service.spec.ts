@@ -755,7 +755,11 @@ describe('OrgManagementService', () => {
       setTestData(testData);
       setTestError(testError);
 
-      jest.spyOn(service, 'getDbs_H1').mockResolvedValue();
+      jest.spyOn(service, 'getDbs_H1').mockResolvedValue([{
+        role_permissions: {
+          view_all_dbs: true
+        }
+      }]);
 
       await service.getDbs({ org_id: '0000' }).catch((error) => {
         expect(error).toBeDefined();
@@ -777,7 +781,13 @@ describe('OrgManagementService', () => {
       setTestData(testData);
       setTestError([]);
 
-      jest.spyOn(service, 'getDbs_H1').mockResolvedValue();
+      jest.spyOn(service, 'getDbs_H1').mockResolvedValue([
+        {
+          role_permissions: {
+            view_all_dbs: true
+          }
+        }
+      ]);
 
       await service.getDbs({ org_id: '0000' }).catch((error) => {
         expect(error).toBeDefined();
@@ -816,7 +826,13 @@ describe('OrgManagementService', () => {
       };
 
       setTestData(testData);
-      jest.spyOn(service, 'getDbs_H1').mockResolvedValue();
+      jest.spyOn(service, 'getDbs_H1').mockResolvedValue([
+        {
+          role_permissions: {
+            view_all_dbs: true
+          }
+        }
+      ]);
 
       const { data } = await service.getDbs({ org_id: '0000' });
       expect(data).toBeDefined();
@@ -1177,6 +1193,8 @@ describe('OrgManagementService', () => {
       setTestData(testData);
       setTestError(testError);
 
+      jest.spyOn(service, 'joinOrg_H1').mockResolvedValue();
+
       await service.joinOrg({ hash: '0000' }).catch((error) => {
         expect(error).toBeDefined();
         expect(error).toHaveProperty('message', 'Internal Server Error');
@@ -1196,6 +1214,8 @@ describe('OrgManagementService', () => {
 
       setTestData(testData);
       setTestError([]);
+
+      jest.spyOn(service, 'joinOrg_H1').mockResolvedValue();
 
       await service.joinOrg({ hash: '0000' }).catch((error) => {
         expect(error).toBeDefined();
@@ -1234,6 +1254,8 @@ describe('OrgManagementService', () => {
       };
 
       setTestData(testData);
+
+      jest.spyOn(service, 'joinOrg_H1').mockResolvedValue();
 
       const { data } = await service.joinOrg({ hash: '0000' });
       expect(data).toBeDefined();
