@@ -207,8 +207,6 @@ export class OrgManagementService {
       user_data.user.id
     );
 
-    // TODO: Add functionality to show only the databases that the user has access to
-
     if (org_data[0].role_permissions.view_all_dbs === true) {
       const { data, error } = await this.supabase
         .getClient()
@@ -409,19 +407,7 @@ export class OrgManagementService {
       update_db_access: false
     };
 
-    const { data: in_org, error: in_org_error } = await this.supabase
-      .getClient()
-      .from('org_members')
-      .select()
-      .eq('org_id', hash_data[0].org_id)
-      .eq('user_id', user_data.user.id);
-
-    if (in_org_error) {
-      throw in_org_error;
-    }
-    if (in_org.length !== 0) {
-      throw new BadRequestException('You are already a member of this org');
-    }
+    await this.joinOrg_H1(hash_data, user_data);
 
     const { data, error } = await this.supabase
       .getClient()
@@ -444,6 +430,22 @@ export class OrgManagementService {
     }
 
     return { data };
+  }
+
+  async joinOrg_H1(hash_data, user_data) {
+    const { data: in_org, error: in_org_error } = await this.supabase
+      .getClient()
+      .from('org_members')
+      .select()
+      .eq('org_id', hash_data[0].org_id)
+      .eq('user_id', user_data.user.id);
+
+    if (in_org_error) {
+      throw in_org_error;
+    }
+    if (in_org.length !== 0) {
+      throw new BadRequestException('You are already a member of this org');
+    }
   }
 
   async createHash(create_hash_dto: Create_Hash_Dto) {
