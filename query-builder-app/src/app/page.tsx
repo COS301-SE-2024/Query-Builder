@@ -26,7 +26,7 @@ export default function Page() {
             // Default options for specific types
             success: {
             duration: 3000,
-            theme: {
+            iconTheme: {
                 primary: 'green',
                 secondary: 'black',
             },
