@@ -3,7 +3,7 @@ import "../../app/globals.css"
 import React, { useState } from "react";
 import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Checkbox, Tooltip} from "@nextui-org/react";
 import { createClient } from "./../../utils/supabase/client";
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import jwt from "jsonwebtoken"
 
 require("dotenv").config();
@@ -73,7 +73,6 @@ export default function AddOrganisationModal(props: AddOrganisationModalProps){
     async function joinOrganisation(hashCode: String){
       setOrgHashHasBeenFocused(false);
       setOrgNameHasBeenFocused(false);
-
       toast.promise(
         fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/join-org`, {
           credentials: "include",
@@ -85,12 +84,18 @@ export default function AddOrganisationModal(props: AddOrganisationModalProps){
           },
           body: JSON.stringify({
               hash: hashCode,
-          })
+          }) 
+        })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.statusCode !== 200 && data.statusCode !== 201) { // Check statusCode after resolving JSON
+            throw new Error(data.response.message || "Failed to join the organization");
+          }
         }),
          {
            loading: 'Joining...',
-           success: (data) => `<b>Organisation joined</b>`,
-           error: (err) => `${err}`,
+           success: 'Successfully joined!',
+           error: (err) => `${err || "Unexpected error while joining, please try again!"}`,
          }
        );
       //call the create-org API endpoint
@@ -159,7 +164,7 @@ export default function AddOrganisationModal(props: AddOrganisationModalProps){
                 <ModalFooter>
                   <Button 
                     color="primary" 
-                    onPress={onClose}  
+                    // onPress={onClose}  
                     onClick={() => joinOrganisation(orgHash)}
                     isDisabled={isOrgHashInvalid}
                     >
