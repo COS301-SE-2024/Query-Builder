@@ -98,13 +98,6 @@ export default function AddOrganisationModal(props: AddOrganisationModalProps){
            error: (err) => `${err || "Unexpected error while joining, please try again!"}`,
          }
        );
-      //call the create-org API endpoint
-      
-
-      // let json = await response.json();
-
-      // console.log("JOIN ORG RESPONSE " + JSON.stringify(json));
-
       props.on_add();
 
     }
