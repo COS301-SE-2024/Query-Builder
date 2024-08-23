@@ -732,5 +732,5 @@ it('should be able to convert queries using pagination, where, group by, and hav
         expect(result).toEqual("SELECT `country`.`country` FROM `sakila`.`country` WHERE `country` LIKE 'B%'");
 
     });
-
+    
 });
