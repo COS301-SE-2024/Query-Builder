@@ -8,55 +8,87 @@ export class JsonConverterService {
         let query = '';
         jsonData.language = jsonData.language.toLowerCase();
         jsonData.query_type = jsonData.query_type.toLowerCase();
-    
+
         if (jsonData.language === 'sql') {
             if (jsonData.query_type === 'select') {
                 if (!jsonData.table || !jsonData.table.name || !jsonData.table.columns) {
                     throw new Error('Invalid query');
                 }
-                
+
                 const select = this.generateSelectClause(jsonData);
 
                 const from = this.generateFromClause(jsonData);
 
-                const where   = this.conditionWhereSQL(jsonData.condition);
+                const where = this.conditionWhereSQL(jsonData.condition);
 
                 const groupBy = this.groupBySQL(jsonData);
 
-                const having  = this.havingSQL(jsonData);
+                const having = this.havingSQL(jsonData);
 
                 const orderBy = this.generateOrderByClause(jsonData);
 
                 const limit = this.generateLimitClause(jsonData);
 
                 query = `SELECT ${select} FROM ${from}${where}${groupBy}${having}${orderBy}${limit}`;
-                
+
             } else {
                 throw new Error('Unsupported query type');
             }
-        } else {
+        }else {
             throw new Error('Invalid language');
         }
-    
+
         return query;
     }
 
+    generateSelectClausePost(jsonData) {
+        if (!jsonData.table || !jsonData.table.columns) {
+            return '*';
+        }
+        
+        return jsonData.table.columns.map(col => {
+            const columnName = typeof col === 'object' && col.name ? col.name : col;
+            return `"${columnName}"`;
+        }).join(', ');
+    }
+    
+    generateFromClausePost(jsonData) {
+        const tableName = jsonData.table.name;
+        return `"${tableName}"`;
+    }
+    
+    conditionWhereSQLPost(condition) {
+        if (!condition || !condition.column || !condition.operator || condition.value === undefined) return '';
+        
+        const column = `"${condition.column}"`;
+        const operator = condition.operator.toUpperCase();
+        const value = typeof condition.value === 'string' ? `'${condition.value.replace(/'/g, "''")}'` : condition.value; // Handle single quotes in strings
+        
+        return ` WHERE ${column} ${operator} ${value}`;
+    }
+    
+    groupBySQLPost(jsonData) {
+        if (!jsonData.groupBy || jsonData.groupBy.length === 0) return '';
+        
+        return ` GROUP BY ${jsonData.groupBy.map(col => `"${col}"`).join(', ')}`;
+    }
+
     //helper function to generate a string of a column
-    generateColumnString(column: column, tableName: string) : string {
+    generateColumnString(column: column, tableName: string): string {
 
         let columnString = '';
 
-        if(column.aggregation){
+        if (column.aggregation) {
             columnString += column.aggregation + '(';
         }
 
         columnString += '`' + tableName + '`.`' + column.name + '`';
 
-        if(column.aggregation){
+        if (column.aggregation) {
             columnString += ')'
         }
 
-        if(column.alias){
+        if (column.alias) {
             columnString += ' AS `' + column.alias + '`';
         }
 
@@ -65,7 +97,7 @@ export class JsonConverterService {
     }
 
     //helper function to generate string of all the columns to be returned from a table
-    generateListOfColumns(table: table) : string {
+    generateListOfColumns(table: table): string {
 
         let tableColumns = '';
 
@@ -76,10 +108,10 @@ export class JsonConverterService {
         //throw new Error('No columns specified for table \'' + table.name + '\'');
         //otherwise concatenate the column strings together
         //first add tick symbols around each column name to deal with names with spaces
-        for(let columnIndex = 0; columnIndex < table.columns.length-1; columnIndex++){
+        for (let columnIndex = 0; columnIndex < table.columns.length - 1; columnIndex++) {
             tableColumns += this.generateColumnString(table.columns[columnIndex], table.name) + ', ';
         }
-        tableColumns += this.generateColumnString(table.columns[table.columns.length-1], table.name);
+        tableColumns += this.generateColumnString(table.columns[table.columns.length - 1], table.name);
 
         return tableColumns;
 
@@ -88,27 +120,27 @@ export class JsonConverterService {
     generateSelectClause(queryParams: QueryParams): string {
 
         let selectClause = '';
-        
+
         //get a reference to the first table
         let tableRef = queryParams.table;
 
         //concatenate the first table's columns
-        if(tableRef.columns.length > 0){
+        if (tableRef.columns.length > 0) {
             selectClause += this.generateListOfColumns(tableRef);
         }
 
         //traverse the table linked list and add columns for each table until tableRef.join is null
-        while(tableRef.join){
+        while (tableRef.join) {
 
             //move the table reference one on
             tableRef = tableRef.join.table2;
-            
-            if(tableRef.columns.length > 0){
+
+            if (tableRef.columns.length > 0) {
                 selectClause += ', ' + this.generateListOfColumns(tableRef);
             }
 
         }
-        
+
         return selectClause;
 
     }
@@ -124,7 +156,7 @@ export class JsonConverterService {
         fromClause += '`' + queryParams.databaseName + '`.`' + tableRef.name + '`';
 
         //traverse the table linked list and add each join until tableRef.join is null
-        while(tableRef.join){
+        while (tableRef.join) {
 
             //get the join
             const join = tableRef.join;
@@ -149,11 +181,11 @@ export class JsonConverterService {
             let sortDirection = '';
 
             //SQL specific mapping of directions
-            if(queryParams.sortParams.direction == "descending"){
+            if (queryParams.sortParams.direction == "descending") {
                 sortDirection = "DESC";
             }
             //defaults to ascending sorting
-            else{
+            else {
                 sortDirection = "ASC";
             }
 
@@ -177,7 +209,7 @@ export class JsonConverterService {
 
             //calculate the offset into the data where we should start returning data
             //in SQL rows are indexed from 1 and the OFFSET is one less than the first row we want to return
-            const offset = (pageNumber-1)*rowsPerPage;
+            const offset = (pageNumber - 1) * rowsPerPage;
 
             limit = ` LIMIT ${rowsPerPage} OFFSET ${offset}`;
 
@@ -187,37 +219,31 @@ export class JsonConverterService {
 
     }
 
-    conditionWhereSQL(condition:condition)
-    {
-        if (!condition) 
-            {
+    conditionWhereSQL(condition: condition) {
+        if (!condition) {
+            return '';
+        }
+
+        if (this.isPrimitiveCondition(condition)) {
+            const primCondition = condition as primitiveCondition;
+            if (primCondition.aggregate != null) {
                 return '';
             }
-
-            if (this.isPrimitiveCondition(condition)) 
-                {
-                    const primCondition = condition as primitiveCondition;
-                    if(primCondition.aggregate != null)
-                    {
-                        return '';
-                    }}
+        }
 
         return " WHERE " + this.conditionWhereSQLHelp(condition);
     }
 
 
-    conditionWhereSQLHelp(condition: condition)
-    {
-        if (!condition) 
-        {
+    conditionWhereSQLHelp(condition: condition) {
+        if (!condition) {
             return '';
         }
-    
-        if (this.isCompoundCondition(condition)) 
-        {
+
+        if (this.isCompoundCondition(condition)) {
             const compCondition = condition as compoundCondition;
             let conditionsSQL = '';
-    
+
             for (let i = 0; i < compCondition.conditions.length; i++) {
                 const condSQL = this.conditionWhereSQLHelp(compCondition.conditions[i]);
                 conditionsSQL += condSQL;
@@ -225,37 +251,34 @@ export class JsonConverterService {
                     conditionsSQL += ` ${compCondition.operator} `;
                 }
             }
-    
+
             return `(${conditionsSQL})`;
-        } 
-        else if (this.isPrimitiveCondition(condition)) 
-        {
+        }
+        else if (this.isPrimitiveCondition(condition)) {
             const primCondition = condition as primitiveCondition;
 
             let sql = '';
 
-            if(primCondition.tableName){
+            if (primCondition.tableName) {
                 sql += `\`${primCondition.tableName}\`.`;
             }
 
             sql += `\`${primCondition.column}\` ${primCondition.operator} `;
-    
-            if (typeof primCondition.value === 'string') 
-            {
+
+            if (typeof primCondition.value === 'string') {
                 sql += `'${primCondition.value}'`;
-            } 
-            else if (typeof primCondition.value === 'boolean') 
-            {
+            }
+            else if (typeof primCondition.value === 'boolean') {
                 sql += primCondition.value ? 'TRUE' : 'FALSE';
-            } 
-            else if (primCondition.value == null){
+            }
+            else if (primCondition.value == null) {
                 sql += "NULL";
             }
             else // number 
             {
                 sql += primCondition.value;
             }// name = 'value'
-    
+
             return sql;
         }
     }
@@ -288,7 +311,7 @@ export class JsonConverterService {
         let groupByColumns = '';
 
         // Iterate over all tables
-        if(this.isThereAggregates(jsonData) == false){
+        if (this.isThereAggregates(jsonData) == false) {
             return '';
         }
 
@@ -299,7 +322,7 @@ export class JsonConverterService {
         groupByColumns += this.generateNonAggregateColumnsString(tableRef);
 
         //traverse the table linked list and add columns for each table until tableRef.join is null
-        while(tableRef.join){
+        while (tableRef.join) {
 
             //move the table reference one on
             tableRef = tableRef.join.table2;
@@ -307,7 +330,7 @@ export class JsonConverterService {
             groupByColumns += this.generateNonAggregateColumnsString(tableRef);
 
         }
-    
+
         // Remove the trailing comma and space
         if (groupByColumns) {
             groupByColumns = groupByColumns.slice(0, -2); // Remove last comma and space
@@ -326,11 +349,11 @@ export class JsonConverterService {
                 return true;
             }
         }
-        while(tableRef.join){
+        while (tableRef.join) {
             tableRef = tableRef.join.table2;
 
             for (const column of tableRef.columns) {
-                if(column.aggregation) {
+                if (column.aggregation) {
                     return true;
                 }
             }
@@ -339,57 +362,54 @@ export class JsonConverterService {
         return false;
 
     }
-    
+
     havingSQL(jsonData: QueryParams) {
         if (!jsonData.condition) {
             return '';
         }
 
         const havingConditions = this.getAggregateConditions(jsonData.condition);
-    
+
         return havingConditions.length > 0 ? ` HAVING ${havingConditions.join(' AND ')}` : '';
     }
-    
+
     getAggregateConditions(condition: condition): string[] {
         let aggregateConditions: string[] = [];
-    
+
         if (this.isCompoundCondition(condition)) {
             const compCondition = condition as compoundCondition;
-    
+
             for (let i = 0; i < compCondition.conditions.length; i++) {
                 aggregateConditions.push(...this.getAggregateConditions(compCondition.conditions[i]));
             }
         } else if (this.isPrimitiveCondition(condition) && condition.aggregate) {
             const primCondition = condition as primitiveCondition;
             let sql = '';
-    
+
             if (condition.tableName) {
                 sql = `${primCondition.aggregate}(\`${condition.tableName}\`.\`${primCondition.column}\`) ${primCondition.operator} `;
             } else {
                 sql = `${primCondition.aggregate}(\`${primCondition.column}\`) ${primCondition.operator} `;
             }
-    
-            if (typeof primCondition.value === 'string') 
-                {
-                    sql += `'${primCondition.value}'`;
-                } 
-            else if (typeof primCondition.value === 'boolean') 
-                {
-                    sql += primCondition.value ? 'TRUE' : 'FALSE';
-                } 
-            else if (primCondition.value == null){
+
+            if (typeof primCondition.value === 'string') {
+                sql += `'${primCondition.value}'`;
+            }
+            else if (typeof primCondition.value === 'boolean') {
+                sql += primCondition.value ? 'TRUE' : 'FALSE';
+            }
+            else if (primCondition.value == null) {
                 sql += "NULL";
             }
-            else 
-                { // number
-                    sql += primCondition.value;
-                }
-    
+            else { // number
+                sql += primCondition.value;
+            }
+
             aggregateConditions.push(sql);
         }
-    
+
         return aggregateConditions;
     }
-    
-    
+
+
 }
