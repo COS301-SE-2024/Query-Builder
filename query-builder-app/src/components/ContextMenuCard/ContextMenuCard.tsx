@@ -9,6 +9,7 @@ import {
 } from "@nextui-org/react";
 import { createClient } from "./../../utils/supabase/client";
 import { useRouter } from 'next/navigation'
+import { timeStamp } from "console";
 
 interface ContextMenuCardProps {
     queryTitle: string;
@@ -87,6 +88,14 @@ export default function ContextMenuCard({
         
     };
 
+    const localDateTime = new Date(saved_at).toLocaleString([], {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+    });
+
     return (
         <Dropdown>
             <DropdownTrigger>
@@ -100,7 +109,7 @@ export default function ContextMenuCard({
                 </Button>
             </DropdownTrigger>
             <DropdownMenu aria-label="Static Actions">
-                <DropdownSection title={saved_at}>
+                <DropdownSection title={localDateTime}>
                     <DropdownItem
                         key="retrieve"
                         description="Retrieve saved query"
