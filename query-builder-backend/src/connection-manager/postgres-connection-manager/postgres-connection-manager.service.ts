@@ -1,5 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConnectionManagerService, ConnectionStatus } from '../connection-manager.service';
+import { Client } from 'pg';
 
 @Injectable()
 export class PostgresConnectionManagerService extends ConnectionManagerService {
@@ -54,36 +55,32 @@ export class PostgresConnectionManagerService extends ConnectionManagerService {
         
                 let { user, password } = await this.decryptDbSecrets(db_id, session);
 
-                const { Client } = require('pg');
-
                 const postgresClient = new Client({
                     user: user,
                     password: password,
                     host: host,
-                    port: '',
+                    port: 0,
                     database: ''
                 });
 
-                const {connection, error} = await postgresClient.connect();
-
-                if(error){
-                    return reject(error);
-                }
-                else{
+                try{
+                    await postgresClient.connect();
                     session.host = host;
         
                     this.sessionStore.add({
                       id: session.id,
-                      conn: connection
+                      conn: postgresClient
                     });
         
                     this.logger.log(
                       `[Inital Connection] ${session.id} connected to ${host}`
                     , PostgresConnectionManagerService.name);
                     return resolve({
-                      success: true,
-                      connectionID: connection.threadID
+                      success: true
                     });
+                }
+                catch(error){
+                    return reject(error);
                 }
     
               }
