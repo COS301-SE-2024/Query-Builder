@@ -193,7 +193,7 @@ export default function Form(){
         }
         else{
             let json = await response.json();
-            alert(JSON.stringify(json));
+            console.log(JSON.stringify(json));
         }
 
     }
