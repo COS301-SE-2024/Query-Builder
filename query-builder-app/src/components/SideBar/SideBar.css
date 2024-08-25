@@ -9,11 +9,11 @@
     background-color: var(--sidebar-background);
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    height: 55vh;
     position: relative;
     aspect-ratio: 2/6;
-    min-width: 15rem;
-    max-width: 20rem;
+    min-width: 20rem;
+    max-width: 40rem;
     /* padding: 1rem; */
     font-size: 1.25rem;
     color: var(--text-colour);
