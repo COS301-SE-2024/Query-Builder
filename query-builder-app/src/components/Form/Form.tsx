@@ -29,7 +29,7 @@ export default function Form(){
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
 
     //React hook for all the databases in the database server
-    const [databases, setDatabases] = useState<Database[]>();
+    const [databases, setDatabases] = useState<Database[]>([]);
 
     //React hook containing the Query the user is busy building
     const [query, setQuery] = useState<Query>({
@@ -235,6 +235,7 @@ export default function Form(){
                                 </DropdownTrigger>
                                 <DropdownMenu 
                                         className="max-h-[50vh] overflow-y-auto"
+                                        emptyContent="Loading databases..."
                                         items={databases} 
                                         onAction={(key) => handleDatabaseSelection(key)}
                                     >
@@ -284,6 +285,7 @@ export default function Form(){
             <CardFooter>
                 <>
                     <Button 
+                        aria-label="query button"
                         onPress={onOpen} 
                         color="primary"  
                     >
