@@ -47,15 +47,11 @@ jobs:
           cat .env
         working-directory: query-builder-backend
 
-      - name: Build backend
-        run:
+      - name: Build and start backend
+        run: |
           pnpm run build
-        working-directory: query-builder-backend        
-
-      - name: Start backend
-        run:
           pnpm start
-        working-directory: query-builder-backend
+        working-directory: query-builder-backend        
 
       - name: Install Dependencies App
         run: |
@@ -71,15 +67,11 @@ jobs:
           cat .env
         working-directory: query-builder-app
 
-      - name: Build frontend
-        run:
+      - name: Build and start frontend
+        run: |
           pnpm run build
-        working-directory: query-builder-app      
-
-      - name: Start frontend
-        run:
           pnpm start
-        working-directory: query-builder-app
+        working-directory: query-builder-app      
           
       - name: Cypress run
         uses: cypress-io/github-action@v6
