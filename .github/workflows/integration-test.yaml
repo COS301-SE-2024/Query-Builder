@@ -80,4 +80,4 @@ jobs:
           CYPRESS_test_password: ${{ secrets.CYPRESS_TEST_PASSWORD }}
         with:
           working-directory: query-builder-app
-          wait-on: 'http://127.0.0.1:3000'
+          wait-on: 'http://127.0.0.1:3000, http://127.0.0.1:55555'
