@@ -87,11 +87,7 @@ jobs:
         run: |
           pnpm run build &&
           pnpm start &
-        working-directory: query-builder-app  
-
-      - name: MySql test
-        run: |
-          sudo mysql -e 'SELECT first_name FROM sakila.actor;' --user=${{ secrets.CYPRESS_DB_USERNAME }} --password=${{ secrets.CYPRESS_DB_PASSWORD }}
+        working-directory: query-builder-app
           
       - name: Cypress run
         uses: cypress-io/github-action@v6
