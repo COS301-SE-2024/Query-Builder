@@ -1,8 +1,6 @@
 import '@testing-library/cypress/add-commands';
 describe('Queries', () => {
 
-  let spyErrorLog;
-
   beforeEach(() => {
 
     //visit home page
@@ -16,10 +14,6 @@ describe('Queries', () => {
     cy.get('.sign-in-container').findByLabelText('Password').type(Cypress.env('test_password'), {log: false});
 
     cy.contains('Login').click();
-
-    Cypress.on("window:before:load", (win) => {
-        spyErrorLog = cy.spy(win.console, "log");  // can be: log, warn
-    });
 
   });
 
