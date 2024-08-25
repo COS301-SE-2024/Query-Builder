@@ -81,6 +81,11 @@ interface ChartData {
   }[];
 }
 
+interface ReportProps {
+  data: JSON[];
+  metadata: Metadata;
+}
+
 const tableCol = (numCols: number) => ({
   width: `${100 / numCols}%`,
   borderStyle: 'solid' as 'solid',
@@ -89,15 +94,15 @@ const tableCol = (numCols: number) => ({
   borderTopWidth: 0,
 });
 
-export default function Report({ data }: { data: JSON[] }) {
+export default function Report(props: ReportProps) {
   const [chartsData, setChartsData] = useState<ChartData[]>([]);
 
   useEffect(() => {
-    const headings = Object.keys(data[0]) as (keyof (typeof data)[0])[]; // stores the headings of each column (can be used to reference)
-    const numberColumns: boolean[] = Object.values(data[0]).map(
+    const headings = Object.keys(props.data[0]) as (keyof (typeof props.data)[0])[]; // stores the headings of each column (can be used to reference)
+    const numberColumns: boolean[] = Object.values(props.data[0]).map(
       (value) => typeof value === 'number',
     ); // stores the types of each column in the dataset
-    const firstKey: string[] = data.map((row) => row[headings[0]] as string); // getting all of the classes
+    const firstKey: string[] = props.data.map((row) => row[headings[0]] as string); // getting all of the classes
 
     // We want to create a graph of every numeric value(y) against the first column(x)
     numberColumns.forEach((column, index) => {
@@ -107,7 +112,7 @@ export default function Report({ data }: { data: JSON[] }) {
           datasets: [
             {
               label: String(headings[index]),
-              data: data.map((item) => item[headings[index]]),
+              data: props.data.map((item) => item[headings[index]]),
               backgroundColor: `rgba(${index * 50}, 162, 235, 0.2)`,
               borderColor: `rgba(${index * 50}, 162, 235, 1)`,
               borderWidth: 1,
@@ -121,34 +126,22 @@ export default function Report({ data }: { data: JSON[] }) {
     });
   }, []);
 
-  const buttonStyle = {
-    marginLeft: 10,
-    backgroundColor: 'blue',
-    color: 'white',
-    padding: '8px 16px',
-    border: 'none',
-    cursor: 'pointer',
-  };
-
   return (
     <div
       style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
     >
       <PDFViewer width="800" height="600" style={{ marginBottom: 20 }}>
-        <MyDocument tableData={data} chartData={chartsData}/>
+        <MyDocument tableData={props.data} chartData={chartsData} metadata={props.metadata}/>
       </PDFViewer>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <div style={{ marginLeft: 20 }}>
           <PDFDownloadLink
-            document={<MyDocument tableData={data} chartData={chartsData}/>}
+            document={<MyDocument tableData={props.data} chartData={chartsData} metadata={props.metadata}/>}
             fileName="report.pdf"
           >
             {({ loading }) => (
               <span
-                style={{
-                  ...buttonStyle,
-                  backgroundColor: loading ? '#999' : 'blue',
-                }}
+                className={"z-0 group relative inline-flex items-center justify-center box-border appearance-none select-none whitespace-nowrap font-normal subpixel-antialiased overflow-hidden tap-highlight-transparent data-[pressed=true]:scale-[0.97] outline-none data-[focus-visible=true]:z-10 data-[focus-visible=true]:outline-2 data-[focus-visible=true]:outline-focus data-[focus-visible=true]:outline-offset-2 px-4 min-w-20 h-10 text-small gap-2 rounded-medium [&>svg]:max-w-[theme(spacing.8)] transition-transform-colors-opacity motion-reduce:transition-none bg-primary text-primary-foreground data-[hover=true]:opacity-hover"}
               >
                 {loading ? 'Loading document...' : 'Download PDF'}
               </span>
@@ -187,12 +180,18 @@ export default function Report({ data }: { data: JSON[] }) {
   );
 }
 
+interface Metadata
+{
+  title: string;
+}
+
 type MyDocumentProps = {
   tableData: any[];
   chartData: ChartData[];
+  metadata: Metadata;
 };
 
-function MyDocument({ tableData, chartData }: MyDocumentProps) {
+function MyDocument({ tableData, chartData, metadata }: MyDocumentProps) {
   const headers = Object.keys(tableData[0]) as (keyof (typeof tableData)[0])[];
   const numCols = headers.length;
 
@@ -200,7 +199,7 @@ function MyDocument({ tableData, chartData }: MyDocumentProps) {
     <Document>
       <Page size="A4" style={styles.page}>
         <View>
-          <Text style={styles.title}>QBEE INITIAL REPORT</Text>
+          <Text style={styles.title}>{metadata.title}</Text>
           <View style={styles.section}>
             <Text style={styles.header}>Results</Text>
             <View style={styles.table}>
