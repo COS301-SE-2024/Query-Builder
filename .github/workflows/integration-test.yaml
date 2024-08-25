@@ -29,6 +29,12 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: query-builder-app/pnpm-lock.yaml
 
+      - name: Install redis
+        run: sudo apt-get install -y redis-tools redis-server
+        
+      - name: Verify that redis is up
+        run: redis-cli ping
+
       - name: Install Dependencies Backend
         run: |
             pnpm install --frozen-lockfile
@@ -52,7 +58,7 @@ jobs:
       - name: Build and start backend
         run: |
           pnpm run build &&
-          pnpm start
+          pnpm start &
         working-directory: query-builder-backend        
 
       - name: Install Dependencies App
