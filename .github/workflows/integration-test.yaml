@@ -95,6 +95,8 @@ jobs:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           CYPRESS_test_username: ${{ secrets.CYPRESS_TEST_USERNAME }}
           CYPRESS_test_password: ${{ secrets.CYPRESS_TEST_PASSWORD }}
+          CYPRESS_mysql_username: ${{ secrets.CYPRESS_DB_USERNAME }}
+          CYPRESS_mysql_password: ${{ secrets.CYPRESS_DB_PASSWORD }}
         with:
           record: true
           working-directory: query-builder-app
