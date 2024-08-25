@@ -38,6 +38,7 @@ jobs:
       - name: start MySQL
         run: |
             sudo systemctl start mysql.service
+            sudo mysql --user=${{ secrets.CYPRESS_DB_USERNAME }} --password=${{ secrets.CYPRESS_DB_PASSWORD }}
 
       - name: Install Dependencies Backend
         run: |
