@@ -49,8 +49,8 @@ jobs:
 
       - name: Build and start backend
         run: |
-          pnpm run build
-          pnpm start
+          pnpm run build &&
+          pnpm start:prod &
         working-directory: query-builder-backend        
 
       - name: Install Dependencies App
@@ -69,8 +69,8 @@ jobs:
 
       - name: Build and start frontend
         run: |
-          pnpm run build
-          pnpm start
+          pnpm run build &&
+          pnpm start &
         working-directory: query-builder-app      
           
       - name: Cypress run
