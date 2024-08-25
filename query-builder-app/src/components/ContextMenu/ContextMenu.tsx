@@ -1,5 +1,5 @@
-import React from "react";
-import { ScrollShadow, Spacer } from "@nextui-org/react";
+import React, { useState } from "react";
+import { Input, ScrollShadow, Spacer } from "@nextui-org/react";
 import ContextMenuCard from "../ContextMenuCard/ContextMenuCard";
 import { createClient } from "./../../utils/supabase/client";
 
@@ -61,7 +61,7 @@ export default function ContextMenu() {
     //React hook to hold the user's organisations
     const [savedQueries, setSavedQueries] = React.useState<ContextMenuCardProps[]>([]);
 
-
+    const [searchTerm, setSearchTerm] = useState("");
 
     //React hook to fetch the user's organisations upon rerender of the component
     React.useEffect(() => {
@@ -69,22 +69,43 @@ export default function ContextMenu() {
 
     }, [])
 
-    return (
-        <ScrollShadow className=" h-full size-full  pl-3 pr-3 mt-2">
-            {Array.isArray(savedQueries) && savedQueries.map((queryData: ContextMenuCardProps, index: number) => (
-                <React.Fragment key={index}>
-                    <ContextMenuCard
-                        queryTitle={queryData.queryTitle}
-                        saved_at={queryData.saved_at}
-                        parameters={queryData.parameters}
-                        query_id={queryData.query_id}
-                        db_id={queryData.db_id}
-                        onDelete={reload}
-                    />
-                    <Spacer x={4} />
 
-                </React.Fragment>
-            ))}
-        </ScrollShadow>
-    );
-}
+    const filteredQueries = Array.isArray(savedQueries) 
+        ? savedQueries.filter(queryData =>
+            queryData.queryTitle.toLowerCase().includes(searchTerm.toLowerCase())
+          )
+        : [];
+
+        return (
+            <div className="size-full pl-3 pr-3 mt-2">
+                <Input 
+                    fullWidth 
+                    color="primary" 
+                    placeholder="Search Queries..." 
+                    onChange={(e) => setSearchTerm(e.target.value)} 
+                    value={searchTerm} 
+                />
+                <Spacer y={2} />
+                <ScrollShadow hideScrollBar style={{ maxHeight: '80%' }}>
+                    {filteredQueries.length > 0 ? (
+                        filteredQueries.map((queryData: ContextMenuCardProps, index: number) => (
+                            <React.Fragment key={index}>
+                                <ContextMenuCard
+                                    queryTitle={queryData.queryTitle}
+                                    saved_at={queryData.saved_at}
+                                    parameters={queryData.parameters}
+                                    query_id={queryData.query_id}
+                                    db_id={queryData.db_id}
+                                    onDelete={reload}
+                                />
+                                <Spacer x={4} />
+                            </React.Fragment>
+                        ))
+                    ) : (
+                        <p>No queries found</p>
+                    )}
+                </ScrollShadow>
+            </div>
+        );
+    
+};
