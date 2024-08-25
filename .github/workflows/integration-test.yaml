@@ -40,7 +40,7 @@ jobs:
             sudo systemctl start mysql.service
             sudo mysql --user=${{ secrets.CYPRESS_DB_USERNAME }} --password=${{ secrets.CYPRESS_DB_PASSWORD }} < sakila/sakila-schema.sql;
             sudo mysql --user=${{ secrets.CYPRESS_DB_USERNAME }} --password=${{ secrets.CYPRESS_DB_PASSWORD }} < sakila/sakila-data.sql;
-            sudo mysql --user=${{ secrets.CYPRESS_DB_USERNAME }} --password=${{ secrets.CYPRESS_DB_PASSWORD }} < "SHOW DATABASES;";
+            sudo mysql -e 'SHOW DATABASES;' --user=${{ secrets.CYPRESS_DB_USERNAME }} --password=${{ secrets.CYPRESS_DB_PASSWORD }}
 
       - name: Install Dependencies Backend
         run: |
