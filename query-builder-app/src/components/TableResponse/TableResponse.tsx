@@ -8,6 +8,7 @@ import csvDownload from 'json-to-csv-export'
 import { Query } from "@/interfaces/intermediateJSON";
 import { createClient } from "./../../utils/supabase/client";
 import SaveQueryModal from "../SaveQueryModal/SaveQueryModal";
+import {Metadata} from "../Report/Report"
 
 interface Column {
   key: string,
@@ -16,8 +17,8 @@ interface Column {
 
 export interface TableResponseProps{
 
-  query: Query
-
+  query: Query;
+  metadata: Metadata;
 }
 
 // This function gets the token from local storage.
@@ -237,7 +238,7 @@ export default function TableResponse(props: TableResponseProps){
                       <ModalHeader className="flex flex-col gap-1">Query Report</ModalHeader>
                       <Report
                         data={tableData.items as JSON[]}
-                        metadata = {{title: "Query Report" /* TODO change this so that it is dynamic */}}
+                        metadata = {{title: `${props.metadata.title}`}}
                       />
                   </>
               )}

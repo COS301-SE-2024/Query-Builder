@@ -1,6 +1,5 @@
 "use client"
 import Form from "@/components/Form/Form";
-import TableResponse from "@/components/TableResponse/TableResponse";
 import {Tabs, Tab} from "@nextui-org/react";
 import { useState } from "react";
 import Sidebar from "../../components/SideBar/SideBar";

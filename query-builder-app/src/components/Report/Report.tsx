@@ -180,7 +180,7 @@ export default function Report(props: ReportProps) {
   );
 }
 
-interface Metadata
+export interface Metadata
 {
   title: string;
 }
