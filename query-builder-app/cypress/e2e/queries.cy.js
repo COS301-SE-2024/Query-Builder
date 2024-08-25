@@ -1,7 +1,7 @@
 import '@testing-library/cypress/add-commands';
 describe('Queries', () => {
 
-    let spyErrorLog;
+  let spyErrorLog;
 
   beforeEach(() => {
 
