@@ -1,0 +1,73 @@
+name: Cypress Tests
+
+on: 
+  push:
+    branches:
+      - feature/integration-testing
+  pull_request:
+    branches:
+      - dev
+      - main
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-22.04
+    steps:
+    
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: '9.1.2'
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+          cache-dependency-path: query-builder-app/pnpm-lock.yaml
+
+      - name: Install Dependencies Backend
+        run: |
+            pnpm install --frozen-lockfile
+        working-directory: query-builder-backend
+
+      - name: Make backend env file
+        run: |
+          touch .env
+          echo SUPABASE_URL = ${{ secrets.SUPABASE_URL }} >> .env
+          echo SUPABASE_KEY = ${{ secrets.SUPABASE_ANON_KEY }} >> .env
+          echo SUPABASE_SERVICE_KEY = ${{ secrets.SUPABASE_SERVICE_ROLE_KEY}} >> .env
+          echo SUPABASE_JWT_SECRET = ${{ secrets.SUPABASE_JWT_SECRET }} >> .env
+          echo UNI_KEY = ${{ secrets.UNI_KEY }} >> .env
+          cat .env
+        working-directory: query-builder-backend
+
+      - name: Run backend
+        run: pnpm start:prod
+        working-directory: query-builder-backend
+
+      - name: Install Dependencies App
+        run: |
+            pnpm install --frozen-lockfile
+        working-directory: query-builder-app
+
+      - name: Make frontend env file
+        run: |
+          touch .env
+          echo NEXT_PUBLIC_SUPABASE_URL = ${{ secrets.SUPABASE_URL }} >> .env
+          echo NEXT_PUBLIC_SUPABASE_ANON_KEY = ${{ secrets.SUPABASE_ANON_KEY }} >> .env
+          echo NEXT_PUBLIC_SUPABASE_PROJECT_ID = ${{ secrets.SUPABASE_SERVICE_ROLE_KEY}} >> .env
+          cat .env
+        working-directory: query-builder-app
+
+      - name: Run frontend
+        run: 
+          pnpm run build
+          pnpm start
+        working-directory: query-builder-app
+          
+      - name: Cypress run
+        uses: cypress-io/github-action@v6
