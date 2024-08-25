@@ -50,7 +50,8 @@ jobs:
       - name: Build and start backend
         run: |
           pnpm run build &&
-          pnpm start &
+          pnpm start &&
+          curl http://localhost:55555/api
         working-directory: query-builder-backend        
 
       - name: Install Dependencies App
