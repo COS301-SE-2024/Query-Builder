@@ -83,12 +83,6 @@ describe('Queries', () => {
     //Click on the database server to open QueryBuilder
     cy.contains('Cypress Sakila').click();
 
-    cy.intercept('http://localhost:55555/api/metadata/schemas', (req) => {
-        req.on('response', (res) => {
-            console.log(JSON.stringify(res))
-        })
-    })
-
     //Click on the button to choose a database to query
     cy.contains('+').click();
 
