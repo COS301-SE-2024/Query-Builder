@@ -35,6 +35,10 @@ jobs:
       - name: Verify that redis is up
         run: redis-cli ping
 
+      - name: start MySQL
+        run: |
+            sudo systemctl start mysql.service
+
       - name: Install Dependencies Backend
         run: |
             pnpm install --frozen-lockfile
