@@ -133,7 +133,7 @@ export class OrgManagementService {
     if (org_error) {
       throw org_error;
     }
-    if (org_data.length === 0) {
+    if (org_data.length === 0 || org_data[0].verified === false) {
       throw new UnauthorizedException(
         'You are not a member of this organisation'
       );
@@ -184,7 +184,7 @@ export class OrgManagementService {
     if (org_error) {
       throw org_error;
     }
-    if (org_data.length === 0) {
+    if (org_data.length === 0 || org_data[0].verified === false) {
       throw new UnauthorizedException(
         'You are not a member of this organisation'
       );
@@ -473,7 +473,7 @@ export class OrgManagementService {
     if (org_error) {
       throw org_error;
     }
-    if (org_data.length === 0) {
+    if (org_data.length === 0 || org_data[0].verified === false) {
       throw new UnauthorizedException(
         'You are not a member of this organisation'
       );
@@ -576,7 +576,7 @@ export class OrgManagementService {
     if (org_error) {
       throw org_error;
     }
-    if (org_data.length === 0) {
+    if (org_data.length === 0 || org_data[0].verified === false) {
       throw new UnauthorizedException(
         'You are not a member of this organisation'
       );
@@ -624,7 +624,7 @@ export class OrgManagementService {
     if (org_error) {
       throw org_error;
     }
-    if (org_data.length === 0) {
+    if (org_data.length === 0 || org_data[0].verified === false) {
       throw new UnauthorizedException(
         'You are not a member of this organisation'
       );
@@ -710,7 +710,7 @@ export class OrgManagementService {
     if (org_error) {
       throw org_error;
     }
-    if (org_data.length === 0) {
+    if (org_data.length === 0 || org_data[0].verified === false) {
       throw new UnauthorizedException(
         'You are not a member of this organisation'
       );
@@ -850,7 +850,7 @@ export class OrgManagementService {
     if (org_error) {
       throw org_error;
     }
-    if (org_data.length === 0) {
+    if (org_data.length === 0 || org_data[0].verified === false) {
       throw new UnauthorizedException(
         'You are not a member of this organisation'
       );
@@ -1017,7 +1017,7 @@ export class OrgManagementService {
     if (org_error) {
       throw org_error;
     }
-    if (org_data.length === 0) {
+    if (org_data.length === 0 || org_data[0].verified === false) {
       throw new UnauthorizedException(
         'You are not a member of this organisation'
       );
@@ -1114,7 +1114,7 @@ export class OrgManagementService {
     if (org_error) {
       throw org_error;
     }
-    if (org_data.length === 0) {
+    if (org_data.length === 0 || org_data[0].verified === false) {
       throw new UnauthorizedException(
         'You are not a member of this organisation'
       );
@@ -1163,7 +1163,7 @@ export class OrgManagementService {
     if (org_error) {
       throw org_error;
     }
-    if (org_data.length === 0) {
+    if (org_data.length === 0 || org_data[0].verified === false) {
       throw new UnauthorizedException(
         'You are not a member of this organisation'
       );
@@ -1211,7 +1211,7 @@ export class OrgManagementService {
     if (org_error) {
       throw org_error;
     }
-    if (org_data.length === 0) {
+    if (org_data.length === 0 || org_data[0].verified === false) {
       throw new UnauthorizedException(
         'You are not a member of this organisation'
       );
