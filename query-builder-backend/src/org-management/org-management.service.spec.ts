@@ -217,6 +217,8 @@ describe('OrgManagementService', () => {
         property2: 'value2'
       });
 
+      expect(await service.deepMerge(undefined, undefined)).toEqual(undefined);
+
       expect(
         await service.deepMerge(
           {
