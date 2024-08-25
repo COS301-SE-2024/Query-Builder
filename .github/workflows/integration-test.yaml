@@ -75,6 +75,9 @@ jobs:
           
       - name: Cypress run
         uses: cypress-io/github-action@v6
+        env:
+          CYPRESS_test_username: ${{ secrets.CYPRESS_TEST_USERNAME }}
+          CYPRESS_test_password: ${{ secrets.CYPRESS_TEST_PASSWORD }}
         with:
           working-directory: query-builder-app
           wait-on: 'http://127.0.0.1:3000'
