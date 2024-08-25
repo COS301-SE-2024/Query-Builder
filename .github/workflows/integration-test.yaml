@@ -77,3 +77,4 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           working-directory: query-builder-app
+          wait-on: 'http://127.0.0.1:3000'
