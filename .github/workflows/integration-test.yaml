@@ -47,9 +47,10 @@ jobs:
           cat .env
         working-directory: query-builder-backend
 
-      - name: Start backend
+      - name: Build and start backend
         run: |
-          pnpm start:prod &
+          pnpm run build &&
+          pnpm start &
         working-directory: query-builder-backend        
 
       - name: Install Dependencies App
