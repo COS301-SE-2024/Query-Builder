@@ -19,6 +19,8 @@ import {
   Legend,
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
+import { Query } from '@testing-library/dom';
+import { FiAlignRight } from 'react-icons/fi';
 
 ChartJS.register(
   LinearScale,
@@ -42,6 +44,12 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: 'grey',
     textAlign: 'center',
     marginBottom: 20,
   },
@@ -96,13 +104,18 @@ const tableCol = (numCols: number) => ({
 
 export default function Report(props: ReportProps) {
   const [chartsData, setChartsData] = useState<ChartData[]>([]);
+  const [date, setDate] = useState(new Date());
 
   useEffect(() => {
-    const headings = Object.keys(props.data[0]) as (keyof (typeof props.data)[0])[]; // stores the headings of each column (can be used to reference)
+    const headings = Object.keys(
+      props.data[0],
+    ) as (keyof (typeof props.data)[0])[]; // stores the headings of each column (can be used to reference)
     const numberColumns: boolean[] = Object.values(props.data[0]).map(
       (value) => typeof value === 'number',
     ); // stores the types of each column in the dataset
-    const firstKey: string[] = props.data.map((row) => row[headings[0]] as string); // getting all of the classes
+    const firstKey: string[] = props.data.map(
+      (row) => row[headings[0]] as string,
+    ); // getting all of the classes
 
     // We want to create a graph of every numeric value(y) against the first column(x)
     numberColumns.forEach((column, index) => {
@@ -131,17 +144,31 @@ export default function Report(props: ReportProps) {
       style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
     >
       <PDFViewer width="800" height="600" style={{ marginBottom: 20 }}>
-        <MyDocument tableData={props.data} chartData={chartsData} metadata={props.metadata}/>
+        <MyDocument
+          tableData={props.data}
+          chartData={chartsData}
+          metadata={props.metadata}
+          date={date}
+        />
       </PDFViewer>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <div style={{ marginLeft: 20 }}>
           <PDFDownloadLink
-            document={<MyDocument tableData={props.data} chartData={chartsData} metadata={props.metadata}/>}
-            fileName="report.pdf"
+            document={
+              <MyDocument
+                tableData={props.data}
+                chartData={chartsData}
+                metadata={props.metadata}
+                date={date}
+              />
+            }
+            fileName={`${props.metadata.title}_report_${date.toISOString}.pdf`}
           >
             {({ loading }) => (
               <span
-                className={"z-0 group relative inline-flex items-center justify-center box-border appearance-none select-none whitespace-nowrap font-normal subpixel-antialiased overflow-hidden tap-highlight-transparent data-[pressed=true]:scale-[0.97] outline-none data-[focus-visible=true]:z-10 data-[focus-visible=true]:outline-2 data-[focus-visible=true]:outline-focus data-[focus-visible=true]:outline-offset-2 px-4 min-w-20 h-10 text-small gap-2 rounded-medium [&>svg]:max-w-[theme(spacing.8)] transition-transform-colors-opacity motion-reduce:transition-none bg-primary text-primary-foreground data-[hover=true]:opacity-hover"}
+                className={
+                  'z-0 group relative inline-flex items-center justify-center box-border appearance-none select-none whitespace-nowrap font-normal subpixel-antialiased overflow-hidden tap-highlight-transparent data-[pressed=true]:scale-[0.97] outline-none data-[focus-visible=true]:z-10 data-[focus-visible=true]:outline-2 data-[focus-visible=true]:outline-focus data-[focus-visible=true]:outline-offset-2 px-4 min-w-20 h-10 text-small gap-2 rounded-medium [&>svg]:max-w-[theme(spacing.8)] transition-transform-colors-opacity motion-reduce:transition-none bg-primary text-primary-foreground data-[hover=true]:opacity-hover'
+                }
               >
                 {loading ? 'Loading document...' : 'Download PDF'}
               </span>
@@ -180,8 +207,7 @@ export default function Report(props: ReportProps) {
   );
 }
 
-export interface Metadata
-{
+export interface Metadata {
   title: string;
 }
 
@@ -189,61 +215,69 @@ type MyDocumentProps = {
   tableData: any[];
   chartData: ChartData[];
   metadata: Metadata;
+  date: Date;
 };
 
-function MyDocument({ tableData, chartData, metadata }: MyDocumentProps) {
+function MyDocument({ tableData, chartData, metadata, date }: MyDocumentProps) {
   const headers = Object.keys(tableData[0]) as (keyof (typeof tableData)[0])[];
   const numCols = headers.length;
 
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        <View>
-          <Text style={styles.title}>{metadata.title}</Text>
-          <View style={styles.section}>
-            <Text style={styles.header}>Results</Text>
-            <View style={styles.table}>
-              <View style={styles.tableRow}>
-                {headers.map((header, index) => (
-                  <View key={index} style={tableCol(numCols)}>
-                    <Text style={styles.tableCell}>{String(header)}</Text>
-                  </View>
-                ))}
-              </View>
-              {tableData.map((row, rowIndex) => (
-                <View key={rowIndex} style={styles.tableRow}>
-                  {headers.map((header, cellIndex) => (
-                    <View key={cellIndex} style={tableCol(numCols)}>
-                      <Text style={styles.tableCell}>{row[header]}</Text>
-                    </View>
-                  ))}
+        <View
+          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+        >
+          <Text style={styles.title}>{`Report on\n${metadata.title}`}</Text>
+          <Text
+            style={styles.subtitle}
+          >{`Generated on ${date.toLocaleString('en-UK', { day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZone: 'UTC' })} UTC using QBEE`}</Text>
+        </View>
+      </Page>
+      <Page size="A4" style={styles.page}>
+        <View style={styles.section}>
+          <Text style={styles.header}>Results</Text>
+          <View style={styles.table}>
+            <View style={styles.tableRow}>
+              {headers.map((header, index) => (
+                <View key={index} style={tableCol(numCols)}>
+                  <Text style={styles.tableCell}>{String(header)}</Text>
                 </View>
               ))}
             </View>
-          </View>
-          <View style={styles.section} break>
-            <Text style={styles.header}>Graphs</Text>
-            {chartData.map((data, index: number) => (
-              <Image
-                key={index}
-                src={(async () => {
-                  const ChartJsImage = require('chartjs-to-image');
-
-                  const myChart = new ChartJsImage();
-                  myChart.setConfig({
-                    type: 'bar',
-                    data: {
-                      labels: data.labels,
-                      datasets: data.datasets,
-                    },
-                  });
-
-                  return await myChart.toDataUrl();
-                })()}
-                style={styles.chart}
-              />
+            {tableData.map((row, rowIndex) => (
+              <View key={rowIndex} style={styles.tableRow}>
+                {headers.map((header, cellIndex) => (
+                  <View key={cellIndex} style={tableCol(numCols)}>
+                    <Text style={styles.tableCell}>{row[header]}</Text>
+                  </View>
+                ))}
+              </View>
             ))}
           </View>
+        </View>
+        <View style={styles.section} break>
+          <Text style={styles.header}>Graphs</Text>
+          {chartData.map((data, index: number) => (
+            <Image
+              key={index}
+              src={(async () => {
+                const ChartJsImage = require('chartjs-to-image');
+
+                const myChart = new ChartJsImage();
+                myChart.setConfig({
+                  type: 'bar',
+                  data: {
+                    labels: data.labels,
+                    datasets: data.datasets,
+                  },
+                });
+
+                return await myChart.toDataUrl();
+              })()}
+              style={styles.chart}
+            />
+          ))}
         </View>
       </Page>
     </Document>

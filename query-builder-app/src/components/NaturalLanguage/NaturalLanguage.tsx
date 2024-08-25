@@ -114,7 +114,7 @@ export default function NaturalLanguage() {
                 <TableResponse
                   query={query!}
                   metadata={{
-                    title: `Report on ${query?.queryParams.databaseName}`,
+                    title: `${query?.queryParams.databaseName}`,
                   }}
                 />
               </>

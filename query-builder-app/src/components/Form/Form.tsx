@@ -294,7 +294,7 @@ export default function Form() {
                       <TableResponse
                         query={getMergedQuery()}
                         metadata={{
-                          title: `Report on ${query?.queryParams.databaseName}`,
+                          title: `${query?.queryParams.databaseName}`,
                         }}
                       />
                     </>
