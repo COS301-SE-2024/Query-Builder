@@ -46,7 +46,9 @@ jobs:
         working-directory: query-builder-backend
 
       - name: Run backend
-        run: pnpm start:prod
+        run:
+          pnpm run build
+          pnpm start
         working-directory: query-builder-backend
 
       - name: Install Dependencies App
