@@ -5,6 +5,7 @@ import React from "react";
 import { createClient } from "./../../utils/supabase/client";
 import AddOrganisationModal from "../AddOrganisationModal/AddOrganisationModal";
 
+
 interface Database {
     created_at: String,
     name: String,
@@ -70,7 +71,7 @@ export default function SignedInHomePage(){
     },[])
 
     return (
-
+        
         <div className="p-5 app">
         <div className="flex justify-between">
             <h1 className="text-5xl">Your Organisations</h1>
