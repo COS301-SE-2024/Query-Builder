@@ -47,9 +47,8 @@ jobs:
           cat .env
         working-directory: query-builder-backend
 
-      - name: Build and start backend
+      - name: Start backend
         run: |
-          pnpm run build &&
           pnpm start:prod &
         working-directory: query-builder-backend        
 
