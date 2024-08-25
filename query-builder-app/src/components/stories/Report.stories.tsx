@@ -149,5 +149,5 @@ const data: ListData<unknown> = {
 
 // Can have multiple different variants of a component
 export const DefaultReport = {
-  render: () => <Report data={data.items as JSON[]} />,
+  render: () => <Report data={data.items as JSON[]} metadata={{title:"Query Report"}} />,
 };

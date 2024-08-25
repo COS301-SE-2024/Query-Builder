@@ -19,7 +19,7 @@ export interface TableResponseProps{
 
   query: Query
 
-} 
+}
 
 // This function gets the token from local storage.
 // Supabase stores the token in local storage so we can access it from there.
@@ -74,8 +74,6 @@ export default function TableResponse(props: TableResponseProps){
   async function downloadCSV(){
 
     let data = await getAllData();
-
-    console.log(data);
 
     const dataProperties = {
       data: data,
@@ -266,7 +264,10 @@ export default function TableResponse(props: TableResponseProps){
               {(onClose : any) => (
                   <>
                       <ModalHeader className="flex flex-col gap-1">Query Report</ModalHeader>
-                      <Report data={tableData.items as JSON[]} />
+                      <Report
+                        data={tableData.items as JSON[]}
+                        metadata = {{title: "Query Report" /* TODO change this so that it is dynamic */}}
+                      />
                   </>
               )}
           </ModalContent>
