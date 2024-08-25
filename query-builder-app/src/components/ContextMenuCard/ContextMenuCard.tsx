@@ -78,6 +78,7 @@ export default function ContextMenuCard({
         } finally {
             setLoading(false);
             onDelete();
+            onOpenChange();
         }
     };
 
