@@ -183,12 +183,18 @@ export default function Form(){
             })
         });
 
-        let json = await response.json();
+        if(response.ok){
+            let json = await response.json();
 
-        console.log(json);
-
-        //set the databases hook
-        setDatabases(json.data);
+            console.log(json);
+    
+            //set the databases hook
+            setDatabases(json.data);
+        }
+        else{
+            let json = await response.json();
+            alert(JSON.stringify(json));
+        }
 
     }
 
