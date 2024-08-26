@@ -227,8 +227,8 @@ export class OrgManagementService {
     if (org_data[0].role_permissions.view_all_dbs === true) {
       const { data, error } = await this.supabase
         .getClient()
-        .from('org_dbs')
-        .select('org_id, db_id, db_envs(created_at, name, type)')
+        .from('db_envs')
+        .select('org_id, db_id, created_at, name, type')
         .match({ ...get_dbs_dto });
 
       if (error) {
@@ -246,8 +246,8 @@ export class OrgManagementService {
 
       const { data, error } = await this.supabase
         .getClient()
-        .from('org_dbs')
-        .select('org_id, db_id, db_envs(created_at, name, type)')
+        .from('db_envs')
+        .select('org_id, db_id, created_at, name, type')
         .eq('org_id', get_dbs_dto.org_id)
         .in('db_id', db_ids);
 
@@ -634,62 +634,55 @@ export class OrgManagementService {
       throw new UnauthorizedException('You do not have permission to add dbs');
     }
 
-    const { db_data } = await this.addDb_H1(add_db_dto);
-
     const { data, error } = await this.supabase
       .getClient()
-      .from('org_dbs')
-      .insert({ org_id: add_db_dto.org_id, db_id: db_data[0].db_id })
+      .from('db_envs')
+      .insert({ ...add_db_dto })
       .select();
 
     if (error) {
       throw error;
     }
     if (data.length === 0) {
-      await this.supabase
-        .getClient()
-        .from('db_envs')
-        .delete()
-        .eq('db_id', db_data[0].db_id);
       throw new InternalServerErrorException(
         'Database not added to organisation'
       );
     }
 
     let give_db_access_dto = {
-      db_id: db_data[0].db_id,
+      db_id: data[0].db_id,
       org_id: add_db_dto.org_id,
       user_id: user_data.user.id
     };
 
     await this.giveDbAccess(give_db_access_dto);
 
-    return { data: db_data };
+    return { data };
   }
 
-  async addDb_H1(add_db_dto: Add_Db_Dto) {
-    const db_fields = {
-      name: add_db_dto.name,
-      type: add_db_dto.type,
-      db_info: add_db_dto.db_info ? add_db_dto.db_info : {},
-      host: add_db_dto.host
-    };
+  // async addDb_H1(add_db_dto: Add_Db_Dto) {
+  //   const db_fields = {
+  //     name: add_db_dto.name,
+  //     type: add_db_dto.type,
+  //     db_info: add_db_dto.db_info ? add_db_dto.db_info : {},
+  //     host: add_db_dto.host
+  //   };
 
-    const { data: db_data, error: db_error } = await this.supabase
-      .getClient()
-      .from('db_envs')
-      .insert({ ...db_fields })
-      .select();
+  //   const { data: db_data, error: db_error } = await this.supabase
+  //     .getClient()
+  //     .from('db_envs')
+  //     .insert({ ...db_fields })
+  //     .select();
 
-    if (db_error) {
-      throw db_error;
-    }
-    if (db_data.length === 0) {
-      throw new InternalServerErrorException('Database not added');
-    }
+  //   if (db_error) {
+  //     throw db_error;
+  //   }
+  //   if (db_data.length === 0) {
+  //     throw new InternalServerErrorException('Database not added');
+  //   }
 
-    return { db_data };
-  }
+  //   return { db_data };
+  // }
 
   async giveDbAccess(give_db_access_dto: Give_Db_Access_Dto) {
     const { data: user_data, error: owner_error } = await this.supabase

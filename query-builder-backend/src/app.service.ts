@@ -45,7 +45,6 @@ export class AppService {
     let encrypted = cipher.update(text);
     encrypted = Buffer.concat([encrypted, cipher.final()]);
     return Buffer.concat([iv, encrypted]).toString('hex');   
-  
   }
   
   decrypt(data: string, key: string): string {
