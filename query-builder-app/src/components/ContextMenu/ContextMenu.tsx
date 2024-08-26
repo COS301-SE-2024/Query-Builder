@@ -59,7 +59,7 @@ export default function ContextMenu() {
         getSavedQueries();
     }, []);
 
-    const filteredQueries = Array.isArray(savedQueries) 
+    const filteredQueries = Array.isArray(savedQueries)
         ? savedQueries.filter(queryData =>
             queryData.queryTitle.toLowerCase().includes(searchTerm.toLowerCase())
         )
@@ -67,12 +67,12 @@ export default function ContextMenu() {
 
     return (
         <div className="size-full pl-3 pr-3 mt-2">
-            <Input 
-                fullWidth 
-                color="primary" 
-                placeholder="Search Queries..." 
-                onChange={(e) => setSearchTerm(e.target.value)} 
-                value={searchTerm} 
+            <Input
+                fullWidth
+                color="primary"
+                placeholder="Search Queries..."
+                onChange={(e) => setSearchTerm(e.target.value)}
+                value={searchTerm}
             />
             <Spacer y={2} />
             <ScrollShadow hideScrollBar style={{ minHeight: '40vh', maxHeight: '150vh', height: '50vh' }}>
@@ -91,8 +91,7 @@ export default function ContextMenu() {
                         </React.Fragment>
                     ))
                 ) : (
-                    <p>No queries found</p>
-                )}
+                    <p style={{ fontSize: '15px' }}>No queries, only empty space...</p>)}
             </ScrollShadow>
         </div>
     );
