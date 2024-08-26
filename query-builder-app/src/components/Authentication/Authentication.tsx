@@ -112,6 +112,8 @@ export default function Authentication() {
   
     let responseData = await response.json();
     login(email, password);
+    setLoading(false);
+
   };
 
   const signUpUser = async (

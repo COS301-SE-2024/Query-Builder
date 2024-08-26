@@ -25,3 +25,8 @@
     justify-content: center; /* Optional: to center content horizontally */
     align-items: center; /* Optional: to center content vertically */
 }
+
+.logoContainer svg {
+    height: 5rem;
+    width: 5rem;
+}
