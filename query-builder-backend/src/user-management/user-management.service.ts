@@ -69,7 +69,7 @@ export class UserManagementService {
 
     session.sessionKey = key.toString('base64');
 
-    return { data: { success: true } };
+    return { data: { success: true }, key: session.sessionKey, id: session.id };
   }
 
   async signIn(user: Sign_In_User_Dto){
