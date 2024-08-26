@@ -753,10 +753,15 @@ export class OrgManagementService {
     // console.log(key);
     // console.log("second key length" + key.length);
 
-    const encryptedText = this.app_service.encrypt(
+    let encryptedText;
+    try{
+    encryptedText = this.app_service.encrypt(
       save_db_secrets_dto.db_secrets,
       session.sessionKey
-    );
+    );}
+    catch(err){
+      throw new InternalServerErrorException(session.session_key + " ++ " + session.id);
+    }
 
     const uni_key = this.config_service.get('UNI_KEY');
 

@@ -57,18 +57,6 @@ describe('Queries', () => {
 
   it('Can make a simple database query', () => {
 
-    //visit home page
-    cy.viewport(1920, 1080);
-    cy.visit('/');
-
-    //Log in
-    cy.get('.sign-in-container')
-    .findByLabelText('Email')
-    .type(Cypress.env('test_username'), {log: false});
-    cy.get('.sign-in-container').findByLabelText('Password').type(Cypress.env('test_password'), {log: false});
-
-    cy.contains('Login').click();
-
     //Add organisation
     cy.contains('+ Add').click();
     cy.findByLabelText('Organisation Name').type('Cypress Organisation');
