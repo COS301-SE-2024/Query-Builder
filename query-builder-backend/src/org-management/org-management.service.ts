@@ -752,11 +752,15 @@ export class OrgManagementService {
     // use the session key to encrypt the database info
     // console.log(key);
     // console.log("second key length" + key.length);
-
-    const encryptedText = this.app_service.encrypt(
+    let encryptedText;
+    try{
+    encryptedText = this.app_service.encrypt(
       save_db_secrets_dto.db_secrets,
       session.sessionKey
-    );
+    );}
+    catch(err){
+      throw new InternalServerErrorException(err + " encrypt error");
+    }
 
     const uni_key = this.config_service.get('UNI_KEY');
 

@@ -170,9 +170,7 @@ export default function Form(){
     //async function to fetch the database server's databases
     async function fetchDatabases() {
     
-        let response;
-        try{
-        response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/schemas`, {
+        let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/schemas`, {
             credentials: "include",
             method: "PUT",
             headers: {
@@ -184,12 +182,7 @@ export default function Form(){
                 databaseServerID: databaseServerID[0]
             })
         });
-        }
-        catch(err){
-            alert(err);
-        }
 
-        if(response){
         if(response.ok){
             let json = await response.json();
 
@@ -201,7 +194,6 @@ export default function Form(){
         else{
             let json = await response.json();
             console.log(JSON.stringify(json));
-        }
         }
 
     }
