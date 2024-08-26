@@ -79,7 +79,7 @@ jobs:
           echo NEXT_PUBLIC_SUPABASE_URL = ${{ secrets.SUPABASE_URL }} >> .env
           echo NEXT_PUBLIC_SUPABASE_ANON_KEY = ${{ secrets.SUPABASE_ANON_KEY }} >> .env
           echo NEXT_PUBLIC_SUPABASE_PROJECT_ID = ${{ secrets.SUPABASE_SERVICE_ROLE_KEY}} >> .env
-          echo NEXT_PUBLIC_BACKEND_URL = http://localhost:55555 >> .env
+          echo NEXT_PUBLIC_BACKEND_URL = http://127.0.0.1:55555 >> .env
           cat .env
         working-directory: query-builder-app
 
