@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -132,7 +133,7 @@ export class OrgManagementService {
     if (org_error) {
       throw org_error;
     }
-    if (org_data.length === 0) {
+    if (org_data.length === 0 || org_data[0].verified === false) {
       throw new UnauthorizedException(
         'You are not a member of this organisation'
       );
@@ -183,11 +184,30 @@ export class OrgManagementService {
     if (org_error) {
       throw org_error;
     }
-    if (org_data.length === 0) {
+    if (org_data.length === 0 || org_data[0].verified === false) {
       throw new UnauthorizedException(
         'You are not a member of this organisation'
       );
     }
+
+    return org_data;
+  }
+
+  async getDbs_H2(user_id) {
+    const { data: db_data, error: db_error } = await this.supabase
+      .getClient()
+      .from('db_access')
+      .select('db_id')
+      .eq('user_id', user_id);
+
+    if (db_error) {
+      throw db_error;
+    }
+    if (db_data.length === 0) {
+      throw new NotFoundException('Databases not found');
+    }
+
+    return db_data;
   }
 
   async getDbs(get_dbs_dto: Get_Dbs_Dto) {
@@ -199,24 +219,47 @@ export class OrgManagementService {
       throw owner_error;
     }
 
-    await this.getDbs_H1(get_dbs_dto.org_id, user_data.user.id);
+    const org_data = await this.getDbs_H1(
+      get_dbs_dto.org_id,
+      user_data.user.id
+    );
 
-    // TODO: Add functionality to show only the databases that the user has access to
+    if (org_data[0].role_permissions.view_all_dbs === true) {
+      const { data, error } = await this.supabase
+        .getClient()
+        .from('db_envs')
+        .select('org_id, db_id, created_at, name, type')
+        .match({ ...get_dbs_dto });
 
-    const { data, error } = await this.supabase
-      .getClient()
-      .from('org_dbs')
-      .select('org_id, db_id, db_envs(created_at, name, type)')
-      .match({ ...get_dbs_dto });
+      if (error) {
+        throw error;
+      }
+      if (data.length === 0) {
+        throw new NotFoundException('Databases not found');
+      }
 
-    if (error) {
-      throw error;
+      return { data };
+    } else {
+      const db_data = await this.getDbs_H2(user_data.user.id);
+
+      const db_ids = db_data.map((db) => db.db_id);
+
+      const { data, error } = await this.supabase
+        .getClient()
+        .from('db_envs')
+        .select('org_id, db_id, created_at, name, type')
+        .eq('org_id', get_dbs_dto.org_id)
+        .in('db_id', db_ids);
+
+      if (error) {
+        throw error;
+      }
+      if (data.length === 0) {
+        throw new NotFoundException('Databases not found');
+      }
+
+      return { data };
     }
-    if (data.length === 0) {
-      throw new NotFoundException('Databases not found');
-    }
-
-    return { data };
   }
 
   async getOrgHash(create_hash_dto: Create_Hash_Dto) {
@@ -370,6 +413,8 @@ export class OrgManagementService {
       update_db_access: false
     };
 
+    await this.joinOrg_H1(hash_data, user_data);
+
     const { data, error } = await this.supabase
       .getClient()
       .from('org_members')
@@ -393,6 +438,22 @@ export class OrgManagementService {
     return { data };
   }
 
+  async joinOrg_H1(hash_data, user_data) {
+    const { data: in_org, error: in_org_error } = await this.supabase
+      .getClient()
+      .from('org_members')
+      .select()
+      .eq('org_id', hash_data[0].org_id)
+      .eq('user_id', user_data.user.id);
+
+    if (in_org_error) {
+      throw in_org_error;
+    }
+    if (in_org.length !== 0) {
+      throw new BadRequestException('You are already a member of this org');
+    }
+  }
+
   async createHash(create_hash_dto: Create_Hash_Dto) {
     const { data: user_data, error: user_error } = await this.supabase
       .getClient()
@@ -412,7 +473,7 @@ export class OrgManagementService {
     if (org_error) {
       throw org_error;
     }
-    if (org_data.length === 0) {
+    if (org_data.length === 0 || org_data[0].verified === false) {
       throw new UnauthorizedException(
         'You are not a member of this organisation'
       );
@@ -515,7 +576,7 @@ export class OrgManagementService {
     if (org_error) {
       throw org_error;
     }
-    if (org_data.length === 0) {
+    if (org_data.length === 0 || org_data[0].verified === false) {
       throw new UnauthorizedException(
         'You are not a member of this organisation'
       );
@@ -563,7 +624,7 @@ export class OrgManagementService {
     if (org_error) {
       throw org_error;
     }
-    if (org_data.length === 0) {
+    if (org_data.length === 0 || org_data[0].verified === false) {
       throw new UnauthorizedException(
         'You are not a member of this organisation'
       );
@@ -573,62 +634,55 @@ export class OrgManagementService {
       throw new UnauthorizedException('You do not have permission to add dbs');
     }
 
-    const { db_data } = await this.addDb_H1(add_db_dto);
-
     const { data, error } = await this.supabase
       .getClient()
-      .from('org_dbs')
-      .insert({ org_id: add_db_dto.org_id, db_id: db_data[0].db_id })
+      .from('db_envs')
+      .insert({ ...add_db_dto })
       .select();
 
     if (error) {
       throw error;
     }
     if (data.length === 0) {
-      await this.supabase
-        .getClient()
-        .from('db_envs')
-        .delete()
-        .eq('db_id', db_data[0].db_id);
       throw new InternalServerErrorException(
         'Database not added to organisation'
       );
     }
 
     let give_db_access_dto = {
-      db_id: db_data[0].db_id,
+      db_id: data[0].db_id,
       org_id: add_db_dto.org_id,
       user_id: user_data.user.id
     };
 
     await this.giveDbAccess(give_db_access_dto);
 
-    return { data: db_data };
+    return { data };
   }
 
-  async addDb_H1(add_db_dto: Add_Db_Dto) {
-    const db_fields = {
-      name: add_db_dto.name,
-      type: add_db_dto.type,
-      db_info: add_db_dto.db_info ? add_db_dto.db_info : {},
-      host: add_db_dto.host
-    };
+  // async addDb_H1(add_db_dto: Add_Db_Dto) {
+  //   const db_fields = {
+  //     name: add_db_dto.name,
+  //     type: add_db_dto.type,
+  //     db_info: add_db_dto.db_info ? add_db_dto.db_info : {},
+  //     host: add_db_dto.host
+  //   };
 
-    const { data: db_data, error: db_error } = await this.supabase
-      .getClient()
-      .from('db_envs')
-      .insert({ ...db_fields })
-      .select();
+  //   const { data: db_data, error: db_error } = await this.supabase
+  //     .getClient()
+  //     .from('db_envs')
+  //     .insert({ ...db_fields })
+  //     .select();
 
-    if (db_error) {
-      throw db_error;
-    }
-    if (db_data.length === 0) {
-      throw new InternalServerErrorException('Database not added');
-    }
+  //   if (db_error) {
+  //     throw db_error;
+  //   }
+  //   if (db_data.length === 0) {
+  //     throw new InternalServerErrorException('Database not added');
+  //   }
 
-    return { db_data };
-  }
+  //   return { db_data };
+  // }
 
   async giveDbAccess(give_db_access_dto: Give_Db_Access_Dto) {
     const { data: user_data, error: owner_error } = await this.supabase
@@ -649,7 +703,7 @@ export class OrgManagementService {
     if (org_error) {
       throw org_error;
     }
-    if (org_data.length === 0) {
+    if (org_data.length === 0 || org_data[0].verified === false) {
       throw new UnauthorizedException(
         'You are not a member of this organisation'
       );
@@ -789,7 +843,7 @@ export class OrgManagementService {
     if (org_error) {
       throw org_error;
     }
-    if (org_data.length === 0) {
+    if (org_data.length === 0 || org_data[0].verified === false) {
       throw new UnauthorizedException(
         'You are not a member of this organisation'
       );
@@ -956,7 +1010,7 @@ export class OrgManagementService {
     if (org_error) {
       throw org_error;
     }
-    if (org_data.length === 0) {
+    if (org_data.length === 0 || org_data[0].verified === false) {
       throw new UnauthorizedException(
         'You are not a member of this organisation'
       );
@@ -978,7 +1032,7 @@ export class OrgManagementService {
     const { data: db_data, error: db_error } = await this.supabase
       .getClient()
       .from('db_envs')
-      .update({ ...db_fields})
+      .update({ ...db_fields })
       .match({ db_id: update_db_dto.db_id })
       .select();
 
@@ -1053,7 +1107,7 @@ export class OrgManagementService {
     if (org_error) {
       throw org_error;
     }
-    if (org_data.length === 0) {
+    if (org_data.length === 0 || org_data[0].verified === false) {
       throw new UnauthorizedException(
         'You are not a member of this organisation'
       );
@@ -1102,7 +1156,7 @@ export class OrgManagementService {
     if (org_error) {
       throw org_error;
     }
-    if (org_data.length === 0) {
+    if (org_data.length === 0 || org_data[0].verified === false) {
       throw new UnauthorizedException(
         'You are not a member of this organisation'
       );
@@ -1150,7 +1204,7 @@ export class OrgManagementService {
     if (org_error) {
       throw org_error;
     }
-    if (org_data.length === 0) {
+    if (org_data.length === 0 || org_data[0].verified === false) {
       throw new UnauthorizedException(
         'You are not a member of this organisation'
       );
