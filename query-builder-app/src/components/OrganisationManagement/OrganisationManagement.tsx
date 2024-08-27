@@ -43,7 +43,7 @@ export default function OrganisationManagement(){
     let [profilePicURL, setProfilePicURL] = useState('');
     let [hasAdminPermission, setHasAdminPermission] = useState(false);
     let [table, setTable] = useState('');
-    let [hashCodeCopyText, setHashCodeCopyText] = useState('Share Organisation Code');
+    let [hashCodeCopyText, setHashCodeCopyText] = useState('Share Join Code');
 
     async function getMembers() {
       try {
@@ -168,6 +168,7 @@ export default function OrganisationManagement(){
           body: JSON.stringify({ org_id: orgServerID, user_id: userId})
       })
       console.log(response);
+      await getMembers();
     }
 
     async function deleteOrganisation(){
@@ -289,7 +290,7 @@ export default function OrganisationManagement(){
               <Spacer y={2}/>
               <div className="infield">
                 <Input
-                    // isRequired
+                    isRequired
                     label="Organisation Name"
                     defaultValue={updateOrgName}
                     variant="bordered"
@@ -447,7 +448,7 @@ export default function OrganisationManagement(){
             } 
             setHashCodeCopyText("Copied!");
             setTimeout(() => {
-              setHashCodeCopyText("Share Organisation Code");
+              setHashCodeCopyText("Share Join Code");
             },2000);
         } catch(fetchError){
           console.error("Fetch error", fetchError);
@@ -513,6 +514,8 @@ export default function OrganisationManagement(){
                     console.log(response);
                     setProfilePicURL((await response.json()).publicUrl);
                 });
+
+                await updateQuery();
             }
         };
 
