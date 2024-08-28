@@ -3,6 +3,7 @@ import "../../app/globals.css"
 import React, { useState } from "react";
 import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Checkbox, Tooltip} from "@nextui-org/react";
 import { createClient } from "./../../utils/supabase/client";
+import toast from 'react-hot-toast';
 import jwt from "jsonwebtoken"
 
 require("dotenv").config();
@@ -70,25 +71,33 @@ export default function AddOrganisationModal(props: AddOrganisationModalProps){
     }
 
     async function joinOrganisation(hashCode: String){
-
-      //call the create-org API endpoint
-      let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/join-org`, {
-        credentials: "include",
-        method: "POST",
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + await getToken()
-        },
-        body: JSON.stringify({
-            hash: hashCode,
+      setOrgHashHasBeenFocused(false);
+      setOrgNameHasBeenFocused(false);
+      toast.promise(
+        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/join-org`, {
+          credentials: "include",
+          method: "POST",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + await getToken()
+          },
+          body: JSON.stringify({
+              hash: hashCode,
+          }) 
         })
-      })
-
-      let json = await response.json();
-
-      console.log("JOIN ORG RESPONSE " + JSON.stringify(json));
-
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.statusCode !== 200 && data.statusCode !== 201) { // Check statusCode after resolving JSON
+            throw new Error(data.response.message || "Failed to join the organization");
+          }
+        }),
+         {
+           loading: 'Joining...',
+           success: 'Successfully joined!',
+           error: (err) => `${err || "Unexpected error while joining, please try again!"}`,
+         }
+       );
       props.on_add();
 
     }
@@ -135,20 +144,20 @@ export default function AddOrganisationModal(props: AddOrganisationModalProps){
                 <ModalBody>
                   <Input
                     isRequired
-                    label="Organisation Hash Code"
-                    placeholder="Enter a hash code for the organisation you want to join"
+                    label="Organisation Join Code"
+                    placeholder="Enter a join code for the organisation you want to join"
                     variant="bordered"
                     onValueChange={setOrgHash}
                     onFocus={() => {setOrgNameHasBeenFocused(false); setOrgHashHasBeenFocused(true);}}
                     isInvalid={isOrgHashInvalid && orgHashBeenFocused}
                     color={orgHashBeenFocused ? "primary" : isOrgHashInvalid ? "danger" : "success"}
-                    errorMessage="Please enter a name for your organisation"
+                    errorMessage="Please enter a valid join code for your organisation"
                   />
                 </ModalBody>
                 <ModalFooter>
                   <Button 
                     color="primary" 
-                    onPress={onClose}  
+                    // onPress={onClose}  
                     onClick={() => joinOrganisation(orgHash)}
                     isDisabled={isOrgHashInvalid}
                     >

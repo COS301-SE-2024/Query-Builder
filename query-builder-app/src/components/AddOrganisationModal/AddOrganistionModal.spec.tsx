@@ -113,7 +113,7 @@ describe('join organisation tests', () => {
     await user.click(button);
 
     //Get the Organisation Hash Code Field
-    const organisationHashCodeField = screen.getByLabelText("Organisation Hash Code");
+    const organisationHashCodeField = screen.getByLabelText("Organisation Join Code");
   
     //type an Organisation Name into the Organisation Name field
     await user.type(organisationHashCodeField, "Mock Hash Code");
