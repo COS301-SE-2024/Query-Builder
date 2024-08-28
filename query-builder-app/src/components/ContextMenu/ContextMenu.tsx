@@ -73,6 +73,10 @@ export default function ContextMenu() {
                 placeholder="Search Queries..."
                 onChange={(e) => setSearchTerm(e.target.value)}
                 value={searchTerm}
+                style={{
+                    backgroundColor: 'transparent',
+                    color: '#333',
+                }}
             />
             <Spacer y={2} />
             <ScrollShadow hideScrollBar style={{ minHeight: '40vh', maxHeight: '150vh', height: '50vh' }}>
