@@ -94,5 +94,19 @@ describe('AppService', () => {
     });
   });
 
-  describe('decrypt', () => {});
+  describe('decrypt', () => {
+    const key = crypto.randomBytes(32).toString('base64');
+
+    it('should return a string', () => {
+      const encrypted = appService.encrypt('test', key);
+      const decrypted = appService.decrypt(encrypted, key);
+      expect(typeof decrypted).toBe('string');
+    });
+
+    it('should return the original string', () => {
+      const encrypted = appService.encrypt('test', key);
+      const decrypted = appService.decrypt(encrypted, key);
+      expect(decrypted).toBe('test');
+    });
+  });
 });
