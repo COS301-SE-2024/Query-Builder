@@ -1,0 +1,50 @@
+import { Test, TestingModule } from '@nestjs/testing';
+import { AppService } from './app.service';
+import { ConfigService } from '@nestjs/config';
+
+jest.mock('@nestjs/config', () => ({
+  ConfigService: jest.fn().mockImplementation(() => ({
+    get: jest.fn((key: string) => {
+      if (key === 'SUPABASE_JWT_SECRET') {
+        return 'test-secret';
+      }
+      return;
+    })
+  }))
+}));
+
+describe('AppService', () => {
+  let appService: AppService;
+
+  beforeEach(async () => {
+    const app: TestingModule = await Test.createTestingModule({
+      providers: [AppService, ConfigService]
+    }).compile();
+
+    appService = app.get<AppService>(AppService);
+  });
+
+  it('should be defined', () => {
+    expect(appService).toBeDefined();
+  });
+
+  describe('signJWT', () => {
+    it('should return a string', () => {
+      expect(typeof appService.signJWT({})).toBe('string');
+    });
+
+    it('should return a JWT', () => {
+      const jwt = appService.signJWT({});
+      const parts = jwt.split('.');
+
+      expect(parts.length).toBe(3);
+    });
+  });
+
+  describe('deriveKey', () => {
+    
+  });
+  describe('has_session', () => {});
+  describe('encrypt', () => {});
+  describe('decrypt', () => {});
+});
