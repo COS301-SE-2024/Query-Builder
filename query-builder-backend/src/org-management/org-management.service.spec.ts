@@ -2693,6 +2693,28 @@ describe('OrgManagementService', () => {
       });
     });
 
+    it('should throw an error when the user does not have access to the database', async () => {
+      let testError = [];
+      let testData = [];
+
+      testData[AUTH] = {
+        user: {
+          id: '0000'
+        }
+      };
+
+      testData[SELECT] = [];
+
+      setTestData(testData);
+      setTestError(testError);
+
+      await service.hasSavedDbCredentials({ db_id: '0000' }).catch((error) => {
+        expect(error).toBeDefined();
+        expect(error).toBeInstanceOf(UnauthorizedException);
+        expect(error.message).toBe('You do not have access to this database');
+      });
+    });
+
     
   });
 
