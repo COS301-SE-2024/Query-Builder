@@ -755,7 +755,7 @@ export class OrgManagementService {
       throw error;
     }
     if (data.length === 0) {
-      throw new NotFoundException('You do not have access to this database');
+      throw new UnauthorizedException('You do not have access to this database');
     }
 
     return {
