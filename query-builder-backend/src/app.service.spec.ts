@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppService } from './app.service';
 import { ConfigService } from '@nestjs/config';
+import * as crypto from 'crypto';
 
 jest.mock('@nestjs/config', () => ({
   ConfigService: jest.fn().mockImplementation(() => ({
@@ -69,7 +70,29 @@ describe('AppService', () => {
       expect(result).toEqual({ has_session: false });
     });
   });
-  
-  describe('encrypt', () => {});
+
+  describe('encrypt', () => {
+    const key = crypto.randomBytes(32).toString('base64');
+
+    it('should return a string', () => {
+      const encrypted = appService.encrypt('test', key);
+      expect(typeof encrypted).toBe('string');
+    });
+
+    it('should return a hex string', () => {
+      const encrypted = appService.encrypt('test', key);
+      const hexRegex = /^[0-9a-f]+$/i;
+
+      expect(hexRegex.test(encrypted)).toBe(true);
+    });
+
+    it('should return a different string', () => {
+      const encrypted = appService.encrypt('test', key);
+      const encrypted2 = appService.encrypt('test', key);
+
+      expect(encrypted).not.toBe(encrypted2);
+    });
+  });
+
   describe('decrypt', () => {});
 });
