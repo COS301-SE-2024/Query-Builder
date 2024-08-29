@@ -42,8 +42,18 @@ describe('AppService', () => {
   });
 
   describe('deriveKey', () => {
-    
+    it('should return a string', async () => {
+      const key = await appService.deriveKey('test');
+      expect(typeof key).toBe('string');
+    });
+
+    it('should return a base64 string', async () => {
+      const key = await appService.deriveKey('test');
+      const base64Regex = /^[A-Za-z0-9+/]+={0,2}$/;
+      expect(base64Regex.test(key)).toBe(true);
+    });
   });
+
   describe('has_session', () => {});
   describe('encrypt', () => {});
   describe('decrypt', () => {});
