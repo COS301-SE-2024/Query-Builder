@@ -2715,7 +2715,57 @@ describe('OrgManagementService', () => {
       });
     });
 
-    
+    it('should return a object containing the property saved_db_credentials (false)', async () => {
+      let testError = [];
+      let testData = [];
+
+      testData[AUTH] = {
+        user: {
+          id: '0000'
+        }
+      };
+
+      testData[SELECT] = [
+        {
+          db_id: '0000',
+          db_secrets: null
+        }
+      ];
+
+      setTestData(testData);
+      setTestError(testError);
+
+      const data = await service.hasSavedDbCredentials({ db_id: '0000' });
+
+      expect(data).toBeDefined();
+      expect(data).toHaveProperty('saved_db_credentials', false);
+    });
+
+    it('should return a object containing the property saved_db_credentials (true)', async () => {
+      let testError = [];
+      let testData = [];
+
+      testData[AUTH] = {
+        user: {
+          id: '0000'
+        }
+      };
+
+      testData[SELECT] = [
+        {
+          db_id: '0000',
+          db_secrets: 'encrypted_secret'
+        }
+      ];
+
+      setTestData(testData);
+      setTestError(testError);
+
+      const data = await service.hasSavedDbCredentials({ db_id: '0000' });
+
+      expect(data).toBeDefined();
+      expect(data).toHaveProperty('saved_db_credentials', true);
+    });
   });
 
   describe('saveDbSecrets', () => {
