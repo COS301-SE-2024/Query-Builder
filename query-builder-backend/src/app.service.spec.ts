@@ -54,7 +54,22 @@ describe('AppService', () => {
     });
   });
 
-  describe('has_session', () => {});
+  describe('has_session', () => {
+    it('should return an object with has_session key (true)', async () => {
+      const session = { sessionKey: 'test' };
+      const result = await appService.has_session(session);
+
+      expect(result).toEqual({ has_session: true });
+    });
+
+    it('should return an object with has_session key (false)', async () => {
+      const session = {};
+      const result = await appService.has_session(session);
+
+      expect(result).toEqual({ has_session: false });
+    });
+  });
+  
   describe('encrypt', () => {});
   describe('decrypt', () => {});
 });
