@@ -33,6 +33,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
 import { Join_Org_Dto } from './dto/join-org.dto';
 import { Create_Hash_Dto } from './dto/create-hash.dto';
+import { Has_Saved_Db_Creds_Dto } from './dto/has-saved-db-creds.dto';
 
 @Controller('org-management')
 export class OrgManagementController {
@@ -102,6 +103,11 @@ export class OrgManagementController {
     @Body(ValidationPipe) give_db_access_dto: Give_Db_Access_Dto
   ) {
     return this.org_management_service.giveDbAccess(give_db_access_dto);
+  }
+
+  @Post('has-saved-db-credentials')
+  async hasSavedDbCredentials(@Body() has_saved_db_creds_dto: Has_Saved_Db_Creds_Dto) {
+    return this.org_management_service.hasSavedDbCredentials(has_saved_db_creds_dto);
   }
 
   @Post('save-db-secrets')

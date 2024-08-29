@@ -21,6 +21,7 @@ describe('OrgManagementController', () => {
     addMember: jest.fn().mockResolvedValue('0000'),
     addDb: jest.fn().mockResolvedValue('0000'),
     giveDbAccess: jest.fn().mockResolvedValue('0000'),
+    hasSavedDbCredentials: jest.fn().mockResolvedValue(false),
     saveDbSecrets: jest.fn().mockResolvedValue('0000'),
     updateOrg: jest.fn().mockResolvedValue('0000'),
     updateMember: jest.fn().mockResolvedValue('0000'),
@@ -152,6 +153,12 @@ describe('OrgManagementController', () => {
       ).toBe('0000');
     });
   });
+
+  describe('hasSavedDbCredentials', () => {
+    it('should return boolean', async () => {
+      expect(typeof await controller.hasSavedDbCredentials({ db_id: '0000' })).toBe('boolean');
+    });
+  })
 
   describe('saveDbSecrets', () => {
     it('should return db secrets', async () => {

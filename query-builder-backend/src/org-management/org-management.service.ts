@@ -30,6 +30,7 @@ import { Join_Org_Dto } from './dto/join-org.dto';
 import { Create_Hash_Dto } from './dto/create-hash.dto';
 import * as crypto from 'crypto';
 import { createHash } from 'crypto';
+import { Has_Saved_Db_Creds_Dto } from './dto/has-saved-db-creds.dto';
 
 @Injectable()
 export class OrgManagementService {
@@ -732,6 +733,34 @@ export class OrgManagementService {
     }
 
     return { data: db_data };
+  }
+
+  async hasSavedDbCredentials(has_saved_db_creds_dto: Has_Saved_Db_Creds_Dto) {
+    const { data: user_data, error: user_error } = await this.supabase
+      .getClient()
+      .auth.getUser(this.supabase.getJwt());
+
+    if (user_error) {
+      throw user_error;
+    }
+
+    const { data, error } = await this.supabase
+      .getClient()
+      .from('db_access')
+      .select('db_secrets')
+      .eq('user_id', user_data.user.id)
+      .eq('db_id', has_saved_db_creds_dto.db_id);
+
+    if (error) {
+      throw error;
+    }
+    if (data.length === 0) {
+      throw new UnauthorizedException('You do not have access to this database');
+    }
+
+    return {
+      saved_db_credentials: data[0].db_secrets !== null ? true : false
+    }
   }
 
   async saveDbSecrets(
