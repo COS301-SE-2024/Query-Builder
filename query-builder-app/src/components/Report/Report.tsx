@@ -160,7 +160,7 @@ export default function Report(props: ReportProps) {
                 date={date}
               />
             }
-            fileName={`${props.metadata.title}_report_${date.toISOString}.pdf`}
+            fileName={`${props.metadata.title}_report_${date.toISOString()}.pdf`}
           >
             {({ loading }) => (
               <span
