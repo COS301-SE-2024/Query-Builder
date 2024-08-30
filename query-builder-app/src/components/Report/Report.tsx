@@ -1,3 +1,4 @@
+"use client"
 import { useEffect, useState } from 'react';
 import {
   Page,
@@ -18,9 +19,6 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { Bar } from 'react-chartjs-2';
-import { Query } from '@testing-library/dom';
-import { FiAlignRight } from 'react-icons/fi';
 
 ChartJS.register(
   LinearScale,
@@ -176,33 +174,6 @@ export default function Report(props: ReportProps) {
           </PDFDownloadLink>
         </div>
       </div>
-      <div
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'center',
-          marginTop: 20,
-        }}
-      >
-        {chartsData.map((chart, index) => (
-          <div key={index} style={{ margin: 10 }}>
-            <Bar
-              data={chart}
-              options={{
-                maintainAspectRatio: false,
-                plugins: {
-                  title: {
-                    display: true,
-                    text: chart.datasets[0].label,
-                  },
-                },
-              }}
-              width={200}
-              height={200}
-            />
-          </div>
-        ))}
-      </div>
     </div>
   );
 }
@@ -231,7 +202,7 @@ function MyDocument({ tableData, chartData, metadata, date }: MyDocumentProps) {
           <Text style={styles.title}>{`Report on\n${metadata.title}`}</Text>
           <Text
             style={styles.subtitle}
-          >{`Generated on ${date.toLocaleString('en-UK', { day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZone: 'UTC' })} UTC using QBEE`}</Text>
+          >{`Generated on ${date.toLocaleString('en-UK', { day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZone: 'UTC' })} UTC using QBee`}</Text>
         </View>
       </Page>
       <Page size="A4" style={styles.page}>
