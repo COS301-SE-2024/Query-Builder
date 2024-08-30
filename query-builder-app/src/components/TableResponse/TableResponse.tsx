@@ -128,8 +128,8 @@ export default function TableResponse(props: TableResponseProps) {
       //the data is being loaded
       setLoading(true);
 
-      //get the query from props
-      let query: Query = props.query;
+      //get the query from props (making sure that it is a deep copy)
+      let query: Query = JSON.parse(JSON.stringify(props.query));
 
       //if we want to sort, add SortParams to the QueryParams
       if (sortDescriptor) {
@@ -156,7 +156,7 @@ export default function TableResponse(props: TableResponseProps) {
             'Content-Type': 'application/json',
             Authorization: 'Bearer ' + (await getToken()),
           },
-          body: JSON.stringify(props.query),
+          body: JSON.stringify(query),
         },
       );
 
@@ -287,9 +287,7 @@ export default function TableResponse(props: TableResponseProps) {
         >
           Export Data
         </Button>
-        <Button onPress={() => {
-          onOpen;
-          }} color="primary" className="mx-1">
+        <Button onPress={onOpen} color="primary" className="mx-1">
           Generate Report
         </Button>
         <Modal
