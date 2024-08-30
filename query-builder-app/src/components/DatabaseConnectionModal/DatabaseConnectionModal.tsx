@@ -30,17 +30,17 @@ export default function DatabaseConnectionModal(props: DatabaseConnectionModalPr
 
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
 
-    const [databaseConnectionStatus, setDatabaseConnectionStatus] = useState('Not connected to a database');
-
     //React hook to store whether the user wants QBee to remember their database credentials or not
     const [rememberDatabaseCredentials, setRememberDatabaseCredentials] = useState(false);
 
     const [url, setUrl] = useState('');
+    const [port, setPort] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [dbName, setDbName] = useState('');
 
     const [urlHasBeenFocused, setURLHasBeenFocused] = useState(false);
+    const [portHasBeenFocused, setPortHasBeenFocused] = useState(false);
     const [usernameHasBeenFocused, setUsernameHasBeenFocused] = useState(false);
     const [passwordBeenFocused, setPasswordHasBeenFocused] = useState(false);
     const [dbNameBeenFocused, setDbNameHasBeenFocused] = useState(false);
@@ -53,6 +53,18 @@ export default function DatabaseConnectionModal(props: DatabaseConnectionModalPr
   
       return validateURL(url) ? false : true;
     }, [url]);
+
+    const isPortInvalid = React.useMemo(() => {
+
+      const portNumber = Number(port);
+
+      if (isNaN(portNumber)){
+        return true;
+      }else{
+        return (portNumber < 0 || portNumber > 65535);
+      }
+
+    }, [port]);
 
     const isPasswordInvalid = React.useMemo(() => {
       if (password === "") return true;
@@ -184,6 +196,17 @@ export default function DatabaseConnectionModal(props: DatabaseConnectionModalPr
                     isInvalid={isURLInvalid && urlHasBeenFocused}
                     color={!urlHasBeenFocused ? "primary" : isURLInvalid ? "danger" : "success"}
                     errorMessage="Please enter a valid database server URL or Host"
+                  />
+                  <Input
+                    isRequired
+                    label="Port"
+                    placeholder="Enter the database server port number"
+                    variant="bordered"
+                    onValueChange={setPort}
+                    onFocus={() => setPortHasBeenFocused(true)}
+                    isInvalid={isPortInvalid && portHasBeenFocused}
+                    color={!portHasBeenFocused ? "primary" : isPortInvalid ? "danger" : "success"}
+                    errorMessage="Please enter a valid database server port number"
                   />
                   <Input
                     isRequired
