@@ -3,7 +3,7 @@ import '@testing-library/jest-dom/vitest'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vitest, vi, Mock } from 'vitest';
 import React from 'react';
-import DatabaseConnectionModal from './DatabaseConnectionModal';
+import DatabaseAdditionModal from './DatabaseAdditionModal';
 
 //Mock out Supabase access token retrieval
 vitest.mock("./../../utils/supabase/client", () => {
@@ -31,24 +31,24 @@ global.fetch = vi.fn(() =>
 ) as Mock;
 
 //basic component rendering tests
-describe('DatabaseConnectionModal basic rendering tests', () => {
+describe('DatabaseAdditionModal basic rendering tests', () => {
   it('should render successfully', () => {
-    const { baseElement } = render(<DatabaseConnectionModal org_id={"1234"} on_add={()=>{}}/>);
+    const { baseElement } = render(<DatabaseAdditionModal org_id={"1234"} on_add={()=>{}}/>);
     expect(baseElement).toBeTruthy();
   });
 });
 
 //button should say + Add
-describe('DatabaseConnectionModal initial tests', () => {
+describe('DatabaseAdditionModal initial tests', () => {
   it('should display the button to Add a new database', () => {
-    render(<DatabaseConnectionModal org_id={"1234"} on_add={()=>{}}/>);
+    render(<DatabaseAdditionModal org_id={"1234"} on_add={()=>{}}/>);
     const text = screen.getByText("+ Add");
     expect(text).toBeInTheDocument();
   });
 });
 
 //click the add button
-describe('DatabaseConnectionModal modal popup tests', () => {
+describe('DatabaseAdditionModal modal popup tests', () => {
 
   it('it should open the modal upon clicking the button', async () => {
 
@@ -56,7 +56,7 @@ describe('DatabaseConnectionModal modal popup tests', () => {
     const user = userEvent.setup()
 
     //render the component
-    render(<DatabaseConnectionModal org_id={"1234"} on_add={()=>{}}/>);
+    render(<DatabaseAdditionModal org_id={"1234"} on_add={()=>{}}/>);
 
     //get the button to add a database
     const button = screen.getByText("+ Add");
@@ -76,7 +76,7 @@ describe('DatabaseConnectionModal modal popup tests', () => {
     const user = userEvent.setup()
 
     //render the component
-    render(<DatabaseConnectionModal org_id={"1234"} on_add={()=>{}}/>);
+    render(<DatabaseAdditionModal org_id={"1234"} on_add={()=>{}}/>);
 
     //get the button to add a database
     const button = screen.getByText("+ Add");
@@ -95,7 +95,7 @@ describe('DatabaseConnectionModal modal popup tests', () => {
     const user = userEvent.setup()
 
     //render the component
-    render(<DatabaseConnectionModal org_id={"1234"} on_add={()=>{}}/>);
+    render(<DatabaseAdditionModal org_id={"1234"} on_add={()=>{}}/>);
 
     //get the button to add a database
     const button = screen.getByText("+ Add");
@@ -114,7 +114,7 @@ describe('DatabaseConnectionModal modal popup tests', () => {
     const user = userEvent.setup()
 
     //render the component
-    render(<DatabaseConnectionModal org_id={"1234"} on_add={()=>{}}/>);
+    render(<DatabaseAdditionModal org_id={"1234"} on_add={()=>{}}/>);
 
     //get the button to add a database
     const button = screen.getByText("+ Add");
@@ -133,7 +133,7 @@ describe('DatabaseConnectionModal modal popup tests', () => {
     const user = userEvent.setup()
 
     //render the component
-    render(<DatabaseConnectionModal org_id={"1234"} on_add={()=>{}}/>);
+    render(<DatabaseAdditionModal org_id={"1234"} on_add={()=>{}}/>);
 
     //get the button to add a database
     const button = screen.getByText("+ Add");
@@ -148,7 +148,7 @@ describe('DatabaseConnectionModal modal popup tests', () => {
 
 });
 
-describe('DatabaseConnectionModal add database tests', () => {
+describe('DatabaseAdditionModal add database tests', () => {
 
   it('Should be able to fill out the fields and add a database', async () => {
 
@@ -156,7 +156,7 @@ describe('DatabaseConnectionModal add database tests', () => {
     const user = userEvent.setup()
 
     //render the component
-    render(<DatabaseConnectionModal org_id={"1234"} on_add={()=>{}}/>);
+    render(<DatabaseAdditionModal org_id={"1234"} on_add={()=>{}}/>);
 
     //get the button to add a database
     const button = screen.getByText("+ Add");

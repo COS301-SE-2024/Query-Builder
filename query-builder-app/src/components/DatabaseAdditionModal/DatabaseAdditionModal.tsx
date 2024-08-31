@@ -1,15 +1,14 @@
 "use client"
 import "../../app/globals.css"
 import React, { useState } from "react";
-import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Checkbox, Tooltip} from "@nextui-org/react";
-import { createClient } from "./../../utils/supabase/client";
-import jwt from "jsonwebtoken"
+import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Checkbox} from "@nextui-org/react";
+import { createClient } from "../../utils/supabase/client";
 
 require("dotenv").config();
 
-//interface for the props to DatabaseConnectionModal
+//interface for the props to DatabaseAdditionModal
 
-interface DatabaseConnectionModalProps {
+interface DatabaseAdditionModalProps {
   org_id: String,
   on_add: () => void
 }
@@ -26,7 +25,7 @@ const getToken = async () => {
   return token;
 };
 
-export default function DatabaseConnectionModal(props: DatabaseConnectionModalProps){
+export default function DatabaseAdditionModal(props: DatabaseAdditionModalProps){
 
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
 
@@ -173,7 +172,7 @@ export default function DatabaseConnectionModal(props: DatabaseConnectionModalPr
           <ModalContent>
             {(onClose : any) => (
               <>
-                <ModalHeader className="flex flex-col gap-1">Connect a new database server</ModalHeader>
+                <ModalHeader className="flex flex-col gap-1">Add a new database server to your organisation</ModalHeader>
                 <ModalBody>
                   <Input
                     isRequired

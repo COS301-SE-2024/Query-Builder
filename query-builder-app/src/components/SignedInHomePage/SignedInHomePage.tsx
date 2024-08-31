@@ -1,6 +1,6 @@
 "use client"
 import { Chip, Spacer, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Link} from "@nextui-org/react"
-import DatabaseConnectionModal from "../DatabaseConnectionModal/DatabaseConnectionModal"
+import DatabaseAdditionModal from "../DatabaseAdditionModal/DatabaseAdditionModal"
 import React from "react";
 import { createClient } from "./../../utils/supabase/client";
 import AddOrganisationModal from "../AddOrganisationModal/AddOrganisationModal";
@@ -82,7 +82,7 @@ export default function SignedInHomePage(){
             <>
                 <div className="flex">
                     <h1 className="text-3xl flex-1">{org.name}</h1>
-                    <DatabaseConnectionModal org_id={org.org_id} on_add={fetchOrgs}/>
+                    <DatabaseAdditionModal org_id={org.org_id} on_add={fetchOrgs}/>
                     <Spacer x={5} />
                     <Link href={"/organisation/" + org.org_id}>settings</Link>
                 </div>
