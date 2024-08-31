@@ -105,12 +105,19 @@ export default function Report(props: ReportProps) {
   const [date, setDate] = useState(new Date());
 
   useEffect(() => {
+    setChartsData([]);
     const headings = Object.keys(
       props.data[0],
     ) as (keyof (typeof props.data)[0])[]; // stores the headings of each column (can be used to reference)
     const numberColumns: boolean[] = Object.values(props.data[0]).map(
       (value) => typeof value === 'number',
     ); // stores the types of each column in the dataset
+
+    let count = 0;
+    for(let i in props.data[0]){
+      console.log(`${i} : ${numberColumns[count++]}`)
+    }
+
     const firstKey: string[] = props.data.map(
       (row) => row[headings[0]] as string,
     ); // getting all of the classes
@@ -243,7 +250,6 @@ function MyDocument({ tableData, chartData, metadata, date }: MyDocumentProps) {
                     datasets: data.datasets,
                   },
                 });
-
                 return await myChart.toDataUrl();
               })()}
               style={styles.chart}
