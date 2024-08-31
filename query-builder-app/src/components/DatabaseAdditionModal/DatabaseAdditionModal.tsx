@@ -29,19 +29,12 @@ export default function DatabaseAdditionModal(props: DatabaseAdditionModalProps)
 
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
 
-    //React hook to store whether the user wants QBee to remember their database credentials or not
-    const [rememberDatabaseCredentials, setRememberDatabaseCredentials] = useState(false);
-
     const [url, setUrl] = useState('');
     const [port, setPort] = useState('');
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
     const [dbName, setDbName] = useState('');
 
     const [urlHasBeenFocused, setURLHasBeenFocused] = useState(false);
     const [portHasBeenFocused, setPortHasBeenFocused] = useState(false);
-    const [usernameHasBeenFocused, setUsernameHasBeenFocused] = useState(false);
-    const [passwordBeenFocused, setPasswordHasBeenFocused] = useState(false);
     const [dbNameBeenFocused, setDbNameHasBeenFocused] = useState(false);
 
     //form validation
@@ -54,6 +47,7 @@ export default function DatabaseAdditionModal(props: DatabaseAdditionModalProps)
     }, [url]);
 
     const isPortInvalid = React.useMemo(() => {
+      if (port === "") return true;
 
       const portNumber = Number(port);
 
@@ -65,25 +59,13 @@ export default function DatabaseAdditionModal(props: DatabaseAdditionModalProps)
 
     }, [port]);
 
-    const isPasswordInvalid = React.useMemo(() => {
-      if (password === "") return true;
-  
-      return false;
-    }, [password]);
-
-    const isUsernameInvalid = React.useMemo(() => {
-      if (username === "") return true;
-  
-      return false;
-    }, [username]);
-
     const isDbNameInvalid = React.useMemo(() => {
       if (dbName === "") return true;
   
       return false;
     }, [dbName]);
 
-    async function addDatabase(name: String, host:String, user:String, password:String){
+    async function addDatabase(name: String, host:String){
 
       //log request body
       console.log("BODY OF REQUEST: " + JSON.stringify({
@@ -116,46 +98,6 @@ export default function DatabaseAdditionModal(props: DatabaseAdditionModalProps)
 
       //call the on_add callback so parent component can refetch the modified databases
       props.on_add();
-
-      //if rememberDatabaseCredentials is set, save the db_secrets
-      //change this later - for now always save
-      if(true){
-
-        //create a db_secrets object
-        const db_secrets = {
-          user: user,
-          password: password
-        }
-
-        //stringify the db_secrets
-        const db_secrets_string = JSON.stringify(db_secrets);   
-
-        //log request body
-        console.log("BODY OF REQUEST: " + JSON.stringify({
-          db_id: addDBResponse.data[0].db_id,
-          db_secrets: db_secrets_string
-        }))
-
-        //call the save-db-secrets API endpoint
-        let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/save-db-secrets`, {
-          credentials: "include",
-          method: "POST",
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + await getToken()
-          },
-          body: JSON.stringify({
-              db_id: addDBResponse.data[0].db_id,
-              db_secrets: db_secrets_string
-          })
-        })
-
-        //log response body
-        let json = await response.json();
-        console.log("ADD DB RESPONSE " + JSON.stringify(json));
-
-      }
 
     }
 
@@ -207,47 +149,15 @@ export default function DatabaseAdditionModal(props: DatabaseAdditionModalProps)
                     color={!portHasBeenFocused ? "primary" : isPortInvalid ? "danger" : "success"}
                     errorMessage="Please enter a valid database server port number"
                   />
-                  <Input
-                    isRequired
-                    label="Username"
-                    placeholder="Enter your username"
-                    variant="bordered"
-                    onValueChange={setUsername}
-                    onFocus={() => setUsernameHasBeenFocused(true)}
-                    isInvalid={isUsernameInvalid && usernameHasBeenFocused}
-                    color={!usernameHasBeenFocused ? "primary" : isUsernameInvalid ? "danger" : "success"}
-                    errorMessage="Please enter a username"
-                  />
-                  <Input
-                    isRequired
-                    label="Password"
-                    placeholder="Enter your password"
-                    type="password"
-                    variant="bordered"
-                    onValueChange={setPassword}
-                    onFocus={() => setPasswordHasBeenFocused(true)}
-                    isInvalid={isPasswordInvalid && passwordBeenFocused}
-                    color={!passwordBeenFocused ? "primary" : isPasswordInvalid ? "danger" : "success"}
-                    errorMessage="Please enter a password"
-                  />
-                  <Checkbox
-                    isSelected={rememberDatabaseCredentials}
-                    onValueChange={setRememberDatabaseCredentials}
-                    classNames={{
-                      label: "text-small",
-                    }}
-                  >
-                    Remember my database credentials
-                  </Checkbox>
                 </ModalBody>
                 <ModalFooter>
                   <Button 
                     color="primary" 
                     onPress={onClose}  
-                    onClick={() => addDatabase(dbName, url, username, password)}
-                    isDisabled={isURLInvalid || isUsernameInvalid || isPasswordInvalid || isDbNameInvalid}
+                    onClick={() => addDatabase(dbName, url)}
+                    isDisabled={isURLInvalid || isDbNameInvalid}
                     >
-                    Connect
+                    Add
                   </Button>
                 </ModalFooter>
               </>

@@ -9,7 +9,7 @@ require("dotenv").config();
 //interface for the props to DatabaseCredentialsModal
 
 interface DatabaseCredentialsModalProps {
-
+  dbServerID: String
 }
 
 // This function gets the token from local storage.
@@ -50,10 +50,54 @@ export default function DatabaseCredentialsModal(props: DatabaseCredentialsModal
       return false;
     }, [username]);
 
+    async function connectToDatabaseServer(user:String, password:String){
+
+      //if rememberDatabaseCredentials is set, save the db_secrets
+      //change this later - for now always save
+      if(true){
+
+        //create a db_secrets object
+        const db_secrets = {
+          user: user,
+          password: password
+        }
+
+        //stringify the db_secrets
+        const db_secrets_string = JSON.stringify(db_secrets);   
+
+        //log request body
+        console.log("BODY OF REQUEST: " + JSON.stringify({
+          db_id: props.dbServerID,
+          db_secrets: db_secrets_string
+        }))
+
+        //call the save-db-secrets API endpoint
+        let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/save-db-secrets`, {
+          credentials: "include",
+          method: "POST",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + await getToken()
+          },
+          body: JSON.stringify({
+              db_id: props.dbServerID,
+              db_secrets: db_secrets_string
+          })
+        })
+
+        //log response body
+        let json = await response.json();
+        console.log("SAVE DB SECRETS RESPONSE " + JSON.stringify(json));
+
+      }
+
+    }
+
     return (
 
         <>
-        <Button aria-label="add database server button" onPress={onOpen} color="primary">Connect</Button>
+        <Button aria-label="connect to database server button" onPress={onOpen} color="primary">Connect</Button>
         <Modal 
           isOpen={isOpen} 
           onOpenChange={onOpenChange}
@@ -103,7 +147,7 @@ export default function DatabaseCredentialsModal(props: DatabaseCredentialsModal
                     aria-label="connect new database button"
                     color="primary" 
                     onPress={onClose}  
-                    onClick={() => {}}
+                    onClick={() => {connectToDatabaseServer(username, password)}}
                     isDisabled={isUsernameInvalid || isPasswordInvalid}
                     >
                     Connect
