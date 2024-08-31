@@ -1,13 +1,18 @@
 "use client"
 import "../../app/globals.css"
 import React, { useState } from "react";
-import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Checkbox} from "@nextui-org/react";
+import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Checkbox, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Spacer} from "@nextui-org/react";
 import { createClient } from "../../utils/supabase/client";
 
 require("dotenv").config();
 
-//interface for the props to DatabaseAdditionModal
+//map of database vendors to their default ports
+const portMap = new Map<string, string>([
+  ["mysql", "3306"],
+  ["postgres", "5432"]
+]);
 
+//interface for the props to DatabaseAdditionModal
 interface DatabaseAdditionModalProps {
   org_id: String,
   on_add: () => void
@@ -29,16 +34,23 @@ export default function DatabaseAdditionModal(props: DatabaseAdditionModalProps)
 
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
 
-    const [url, setUrl] = useState('');
-    const [port, setPort] = useState('');
     const [dbName, setDbName] = useState('');
+    const [type, setType] = useState('mysql');
+    const [url, setUrl] = useState('');
+    const [port, setPort] = useState('3306');
 
+    const [dbNameBeenFocused, setDbNameHasBeenFocused] = useState(false);
     const [urlHasBeenFocused, setURLHasBeenFocused] = useState(false);
     const [portHasBeenFocused, setPortHasBeenFocused] = useState(false);
-    const [dbNameBeenFocused, setDbNameHasBeenFocused] = useState(false);
 
     //form validation
     const validateURL = (value: string) => value.match(/^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$|(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/i);
+
+    const isDbNameInvalid = React.useMemo(() => {
+      if (dbName === "") return true;
+  
+      return false;
+    }, [dbName]);
 
     const isURLInvalid = React.useMemo(() => {
       if (url === "") return true;
@@ -58,12 +70,6 @@ export default function DatabaseAdditionModal(props: DatabaseAdditionModalProps)
       }
 
     }, [port]);
-
-    const isDbNameInvalid = React.useMemo(() => {
-      if (dbName === "") return true;
-  
-      return false;
-    }, [dbName]);
 
     async function addDatabase(name: String, host:String){
 
@@ -116,6 +122,30 @@ export default function DatabaseAdditionModal(props: DatabaseAdditionModalProps)
               <>
                 <ModalHeader className="flex flex-col gap-1">Add a new database server to your organisation</ModalHeader>
                 <ModalBody>
+                  <h3>Database Vendor:</h3>
+                  <Dropdown>
+                    <DropdownTrigger>
+                      <Button
+                        variant="bordered"
+                      >
+                        {type}
+                      </Button>
+                    </DropdownTrigger>
+                    <DropdownMenu
+                      disallowEmptySelection
+                      selectionMode="single"
+                      selectedKeys={type}
+                      onSelectionChange={(keys) => {
+                        const key = Array.from(keys)[0];
+                        setPort(portMap.get(key.toString())!);
+                        setType(key.toString());
+                      }}
+                    >
+                      <DropdownItem key="mysql">mysql</DropdownItem>
+                      <DropdownItem key="postgres">postgres</DropdownItem>
+                    </DropdownMenu>
+                  </Dropdown>
+                  <Spacer y={0.5}></Spacer>
                   <Input
                     isRequired
                     label="Database Server Name"
@@ -140,9 +170,10 @@ export default function DatabaseAdditionModal(props: DatabaseAdditionModalProps)
                   />
                   <Input
                     isRequired
-                    label="Port"
+                    label="Port (Default autofills)"
                     placeholder="Enter the database server port number"
                     variant="bordered"
+                    value={port}
                     onValueChange={setPort}
                     onFocus={() => setPortHasBeenFocused(true)}
                     isInvalid={isPortInvalid && portHasBeenFocused}
