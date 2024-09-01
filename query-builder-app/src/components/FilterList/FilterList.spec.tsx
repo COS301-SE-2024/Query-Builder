@@ -29,6 +29,7 @@ global.fetch = vi.fn((url: string, config: any) => {
 
   if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/fields`){
       return Promise.resolve({
+          ok: true,
           json: () => Promise.resolve({ data: [{name: "first_name"}, {name: "last_name"}] }),
       })
   }

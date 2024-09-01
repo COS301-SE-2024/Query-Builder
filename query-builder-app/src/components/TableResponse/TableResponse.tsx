@@ -8,7 +8,7 @@ import csvDownload from 'json-to-csv-export'
 import { Query } from "@/interfaces/intermediateJSON";
 import { createClient } from "./../../utils/supabase/client";
 import SaveQueryModal from "../SaveQueryModal/SaveQueryModal";
-import { navigateToAuth } from "@/app/authentication/actions";
+import { navigateToAuth } from "../../app/authentication/actions";
 
 interface Column {
   key: string,

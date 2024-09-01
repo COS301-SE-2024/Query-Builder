@@ -7,7 +7,7 @@ import { useState } from "react"
 import { createClient } from "./../../utils/supabase/client";
 import FilterChip from "../FilterChip/FilterChip";
 import React from "react";
-import { navigateToAuth } from "@/app/authentication/actions";
+import { navigateToAuth } from "../../app/authentication/actions";
 
 //---------------------------INTERFACES---------------------------------//
 

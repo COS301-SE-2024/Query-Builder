@@ -3,7 +3,7 @@ import { column, table } from "../../interfaces/intermediateJSON"
 import { Button, Card, CardBody, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spacer } from "@nextui-org/react";
 import ColumnChip from "../ColumnChip/ColumnChip";
 import { createClient } from "./../../utils/supabase/client";
-import { navigateToAuth } from "@/app/authentication/actions";
+import { navigateToAuth } from "../../app/authentication/actions";
 
 interface TableFormProps {
     databaseServerID: string,

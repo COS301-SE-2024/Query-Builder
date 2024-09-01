@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import TableForm from "../TableForm/TableForm"
 import { Button, Card, CardBody, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spacer } from "@nextui-org/react";
 import { createClient } from "./../../utils/supabase/client";
-import { navigateToAuth } from "@/app/authentication/actions";
+import { navigateToAuth } from "../../app/authentication/actions";
 
 //----------------------------INTERFACES------------------------------------//
 

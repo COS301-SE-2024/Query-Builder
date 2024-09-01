@@ -11,7 +11,7 @@ import { createClient } from "./../../utils/supabase/client";
 import { compoundCondition, condition, LogicalOperator, Query, table} from "@/interfaces/intermediateJSON";
 import TableList from "../TableList/TableList";
 import FilterList from "../FilterList/FilterList";
-import { navigateToAuth } from "@/app/authentication/actions";
+import { navigateToAuth } from "../../app/authentication/actions";
 
 //----------------------------INTERFACES------------------------------------//
 
