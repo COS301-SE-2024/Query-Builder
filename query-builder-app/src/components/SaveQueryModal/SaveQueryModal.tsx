@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input} from "@nextui-org/react";
 import { createClient } from "./../../utils/supabase/client";
 import { Query } from "@/interfaces/intermediateJSON";
+import reload from "../ContextMenu/ContextMenu"
 
 require("dotenv").config();
 
@@ -54,6 +55,8 @@ export default function SaveQueryModal(props: SaveQueryModalProps){
           queryTitle: queryTitle
         })
       })
+
+      window.location.reload();
 
     }
 
