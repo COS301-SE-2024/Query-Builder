@@ -3,6 +3,7 @@ import { column, table } from "../../interfaces/intermediateJSON"
 import { Button, Card, CardBody, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spacer } from "@nextui-org/react";
 import ColumnChip from "../ColumnChip/ColumnChip";
 import { createClient } from "./../../utils/supabase/client";
+import { navigateToAuth } from "@/app/authentication/actions";
 
 interface TableFormProps {
     databaseServerID: string,
@@ -68,10 +69,17 @@ export default function TableForm(props: TableFormProps){
 
         let json = await response.json();
 
-        console.log(json);
-
-        //set the databases hook
-        setAllColumns(json.data);
+        if(response.ok){
+            //set the databases hook
+            setAllColumns(json.data);
+        }
+        else{
+        
+            if(json.response.message == 'You do not have a backend session'){
+                navigateToAuth();
+            }
+      
+        }
 
     }
 

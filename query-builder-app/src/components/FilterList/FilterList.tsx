@@ -7,6 +7,7 @@ import { useState } from "react"
 import { createClient } from "./../../utils/supabase/client";
 import FilterChip from "../FilterChip/FilterChip";
 import React from "react";
+import { navigateToAuth } from "@/app/authentication/actions";
 
 //---------------------------INTERFACES---------------------------------//
 
@@ -97,6 +98,14 @@ export default function FilterList(props: FilterListProps){
 
         let json = await response.json();
 
+        if(!response.ok){
+        
+            if(json.response.message == 'You do not have a backend session'){
+                navigateToAuth();
+            }
+          
+        }
+
         console.log(json.data)
 
         for(let item of json.data){
@@ -122,6 +131,14 @@ export default function FilterList(props: FilterListProps){
             });
 
             let json = await response.json();
+
+            if(!response.ok){
+        
+                if(json.response.message == 'You do not have a backend session'){
+                    navigateToAuth();
+                }
+              
+            }
 
             console.log(json.data)
 

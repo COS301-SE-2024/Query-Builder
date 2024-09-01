@@ -8,6 +8,7 @@ import csvDownload from 'json-to-csv-export'
 import { Query } from "@/interfaces/intermediateJSON";
 import { createClient } from "./../../utils/supabase/client";
 import SaveQueryModal from "../SaveQueryModal/SaveQueryModal";
+import { navigateToAuth } from "@/app/authentication/actions";
 
 interface Column {
   key: string,
@@ -101,15 +102,27 @@ export default function TableResponse(props: TableResponseProps){
       body: JSON.stringify(props.query)
     })
 
-    let json = (await response.json()).data;
+    let json = await response.json();
+    let jsonData = json.data;
 
-    //remove qbee_id
-    json.map(function(item: any) { 
-      delete item.qbee_id; 
-      return item; 
-    });
+    if(response.ok){
 
-    return json;
+      //remove qbee_id
+      jsonData.map(function(item: any) { 
+        delete item.qbee_id; 
+        return item; 
+      });
+
+      return jsonData;
+
+    }
+    else{
+        
+      if(json.response.message == 'You do not have a backend session'){
+          navigateToAuth();
+      }
+
+    }
 
   }
 
@@ -152,16 +165,32 @@ export default function TableResponse(props: TableResponseProps){
       })
 
       let json = await response.json();
-      setLoading(false);
 
-      //set totalNumberOfPages
-      const totalNumberOfRows = json.totalNumRows;
-      const totalNumberOfPages = Math.ceil(totalNumberOfRows/rowsPerPage);
-      setTotalPages(totalNumberOfPages);
+      if(response.ok){
+        setLoading(false);
 
-      return {
-        items: json.data
-      };},
+        //set totalNumberOfPages
+        const totalNumberOfRows = json.totalNumRows;
+        const totalNumberOfPages = Math.ceil(totalNumberOfRows/rowsPerPage);
+        setTotalPages(totalNumberOfPages);
+  
+        return {
+          items: json.data
+        }; 
+      }
+      else{
+
+        if(json.response.message == 'You do not have a backend session'){
+          navigateToAuth();
+        }
+
+        return {
+          items: []
+        };
+
+      }
+    
+    },
 
   });
 
