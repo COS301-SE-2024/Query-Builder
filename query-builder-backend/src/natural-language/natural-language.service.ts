@@ -257,7 +257,37 @@ export class NaturalLanguageService {
       prompt +=
         '\n\n The database structure is as follows: ' + metadataSummaryString;
 
-      prompt += '\n\n Here are a few examples of input and desired output: ';
+      prompt += '\n\n Please do not use "*" to select all columns but instead use all the names for them. ';
+      prompt += '\n\n For example: ';
+      prompt += '\n\n DO NOT DO: ';
+      prompt += `QueryParams = {
+                    "language": "sql",
+                    "query_type": "select",
+                    "databaseName": "your_database_name",
+                    "table": {
+                        "name": "table_name",
+                        "columns": [*]
+                    }
+                }`;
+      prompt += '\n\n RATHER DO: ';
+      prompt += `QueryParams = {
+                      "language": "sql",
+                      "query_type": "select",
+                      "databaseName": "your_database_name",
+                      "table": {
+                          "name": "table_name",
+                          "columns": [
+                              {"name": "column1"},
+                              {"name": "column2"},
+                              {"name": "column3"},
+                              {"name": "column4"}
+                          ]
+                      }
+                  }`;
+
+      prompt += '\n\n Please ensure you always use the symbols for operators for example "=", "<" ect rather than using EQUAL ect...  ';
+
+      prompt += '\n\n Here are a few examples of inputs and desired output: ';
 
       prompt += '\n\n Example 1: ';
       prompt += '\n\n Query: Give me country names starting with B ';
@@ -328,8 +358,11 @@ export class NaturalLanguageService {
                     }
                 }`;
 
+      prompt += '\n\n Please ensure the following before returning a response: ';
+      prompt += '\n\n 1. The QueryParams should always have all the brackets, please ensure all starting brackets have ending brackets';
 
-      prompt += '\n\n Please think of the given query and analyze the examples before giving me an output ';
+
+      prompt += '\n\n Please think really hard of the given query and analyze the examples before giving me an output ';
 
 
       //--------------------Get the JSON intermediate form result from the LLM---------------------//
