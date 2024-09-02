@@ -69,8 +69,8 @@ export default function OrganisationManagement(){
 
         getUser().then((user) => {
           setLoggedInUserID(user as string);
-          console.log(orgMembers);
-          console.log(membersData);
+          // console.log(orgMembers);
+          // console.log(membersData);
           let role = membersData.find((orgMember:any) => orgMember.profiles.user_id === user).user_role;
           setLoggedInUserRole(role);
           // console.log(membersData.find((orgMember:any) => orgMember.profiles.user_id === user).user_role);
