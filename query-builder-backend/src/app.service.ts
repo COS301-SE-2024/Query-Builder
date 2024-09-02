@@ -17,6 +17,7 @@ import { promisify } from 'util';
 import { compoundCondition, primitiveCondition } from './interfaces/dto/conditions.dto';
 import { plainToInstance } from 'class-transformer';
 import { table } from './interfaces/dto/table.dto';
+import { QueryParams } from './interfaces/dto/query.dto';
 
 @Injectable()
 export class AppService {
@@ -37,7 +38,7 @@ export class AppService {
   }
 
   async validateBoi(body: any){
-    const obj = plainToInstance(compoundCondition, body);
+    const obj = plainToInstance(QueryParams, body);
     await validate(obj).then((errors) => {
       if (errors.length > 0) {
         throw new HttpException({ message: 'Validation failed', errors }, 400);

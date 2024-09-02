@@ -7,9 +7,13 @@ import {
   IsNumber,
   Min
 } from 'class-validator';
-import { condition } from './conditions.dto';
+import {
+  compoundCondition,
+  condition,
+  primitiveCondition
+} from './conditions.dto';
 import { table } from './table.dto';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
 export class DatabaseCredentials {
   @IsString()
@@ -19,6 +23,29 @@ export class DatabaseCredentials {
   @IsString()
   @IsNotEmpty()
   password: string;
+}
+
+export class SortParams {
+  @IsString()
+  @IsNotEmpty()
+  column: string;
+
+  @IsOptional()
+  @IsEnum(['ascending', 'descending'], {
+    message: 'Must be either ascending or descending'
+  })
+  direction?: string;
+}
+
+export class PageParams {
+  //note pageNumbers are indexed from 1
+  @IsNumber()
+  @Min(1)
+  pageNumber: number;
+
+  @IsNumber()
+  @Min(1)
+  rowsPerPage: number;
 }
 
 export class QueryParams {
@@ -36,12 +63,46 @@ export class QueryParams {
 
   @ValidateNested()
   @Type(() => table)
+  @IsNotEmpty()
   table: table;
 
   @IsOptional()
   @ValidateNested()
-  @Type(() => condition)
-  condition?: condition;
+  @Type(() => condition, {
+    discriminator: {
+      property: 'type',
+      subTypes: [
+        { value: primitiveCondition, name: 'p' },
+        { value: compoundCondition, name: 'c' }
+      ]
+    },
+    keepDiscriminatorProperty: true
+  })
+  @Transform(
+    ({ value }) => {
+      if (value.condtions !== undefined && value.operator !== undefined) {
+        return Object.assign(new compoundCondition(), value);
+      }
+      if (
+        value.value !== undefined &&
+        value.column !== undefined &&
+        value.operator !== undefined
+      ) {
+        return Object.assign(new primitiveCondition(), value);
+      } else {
+        if (value.conditions !== undefined) {
+          return Object.assign(new compoundCondition(), value);
+        }
+        if (value.value !== undefined || value.column !== undefined) {
+          return Object.assign(new primitiveCondition(), value);
+        }
+
+        return Object.assign(new primitiveCondition(), value);
+      }
+    },
+    { toClassOnly: true }
+  )
+  condition?: primitiveCondition | compoundCondition;
 
   @IsOptional()
   @ValidateNested()
@@ -68,27 +129,4 @@ export class Query {
   @ValidateNested()
   @Type(() => QueryParams)
   queryParams: QueryParams;
-}
-
-export class SortParams {
-  @IsString()
-  @IsNotEmpty()
-  column: string;
-
-  @IsOptional()
-  @IsEnum(['ascending', 'descending'], {
-    message: 'Must be either ascending or descending'
-  })
-  direction?: string;
-}
-
-export class PageParams {
-  //note pageNumbers are indexed from 1
-  @IsNumber()
-  @Min(1)
-  pageNumber: number;
-
-  @IsNumber()
-  @Min(1)
-  rowsPerPage: number;
 }
