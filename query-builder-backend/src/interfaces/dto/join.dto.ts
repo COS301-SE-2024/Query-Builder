@@ -1,5 +1,6 @@
 import { IsString, IsNotEmpty, ValidateNested } from "class-validator";
 import { table } from "./table.dto";
+import { Type } from "class-transformer";
 
 export class join {
   @IsString()
@@ -7,6 +8,7 @@ export class join {
   table1MatchingColumnName: string;
 
   @ValidateNested()
+  @Type(() => table)
   table2: table;
 
   @IsString()

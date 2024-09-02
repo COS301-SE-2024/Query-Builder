@@ -1,4 +1,4 @@
-import { Body, HttpException, Injectable } from '@nestjs/common';
+import { Body, HttpException, Injectable, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { isAuthApiError } from '@supabase/supabase-js';
 import { validate } from 'class-validator';
@@ -14,7 +14,9 @@ import { get } from 'http';
 import { stringify } from 'querystring';
 import { concat, from } from 'rxjs';
 import { promisify } from 'util';
-import { primitiveCondition } from './interfaces/intermediateJSON.dto';
+import { compoundCondition, primitiveCondition } from './interfaces/dto/conditions.dto';
+import { plainToInstance } from 'class-transformer';
+import { table } from './interfaces/dto/table.dto';
 
 @Injectable()
 export class AppService {
@@ -34,10 +36,18 @@ export class AppService {
     return token;
   }
 
-  validateBoi(@Body() body: primitiveCondition){
-    validate(body).then(errors => {
-      throw errors;
-    })
+  async validateBoi(body: any){
+    const obj = plainToInstance(compoundCondition, body);
+    await validate(obj).then((errors) => {
+      if (errors.length > 0) {
+        throw new HttpException({ message: 'Validation failed', errors }, 400);
+      }
+      else{
+        return {message: 'Validation passed'};
+      }
+    });
+
+    return {message: 'Validation passed'};
   }
 
   async deriveKey(text: string) {

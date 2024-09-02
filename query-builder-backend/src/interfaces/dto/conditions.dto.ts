@@ -1,5 +1,15 @@
-import { IsArray, ValidateNested, IsEnum, IsNotEmpty, IsOptional, IsString } from "class-validator";
-import { IsType } from "../../type-validator";
+import {
+  IsArray,
+  ValidateNested,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  ValidateIf,
+  IsInstance
+} from 'class-validator';
+import { IsType } from '../../type-validator';
+import { Type } from 'class-transformer';
 // import { LogicalOperator, ComparisonOperator, AggregateFunction } from "../intermediateJSON.dto";
 
 export enum AggregateFunction {
@@ -28,19 +38,23 @@ export enum ComparisonOperator {
   IS_NOT = 'IS NOT'
 }
 
-export class condition {}
+export class condition {
+  @IsEnum(
+    { c: 'c', p: 'p' },
+    {
+      message: `type must be one of 'c' or 'p'`
+    }
+  )
+  type: 'c' | 'p';
 
-export class compoundCondition extends condition {
-  @IsArray()
-  @ValidateNested({ each: true })
-  conditions: condition[];
+  protected constructor() {
 
-  @IsEnum({ enum: { LogicalOperator } })
-  operator: string;
+  }
 }
 
 export class primitiveCondition extends condition {
-  @IsType(['string', 'number', 'boolean', null])
+  @ValidateIf(({ value }) => value !== null)
+  @IsType(['string', 'number', 'boolean'])
   @IsNotEmpty()
   value: string | number | boolean | null;
 
@@ -53,10 +67,46 @@ export class primitiveCondition extends condition {
   @IsNotEmpty()
   column: string;
 
-  @IsEnum({ enum: { ComparisonOperator } })
-  operator: string;
+  @IsEnum(ComparisonOperator, {
+    message: `Comparison operator must be one of ${Object.values(ComparisonOperator).join(', ')}`
+  })
+  operator: ComparisonOperator;
 
   @IsOptional()
-  @IsEnum({ enum: { AggregateFunction } })
-  aggregate?: string;
+  @IsEnum(AggregateFunction, {
+    message: `Aggregate function must be one of ${Object.values(AggregateFunction).join(', ')}`
+  })
+  aggregate?: AggregateFunction;
+
+  // constructor
+  constructor() {
+    super()
+    this.type = 'p';
+  }
+}
+
+export class compoundCondition extends condition {
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => condition, {
+    discriminator: {
+      property: 'type',
+      subTypes: [
+        { value: primitiveCondition, name: 'p' },
+        { value: compoundCondition, name: 'c' },
+      ],
+    },
+    keepDiscriminatorProperty: true,
+  })
+  conditions: condition[];
+
+  @IsEnum(LogicalOperator, {
+    message: `Logical operator must be one of ${Object.values(LogicalOperator).join(', ')}`
+  })
+  operator: LogicalOperator;
+
+  constructor(){
+    super()
+    this.type = 'c'
+  }
 }

@@ -1,6 +1,14 @@
-import { IsString, IsNotEmpty, IsOptional, IsEnum, IsArray, ValidateNested } from "class-validator";
-import { AggregateFunction } from "../intermediateJSON";
-import { join } from "./join.dto";
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsEnum,
+  IsArray,
+  ValidateNested
+} from 'class-validator';
+import { AggregateFunction } from './conditions.dto';
+import { join } from './join.dto';
+import { Type } from 'class-transformer';
 
 export class column {
   @IsString()
@@ -8,7 +16,9 @@ export class column {
   name: string;
 
   @IsOptional()
-  @IsEnum({ enum: { AggregateFunction } })
+  @IsEnum(AggregateFunction, {
+    message: `Aggregate function must be one of ${Object.values(AggregateFunction).join(', ')}`
+  })
   aggregation?: string;
 
   @IsOptional()
@@ -24,9 +34,11 @@ export class table {
 
   @IsArray()
   @ValidateNested({ each: true })
+  @Type(() => column)
   columns: column[];
 
   @IsOptional()
   @ValidateNested()
+  @Type(() => join)
   join?: join;
 }

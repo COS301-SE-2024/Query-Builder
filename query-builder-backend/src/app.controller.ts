@@ -26,7 +26,7 @@ export class AppController {
   }
 
   @Put('validate-boi')
-  validateBoi(@Body() body: any){
-    return this.appService.validateBoi(body);
+  async validateBoi(@Body() body: any) {
+    return await this.appService.validateBoi(body);
   }
 }

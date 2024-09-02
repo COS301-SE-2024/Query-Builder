@@ -1,6 +1,15 @@
-import { IsString, IsNotEmpty, ValidateNested, IsOptional, IsEnum, IsNumber, Min } from "class-validator";
-import { condition } from "./conditions.dto";
-import { table } from "./table.dto";
+import {
+  IsString,
+  IsNotEmpty,
+  ValidateNested,
+  IsOptional,
+  IsEnum,
+  IsNumber,
+  Min
+} from 'class-validator';
+import { condition } from './conditions.dto';
+import { table } from './table.dto';
+import { Type } from 'class-transformer';
 
 export class DatabaseCredentials {
   @IsString()
@@ -26,24 +35,29 @@ export class QueryParams {
   databaseName: string;
 
   @ValidateNested()
+  @Type(() => table)
   table: table;
 
   @IsOptional()
   @ValidateNested()
+  @Type(() => condition)
   condition?: condition;
 
   @IsOptional()
   @ValidateNested()
+  @Type(() => SortParams)
   sortParams?: SortParams;
 
   @IsOptional()
   @ValidateNested()
+  @Type(() => PageParams)
   pageParams?: PageParams;
 }
 
 export class Query {
   @IsOptional()
   @ValidateNested()
+  @Type(() => DatabaseCredentials)
   credentials?: DatabaseCredentials;
 
   @IsString()
@@ -52,6 +66,7 @@ export class Query {
 
   @IsNotEmpty()
   @ValidateNested()
+  @Type(() => QueryParams)
   queryParams: QueryParams;
 }
 

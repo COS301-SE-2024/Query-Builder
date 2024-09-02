@@ -14,7 +14,6 @@ export function IsType(
     | 'undefined'
     | 'object'
     | 'function'
-    | null
   >,
   validationOptions?: ValidationOptions
 ): PropertyDecorator {
