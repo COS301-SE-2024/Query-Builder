@@ -34,10 +34,10 @@ export class NaturalLanguageService {
 
       //-----------Fetch DB metadata to inform the LLM of the database server's structure-----------//
       const metadataSummary =
-      await this.dbMetadataHandlerService.getSchemaSummary(
-        { databaseServerID: naturalLanguageQuery.databaseServerID },
-        session
-      );
+        await this.dbMetadataHandlerService.getSchemaSummary(
+          { databaseServerID: naturalLanguageQuery.databaseServerID },
+          session
+        );
       const metadataSummaryString = JSON.stringify(metadataSummary);
 
       //-------------------------------Create the prompt for the LLM-------------------------------//
@@ -256,6 +256,81 @@ export class NaturalLanguageService {
 
       prompt +=
         '\n\n The database structure is as follows: ' + metadataSummaryString;
+
+      prompt += '\n\n Here are a few examples of input and desired output: ';
+
+      prompt += '\n\n Example 1: ';
+      prompt += '\n\n Query: Give me country names starting with B ';
+      prompt += `QueryParams = {
+        "language": "sql",
+        "query_type": "select",
+        "databaseName": "sakila",
+        "table": {
+            "name": "country",
+            "columns": [{"name": "country"}]
+        },
+        "condition": {
+            "column": "country",
+            "operator": "LIKE",
+            "value": "B%"
+        }`;
+
+      prompt += '\n\n Example 2: ';
+      prompt += '\n\n Query: Give me all the actors with the first name Nick ';
+      prompt += `QueryParams = {
+                    "language": "sql",
+                    "query_type": "select",
+                    "databaseName": "sakila",
+                    "table": {
+                        "name": "actor",
+                        "columns": [
+                            {"name": "first_name"},
+                            {"name": "last_name"}
+                        ]
+                    },
+                    "condition": {
+                        "conditions": [
+                            {
+                                "tableName": "actor",
+                                "column": "first_name",
+                                "operator": "=",
+                                "value": "Nick"
+                            }
+                        ],
+                        "operator": "AND"
+                    }
+                }`;
+
+      prompt += '\n\n Example 3: ';
+      prompt += '\n\n Query: Get me all the names of active staff members as well as their payment amounts and dates ';
+      prompt += `QueryParams = {
+                    "language": "sql",
+                    "query_type": "select",
+                    "databaseName": "sakila",
+                    "table": {
+                        "name": "staff",
+                        "columns": [
+                            {"name": "active"},
+                            {"name": "first_name"},
+                            {"name": "last_name"}
+                        ],
+                        "join": {
+                            "table1MatchingColumnName": "staff_id",
+                            "table2MatchingColumnName": "staff_id",
+                            "table2": {
+                                "name": "payment",
+                                "columns": [
+                                    {"name": "amount"},
+                                    {"name": "payment_date"}
+                                ]
+                            }
+                        }
+                    }
+                }`;
+
+
+      prompt += '\n\n Please think of the given query and analyze the examples before giving me an output ';
+
 
       //--------------------Get the JSON intermediate form result from the LLM---------------------//
 
