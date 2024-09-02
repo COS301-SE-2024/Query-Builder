@@ -46,10 +46,6 @@ export class condition {
     }
   )
   type: 'c' | 'p';
-
-  protected constructor() {
-
-  }
 }
 
 export class primitiveCondition extends condition {
@@ -77,12 +73,6 @@ export class primitiveCondition extends condition {
     message: `Aggregate function must be one of ${Object.values(AggregateFunction).join(', ')}`
   })
   aggregate?: AggregateFunction;
-
-  // constructor
-  constructor() {
-    super()
-    this.type = 'p';
-  }
 }
 
 export class compoundCondition extends condition {
@@ -104,9 +94,4 @@ export class compoundCondition extends condition {
     message: `Logical operator must be one of ${Object.values(LogicalOperator).join(', ')}`
   })
   operator: LogicalOperator;
-
-  constructor(){
-    super()
-    this.type = 'c'
-  }
 }
