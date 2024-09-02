@@ -90,7 +90,7 @@ jobs:
         working-directory: query-builder-app
           
       - name: Cypress run
-        uses: cypress-io/github-action@v5
+        uses: cypress-io/github-action@v6
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           CYPRESS_test_username: ${{ secrets.CYPRESS_TEST_USERNAME }}
@@ -99,6 +99,7 @@ jobs:
           CYPRESS_mysql_password: ${{ secrets.CYPRESS_DB_PASSWORD }}
         with:
           browser: chrome
+          headed: true
           record: true
           working-directory: query-builder-app
           wait-on: 'http://127.0.0.1:3000'
