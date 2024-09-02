@@ -2,13 +2,15 @@ import "../../app/globals.css"
 import "../Authentication/Authentication.css"
 import './OrganisationManagement.css';
 import React, { useState, useEffect } from "react";
-import {Button, Image, Spacer, Card, CardBody, CardHeader, Input, Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, User, Chip, Tooltip, getKeyValue} from "@nextui-org/react";
+import {Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Image, Spacer, Card, CardBody, CardHeader, Input, Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, User, Chip, Tooltip, getKeyValue} from "@nextui-org/react";
 import { createClient } from "./../../utils/supabase/client";
 import {DeleteIcon} from "./DeleteIcon";
 import { useParams } from 'next/navigation'
 import EditUserModal from "./EditUserModal";
 import {EditIcon} from "./EditIcon";
 import {CheckIcon} from "./CheckIcon";
+import Link from 'next/link';
+
 
 interface UpdateOrganisation {
     org_id: string;
@@ -35,10 +37,10 @@ export default function OrganisationManagement(){
     const {orgServerID} = useParams<{orgServerID: string}>();
     let [loggedInUserID, setLoggedInUserID] = useState('');
     let [loggedInUserRole, setLoggedInUserRole] = useState('');
-    let [initialOrgName, setInitialOrgName] = useState('');
-    let [initialOrgLogo, setInitialOrgLogo] = useState('');
+    let [initialOrgName, setInitialOrgName] = useState("");
+    let [initialOrgLogo, setInitialOrgLogo] = useState("");
     let [orgMembers, setOrgMembers] = useState([]);
-    let [updateOrgName, setUpdateOrgName] = useState('');
+    let [updateOrgName, setUpdateOrgName] = useState("");
     let [updateOrgNameHasBeenFocused, setUpdateOrgNameHasBeenFocused] = useState(false);
     let [profilePicURL, setProfilePicURL] = useState('');
     let [hasAdminPermission, setHasAdminPermission] = useState(false);
@@ -112,7 +114,7 @@ export default function OrganisationManagement(){
             setInitialOrgLogo(orgData.logo);
             // setOrgMembers(orgData.org_members);
             setProfilePicURL(orgData.logo);
-            setUpdateOrgName(orgData.name);
+            // setUpdateOrgName(orgData.name);
           } catch (error) {
             console.error("Failed to fetch organisation info:", error);
           }
@@ -131,7 +133,7 @@ export default function OrganisationManagement(){
             org_id: orgServerID,
         };
 
-        if(updateOrgName == initialOrgName && profilePicURL == initialOrgLogo){
+        if(updateOrgName === initialOrgName && profilePicURL === initialOrgLogo){
             console.log("No Updates")
             return;
         }
@@ -167,7 +169,6 @@ export default function OrganisationManagement(){
           },
           body: JSON.stringify({ org_id: orgServerID, user_id: userId})
       })
-      console.log(response);
       await getMembers();
     }
 
@@ -181,7 +182,8 @@ export default function OrganisationManagement(){
           },
           body: JSON.stringify({ org_id: orgServerID })
       })
-      console.log(response);
+      // console.log(response);
+
     }
 
     async function verifyUser(userId: string){
@@ -261,7 +263,8 @@ export default function OrganisationManagement(){
       }, [hasAdminPermission, orgMembers]);
 
       const renderUpdatePage = React.useCallback(() => {
-        console.log(loggedInUserRole);
+        // console.log(loggedInUserRole);
+        const { isOpen, onOpen, onOpenChange } = useDisclosure();
         if  (hasAdminPermission && (loggedInUserRole == "owner" || loggedInUserRole == "Owner")) {
           return(
           <>
@@ -289,12 +292,12 @@ export default function OrganisationManagement(){
               </div>
               <Spacer y={2}/>
               <div className="infield">
-                <Input
+              <Input
                     isRequired
                     label="Organisation Name"
-                    defaultValue={updateOrgName}
+                    defaultValue={initialOrgName}
                     variant="bordered"
-                    placeholder={updateOrgName}
+                    placeholder={initialOrgName}
                     onValueChange={setUpdateOrgName}
                     onFocus={() => {setUpdateOrgNameHasBeenFocused(true);}}
                     isInvalid={isUpdateOrgNameInvalid && updateOrgNameHasBeenFocused}
@@ -306,17 +309,49 @@ export default function OrganisationManagement(){
             <Spacer y={2}/>
             <Button 
                 color="primary"  
-                onClick={() => updateQuery()}
+                onClick={updateQuery}
             >
                 Update
             </Button>
             <Spacer y={2}/>
             <Button 
-                color="danger"  
-                onClick={() => deleteOrganisation()}
+                color="danger" 
+    
+                onClick={onOpen}
             >
                 Delete Organisation
             </Button>
+            <>
+            <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+            <ModalContent>
+                        {(onClose) => (
+                            <>
+                                <ModalHeader className="flex flex-row items-center justify-center text-center">
+                                    <span>Delete {updateOrgName}</span>
+                                </ModalHeader>
+                                <ModalBody className="text-center">
+                                    <p className="text-lg">Are you sure you want to delete the Organisation?</p>
+                                    <p className="text-sm text-gray-500">This action cannot be undone.</p>
+                                </ModalBody>
+                                <ModalFooter className="flex flex-row items-center justify-center space-x-4">
+                                    <Button color="primary" onPress={onClose}>
+                                        Cancel
+                                    </Button>
+                                    <Button
+                                        as={Link}
+                                        href="/"
+                                        color="danger"
+                                        type="button"
+                                        onClick={() => deleteOrganisation()}
+                                    >
+                                        Delete
+                                    </Button>
+                                </ModalFooter>
+                            </>
+                        )}
+                    </ModalContent>
+                </Modal>
+            </>
           </>
           );
         }
@@ -349,11 +384,11 @@ export default function OrganisationManagement(){
               <Spacer y={2}/>
               <div className="infield">
                 <Input
-                    // isRequired
+                    isRequired
                     label="Organisation Name"
-                    defaultValue={updateOrgName}
+                    defaultValue={initialOrgName}
                     variant="bordered"
-                    placeholder={updateOrgName}
+                    placeholder={initialOrgName}
                     onValueChange={setUpdateOrgName}
                     onFocus={() => {setUpdateOrgNameHasBeenFocused(true);}}
                     isInvalid={isUpdateOrgNameInvalid && updateOrgNameHasBeenFocused}
@@ -394,12 +429,11 @@ export default function OrganisationManagement(){
               <Spacer y={2}/>
               <div className="infield">
                 <Input
-                    // isRequired
                     isDisabled
                     label="Organisation Name"
-                    defaultValue={updateOrgName}
+                    defaultValue={initialOrgName}
                     variant="bordered"
-                    placeholder={updateOrgName}
+                    placeholder={initialOrgName}
                     onValueChange={setUpdateOrgName}
                     onFocus={() => {setUpdateOrgNameHasBeenFocused(true);}}
                     isInvalid={isUpdateOrgNameInvalid && updateOrgNameHasBeenFocused}
