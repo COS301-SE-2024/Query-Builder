@@ -37,7 +37,7 @@ export class AppService {
     return token;
   }
 
-  async validateBoi(body: any){
+  async validateDTO(body: any){
     const obj = plainToInstance(QueryParams, body);
     await validate(obj).then((errors) => {
       if (errors.length > 0) {

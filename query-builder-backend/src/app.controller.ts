@@ -25,8 +25,8 @@ export class AppController {
     return await this.appService.has_session(session);
   }
 
-  @Put('validate-boi')
-  async validateBoi(@Body() body: any) {
-    return await this.appService.validateBoi(body);
+  @Put('validate-dto')
+  async validateDTO(@Body() body: any) {
+    return await this.appService.validateDTO(body);
   }
 }
