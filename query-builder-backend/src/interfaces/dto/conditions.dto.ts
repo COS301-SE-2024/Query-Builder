@@ -103,45 +103,24 @@ export class compoundCondition extends condition {
   @Transform(
     ({ value }) =>
       value.map((item: any) => {
-        if (item.condtions && item.operator) {
+        if (item.condtions !== undefined && item.operator !== undefined) {
           return Object.assign(new compoundCondition(), item);
-        } if (item.value && item.column && item.operator) {
+        }
+        if (
+          item.value !== undefined &&
+          item.column !== undefined &&
+          item.operator !== undefined
+        ) {
           return Object.assign(new primitiveCondition(), item);
         } else {
-          const validationError = new ValidationError();
-
-          validationError.target = item;
-          validationError.property = 'conditions';
-          validationError.children = [];
-
-          if (!item.value) {
-            const valueError = new ValidationError();
-            valueError.property = 'value';
-            valueError.constraints = {
-              isNotEmpty: 'value should not be empty'
-            };
-            validationError.children.push(valueError);
+          if (item.conditions !== undefined) {
+            return Object.assign(new compoundCondition(), item);
+          }
+          if (item.value !== undefined || item.column !== undefined) {
+            return Object.assign(new primitiveCondition(), item);
           }
 
-          if (!item.column) {
-            const columnError = new ValidationError();
-            columnError.property = 'column';
-            columnError.constraints = {
-              isNotEmpty: 'column should not be empty'
-            };
-            validationError.children.push(columnError);
-          }
-
-          if (!item.operator) {
-            const operatorError = new ValidationError();
-            operatorError.property = 'operator';
-            operatorError.constraints = {
-              isNotEmpty: 'operator should not be empty'
-            };
-            validationError.children.push(operatorError);
-          }
-
-          throw validationError;
+          return Object.assign(new primitiveCondition(), item);
         }
       }),
     { toClassOnly: true }
