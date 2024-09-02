@@ -83,6 +83,7 @@ export default function NaturalLanguage() {
             setLoading(false);
             setQuery(query);
             setQueryLoaded(true);
+            setValue("");
         } else {
             setLoading(false);
             setShowError(true);
@@ -129,6 +130,7 @@ export default function NaturalLanguage() {
                     onPress={() => {
                         getQuery();
                         onOpen();
+                        setValue("");
                     }}
                 >
                     Query
