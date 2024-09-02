@@ -42,7 +42,7 @@ jobs:
 
       - name: start MySQL
         run: |
-            apt-get install mariadb-server
+            apt-get -y install mariadb-server
             systemctl start mariadb
             mariadb -e 'ALTER USER '${{ secrets.CYPRESS_DB_USERNAME }}'@'localhost' IDENTIFIED WITH mysql_native_password BY '${{ secrets.CYPRESS_DB_PASSWORD }}';' -h 127.0.0.1 --port=3306
             mariadb --user=${{ secrets.CYPRESS_DB_USERNAME }} --password=${{ secrets.CYPRESS_DB_PASSWORD }} < sakila/sakila-schema.sql;
