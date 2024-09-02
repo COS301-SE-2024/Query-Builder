@@ -98,6 +98,7 @@ jobs:
           CYPRESS_mysql_username: ${{ secrets.CYPRESS_DB_USERNAME }}
           CYPRESS_mysql_password: ${{ secrets.CYPRESS_DB_PASSWORD }}
         with:
+          browser: chrome
           record: true
           working-directory: query-builder-app
           wait-on: 'http://127.0.0.1:3000'
