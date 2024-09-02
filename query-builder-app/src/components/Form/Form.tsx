@@ -297,6 +297,7 @@ export default function Form() {
                         <>
                             <div style={{ display: 'flex', gap: '3px' }}>
                                 <Button
+                                    aria-label="query button"
                                     onPress={onOpen}
                                     color="primary"
                                 >
@@ -304,7 +305,6 @@ export default function Form() {
                                 </Button>
                                 <SaveQueryModal query={query}/>
                                 <Button
-                                    aria-label="query button"
                                     color="primary"
                                     onClick={() => { 
                                         setQuery({ 
