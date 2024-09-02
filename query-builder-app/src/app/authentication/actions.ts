@@ -50,3 +50,8 @@ export async function signup(
     revalidatePath('/', 'layout');
     redirect('/');
 }
+ 
+export async function navigateToAuth() {
+    revalidatePath('/authentication', 'layout');
+    redirect('/authentication');
+}

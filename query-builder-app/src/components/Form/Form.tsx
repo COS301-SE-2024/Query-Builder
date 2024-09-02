@@ -11,6 +11,7 @@ import { createClient } from "./../../utils/supabase/client";
 import { compoundCondition, condition, LogicalOperator, Query, table } from "@/interfaces/intermediateJSON";
 import TableList from "../TableList/TableList";
 import FilterList from "../FilterList/FilterList";
+import { navigateToAuth } from "../../app/authentication/actions";
 import SaveQueryModal from "../SaveQueryModal/SaveQueryModal";
 
 //----------------------------INTERFACES------------------------------------//
@@ -186,10 +187,21 @@ export default function Form() {
 
         let json = await response.json();
 
-        console.log(json);
+        if(response.ok){
 
-        //set the databases hook
-        setDatabases(json.data);
+            console.log(json);
+    
+            //set the databases hook
+            setDatabases(json.data);
+
+        }
+        else{
+            
+            if(json.response.message == 'You do not have a backend session'){
+                navigateToAuth();
+            }
+
+        }
 
     }
 
