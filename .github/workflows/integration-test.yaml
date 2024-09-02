@@ -32,7 +32,9 @@ jobs:
           cache-dependency-path: query-builder-app/pnpm-lock.yaml
 
       - name: Install redis
-        run: apt-get install -y redis-tools redis-server
+        run: |
+          apt-get update
+          apt-get install -y redis-tools redis-server
         
       - name: Verify that redis is up
         run: redis-cli ping
