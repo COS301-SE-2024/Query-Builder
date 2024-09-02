@@ -441,7 +441,7 @@ export default function OrganisationManagement(){
                         )}
                     </ModalContent>
                 </Modal>
-            </>
+              </>
           </>
           );
         }
@@ -476,10 +476,41 @@ export default function OrganisationManagement(){
             <Spacer y={2}/>
             <Button 
                 color="danger"  
-                onClick={() => deleteUserFromOrg(loggedInUserID)}
+                onClick={onOpen}
             >
                 Leave Organisation
             </Button>
+            <>
+            <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+            <ModalContent>
+                        {(onClose) => (
+                            <>
+                                <ModalHeader className="flex flex-row items-center justify-center text-center">
+                                    <span>Leave {updateOrgName}</span>
+                                </ModalHeader>
+                                <ModalBody className="text-center">
+                                    <p className="text-lg">Are you sure you want to leave the Organisation?</p>
+                                    <p className="text-sm text-gray-500">This action cannot be undone.</p>
+                                </ModalBody>
+                                <ModalFooter className="flex flex-row items-center justify-center space-x-4">
+                                    <Button color="primary" onPress={onClose}>
+                                        Cancel
+                                    </Button>
+                                    <Button
+                                        as={Link}
+                                        href="/"
+                                        color="danger"
+                                        type="button"
+                                        onClick={() => deleteUserFromOrg(loggedInUserID)}
+                                    >
+                                        Delete
+                                    </Button>
+                                </ModalFooter>
+                            </>
+                        )}
+                    </ModalContent>
+                </Modal>
+              </>
           </>);
           }
         }
