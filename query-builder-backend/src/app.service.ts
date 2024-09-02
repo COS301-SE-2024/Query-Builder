@@ -1,6 +1,7 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { Body, HttpException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { isAuthApiError } from '@supabase/supabase-js';
+import { validate } from 'class-validator';
 import {
   sign,
   createCipheriv,
@@ -13,6 +14,7 @@ import { get } from 'http';
 import { stringify } from 'querystring';
 import { concat, from } from 'rxjs';
 import { promisify } from 'util';
+import { primitiveCondition } from './interfaces/intermediateJSON.dto';
 
 @Injectable()
 export class AppService {
@@ -30,6 +32,12 @@ export class AppService {
     );
 
     return token;
+  }
+
+  validateBoi(@Body() body: primitiveCondition){
+    validate(body).then(errors => {
+      throw errors;
+    })
   }
 
   async deriveKey(text: string) {

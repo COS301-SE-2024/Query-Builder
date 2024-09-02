@@ -24,4 +24,9 @@ export class AppController {
   async hasSession(@Session() session: Record<string, any>) {
     return await this.appService.has_session(session);
   }
+
+  @Put('validate-boi')
+  validateBoi(@Body() body: any){
+    return this.appService.validateBoi(body);
+  }
 }
