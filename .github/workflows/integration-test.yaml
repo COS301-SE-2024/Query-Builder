@@ -35,7 +35,7 @@ jobs:
         run: |
           apt-get update
           apt-get install -y redis-tools redis-server
-          redis-server
+          redis-server &
         
       - name: Verify that redis is up
         run: redis-cli ping
