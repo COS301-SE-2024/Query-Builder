@@ -157,6 +157,9 @@ export default function OrganisationManagement(){
             body: JSON.stringify(updatedDetails)
         });
         console.log(response);
+        if (response.status === 200 || response.status === 201) {
+          setInitialOrgName(updateOrgName);
+        }
     };
 
     async function deleteUserFromOrg(userId: string){
@@ -292,18 +295,7 @@ export default function OrganisationManagement(){
               </div>
               <Spacer y={2}/>
               <div className="infield">
-              <Input
-                    isRequired
-                    label="Organisation Name"
-                    defaultValue={initialOrgName}
-                    variant="bordered"
-                    placeholder={initialOrgName}
-                    onValueChange={setUpdateOrgName}
-                    onFocus={() => {setUpdateOrgNameHasBeenFocused(true);}}
-                    isInvalid={isUpdateOrgNameInvalid && updateOrgNameHasBeenFocused}
-                    color={!updateOrgNameHasBeenFocused ? "primary" : isUpdateOrgNameInvalid ? "danger" : "success"}
-                    errorMessage="Please enter the Organisation's name"
-                />
+                {renderOrgName()}
               </div>
             </div>
             <Spacer y={2}/>
@@ -383,18 +375,8 @@ export default function OrganisationManagement(){
               </div>
               <Spacer y={2}/>
               <div className="infield">
-                <Input
-                    isRequired
-                    label="Organisation Name"
-                    defaultValue={initialOrgName}
-                    variant="bordered"
-                    placeholder={initialOrgName}
-                    onValueChange={setUpdateOrgName}
-                    onFocus={() => {setUpdateOrgNameHasBeenFocused(true);}}
-                    isInvalid={isUpdateOrgNameInvalid && updateOrgNameHasBeenFocused}
-                    color={!updateOrgNameHasBeenFocused ? "primary" : isUpdateOrgNameInvalid ? "danger" : "success"}
-                    errorMessage="Please enter the Organisation's name"
-                />
+                {renderOrgName()}
+
               </div>
             </div>
             <Spacer y={2}/>
@@ -514,7 +496,24 @@ export default function OrganisationManagement(){
           </>);
           }
         }
-      }, [loggedInUserRole, hasAdminPermission, profilePicURL]);
+      }, [loggedInUserRole, hasAdminPermission, profilePicURL, initialOrgName, updateQuery]);
+
+      const renderOrgName = React.useCallback(() => {
+        return(
+                <Input
+                    isRequired
+                    label="Organisation Name"
+                    defaultValue={initialOrgName}
+                    variant="bordered"
+                    placeholder={initialOrgName}
+                    onValueChange={setUpdateOrgName}
+                    onFocus={() => {setUpdateOrgNameHasBeenFocused(true);}}
+                    isInvalid={isUpdateOrgNameInvalid && updateOrgNameHasBeenFocused}
+                    color={!updateOrgNameHasBeenFocused ? "primary" : isUpdateOrgNameInvalid ? "danger" : "success"}
+                    errorMessage="Please enter the Organisation's name"
+                />
+        );
+      }, [initialOrgName, updateOrgName])
 
       async function copyHashCode() {
         navigator.permissions.query({name: "notifications"}).then((result) => {
@@ -629,7 +628,7 @@ export default function OrganisationManagement(){
                       src={profilePicURL}
                     />
                     <Spacer y={2}/>
-                    <span className="m-auto justify-center content-center text-2xl ">{updateOrgName}</span>
+                    <span className="m-auto justify-center content-center text-2xl ">{initialOrgName}</span>
                 </div>
                 <Spacer y={2}/>
                     {renderJoinOrgHash()}
