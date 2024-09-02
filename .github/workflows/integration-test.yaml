@@ -32,17 +32,19 @@ jobs:
           cache-dependency-path: query-builder-app/pnpm-lock.yaml
 
       - name: Install redis
-        run: sudo apt-get install -y redis-tools redis-server
+        run: apt-get install -y redis-tools redis-server
         
       - name: Verify that redis is up
         run: redis-cli ping
 
       - name: start MySQL
         run: |
-            sudo systemctl start mysql.service
-            sudo mysql --user=${{ secrets.CYPRESS_DB_USERNAME }} --password=${{ secrets.CYPRESS_DB_PASSWORD }} < sakila/sakila-schema.sql;
-            sudo mysql --user=${{ secrets.CYPRESS_DB_USERNAME }} --password=${{ secrets.CYPRESS_DB_PASSWORD }} < sakila/sakila-data.sql;
-            sudo mysql -e 'SHOW DATABASES;' -h 127.0.0.1 --port=3306 --user=${{ secrets.CYPRESS_DB_USERNAME }} --password=${{ secrets.CYPRESS_DB_PASSWORD }}
+            apt install mysql-server
+            systemctl start mysql.service
+            mysql -e 'ALTER USER '${{ secrets.CYPRESS_DB_USERNAME }}'@'localhost' IDENTIFIED WITH mysql_native_password BY '${{ secrets.CYPRESS_DB_PASSWORD }}';' -h 127.0.0.1 --port=3306
+            mysql --user=${{ secrets.CYPRESS_DB_USERNAME }} --password=${{ secrets.CYPRESS_DB_PASSWORD }} < sakila/sakila-schema.sql;
+            mysql --user=${{ secrets.CYPRESS_DB_USERNAME }} --password=${{ secrets.CYPRESS_DB_PASSWORD }} < sakila/sakila-data.sql;
+            mysql -e 'SHOW DATABASES;' -h 127.0.0.1 --port=3306 --user=${{ secrets.CYPRESS_DB_USERNAME }} --password=${{ secrets.CYPRESS_DB_PASSWORD }}
 
       - name: Install Dependencies Backend
         run: |
