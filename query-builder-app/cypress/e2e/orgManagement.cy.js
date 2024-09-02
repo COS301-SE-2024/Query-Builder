@@ -20,7 +20,7 @@ describe('Org Management', () => {
   it('Can add an organisation and delete it again', () => {
 
     //Add organisation
-    cy.contains('+ Add', {timeout: 20000}).click();
+    cy.contains('+ Add').click();
     cy.findByLabelText('Organisation Name').type('Cypress Organisation');
     cy.findByLabelText("add new organisation button").click();
 
