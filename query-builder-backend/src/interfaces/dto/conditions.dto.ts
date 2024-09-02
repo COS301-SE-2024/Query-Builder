@@ -6,10 +6,12 @@ import {
   IsOptional,
   IsString,
   ValidateIf,
-  IsInstance
+  IsInstance,
+  ValidationError
 } from 'class-validator';
 import { IsType } from '../../type-validator';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
+import { InternalServerErrorException } from '@nestjs/common';
 // import { LogicalOperator, ComparisonOperator, AggregateFunction } from "../intermediateJSON.dto";
 
 export enum AggregateFunction {
@@ -49,6 +51,11 @@ export class condition {
 }
 
 export class primitiveCondition extends condition {
+  constructor() {
+    super();
+    this.type = 'p';
+  }
+
   @ValidateIf(({ value }) => value !== null)
   @IsType(['string', 'number', 'boolean'])
   @IsNotEmpty()
@@ -76,6 +83,11 @@ export class primitiveCondition extends condition {
 }
 
 export class compoundCondition extends condition {
+  constructor() {
+    super();
+    this.type = 'c';
+  }
+
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => condition, {
@@ -83,11 +95,57 @@ export class compoundCondition extends condition {
       property: 'type',
       subTypes: [
         { value: primitiveCondition, name: 'p' },
-        { value: compoundCondition, name: 'c' },
-      ],
+        { value: compoundCondition, name: 'c' }
+      ]
     },
-    keepDiscriminatorProperty: true,
+    keepDiscriminatorProperty: true
   })
+  @Transform(
+    ({ value }) =>
+      value.map((item: any) => {
+        if (item.condtions && item.operator) {
+          return Object.assign(new compoundCondition(), item);
+        } if (item.value && item.column && item.operator) {
+          return Object.assign(new primitiveCondition(), item);
+        } else {
+          const validationError = new ValidationError();
+
+          validationError.target = item;
+          validationError.property = 'conditions';
+          validationError.children = [];
+
+          if (!item.value) {
+            const valueError = new ValidationError();
+            valueError.property = 'value';
+            valueError.constraints = {
+              isNotEmpty: 'value should not be empty'
+            };
+            validationError.children.push(valueError);
+          }
+
+          if (!item.column) {
+            const columnError = new ValidationError();
+            columnError.property = 'column';
+            columnError.constraints = {
+              isNotEmpty: 'column should not be empty'
+            };
+            validationError.children.push(columnError);
+          }
+
+          if (!item.operator) {
+            const operatorError = new ValidationError();
+            operatorError.property = 'operator';
+            operatorError.constraints = {
+              isNotEmpty: 'operator should not be empty'
+            };
+            validationError.children.push(operatorError);
+          }
+
+          throw validationError;
+        }
+      }),
+    { toClassOnly: true }
+  )
   conditions: condition[];
 
   @IsEnum(LogicalOperator, {
