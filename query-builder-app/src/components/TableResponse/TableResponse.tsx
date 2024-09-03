@@ -1,6 +1,6 @@
 'use client';
 import '../../app/globals.css';
-import { useEffect, useState } from 'react';
+import React,{ useEffect, useState } from 'react';
 import {
   Table,
   TableHeader,
