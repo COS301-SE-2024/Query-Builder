@@ -30,6 +30,6 @@
     "cypress/e2e/login.cy.js",
     "src/components/Authentication/Authentication.cy.js",
     "cypress/e2e/auth.cy.js"
-, "cypress/e2e/basicQuery.cy.js"  ],
+, "cypress/e2e/orgManagement.cy.js"  ],
   "exclude": ["node_modules"]
 }

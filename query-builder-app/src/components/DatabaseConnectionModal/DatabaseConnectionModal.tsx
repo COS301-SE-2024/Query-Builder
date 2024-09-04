@@ -151,7 +151,7 @@ export default function DatabaseConnectionModal(props: DatabaseConnectionModalPr
     return (
 
         <>
-        <Button onPress={onOpen} color="primary">+ Add</Button>
+        <Button aria-label="add database server button" onPress={onOpen} color="primary">+ Add</Button>
         <Modal 
           isOpen={isOpen} 
           onOpenChange={onOpenChange}
@@ -220,6 +220,7 @@ export default function DatabaseConnectionModal(props: DatabaseConnectionModalPr
                 </ModalBody>
                 <ModalFooter>
                   <Button 
+                    aria-label="connect new database button"
                     color="primary" 
                     onPress={onClose}  
                     onClick={() => addDatabase(dbName, url, username, password)}

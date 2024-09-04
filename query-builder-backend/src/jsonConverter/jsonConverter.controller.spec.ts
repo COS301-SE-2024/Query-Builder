@@ -27,7 +27,7 @@ describe('JsonConverterController', () => {
       table: {name: 'users', columns: [{name: 'id'}]},
     };
 
-    const expectedQuery = 'SELECT `users`.`id` FROM `users`';
+    const expectedQuery = 'SELECT `users`.`id` FROM `sakila`.`users`';
 
     const result = controller.convert(queryParams);
 

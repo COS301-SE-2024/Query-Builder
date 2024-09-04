@@ -135,6 +135,7 @@ export default function AddOrganisationModal(props: AddOrganisationModalProps){
                     onPress={onClose}  
                     onClick={() => addOrganisation(orgName)}
                     isDisabled={isOrgNameInvalid}
+                    aria-label="add new organisation button"
                     >
                     Add
                   </Button>

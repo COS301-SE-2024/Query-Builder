@@ -31,7 +31,7 @@ export default function Form() {
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
     //React hook for all the databases in the database server
-    const [databases, setDatabases] = useState<Database[]>();
+    const [databases, setDatabases] = useState<Database[]>([]);
 
     //React hook containing the Query the user is busy building
     const [query, setQuery] = useState<Query>({
@@ -188,8 +188,6 @@ export default function Form() {
         let json = await response.json();
 
         if(response.ok){
-
-            console.log(json);
     
             //set the databases hook
             setDatabases(json.data);
@@ -234,34 +232,35 @@ export default function Form() {
                         <Card className="w-full">
                             <CardBody className="flex flex-row items-center space-x-2">
 
-                                {//div for the name
+                                                                {//div for the name
                                     <div className="flex flex-1">
-                                        {query.queryParams.databaseName}
-                                    </div>
-                                }
+                                    {query.queryParams.databaseName}
+                                </div>
+                            }
 
-                                {//include the add button if no database is selected yet
-                                    (query.queryParams.databaseName == "") && (
-                                        <Dropdown>
-                                            <DropdownTrigger>
-                                                <Button variant="bordered">+</Button>
-                                            </DropdownTrigger>
-                                            <DropdownMenu
+                            {//include the add button if no database is selected yet
+                                (query.queryParams.databaseName == "") && (
+                                    <Dropdown>
+                                        <DropdownTrigger>
+                                            <Button variant="bordered">+</Button>
+                                        </DropdownTrigger>
+                                        <DropdownMenu 
                                                 className="max-h-[50vh] overflow-y-auto"
-                                                items={databases}
+                                                emptyContent="Loading databases..."
+                                                items={databases} 
                                                 onAction={(key) => handleDatabaseSelection(key)}
                                             >
-                                                {(item: any) => (
-                                                    <DropdownItem
-                                                        key={item.SCHEMA_NAME}
-                                                    >
-                                                        {item.SCHEMA_NAME}
-                                                    </DropdownItem>
+                                                {(item:any) => (
+                                                <DropdownItem
+                                                    key={item.SCHEMA_NAME}
+                                                >
+                                                    {item.SCHEMA_NAME}
+                                                </DropdownItem>
                                                 )}
                                             </DropdownMenu>
-                                        </Dropdown>
-                                    )
-                                }
+                                    </Dropdown>
+                                )
+                            }
 
                             </CardBody>
                         </Card>
@@ -298,6 +297,7 @@ export default function Form() {
                         <>
                             <div style={{ display: 'flex', gap: '3px' }}>
                                 <Button
+                                    aria-label="query button"
                                     onPress={onOpen}
                                     color="primary"
                                 >

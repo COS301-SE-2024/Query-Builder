@@ -39,28 +39,15 @@ export class QueryHandlerService {
 
     const parser = this.jsonConverterService;
 
-    //first, use the correct database as specified in query
-    const databaseToQuery: string = query.queryParams.databaseName;
-    const useCommand: string = 'USE ' + databaseToQuery + ';';
-
     let connection = this.sessionStore.get(session.id).conn;
 
-    const promise1 = new Promise((resolve) => {
-      connection.query(useCommand, function (error, results, fields) {
-        if (error) {
-          throw error;
-        }
-        resolve(true);
-      });
-    });
-
-    await promise1;
-
     //secondly, get the number of rows of data
-    const countCommand: string = `SELECT COUNT(*) AS numRows FROM ${query.queryParams.table.name}`;
+    const countCommand: string = `SELECT COUNT(*) AS numRows FROM \`${query.queryParams.databaseName}\`.\`${query.queryParams.table.name}\``;
 
     const promise2 = new Promise((resolve) => {
+
       connection.query(countCommand, async function (error, results, fields) {
+        
         if (error) {
           throw error;
         }
