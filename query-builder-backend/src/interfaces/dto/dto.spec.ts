@@ -843,7 +843,68 @@ describe('dto', () => {
           expect(errors[0].property).toBe('columns');
         });
       });
-      describe('join', () => {});
+
+      describe('join', () => {
+        it('should validate the join correctly', async () => {
+          const raw = {
+            name: 'table1',
+            columns: [
+              {
+                name: 'column1'
+              }
+            ],
+            join: {
+              table1MatchingColumnName: 'column1',
+              table2: {
+                name: 'table2',
+                columns: [
+                  {
+                    name: 'column1'
+                  }
+                ]
+              },
+              table2MatchingColumnName: 'column1'
+            }
+          };
+
+          const dto = plainToInstance(column, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBe(0);
+        });
+
+        it('should fail validation when join is empty', async () => {
+          const raw = {
+            name: 'table1',
+            columns: [
+              {
+                name: 'column1'
+              }
+            ],
+            join: {}
+          };
+
+          const dto = plainToInstance(column, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('join');
+        });
+
+        it('should fail validation when join is missing', async () => {
+          const raw = {
+            name: 'table1',
+            columns: [
+              {
+                name: 'column1'
+              }
+            ]
+          };
+
+          const dto = plainToInstance(column, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('join');
+        });
+      });
     });
   });
 });
