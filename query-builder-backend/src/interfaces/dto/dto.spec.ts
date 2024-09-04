@@ -651,7 +651,7 @@ describe('dto', () => {
   });
 
   describe('table dto', () => {
-    describe('column', () => {
+    describe('column DTO', () => {
       describe('name', () => {
         it('should validate the name correctly', async () => {
           const raw = {
@@ -755,7 +755,7 @@ describe('dto', () => {
       });
     });
 
-    describe('table', () => {
+    describe('table DTO', () => {
       describe('name', () => {
         it('should validate the name correctly', async () => {
           const raw = {
@@ -906,5 +906,11 @@ describe('dto', () => {
     });
   });
 
-  describe('query dto', () => {})
+  describe('query dto', () => {
+    describe('DatabaseCredentials DTO', () => {});
+    describe('SortParams DTO', () => {});
+    describe('PageParams DTO', () => {});
+    describe('QueryParams DTO', () => {});
+    describe('Query DTO', () => {});
+  });
 });
