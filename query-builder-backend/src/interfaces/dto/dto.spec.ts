@@ -731,7 +731,27 @@ describe('dto', () => {
           expect(errors.length).toBe(0);
         });
 
-        
+        it('should fail validation when alias is empty', async () => {
+          const raw = {
+            name: 'column1',
+            alias: ''
+          };
+
+          const dto = plainToInstance(column, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('alias');
+        });
+
+        it('should fail validation when alias is missing', async () => {
+          const raw = {
+            name: 'column1'
+          };
+
+          const dto = plainToInstance(column, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBe(0);
+        });
       });
     });
 
