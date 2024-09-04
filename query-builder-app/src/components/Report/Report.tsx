@@ -113,11 +113,6 @@ export default function Report(props: ReportProps) {
       (value) => typeof value === 'number',
     ); // stores the types of each column in the dataset
 
-    let count = 0;
-    for(let i in props.data[0]){
-      console.log(`${i} : ${numberColumns[count++]}`)
-    }
-
     const firstKey: string[] = props.data.map(
       (row) => row[headings[0]] as string,
     ); // getting all of the classes

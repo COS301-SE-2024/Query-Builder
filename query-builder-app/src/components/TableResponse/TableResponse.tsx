@@ -41,9 +41,6 @@ export interface TableResponseProps {
 const getToken = async () => {
   const supabase = createClient();
   const token = (await supabase.auth.getSession()).data.session?.access_token;
-
-  console.log(token);
-
   return token;
 };
 
@@ -93,8 +90,6 @@ export default function TableResponse(props: TableResponseProps) {
       data: data,
       delimiter: ',',
     };
-
-    console.log(dataProperties);
 
     csvDownload(dataProperties);
   }
@@ -213,7 +208,7 @@ export default function TableResponse(props: TableResponseProps) {
       setResults(await getAllData());
     };
     fetchData();
-  }, [isOpen]);
+  }, []);
 
   return (
     <div style={{ overflow: 'scroll', maxHeight: '80vh', overflowX: 'hidden' }}>
