@@ -589,7 +589,63 @@ describe('dto', () => {
     });
 
     describe('table2MatchingColumnName', () => {
-      
+      it('should validate the table2MatchingColumnName correctly', async () => {
+        const raw = {
+          table1MatchingColumnName: 'column1',
+          table2: {
+            name: 'table2',
+            columns: [
+              {
+                name: 'column1'
+              }
+            ]
+          },
+          table2MatchingColumnName: 'column1'
+        };
+
+        const dto = plainToInstance(join, raw);
+        const errors = await validate(dto);
+        expect(errors.length).toBe(0);
+      });
+
+      it('should fail validation when table2MatchingColumnName is empty', async () => {
+        const raw = {
+          table1MatchingColumnName: 'column1',
+          table2: {
+            name: 'table2',
+            columns: [
+              {
+                name: 'column1'
+              }
+            ]
+          },
+          table2MatchingColumnName: ''
+        };
+
+        const dto = plainToInstance(join, raw);
+        const errors = await validate(dto);
+        expect(errors.length).toBeGreaterThan(0);
+        expect(errors[0].property).toBe('table2MatchingColumnName');
+      });
+
+      it('should fail validation when table2MatchingColumnName is missing', async () => {
+        const raw = {
+          table1MatchingColumnName: 'column1',
+          table2: {
+            name: 'table2',
+            columns: [
+              {
+                name: 'column1'
+              }
+            ]
+          }
+        };
+
+        const dto = plainToInstance(join, raw);
+        const errors = await validate(dto);
+        expect(errors.length).toBeGreaterThan(0);
+        expect(errors[0].property).toBe('table2MatchingColumnName');
+      });
     });
   });
 });
