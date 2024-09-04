@@ -708,7 +708,15 @@ describe('dto', () => {
           expect(errors[0].property).toBe('aggregation');
         });
 
-        
+        it('should fail validation when aggregation is missing', async () => {
+          const raw = {
+            name: 'column1'
+          };
+
+          const dto = plainToInstance(column, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBe(0);
+        });
       });
       describe('alias', () => {});
     });
