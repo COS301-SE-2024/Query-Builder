@@ -12,10 +12,8 @@ on:
 jobs:
   cypress-run:
     runs-on: ubuntu-22.04
-    # Docker image with Cypress pre-installed
-    # https://github.com/cypress-io/cypress-docker-images/tree/master/included
-    container: cypress/included:latest
     steps:
+    
       - name: Checkout
         uses: actions/checkout@v4
         
@@ -32,23 +30,17 @@ jobs:
           cache-dependency-path: query-builder-app/pnpm-lock.yaml
 
       - name: Install redis
-        run: |
-          apt-get update
-          apt-get install -y redis-tools redis-server
-          redis-server &
+        run: sudo apt-get install -y redis-tools redis-server
         
       - name: Verify that redis is up
         run: redis-cli ping
 
       - name: start MySQL
         run: |
-            apt-get -y install mariadb-server
-            systemctl start mariadb
-            mariadb -e 'ALTER USER '${{ secrets.CYPRESS_DB_USERNAME }}'@'localhost' IDENTIFIED WITH mysql_native_password BY '${{ secrets.CYPRESS_DB_PASSWORD }}';' -h 127.0.0.1 --port=3306
-            mariadb --user=${{ secrets.CYPRESS_DB_USERNAME }} --password=${{ secrets.CYPRESS_DB_PASSWORD }} < sakila/sakila-schema.sql;
-            mariadb --user=${{ secrets.CYPRESS_DB_USERNAME }} --password=${{ secrets.CYPRESS_DB_PASSWORD }} < sakila/sakila-data.sql;
-            mariadb -e 'SHOW DATABASES;' -h 127.0.0.1 --port=3306 --user=${{ secrets.CYPRESS_DB_USERNAME }} --password=${{ secrets.CYPRESS_DB_PASSWORD }}
-
+            sudo systemctl start mysql.service
+            sudo mysql --user=${{ secrets.CYPRESS_DB_USERNAME }} --password=${{ secrets.CYPRESS_DB_PASSWORD }} < sakila/sakila-schema.sql;
+            sudo mysql --user=${{ secrets.CYPRESS_DB_USERNAME }} --password=${{ secrets.CYPRESS_DB_PASSWORD }} < sakila/sakila-data.sql;
+            sudo mysql -e 'SHOW DATABASES;' -h 127.0.0.1 --port=3306 --user=${{ secrets.CYPRESS_DB_USERNAME }} --password=${{ secrets.CYPRESS_DB_PASSWORD }}
       - name: Install Dependencies Backend
         run: |
             pnpm install --frozen-lockfile
