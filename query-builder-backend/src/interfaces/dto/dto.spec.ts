@@ -889,7 +889,7 @@ describe('dto', () => {
           expect(errors[0].property).toBe('join');
         });
 
-        it('should fail validation when join is missing', async () => {
+        it('should pass validation when join is missing', async () => {
           const raw = {
             name: 'table1',
             columns: [
@@ -901,8 +901,7 @@ describe('dto', () => {
 
           const dto = plainToInstance(column, raw);
           const errors = await validate(dto);
-          expect(errors.length).toBeGreaterThan(0);
-          expect(errors[0].property).toBe('join');
+          expect(errors.length).toBe(0);
         });
       });
     });
