@@ -9,6 +9,7 @@ import {
 } from './conditions.dto';
 import { join } from './join.dto';
 import { plainToInstance } from 'class-transformer';
+import { column } from './table.dto';
 
 describe('dto', () => {
   describe('conditions_dto', () => {
@@ -651,7 +652,19 @@ describe('dto', () => {
 
   describe('table dto', () => {
     describe('column', () => {
-      describe('name', () => {});
+      describe('name', () => {
+        it('should validate the name correctly', async () => {
+          const raw = {
+            name: 'column1'
+          };
+
+          const dto = plainToInstance(column, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBe(0);
+        });
+
+        
+      });
       describe('aggregation', () => {});
       describe('alias', () => {});
     });
