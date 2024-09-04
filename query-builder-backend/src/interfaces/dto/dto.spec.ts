@@ -905,4 +905,6 @@ describe('dto', () => {
       });
     });
   });
+
+  describe('query dto', () => {})
 });
