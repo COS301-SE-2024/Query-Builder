@@ -10,7 +10,13 @@ import {
 import { join } from './join.dto';
 import { plainToInstance } from 'class-transformer';
 import { column, table } from './table.dto';
-import { DatabaseCredentials, PageParams, SortParams } from './query.dto';
+import {
+  DatabaseCredentials,
+  PageParams,
+  QueryParams,
+  SortParams,
+  Query
+} from './query.dto';
 
 describe('dto', () => {
   describe('conditions_dto', () => {
@@ -1106,8 +1112,956 @@ describe('dto', () => {
         });
       });
     });
-    
-    describe('QueryParams DTO', () => {});
-    describe('Query DTO', () => {});
+
+    describe('QueryParams DTO', () => {
+      describe('language', () => {
+        it('should validate the language correctly', async () => {
+          const raw = {
+            language: 'sql',
+            query_type: 'select',
+            databaseName: 'database1',
+            table: {
+              name: 'table1',
+              columns: [
+                {
+                  name: 'column1'
+                }
+              ]
+            }
+          };
+
+          const dto = plainToInstance(QueryParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBe(0);
+        });
+
+        it('should fail validation when language is empty', async () => {
+          const raw = {
+            language: '',
+            query_type: 'select',
+            databaseName: 'database1',
+            table: {
+              name: 'table1',
+              columns: [
+                {
+                  name: 'column1'
+                }
+              ]
+            }
+          };
+
+          const dto = plainToInstance(QueryParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('language');
+        });
+
+        it('should fail validation when language is missing', async () => {
+          const raw = {
+            query_type: 'select',
+            databaseName: 'database1',
+            table: {
+              name: 'table1',
+              columns: [
+                {
+                  name: 'column1'
+                }
+              ]
+            }
+          };
+
+          const dto = plainToInstance(QueryParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('language');
+        });
+      });
+
+      describe('query_type', () => {
+        it('should validate the query_type correctly', async () => {
+          const raw = {
+            language: 'sql',
+            query_type: 'select',
+            databaseName: 'database1',
+            table: {
+              name: 'table1',
+              columns: [
+                {
+                  name: 'column1'
+                }
+              ]
+            }
+          };
+
+          const dto = plainToInstance(QueryParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBe(0);
+        });
+
+        it('should fail validation when query_type is empty', async () => {
+          const raw = {
+            language: 'sql',
+            query_type: '',
+            databaseName: 'database1',
+            table: {
+              name: 'table1',
+              columns: [
+                {
+                  name: 'column1'
+                }
+              ]
+            }
+          };
+
+          const dto = plainToInstance(QueryParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('query_type');
+        });
+
+        it('should fail validation when query_type is missing', async () => {
+          const raw = {
+            language: 'sql',
+            databaseName: 'database1',
+            table: {
+              name: 'table1',
+              columns: [
+                {
+                  name: 'column1'
+                }
+              ]
+            }
+          };
+
+          const dto = plainToInstance(QueryParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('query_type');
+        });
+      });
+
+      describe('databaseName', () => {
+        it('should validate the databaseName correctly', async () => {
+          const raw = {
+            language: 'sql',
+            query_type: 'select',
+            databaseName: 'database1',
+            table: {
+              name: 'table1',
+              columns: [
+                {
+                  name: 'column1'
+                }
+              ]
+            }
+          };
+
+          const dto = plainToInstance(QueryParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBe(0);
+        });
+
+        it('should fail validation when databaseName is empty', async () => {
+          const raw = {
+            language: 'sql',
+            query_type: 'select',
+            databaseName: '',
+            table: {
+              name: 'table1',
+              columns: [
+                {
+                  name: 'column1'
+                }
+              ]
+            }
+          };
+
+          const dto = plainToInstance(QueryParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('databaseName');
+        });
+
+        it('should fail validation when databaseName is missing', async () => {
+          const raw = {
+            language: 'sql',
+            query_type: 'select',
+            table: {
+              name: 'table1',
+              columns: [
+                {
+                  name: 'column1'
+                }
+              ]
+            }
+          };
+
+          const dto = plainToInstance(QueryParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('databaseName');
+        });
+      });
+
+      describe('table', () => {
+        it('should validate the table correctly', async () => {
+          const raw = {
+            name: 'table1',
+            columns: [
+              {
+                name: 'column1'
+              }
+            ],
+            join: {
+              table1MatchingColumnName: 'column1',
+              table2: {
+                name: 'table2',
+                columns: [
+                  {
+                    name: 'column1'
+                  }
+                ]
+              },
+              table2MatchingColumnName: 'column1'
+            }
+          };
+
+          const dto = plainToInstance(table, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBe(0);
+        });
+
+        it('should fail validation when table name is empty', async () => {
+          const raw = {
+            name: '',
+            columns: [
+              {
+                name: 'column1'
+              }
+            ],
+            join: {
+              table1MatchingColumnName: 'column1',
+              table2: {
+                name: 'table2',
+                columns: [
+                  {
+                    name: 'column1'
+                  }
+                ]
+              },
+              table2MatchingColumnName: 'column1'
+            }
+          };
+
+          const dto = plainToInstance(table, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('name');
+        });
+
+        it('should fail validation when table name is missing', async () => {
+          const raw = {
+            columns: [
+              {
+                name: 'column1'
+              }
+            ],
+            join: {
+              table1MatchingColumnName: 'column1',
+              table2: {
+                name: 'table2',
+                columns: [
+                  {
+                    name: 'column1'
+                  }
+                ]
+              },
+              table2MatchingColumnName: 'column1'
+            }
+          };
+
+          const dto = plainToInstance(table, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('name');
+        });
+
+        it('should pass validation when columns are empty', async () => {
+          const raw = {
+            name: 'table1',
+            columns: [],
+            join: {
+              table1MatchingColumnName: 'column1',
+              table2: {
+                name: 'table2',
+                columns: [
+                  {
+                    name: 'column1'
+                  }
+                ]
+              },
+              table2MatchingColumnName: 'column1'
+            }
+          };
+
+          const dto = plainToInstance(table, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBe(0);
+        });
+
+        it('should fail validation when columns are missing', async () => {
+          const raw = {
+            name: 'table1',
+            join: {
+              table1MatchingColumnName: 'column1',
+              table2: {
+                name: 'table2',
+                columns: [
+                  {
+                    name: 'column1'
+                  }
+                ]
+              },
+              table2MatchingColumnName: 'column1'
+            }
+          };
+
+          const dto = plainToInstance(table, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('columns');
+        });
+
+        it('should fail validation when join is empty', async () => {
+          const raw = {
+            name: 'table1',
+            columns: [
+              {
+                name: 'column1'
+              }
+            ],
+            join: {}
+          };
+
+          const dto = plainToInstance(table, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('join');
+        });
+
+        it('should pass validation when join is missing', async () => {
+          const raw = {
+            name: 'table1',
+            columns: [
+              {
+                name: 'column1'
+              }
+            ]
+          };
+
+          const dto = plainToInstance(table, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBe(0);
+        });
+      });
+
+      describe('condition', () => {
+        it('should validate the condition correctly', async () => {
+          const raw = {
+            language: 'sql',
+            query_type: 'select',
+            databaseName: 'database1',
+            table: {
+              name: 'table1',
+              columns: [
+                {
+                  name: 'column1'
+                }
+              ]
+            },
+            condition: {
+              value: 'test',
+              column: 'column1',
+              operator: '='
+            }
+          };
+
+          const dto = plainToInstance(QueryParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBe(0);
+        });
+
+        it('should fail validation when condition column is empty', async () => {
+          const raw = {
+            language: 'sql',
+            query_type: 'select',
+            databaseName: 'database1',
+            table: {
+              name: 'table1',
+              columns: [
+                {
+                  name: 'column1'
+                }
+              ]
+            },
+            condition: {
+              column: '',
+              operator: '=',
+              value: 'test'
+            }
+          };
+
+          const dto = plainToInstance(QueryParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('condition');
+        });
+
+        it('should fail validation when condition column is missing', async () => {
+          const raw = {
+            language: 'sql',
+            query_type: 'select',
+            databaseName: 'database1',
+            table: {
+              name: 'table1',
+              columns: [
+                {
+                  name: 'column1'
+                }
+              ]
+            },
+            condition: {
+              operator: '=',
+              value: 'test'
+            }
+          };
+
+          const dto = plainToInstance(QueryParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('condition');
+        });
+
+        it('should fail validation when condition operator is empty', async () => {
+          const raw = {
+            language: 'sql',
+            query_type: 'select',
+            databaseName: 'database1',
+            table: {
+              name: 'table1',
+              columns: [
+                {
+                  name: 'column1'
+                }
+              ]
+            },
+            condition: {
+              column: 'column1',
+              operator: '',
+              value: 'test'
+            }
+          };
+
+          const dto = plainToInstance(QueryParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('condition');
+        });
+
+        it('should fail validation when condition operator is missing', async () => {
+          const raw = {
+            language: 'sql',
+            query_type: 'select',
+            databaseName: 'database1',
+            table: {
+              name: 'table1',
+              columns: [
+                {
+                  name: 'column1'
+                }
+              ]
+            },
+            condition: {
+              column: 'column1',
+              value: 'test'
+            }
+          };
+
+          const dto = plainToInstance(QueryParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('condition');
+        });
+
+        it('should fail validation when condition value is empty', async () => {
+          const raw = {
+            language: 'sql',
+            query_type: 'select',
+            databaseName: 'database1',
+            table: {
+              name: 'table1',
+              columns: [
+                {
+                  name: 'column1'
+                }
+              ]
+            },
+            condition: {
+              column: 'column1',
+              operator: 'equals',
+              value: ''
+            }
+          };
+
+          const dto = plainToInstance(QueryParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('condition');
+        });
+
+        it('should fail validation when condition value is missing', async () => {
+          const raw = {
+            language: 'sql',
+            query_type: 'select',
+            databaseName: 'database1',
+            table: {
+              name: 'table1',
+              columns: [
+                {
+                  name: 'column1'
+                }
+              ]
+            },
+            condition: {
+              column: 'column1',
+              operator: 'equals'
+            }
+          };
+
+          const dto = plainToInstance(QueryParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('condition');
+        });
+
+        describe('Transformer Decorator', () => {
+          it('should correctly transform a nested compound condition', async () => {
+            const raw = {
+              language: 'sql',
+              query_type: 'select',
+              databaseName: 'database1',
+              table: {
+                name: 'table1',
+                columns: [
+                  {
+                    name: 'column1'
+                  }
+                ]
+              },
+              condition: {
+                type: 'c',
+                operator: LogicalOperator.OR,
+                conditions: [
+                  {
+                    type: 'p',
+                    value: 'test',
+                    column: 'column1',
+                    operator: '='
+                  }
+                ]
+              }
+            };
+
+            const dto = plainToInstance(QueryParams, raw);
+            expect(dto.condition).toBeInstanceOf(compoundCondition);
+          });
+
+          it('should correctly transform a nested primitive condition', async () => {
+            const raw = {
+              language: 'sql',
+              query_type: 'select',
+              databaseName: 'database1',
+              table: {
+                name: 'table1',
+                columns: [
+                  {
+                    name: 'column1'
+                  }
+                ]
+              },
+              condition: {
+                type: 'p',
+                value: 'test',
+                column: 'column1',
+                operator: '='
+              }
+            };
+
+            const dto = plainToInstance(QueryParams, raw);
+            expect(dto.condition).toBeInstanceOf(primitiveCondition);
+          });
+
+          it('should transform to primitiveCondition when value, column, or operator is not a valid ComparisonOperator', () => {
+            const raw = {
+              condition: {
+                value: undefined,
+                column: undefined,
+                operator: 'NOTVALID'
+              }
+            };
+
+            const dto = plainToInstance(QueryParams, raw);
+            expect(dto.condition).toBeInstanceOf(primitiveCondition);
+          });
+
+          it('should transform to primitiveCondition when none of the conditions are met', () => {
+            const raw = {
+              condition: {
+                invalidField: 'invalid'
+              }
+            };
+
+            const dto = plainToInstance(QueryParams, raw);
+            expect(dto.condition).toBeInstanceOf(primitiveCondition);
+          });
+        });
+      });
+
+      describe('sortParams', () => {
+        it('should validate the sortParams correctly', async () => {
+          const raw = {
+            language: 'sql',
+            query_type: 'select',
+            databaseName: 'database1',
+            table: {
+              name: 'table1',
+              columns: [
+                {
+                  name: 'column1'
+                }
+              ]
+            },
+            sortParams: {
+              column: 'column1',
+              direction: 'ascending'
+            }
+          };
+
+          const dto = plainToInstance(QueryParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBe(0);
+        });
+
+        it('should fail validation when sortParams column is empty', async () => {
+          const raw = {
+            language: 'sql',
+            query_type: 'select',
+            databaseName: 'database1',
+            table: {
+              name: 'table1',
+              columns: [
+                {
+                  name: 'column1'
+                }
+              ]
+            },
+            sortParams: {
+              column: '',
+              direction: 'ascending'
+            }
+          };
+
+          const dto = plainToInstance(QueryParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('sortParams');
+        });
+
+        it('should fail validation when sortParams column is missing', async () => {
+          const raw = {
+            language: 'sql',
+            query_type: 'select',
+            databaseName: 'database1',
+            table: {
+              name: 'table1',
+              columns: [
+                {
+                  name: 'column1'
+                }
+              ]
+            },
+            sortParams: {
+              direction: 'ascending'
+            }
+          };
+
+          const dto = plainToInstance(QueryParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('sortParams');
+        });
+
+        it('should fail validation when sortParams direction is empty', async () => {
+          const raw = {
+            language: 'sql',
+            query_type: 'select',
+            databaseName: 'database1',
+            table: {
+              name: 'table1',
+              columns: [
+                {
+                  name: 'column1'
+                }
+              ]
+            },
+            sortParams: {
+              column: 'column1',
+              direction: ''
+            }
+          };
+
+          const dto = plainToInstance(QueryParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('sortParams');
+        });
+
+        it('should pass validation when sortParams direction is missing', async () => {
+          const raw = {
+            language: 'sql',
+            query_type: 'select',
+            databaseName: 'database1',
+            table: {
+              name: 'table1',
+              columns: [
+                {
+                  name: 'column1'
+                }
+              ]
+            },
+            sortParams: {
+              column: 'column1'
+            }
+          };
+
+          const dto = plainToInstance(QueryParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBe(0);
+        });
+      });
+
+      describe('pageParams', () => {
+        it('should validate the pageParams correctly', async () => {
+          const raw = {
+            language: 'sql',
+            query_type: 'select',
+            databaseName: 'database1',
+            table: {
+              name: 'table1',
+              columns: [
+                {
+                  name: 'column1'
+                }
+              ]
+            },
+            pageParams: {
+              pageNumber: 1,
+              rowsPerPage: 10
+            }
+          };
+
+          const dto = plainToInstance(QueryParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBe(0);
+        });
+
+        it('should fail validation when pageParams pageNumber is less than 1', async () => {
+          const raw = {
+            language: 'sql',
+            query_type: 'select',
+            databaseName: 'database1',
+            table: {
+              name: 'table1',
+              columns: [
+                {
+                  name: 'column1'
+                }
+              ]
+            },
+            pageParams: {
+              pageNumber: 0,
+              rowsPerPage: 10
+            }
+          };
+
+          const dto = plainToInstance(QueryParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('pageParams');
+        });
+
+        it('should fail validation when pageParams pageNumber is missing', async () => {
+          const raw = {
+            language: 'sql',
+            query_type: 'select',
+            databaseName: 'database1',
+            table: {
+              name: 'table1',
+              columns: [
+                {
+                  name: 'column1'
+                }
+              ]
+            },
+            pageParams: {
+              rowsPerPage: 10
+            }
+          };
+
+          const dto = plainToInstance(QueryParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('pageParams');
+        });
+
+        it('should fail validation when pageParams rowsPerPage is less than 1', async () => {
+          const raw = {
+            language: 'sql',
+            query_type: 'select',
+            databaseName: 'database1',
+            table: {
+              name: 'table1',
+              columns: [
+                {
+                  name: 'column1'
+                }
+              ]
+            },
+            pageParams: {
+              pageNumber: 1,
+              rowsPerPage: 0
+            }
+          };
+
+          const dto = plainToInstance(QueryParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('pageParams');
+        });
+
+        it('should fail validation when pageParams rowsPerPage is missing', async () => {
+          const raw = {
+            language: 'sql',
+            query_type: 'select',
+            databaseName: 'database1',
+            table: {
+              name: 'table1',
+              columns: [
+                {
+                  name: 'column1'
+                }
+              ]
+            },
+            pageParams: {
+              pageNumber: 1
+            }
+          };
+
+          const dto = plainToInstance(QueryParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('pageParams');
+        });
+      });
+    });
+
+    describe('Query DTO', () => {
+      describe('credentials', () => {
+        it('should validate the credentials correctly', async () => {
+          const raw = {
+            credentials: {
+              user: 'test',
+              password: 'test'
+            },
+            databaseServerID: 'test',
+            queryParams: {
+              language: 'sql',
+              query_type: 'select',
+              databaseName: 'database1',
+              table: {
+                name: 'table1',
+                columns: [
+                  {
+                    name: 'column1'
+                  }
+                ]
+              }
+            }
+          };
+
+          const dto = plainToInstance(Query, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBe(0);
+        });
+      });
+
+      describe('databaseServerID', () => {
+        it('should validate the databaseServerID correctly', async () => {
+          const raw = {
+            credentials: {
+              user: 'test',
+              password: 'test'
+            },
+            databaseServerID: 'test',
+            queryParams: {
+              language: 'sql',
+              query_type: 'select',
+              databaseName: 'database1',
+              table: {
+                name: 'table1',
+                columns: [
+                  {
+                    name: 'column1'
+                  }
+                ]
+              }
+            }
+          };
+
+          const dto = plainToInstance(Query, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBe(0);
+        });
+      });
+
+      describe('queryParams', () => {
+        it('should validate the queryParams correctly', async () => {
+          const raw = {
+            credentials: {
+              user: 'test',
+              password: 'test'
+            },
+            databaseServerID: 'test',
+            queryParams: {
+              language: 'sql',
+              query_type: 'select',
+              databaseName: 'database1',
+              table: {
+                name: 'table1',
+                columns: [
+                  {
+                    name: 'column1'
+                  }
+                ]
+              }
+            }
+          };
+
+          const dto = plainToInstance(Query, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBe(0);
+        });
+      });
+    });
   });
 });
