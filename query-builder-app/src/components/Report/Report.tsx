@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Page,
   Text,
@@ -234,28 +234,32 @@ function MyDocument({ tableData, chartData, metadata, date }: MyDocumentProps) {
             ))}
           </View>
         </View>
-        <View style={styles.section} break>
-          <Text style={styles.header}>Graphs</Text>
-          {chartData.map((data, index: number) => (
-            <Image
-              key={index}
-              src={(async () => {
-                const ChartJsImage = require('chartjs-to-image');
+        {chartData.length > 0 ? (
+          <View style={styles.section} break>
+            <Text style={styles.header}>Graphs</Text>
+            {chartData.map((data, index: number) => (
+              <Image
+                key={index}
+                src={(async () => {
+                  const ChartJsImage = require('chartjs-to-image');
 
-                const myChart = new ChartJsImage();
-                myChart.setConfig({
-                  type: 'bar',
-                  data: {
-                    labels: data.labels,
-                    datasets: data.datasets,
-                  },
-                });
-                return await myChart.toDataUrl();
-              })()}
-              style={styles.chart}
-            />
-          ))}
-        </View>
+                  const myChart = new ChartJsImage();
+                  myChart.setConfig({
+                    type: 'bar',
+                    data: {
+                      labels: data.labels,
+                      datasets: data.datasets,
+                    },
+                  });
+                  return await myChart.toDataUrl();
+                })()}
+                style={styles.chart}
+              />
+            ))}
+          </View>
+        ) : (
+          <></>
+        )}
       </Page>
     </Document>
   );
