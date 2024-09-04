@@ -801,9 +801,48 @@ describe('dto', () => {
           const errors = await validate(dto);
           expect(errors.length).toBeGreaterThan(0);
           expect(errors[0].property).toBe('name');
+        });
       });
 
-      describe('columns', () => {});
+      describe('columns', () => {
+        it('should validate the columns correctly', async () => {
+          const raw = {
+            name: 'table1',
+            columns: [
+              {
+                name: 'column1'
+              }
+            ]
+          };
+
+          const dto = plainToInstance(column, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBe(0);
+        });
+
+        it('should fail validation when columns is empty', async () => {
+          const raw = {
+            name: 'table1',
+            columns: []
+          };
+
+          const dto = plainToInstance(column, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('columns');
+        });
+
+        it('should fail validation when columns is missing', async () => {
+          const raw = {
+            name: 'table1'
+          };
+
+          const dto = plainToInstance(column, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('columns');
+        });
+      });
       describe('join', () => {});
     });
   });
