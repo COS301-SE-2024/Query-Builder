@@ -6,8 +6,8 @@ import {
   primitiveCondition,
   LogicalOperator,
   AggregateFunction,
-  ComparisonOperator
 } from './conditions.dto';
+import { join } from './join.dto';
 import { plainToInstance } from 'class-transformer';
 
 describe('dto', () => {
@@ -479,5 +479,71 @@ describe('dto', () => {
         });
       });
     });
+  });
+
+  describe('join dto', () => {
+    describe('table1MatchingColumnName', () => {
+      it('should validate the table1MatchingColumnName correctly', async () => {
+        const raw = {
+          table1MatchingColumnName: 'column1',
+          table2: {
+            name: 'table2',
+            columns: [
+              {
+                name: 'column1'
+              }
+            ]
+          },
+          table2MatchingColumnName: 'column1'
+        };
+
+        const dto = plainToInstance(join, raw);
+        const errors = await validate(dto);
+        expect(errors.length).toBe(0);
+      });
+
+      it('should fail validation when table1MatchingColumnName is empty', async () => {
+        const raw = {
+          table1MatchingColumnName: '',
+          table2: {
+            name: 'table2',
+            columns: [
+              {
+                name: 'column1'
+              }
+            ]
+          },
+          table2MatchingColumnName: 'column1'
+        };
+
+        const dto = plainToInstance(join, raw);
+        const errors = await validate(dto);
+        expect(errors.length).toBeGreaterThan(0);
+        expect(errors[0].property).toBe('table1MatchingColumnName');
+      });
+
+      it('should fail validation when table1MatchingColumnName is missing', async () => {
+        const raw = {
+          table2: {
+            name: 'table2',
+            columns: [
+              {
+                name: 'column1'
+              }
+            ]
+          },
+          table2MatchingColumnName: 'column1'
+        };
+
+        const dto = plainToInstance(join, raw);
+        const errors = await validate(dto);
+        expect(errors.length).toBeGreaterThan(0);
+        expect(errors[0].property).toBe('table1MatchingColumnName');
+      });
+    });
+
+    describe('table2', () => {});
+
+    describe('table2MatchingColumnName', () => {});
   });
 });
