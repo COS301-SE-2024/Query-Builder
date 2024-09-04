@@ -10,7 +10,7 @@ import {
 import { join } from './join.dto';
 import { plainToInstance } from 'class-transformer';
 import { column, table } from './table.dto';
-import { DatabaseCredentials } from './query.dto';
+import { DatabaseCredentials, SortParams } from './query.dto';
 
 describe('dto', () => {
   describe('conditions_dto', () => {
@@ -959,8 +959,80 @@ describe('dto', () => {
         });
       });
     });
-    
-    describe('SortParams DTO', () => {});
+
+    describe('SortParams DTO', () => {
+      describe('column', () => {
+        it('should validate the column correctly', async () => {
+          const raw = {
+            column: 'column1',
+            direction: 'ascending'
+          };
+
+          const dto = plainToInstance(SortParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBe(0);
+        });
+
+        it('should fail validation when column is empty', async () => {
+          const raw = {
+            column: '',
+            direction: 'ascending'
+          };
+
+          const dto = plainToInstance(SortParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('column');
+        });
+
+        it('should fail validation when column is missing', async () => {
+          const raw = {
+            direction: 'ascending'
+          };
+
+          const dto = plainToInstance(SortParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('column');
+        });
+      });
+
+      describe('direction', () => {
+        it('should validate the direction correctly', async () => {
+          const raw = {
+            column: 'column1',
+            direction: 'ascending'
+          };
+
+          const dto = plainToInstance(SortParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBe(0);
+        });
+
+        it('should fail validation when direction is empty', async () => {
+          const raw = {
+            column: 'column1',
+            direction: ''
+          };
+
+          const dto = plainToInstance(SortParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('direction');
+        });
+
+        it('should pass validation when direction is missing', async () => {
+          const raw = {
+            column: 'column1'
+          };
+
+          const dto = plainToInstance(SortParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBe(0);
+        });
+      });
+    });
+
     describe('PageParams DTO', () => {});
     describe('QueryParams DTO', () => {});
     describe('Query DTO', () => {});
