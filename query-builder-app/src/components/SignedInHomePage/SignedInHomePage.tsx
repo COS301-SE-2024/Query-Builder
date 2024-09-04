@@ -10,30 +10,29 @@ import toast from "react-hot-toast";
 
 
 interface Database {
-    created_at: String,
-    name: String,
-    db_id: any,
-    db_info: any,
-    type: String
+  created_at: String;
+  name: String;
+  db_id: any;
+  db_info: any;
+  type: String;
 }
 
 interface Organisation {
-    created_at: String,
-    logo: String,
-    name: String,
-    org_id: String,
-    db_envs: Database[],
-    org_members: String[]
+  created_at: String;
+  logo: String;
+  name: String;
+  org_id: String;
+  db_envs: Database[];
+  org_members: String[];
 }
 
 // This function gets the token from local storage.
 // Supabase stores the token in local storage so we can access it from there.
 const getToken = async () => {
+  const supabase = createClient();
+  const token = (await supabase.auth.getSession()).data.session?.access_token;
 
-    const supabase = createClient();
-    const token = (await supabase.auth.getSession()).data.session?.access_token
-   
-    return token;
+  return token;
 };
 
 export default function SignedInHomePage(){
@@ -136,9 +135,9 @@ export default function SignedInHomePage(){
             },
         });
 
-        let json = await response.json();
+    let json = await response.json();
 
-        //the org_data property is an array of organisations
+    //the org_data property is an array of organisations
 
         setOrganisations(json.data)
 
@@ -150,15 +149,13 @@ export default function SignedInHomePage(){
     //React hook for the current DB server ID
     const [currentDBServerID, setCurrentDBServerID] = React.useState('');
 
-    //React hook to hold the user's organisations
-    const [organisations, setOrganisations] = React.useState([]);
+  //React hook to hold the user's organisations
+  const [organisations, setOrganisations] = React.useState([]);
 
-    //React hook to fetch the user's organisations upon rerender of the component
-    React.useEffect(() => {
-
-        fetchOrgs();
-
-    },[])
+  //React hook to fetch the user's organisations upon rerender of the component
+  React.useEffect(() => {
+    fetchOrgs();
+  }, []);
 
     return (
         <>
