@@ -674,7 +674,14 @@ describe('dto', () => {
           expect(errors[0].property).toBe('name');
         });
 
-        
+        it('should fail validation when name is missing', async () => {
+          const raw = {};
+
+          const dto = plainToInstance(column, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('name');
+        });
       });
       describe('aggregation', () => {});
       describe('alias', () => {});
