@@ -718,7 +718,21 @@ describe('dto', () => {
           expect(errors.length).toBe(0);
         });
       });
-      describe('alias', () => {});
+
+      describe('alias', () => {
+        it('should validate the alias correctly', async () => {
+          const raw = {
+            name: 'column1',
+            alias: 'alias1'
+          };
+
+          const dto = plainToInstance(column, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBe(0);
+        });
+
+        
+      });
     });
 
     describe('table', () => {
