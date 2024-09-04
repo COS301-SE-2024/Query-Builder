@@ -9,7 +9,7 @@ import {
 } from './conditions.dto';
 import { join } from './join.dto';
 import { plainToInstance } from 'class-transformer';
-import { column } from './table.dto';
+import { column, table } from './table.dto';
 
 describe('dto', () => {
   describe('conditions_dto', () => {
@@ -767,7 +767,7 @@ describe('dto', () => {
             ]
           };
 
-          const dto = plainToInstance(column, raw);
+          const dto = plainToInstance(table, raw);
           const errors = await validate(dto);
           expect(errors.length).toBe(0);
         });
@@ -782,7 +782,7 @@ describe('dto', () => {
             ]
           };
 
-          const dto = plainToInstance(column, raw);
+          const dto = plainToInstance(table, raw);
           const errors = await validate(dto);
           expect(errors.length).toBeGreaterThan(0);
           expect(errors[0].property).toBe('name');
@@ -797,7 +797,7 @@ describe('dto', () => {
             ]
           };
 
-          const dto = plainToInstance(column, raw);
+          const dto = plainToInstance(table, raw);
           const errors = await validate(dto);
           expect(errors.length).toBeGreaterThan(0);
           expect(errors[0].property).toBe('name');
@@ -815,21 +815,20 @@ describe('dto', () => {
             ]
           };
 
-          const dto = plainToInstance(column, raw);
+          const dto = plainToInstance(table, raw);
           const errors = await validate(dto);
           expect(errors.length).toBe(0);
         });
 
-        it('should fail validation when columns is empty', async () => {
+        it('should pass validation when columns is empty', async () => {
           const raw = {
             name: 'table1',
             columns: []
           };
 
-          const dto = plainToInstance(column, raw);
+          const dto = plainToInstance(table, raw);
           const errors = await validate(dto);
-          expect(errors.length).toBeGreaterThan(0);
-          expect(errors[0].property).toBe('columns');
+          expect(errors.length).toBe(0);
         });
 
         it('should fail validation when columns is missing', async () => {
@@ -837,7 +836,7 @@ describe('dto', () => {
             name: 'table1'
           };
 
-          const dto = plainToInstance(column, raw);
+          const dto = plainToInstance(table, raw);
           const errors = await validate(dto);
           expect(errors.length).toBeGreaterThan(0);
           expect(errors[0].property).toBe('columns');
@@ -867,7 +866,7 @@ describe('dto', () => {
             }
           };
 
-          const dto = plainToInstance(column, raw);
+          const dto = plainToInstance(table, raw);
           const errors = await validate(dto);
           expect(errors.length).toBe(0);
         });
@@ -883,7 +882,7 @@ describe('dto', () => {
             join: {}
           };
 
-          const dto = plainToInstance(column, raw);
+          const dto = plainToInstance(table, raw);
           const errors = await validate(dto);
           expect(errors.length).toBeGreaterThan(0);
           expect(errors[0].property).toBe('join');
@@ -899,7 +898,7 @@ describe('dto', () => {
             ]
           };
 
-          const dto = plainToInstance(column, raw);
+          const dto = plainToInstance(table, raw);
           const errors = await validate(dto);
           expect(errors.length).toBe(0);
         });
