@@ -262,5 +262,222 @@ describe('dto', () => {
         });
       });
     });
+
+    describe('compoundCondition DTO', () => {
+      describe('conditions', () => {
+        it('should validate the conditions correctly', async () => {
+          const raw = {
+            type: 'c',
+            operator: LogicalOperator.AND,
+            conditions: [
+              {
+                type: 'p',
+                value: 'test',
+                column: 'column1',
+                operator: '='
+              }
+            ]
+          };
+
+          const dto = plainToInstance(compoundCondition, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBe(0);
+        });
+
+        it('should fail validation when conditions is empty', async () => {
+          const raw = {
+            type: 'c',
+            operator: LogicalOperator.AND,
+            conditions: [{}, {}]
+          };
+
+          const dto = plainToInstance(compoundCondition, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('conditions');
+        });
+
+        it('should fail validation when conditions is missing', async () => {
+          const raw = {
+            type: 'c',
+            operator: LogicalOperator.AND
+          };
+
+          const dto = plainToInstance(compoundCondition, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('conditions');
+        });
+
+        describe('Transformer Decorator', () => {
+          it('should correctly transform a nested compound condition', async () => {
+            const raw = {
+              type: 'c',
+              operator: LogicalOperator.AND,
+              conditions: [
+                {
+                  type: 'c',
+                  operator: LogicalOperator.OR,
+                  conditions: [
+                    {
+                      type: 'p',
+                      value: 'test',
+                      column: 'column1',
+                      operator: '='
+                    }
+                  ]
+                }
+              ]
+            };
+
+            const dto = plainToInstance(compoundCondition, raw);
+            expect(dto.conditions[0]).toBeInstanceOf(compoundCondition);
+          });
+
+          it('should correctly transform a nested primitive condition', async () => {
+            const raw = {
+              type: 'c',
+              operator: LogicalOperator.AND,
+              conditions: [
+                {
+                  type: 'p',
+                  value: 'test',
+                  column: 'column1',
+                  operator: '='
+                }
+              ]
+            };
+
+            const dto = plainToInstance(compoundCondition, raw);
+            expect(dto.conditions[0]).toBeInstanceOf(primitiveCondition);
+          });
+
+          it('should transform to primitiveCondition when value, column, or operator is not a valid ComparisonOperator', () => {
+            const raw = {
+              conditions: [
+                {
+                  value: undefined,
+                  column: undefined,
+                  operator: 'NOTVALID'
+                }
+              ],
+              operator: 'AND'
+            };
+
+            const dto = plainToInstance(compoundCondition, raw);
+            expect(dto.conditions[0]).toBeInstanceOf(primitiveCondition);
+          });
+
+          it('should transform to primitiveCondition when none of the conditions are met', () => {
+            const raw = {
+              conditions: [
+                {
+                  invalidField: 'invalid'
+                }
+              ],
+              operator: 'AND'
+            };
+
+            const dto = plainToInstance(compoundCondition, raw);
+            expect(dto.conditions[0]).toBeInstanceOf(primitiveCondition);
+          });
+
+          it('should transform mixed conditions', () => {
+            const raw = {
+              conditions: [
+                {
+                  conditions: [
+                    { value: 'test', column: 'column1', operator: 'EQUAL' }
+                  ],
+                  operator: 'AND'
+                },
+                {
+                  value: 'test',
+                  column: 'column1',
+                  operator: 'EQUAL'
+                }
+              ]
+            };
+
+            const dto = plainToInstance(compoundCondition, raw);
+            expect(dto.conditions[0]).toBeInstanceOf(compoundCondition);
+            expect(dto.conditions[1]).toBeInstanceOf(primitiveCondition);
+          });
+
+          it('should handle invalid data gracefully', () => {
+            const raw = {
+              conditions: [
+                {
+                  invalidField: 'invalid'
+                }
+              ]
+            };
+
+            const dto = plainToInstance(compoundCondition, raw);
+            expect(dto.conditions[0]).toBeInstanceOf(primitiveCondition);
+          });
+        });
+      });
+
+      describe('operator', () => {
+        it('should validate the operator correctly', async () => {
+          const raw = {
+            type: 'c',
+            operator: LogicalOperator.AND,
+            conditions: [
+              {
+                type: 'p',
+                value: 'test',
+                column: 'column1',
+                operator: '='
+              }
+            ]
+          };
+
+          const dto = plainToInstance(compoundCondition, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBe(0);
+        });
+
+        it('should fail validation when operator is empty', async () => {
+          const raw = {
+            type: 'c',
+            operator: '',
+            conditions: [
+              {
+                type: 'p',
+                value: 'test',
+                column: 'column1',
+                operator: '='
+              }
+            ]
+          };
+
+          const dto = plainToInstance(compoundCondition, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('operator');
+        });
+
+        it('should fail validation when operator is missing', async () => {
+          const raw = {
+            type: 'c',
+            conditions: [
+              {
+                type: 'p',
+                value: 'test',
+                column: 'column1',
+                operator: '='
+              }
+            ]
+          };
+
+          const dto = plainToInstance(compoundCondition, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('operator');
+        });
+      });
+    });
   });
 });
