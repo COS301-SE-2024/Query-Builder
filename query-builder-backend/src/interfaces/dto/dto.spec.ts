@@ -5,7 +5,7 @@ import {
   condition,
   primitiveCondition,
   LogicalOperator,
-  AggregateFunction,
+  AggregateFunction
 } from './conditions.dto';
 import { join } from './join.dto';
 import { plainToInstance } from 'class-transformer';
@@ -646,6 +646,20 @@ describe('dto', () => {
         expect(errors.length).toBeGreaterThan(0);
         expect(errors[0].property).toBe('table2MatchingColumnName');
       });
+    });
+  });
+
+  describe('table dto', () => {
+    describe('column', () => {
+      describe('name', () => {});
+      describe('aggregation', () => {});
+      describe('alias', () => {});
+    });
+
+    describe('table', () => {
+      describe('name', () => {});
+      describe('columns', () => {});
+      describe('join', () => {});
     });
   });
 });
