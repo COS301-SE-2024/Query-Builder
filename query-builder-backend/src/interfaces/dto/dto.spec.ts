@@ -663,6 +663,17 @@ describe('dto', () => {
           expect(errors.length).toBe(0);
         });
 
+        it('should fail validation when name is empty', async () => {
+          const raw = {
+            name: ''
+          };
+
+          const dto = plainToInstance(column, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('name');
+        });
+
         
       });
       describe('aggregation', () => {});
