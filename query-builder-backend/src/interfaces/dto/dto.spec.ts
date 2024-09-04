@@ -683,7 +683,21 @@ describe('dto', () => {
           expect(errors[0].property).toBe('name');
         });
       });
-      describe('aggregation', () => {});
+
+      describe('aggregation', () => {
+        it('should validate the aggregation correctly', async () => {
+          const raw = {
+            name: 'column1',
+            aggregation: AggregateFunction.COUNT
+          };
+
+          const dto = plainToInstance(column, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBe(0);
+        });
+
+        
+      });
       describe('alias', () => {});
     });
 
