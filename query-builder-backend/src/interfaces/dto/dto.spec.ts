@@ -10,6 +10,7 @@ import {
 import { join } from './join.dto';
 import { plainToInstance } from 'class-transformer';
 import { column, table } from './table.dto';
+import { DatabaseCredentials } from './query.dto';
 
 describe('dto', () => {
   describe('conditions_dto', () => {
@@ -907,7 +908,58 @@ describe('dto', () => {
   });
 
   describe('query dto', () => {
-    describe('DatabaseCredentials DTO', () => {});
+    describe('DatabaseCredentials DTO', () => {
+      describe('user', () => {
+        it('should validate the user correctly', async () => {
+          const raw = {
+            user: 'test',
+            password: 'test'
+          };
+
+          const dto = plainToInstance(DatabaseCredentials, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBe(0);
+        });
+
+        it('should fail validation when user is empty', async () => {
+          const raw = {
+            user: '',
+            password: 'test'
+          };
+
+          const dto = plainToInstance(DatabaseCredentials, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('user');
+        });
+      });
+
+      describe('password', () => {
+        it('should validate the password correctly', async () => {
+          const raw = {
+            user: 'test',
+            password: 'test'
+          };
+
+          const dto = plainToInstance(DatabaseCredentials, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBe(0);
+        });
+
+        it('should fail validation when password is empty', async () => {
+          const raw = {
+            user: 'test',
+            password: ''
+          };
+
+          const dto = plainToInstance(DatabaseCredentials, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('password');
+        });
+      });
+    });
+    
     describe('SortParams DTO', () => {});
     describe('PageParams DTO', () => {});
     describe('QueryParams DTO', () => {});
