@@ -10,7 +10,7 @@ import {
 import { join } from './join.dto';
 import { plainToInstance } from 'class-transformer';
 import { column, table } from './table.dto';
-import { DatabaseCredentials, SortParams } from './query.dto';
+import { DatabaseCredentials, PageParams, SortParams } from './query.dto';
 
 describe('dto', () => {
   describe('conditions_dto', () => {
@@ -1033,7 +1033,80 @@ describe('dto', () => {
       });
     });
 
-    describe('PageParams DTO', () => {});
+    describe('PageParams DTO', () => {
+      describe('pageNumber', () => {
+        it('should validate the pageNumber correctly', async () => {
+          const raw = {
+            pageNumber: 1,
+            rowsPerPage: 10
+          };
+
+          const dto = plainToInstance(PageParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBe(0);
+        });
+
+        it('should fail validation when pageNumber is less than 1', async () => {
+          const raw = {
+            pageNumber: 0,
+            rowsPerPage: 10
+          };
+
+          const dto = plainToInstance(PageParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('pageNumber');
+        });
+
+        it('should fail validation when pageNumber is missing', async () => {
+          const raw = {
+            rowsPerPage: 10
+          };
+
+          const dto = plainToInstance(PageParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('pageNumber');
+        });
+      });
+
+      describe('rowsPerPage', () => {
+        it('should validate the rowsPerPage correctly', async () => {
+          const raw = {
+            pageNumber: 1,
+            rowsPerPage: 10
+          };
+
+          const dto = plainToInstance(PageParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBe(0);
+        });
+
+        it('should fail validation when rowsPerPage is less than 1', async () => {
+          const raw = {
+            pageNumber: 1,
+            rowsPerPage: 0
+          };
+
+          const dto = plainToInstance(PageParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('rowsPerPage');
+        });
+
+        it('should fail validation when rowsPerPage is missing', async () => {
+          const raw = {
+            pageNumber: 1
+          };
+
+          const dto = plainToInstance(PageParams, raw);
+          const errors = await validate(dto);
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors[0].property).toBe('rowsPerPage');
+        });
+      });
+    });
+    
     describe('QueryParams DTO', () => {});
     describe('Query DTO', () => {});
   });
