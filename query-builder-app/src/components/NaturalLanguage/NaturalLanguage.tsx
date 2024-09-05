@@ -8,6 +8,7 @@ import { MdMic } from 'react-icons/md';
 import useSpeechToText from 'react-hook-speech-to-text';
 
 export default function NaturalLanguage() {
+    const { databaseServerID } = useParams<{ databaseServerID: string }>(); // Move this to the top
     const [value, setValue] = useState("");
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const [queryLoaded, setQueryLoaded] = useState(false);
@@ -28,13 +29,6 @@ export default function NaturalLanguage() {
         useLegacyResults: false
     });
 
-    if (error) return <p>Web Speech API is not available in this browser 🤷‍</p>;
-
-    type ResultType = {
-        timestamp: number;
-        transcript: string;
-    };
-
     useEffect(() => {
         const combinedResults = results.map((result) => {
             if (typeof result === "string") {
@@ -48,17 +42,13 @@ export default function NaturalLanguage() {
         setValue(finalText);
     }, [interimResult, results]);
 
-
-    // Assuming results is an array of ResultType
-    const safeResults: ResultType[] = results as ResultType[];
+    if (error) return <p>Web Speech API is not available in this browser 🤷‍</p>;
 
     const getToken = async () => {
         const supabase = createClient();
         const token = (await supabase.auth.getSession()).data.session?.access_token;
         return token;
     };
-
-    const { databaseServerID } = useParams<{ databaseServerID: string }>();
 
     async function getQuery() {
         setLoading(true);
