@@ -7,8 +7,11 @@ import {
     DropdownItem,
     DropdownSection,
 } from "@nextui-org/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
+
 import { createClient } from "./../../utils/supabase/client";
 import { useRouter } from 'next/navigation'
+import { timeStamp } from "console";
 
 interface ContextMenuCardProps {
     queryTitle: string;
@@ -61,8 +64,9 @@ export default function ContextMenuCard({
     onDelete,
 }: ContextMenuCardProps) {
     const [loading, setLoading] = useState(false);
-
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const router = useRouter();
+    const [title, setTitle] = useState("");
 
     const handleDelete = async () => {
         setLoading(true);
@@ -74,6 +78,7 @@ export default function ContextMenuCard({
         } finally {
             setLoading(false);
             onDelete();
+            onOpenChange();
         }
     };
 
@@ -82,43 +87,82 @@ export default function ContextMenuCard({
 
         console.log(query);
         //Here we will send the query to the query builder
-        
+
         router.push("/" + db_id + "/" + query_id);
-        
+
     };
 
+    const localDateTime = new Date(saved_at).toLocaleString([], {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+    });
+
     return (
-        <Dropdown>
-            <DropdownTrigger>
-                <Button
-                    variant="flat"
-                    className="size-full pl-1 pr-1"
-                    color="primary"
-                    disabled={loading}
-                >
-                    {loading ? "Processing..." : queryTitle}
-                </Button>
-            </DropdownTrigger>
-            <DropdownMenu aria-label="Static Actions">
-                <DropdownSection title={saved_at}>
-                    <DropdownItem
-                        key="retrieve"
-                        description="Retrieve saved query"
-                        onClick={handleRetrieve}
+        <>
+            <Dropdown>
+                <DropdownTrigger>
+                    <Button
+                        variant="flat"
+                        className="size-full pl-1 pr-1"
+                        color="primary"
+                        disabled={loading}
                     >
-                        Retrieve Query
-                    </DropdownItem>
-                    <DropdownItem
-                        key="delete"
-                        className="text-danger"
-                        color="danger"
-                        description="Delete query from saved queries"
-                        onClick={handleDelete}
-                    >
-                        Delete Query
-                    </DropdownItem>
-                </DropdownSection>
-            </DropdownMenu>
-        </Dropdown>
+                        {loading ? "Processing..." : queryTitle}
+                    </Button>
+                </DropdownTrigger>
+                <DropdownMenu aria-label="Static Actions">
+                    <DropdownSection title={localDateTime}>
+                        <DropdownItem
+                            key="retrieve"
+                            description="Retrieve saved query"
+                            onClick={handleRetrieve}
+                        >
+                            Retrieve Query
+                        </DropdownItem>
+                        <DropdownItem
+                            key="delete"
+                            className="text-danger"
+                            color="danger"
+                            description="Delete query from saved queries"
+                            onPress={onOpen}
+                        >
+                            Delete Query
+                        </DropdownItem>
+                    </DropdownSection>
+                </DropdownMenu>
+            </Dropdown>
+            <>
+            <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+            <ModalContent>
+                        {(onClose) => (
+                            <>
+                                <ModalHeader className="flex flex-row items-center justify-center text-center">
+                                    <span>Delete</span>
+                                    <span style={{ color: 'red', fontWeight: 'bold', marginLeft: '0.5rem' }}>
+                                        {queryTitle}
+                                    </span>
+                                    <span>?</span>
+                                </ModalHeader>
+                                <ModalBody className="text-center">
+                                    <p className="text-lg">Are you sure you want to delete this query?</p>
+                                    <p className="text-sm text-gray-500">This action cannot be undone.</p>
+                                </ModalBody>
+                                <ModalFooter className="flex flex-row items-center justify-center space-x-4">
+                                    <Button color="primary" onPress={onClose}>
+                                        Cancel
+                                    </Button>
+                                    <Button color="danger" onClick={handleDelete}>
+                                        Delete
+                                    </Button>
+                                </ModalFooter>
+                            </>
+                        )}
+                    </ModalContent>
+                </Modal>
+            </>
+        </>
     );
 }

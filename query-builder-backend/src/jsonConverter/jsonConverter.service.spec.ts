@@ -346,7 +346,7 @@ it('should be able to convert compound conditions', () => {
         table: {name: 'users', columns: [{name: 'id'}, {name: "first_name"}, {name: "last_name"}]},
       };
   
-      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users`';
+      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `sakila`.`users`';
   
       const result = service.convertJsonToQuery(queryParams);
   
@@ -363,7 +363,7 @@ it('should be able to convert compound conditions', () => {
         table: {name: 'users', columns: [{name: 'id', aggregation: AggregateFunction.COUNT, alias: "Number"}]},
       };
   
-      const expectedQuery = 'SELECT COUNT(`users`.`id`) AS `Number` FROM `users`';
+      const expectedQuery = 'SELECT COUNT(`users`.`id`) AS `Number` FROM `sakila`.`users`';
   
       const result = service.convertJsonToQuery(queryParams);
   
@@ -391,7 +391,7 @@ it('should be able to convert compound conditions', () => {
         },
       };
   
-      const expectedQuery = 'SELECT `users`.`id`, `actors`.`role` FROM `users` JOIN `actors` ON `users`.`id`=`actors`.`user_id`';
+      const expectedQuery = 'SELECT `users`.`id`, `actors`.`role` FROM `sakila`.`users` JOIN `sakila`.`actors` ON `users`.`id`=`actors`.`user_id`';
   
       const result = service.convertJsonToQuery(queryParams);
   
@@ -412,7 +412,7 @@ it('should be able to convert compound conditions', () => {
         }
       };
   
-      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users` ORDER BY `first_name` DESC';
+      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `sakila`.`users` ORDER BY `first_name` DESC';
   
       const result = service.convertJsonToQuery(queryParams);
   
@@ -432,7 +432,7 @@ it('should be able to convert compound conditions', () => {
         }
       };
   
-      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users` ORDER BY `first_name` ASC';
+      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `sakila`.`users` ORDER BY `first_name` ASC';
   
       const result = service.convertJsonToQuery(queryParams);
   
@@ -453,7 +453,7 @@ it('should be able to convert compound conditions', () => {
         }
       };
   
-      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users` LIMIT 10 OFFSET 20';
+      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `sakila`.`users` LIMIT 10 OFFSET 20';
   
       const result = service.convertJsonToQuery(queryParams);
   
@@ -536,7 +536,7 @@ it('should be able to convert compound conditions', () => {
         }
     };
 
-    const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `users` WHERE `age` > 18 LIMIT 10 OFFSET 20';
+    const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `sakila`.`users` WHERE `age` > 18 LIMIT 10 OFFSET 20';
     const result = service.convertJsonToQuery(queryParams);
 
     expect(result).toEqual(expectedQuery);
@@ -569,7 +569,7 @@ it('should be able to convert queries using pagination, where, group by, and hav
         }
     };
 
-    const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name`, AVG(`users`.`age`) FROM `users` GROUP BY `users`.`id`, `users`.`first_name`, `users`.`last_name` HAVING AVG(`users`.`age`) > 18 LIMIT 10 OFFSET 20';
+    const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name`, AVG(`users`.`age`) FROM `sakila`.`users` GROUP BY `users`.`id`, `users`.`first_name`, `users`.`last_name` HAVING AVG(`users`.`age`) > 18 LIMIT 10 OFFSET 20';
     const result = service.convertJsonToQuery(queryParams);
 
     expect(result).toEqual(expectedQuery);
@@ -600,7 +600,7 @@ it('should be able to convert queries using pagination, where, group by, and hav
             }
         };
 
-        const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name`, `users`.`age` FROM `users` WHERE `age` > 18 LIMIT 10 OFFSET 20';
+        const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name`, `users`.`age` FROM `sakila`.`users` WHERE `age` > 18 LIMIT 10 OFFSET 20';
         const result = service.convertJsonToQuery(queryParams);
 
         expect(result).toEqual(expectedQuery);
@@ -639,7 +639,7 @@ it('should be able to convert queries using pagination, where, group by, and hav
 
         const result = service.convertJsonToQuery(jsonData);
 
-        expect(result).toEqual('SELECT COUNT(`city`.`city_id`) AS `Number of cities per country`, `country`.`country` FROM `city` JOIN `country` ON `city`.`country_id`=`country`.`country_id` GROUP BY `country`.`country` HAVING COUNT(`city`.`city_id`) > 10');
+        expect(result).toEqual('SELECT COUNT(`city`.`city_id`) AS `Number of cities per country`, `country`.`country` FROM `sakila`.`city` JOIN `sakila`.`country` ON `city`.`country_id`=`country`.`country_id` GROUP BY `country`.`country` HAVING COUNT(`city`.`city_id`) > 10');
 
     });
 
@@ -676,7 +676,7 @@ it('should be able to convert queries using pagination, where, group by, and hav
 
         const result = service.convertJsonToQuery(jsonData);
 
-        expect(result).toEqual('SELECT `country`.`country`, COUNT(`city`.`city_id`) AS `Number of cities per country` FROM `country` JOIN `city` ON `country`.`country_id`=`city`.`country_id` GROUP BY `country`.`country` HAVING COUNT(`city`.`city_id`) > 10');
+        expect(result).toEqual('SELECT `country`.`country`, COUNT(`city`.`city_id`) AS `Number of cities per country` FROM `sakila`.`country` JOIN `sakila`.`city` ON `country`.`country_id`=`city`.`country_id` GROUP BY `country`.`country` HAVING COUNT(`city`.`city_id`) > 10');
 
     });
 
@@ -707,7 +707,7 @@ it('should be able to convert queries using pagination, where, group by, and hav
 
         }
         const result = service.convertJsonToQuery(jsonData);
-        expect(result).toEqual('SELECT `city`.`city_id`, `country`.`country` FROM `city` JOIN `country` ON `city`.`country_id`=`country`.`country_id` WHERE `city_id` > 10');
+        expect(result).toEqual('SELECT `city`.`city_id`, `country`.`country` FROM `sakila`.`city` JOIN `sakila`.`country` ON `city`.`country_id`=`country`.`country_id` WHERE `city_id` > 10');
     });
 
     it('Should convert a query finding country names starting with B', () => {
@@ -729,7 +729,7 @@ it('should be able to convert queries using pagination, where, group by, and hav
 
         const result = service.convertJsonToQuery(jsonData);
 
-        expect(result).toEqual("SELECT `country`.`country` FROM `country` WHERE `country` LIKE 'B%'");
+        expect(result).toEqual("SELECT `country`.`country` FROM `sakila`.`country` WHERE `country` LIKE 'B%'");
 
     });
 

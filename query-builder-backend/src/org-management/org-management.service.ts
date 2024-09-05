@@ -775,12 +775,9 @@ export class OrgManagementService {
       throw user_error;
     }
 
-    //get the session key
-    // const key = save_db_secrets_dto.session_key;
-
-    // use the session key to encrypt the database info
-    // console.log(key);
-    // console.log("second key length" + key.length);
+    if(!session.sessionKey){
+      throw new InternalServerErrorException('You do not have a backend session');
+    }
 
     const encryptedText = this.app_service.encrypt(
       save_db_secrets_dto.db_secrets,

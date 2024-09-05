@@ -27,7 +27,8 @@ vitest.mock("./../../utils/supabase/client", () => {
 //Mock out the API call to retrieve the table's columns
 global.fetch = vi.fn(() =>
     Promise.resolve({
-      json: () => Promise.resolve({ data: [{name: "first_name"}, {name: "last_name"}] }),
+        ok: true,
+        json: () => Promise.resolve({ data: [{name: "first_name"}, {name: "last_name"}] }),
     }),
 ) as Mock;
 
