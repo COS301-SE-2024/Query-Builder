@@ -191,8 +191,10 @@ export default function Form() {
 
     let json = await response.json();
 
-        if(response.ok){
-    
+        if (response.ok) {
+
+            console.log(json);
+
             //set the databases hook
             setDatabases(json.data);
 
@@ -217,6 +219,8 @@ export default function Form() {
     });
   };
 
+    };
+
   return (
     <>
       <div className="app overflow-visible">
@@ -239,31 +243,34 @@ export default function Form() {
                   </div>
                 }
 
-                {
-                  //include the add button if no database is selected yet
-                  query.queryParams.databaseName == '' && (
-                    <Dropdown>
-                      <DropdownTrigger>
-                        <Button variant="bordered">+</Button>
-                      </DropdownTrigger>
-                      <DropdownMenu
-                        className="max-h-[50vh] overflow-y-auto"
-                        items={databases}
-                        onAction={(key) => handleDatabaseSelection(key)}
-                      >
-                        {(item: any) => (
-                          <DropdownItem key={item.SCHEMA_NAME}>
-                            {item.SCHEMA_NAME}
-                          </DropdownItem>
-                        )}
-                      </DropdownMenu>
-                    </Dropdown>
-                  )
-                }
-              </CardBody>
-            </Card>
+                            {//include the add button if no database is selected yet
+                                (query.queryParams.databaseName == "") && (
+                                    <Dropdown>
+                                        <DropdownTrigger>
+                                            <Button variant="bordered">+</Button>
+                                        </DropdownTrigger>
+                                        <DropdownMenu 
+                                                className="max-h-[50vh] overflow-y-auto"
+                                                emptyContent="Loading databases..."
+                                                items={databases} 
+                                                onAction={(key) => handleDatabaseSelection(key)}
+                                            >
+                                                {(item:any) => (
+                                                <DropdownItem
+                                                    key={item.SCHEMA_NAME}
+                                                >
+                                                    {item.SCHEMA_NAME}
+                                                </DropdownItem>
+                                                )}
+                                            </DropdownMenu>
+                                    </Dropdown>
+                                )
+                            }
 
-            <Spacer y={2} />
+                            </CardBody>
+                        </Card>
+
+                        <Spacer y={2} />
 
             {/* Select tables */}
             {query.queryParams.databaseName != '' && (
@@ -277,75 +284,83 @@ export default function Form() {
 
             <Spacer y={2} />
 
-            {/* Add filters */}
-            {query.queryParams.table.name != '' && (
-              <FilterList
-                condition={query.queryParams.condition! as compoundCondition}
-                table={query.queryParams.table}
-                databaseServerID={databaseServerID[0]}
-                onChange={updateCondition}
-              />
-            )}
-          </CardBody>
-          <CardFooter>
-            <>
-              <div style={{ display: 'flex', gap: '3px' }}>
-                <Button
-                  aria-label="query button"
-                  onPress={onOpen}
-                  color="primary"
-                >
-                  Query
-                </Button>
-                <SaveQueryModal query={query} />
-                <Button
-                  color="primary"
-                  onClick={() => {
-                    setQuery({
-                      databaseServerID: databaseServerID[0],
-                      queryParams: {
-                        language: 'sql',
-                        query_type: 'select',
-                        databaseName: '',
-                        table: {
-                          name: '',
-                          columns: [],
-                        },
-                      },
-                    });
-                    setCondition(undefined);
-                  }}
-                >
-                  Clear Form
-                </Button>
-              </div>
-              <Modal
-                isOpen={isOpen}
-                onOpenChange={onOpenChange}
-                placement="top-center"
-                className="text-black h-100vh"
-                size="full"
-              >
-                <ModalContent>
-                  {(onClose: any) => (
-                    <>
-                      <ModalHeader className="flex flex-col gap-1">
-                        Query Results
-                      </ModalHeader>
-                      <TableResponse
-                        query={getMergedQuery()}
-                        metadata={{
-                          title: `Report on ${query?.queryParams.databaseName}`,
-                        }}
-                      />
-                    </>
-                  )}
-                </ModalContent>
-              </Modal>
-            </>
-          </CardFooter>
-        </Card>
-      </div>
-    </>
-  );
+                        {/* Add filters */}
+                        {
+                            (query.queryParams.table.name != "") && (
+                                <FilterList
+                                    condition={query.queryParams.condition! as compoundCondition}
+                                    table={query.queryParams.table}
+                                    databaseServerID={databaseServerID[0]}
+                                    onChange={updateCondition}
+                                />
+                            )
+                        }
+                    </CardBody>
+                    <CardFooter>
+                        <>
+                            <div style={{ display: 'flex', gap: '3px' }}>
+                                <div style={{ display: "inline-block" }}>
+                                    <Tooltip
+                                        content="Please select at least one column to run a query"
+                                        placement="top"
+                                        isDisabled={query.queryParams.table.columns.length !== 0}
+                                    >
+                                        <div>
+                                            <Button
+                                                onPress={onOpen}
+                                                color="primary"
+                                                isDisabled={query.queryParams.table.columns.length === 0}
+                                            >
+                                                Query
+                                            </Button>
+                                        </div>
+                                    </Tooltip>
+                                </div>
+                                <SaveQueryModal query={query} />
+                                <Button
+                                    color="primary"
+                                    onClick={() => {
+                                        setQuery({
+                                            databaseServerID: databaseServerID[0],
+                                            queryParams: {
+                                                language: "sql",
+                                                query_type: "select",
+                                                databaseName: "",
+                                                table: {
+                                                    name: "",
+                                                    columns: []
+                                                }
+                                            }
+                                        });
+                                        setCondition(undefined);
+                                    }}                                >
+                                    Clear Form
+                                </Button>
+                            </div>
+                            <Modal
+                                isOpen={isOpen}
+                                onOpenChange={onOpenChange}
+                                placement="top-center"
+                                className="text-black h-100vh"
+                                size="full">
+                                <ModalContent>
+                                    {(onClose: any) => (
+                                        <>
+                                            <ModalHeader className="flex flex-col gap-1">Query Results</ModalHeader>
+                                            <TableResponse query={getMergedQuery()} 
+                                                metadata={{
+                                                  title: `Report on ${query?.queryParams.databaseName}`,
+                                                }} 
+                                            />
+                                        </>
+                                    )}
+                                </ModalContent>
+                            </Modal>
+                        </>
+                    </CardFooter>
+                </Card>
+            </div>
+        </>
+    )
+
 }
