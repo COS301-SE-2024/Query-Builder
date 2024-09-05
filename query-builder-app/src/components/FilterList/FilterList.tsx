@@ -182,7 +182,7 @@ export default function FilterList(props: FilterListProps){
             return(
                 <>
                 {compoundCondition.conditions.map((subCondition, index) => (
-                    <FilterChip key={index} primitiveCondition={subCondition as primitiveCondition} onChange={updateCondition} />
+                    <FilterChip key={index} primitiveCondition={subCondition as primitiveCondition} onChange={updateCondition} onRemove={removeCondition}/>
                 ))}
                 </>
             );
@@ -209,6 +209,17 @@ export default function FilterList(props: FilterListProps){
         });
 
     }
+
+    function removeCondition(primitiveConditionToRemove: primitiveCondition) {
+        const updatedConditions = condition.conditions.filter(cond => 
+            cond !== primitiveConditionToRemove
+        );
+        
+        setCondition((previousConditionState) => {
+            return { ...previousConditionState, conditions: updatedConditions };
+        });
+    }
+    
 
     return (
 
