@@ -12,6 +12,6 @@ export default {
 // Can have multiple different variants of a component
 export const DefaultDatabaseCredentialsModal = {
 
-    render: () => <DatabaseCredentialsModal dbServerID="1234"/> // this function specifies how we want to render this variant of the component
+    render: () => <DatabaseCredentialsModal disclosure={null} dbServerID="1234" onConnected={() => {}}/> // this function specifies how we want to render this variant of the component
 
 };

@@ -10,6 +10,8 @@ require("dotenv").config();
 
 interface DatabaseCredentialsModalProps {
   dbServerID: String
+  disclosure: any
+  onConnected: () => void
 }
 
 // This function gets the token from local storage.
@@ -26,7 +28,7 @@ const getToken = async () => {
 
 export default function DatabaseCredentialsModal(props: DatabaseCredentialsModalProps){
 
-    const {isOpen, onOpen, onOpenChange} = useDisclosure();
+    const {isOpen, onOpen, onOpenChange} = props.disclosure;
 
     //React hook to store whether the user wants QBee to remember their database credentials or not
     const [rememberDatabaseCredentials, setRememberDatabaseCredentials] = useState(false);
@@ -53,8 +55,7 @@ export default function DatabaseCredentialsModal(props: DatabaseCredentialsModal
     async function connectToDatabaseServer(user:String, password:String){
 
       //if rememberDatabaseCredentials is set, save the db_secrets
-      //change this later - for now always save
-      if(true){
+      if(rememberDatabaseCredentials){
 
         //create a db_secrets object
         const db_secrets = {
@@ -92,17 +93,19 @@ export default function DatabaseCredentialsModal(props: DatabaseCredentialsModal
 
       }
 
+      //connect to the database, and navigate to the form if the connection is successful
+
+      //call the api/connect endpoint
+
     }
 
     return (
 
-        <>
-        <Button aria-label="connect to database server button" onPress={onOpen} color="primary">Connect</Button>
         <Modal 
           isOpen={isOpen} 
-          onOpenChange={onOpenChange}
           placement="top-center"
           className="text-black"
+          onOpenChange={onOpenChange}
         >
           <ModalContent>
             {(onClose : any) => (
@@ -157,7 +160,6 @@ export default function DatabaseCredentialsModal(props: DatabaseCredentialsModal
             )}
           </ModalContent>
         </Modal>
-      </>
     )
 
 }

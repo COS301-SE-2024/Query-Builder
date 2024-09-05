@@ -1,9 +1,11 @@
 "use client"
-import { Chip, Spacer, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Link} from "@nextui-org/react"
+import { Chip, Spacer, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Link, useDisclosure} from "@nextui-org/react"
 import DatabaseAdditionModal from "../DatabaseAdditionModal/DatabaseAdditionModal"
 import React from "react";
 import { createClient } from "./../../utils/supabase/client";
 import AddOrganisationModal from "../AddOrganisationModal/AddOrganisationModal";
+import { navigateToForm } from "@/app/serverActions";
+import DatabaseCredentialsModal from "../DatabaseCredentialsModal/DatabaseCredentialsModal";
 
 
 interface Database {
@@ -37,6 +39,37 @@ const getToken = async () => {
 
 export default function SignedInHomePage(){
 
+    //async function to query a database server
+    async function queryDatabaseServer(databaseServerID: string) {
+
+        //first determine whether the user has db secrets saved for the database server
+        let dbSecretsSavedResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/has-saved-db-credentials`, {
+            credentials: "include",
+            method: "POST",
+            headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + await getToken()
+            },
+            body: JSON.stringify({
+                db_id: databaseServerID
+            })
+        });
+
+        const dbSecretsSaved = (await dbSecretsSavedResponse.json()).saved_db_credentials;
+
+        //if the user doesn't have db credentials saved for that database, then prompt them for their credentials
+        if(dbSecretsSaved === false){
+            credentialsModalDisclosure.onOpen();
+            setCurrentDBServerID(databaseServerID);
+        }
+        else{
+            //should actually successfully connect first
+            navigateToForm(databaseServerID);
+        }
+
+    }
+
     //async function to fetch the user's organisations
     async function fetchOrgs() {
         
@@ -60,6 +93,12 @@ export default function SignedInHomePage(){
 
     }
 
+    //React hook to show the credentials modal
+    const credentialsModalDisclosure = useDisclosure();
+
+    //React hook for the current DB server ID
+    const [currentDBServerID, setCurrentDBServerID] = React.useState('');
+
     //React hook to hold the user's organisations
     const [organisations, setOrganisations] = React.useState([]);
 
@@ -71,43 +110,45 @@ export default function SignedInHomePage(){
     },[])
 
     return (
-        
-        <div className="p-5 app">
-        <div className="flex justify-between">
-            <h1 className="text-5xl">Your Organisations</h1>
-            <AddOrganisationModal on_add={fetchOrgs} ></AddOrganisationModal>
-        </div>
-        <Spacer y={10}/>
-        {organisations ? organisations.map((org: Organisation) => (
-            <>
-                <div className="flex">
-                    <h1 className="text-3xl flex-1">{org.name}</h1>
-                    <DatabaseAdditionModal org_id={org.org_id} on_add={fetchOrgs}/>
-                    <Spacer x={5} />
-                    <Link href={"/organisation/" + org.org_id}>settings</Link>
-                </div>
+        <>
+            <DatabaseCredentialsModal dbServerID={currentDBServerID} disclosure={credentialsModalDisclosure} onConnected={() => {navigateToForm(currentDBServerID)}}/>
+            <div className="p-5 app">
+            <div className="flex justify-between">
+                <h1 className="text-5xl">Your Organisations</h1>
+                <AddOrganisationModal on_add={fetchOrgs} ></AddOrganisationModal>
+            </div>
+            <Spacer y={10}/>
+            {organisations ? organisations.map((org: Organisation) => (
+                <>
+                    <div className="flex">
+                        <h1 className="text-3xl flex-1">{org.name}</h1>
+                        <DatabaseAdditionModal org_id={org.org_id} on_add={fetchOrgs}/>
+                        <Spacer x={5} />
+                        <Link href={"/organisation/" + org.org_id}>settings</Link>
+                    </div>
 
-                <Spacer y={5}/>
+                    <Spacer y={5}/>
 
-                <Table 
-                    removeWrapper aria-label="table with dynamic content">
-                    <TableHeader>
-                        <TableColumn>Name</TableColumn>
-                    </TableHeader>
-                    <TableBody>
-                        {org.db_envs.map((db: Database) => 
-                            (
-                            <TableRow key={db.db_id}>
-                                <TableCell><Link href={"/"+db.db_id}>{db.name}</Link></TableCell>
-                            </TableRow>
-                            )
-                        )}
-                    </TableBody>
-                </Table>
-                <Spacer y={5}/>
-            </>
-        )): <></>}
-        </div>
+                    <Table 
+                        removeWrapper aria-label="table with dynamic content">
+                        <TableHeader>
+                            <TableColumn>Name</TableColumn>
+                        </TableHeader>
+                        <TableBody>
+                            {org.db_envs.map((db: Database) => 
+                                (
+                                <TableRow key={db.db_id}>
+                                    <TableCell><Link onPress={() => {queryDatabaseServer(db.db_id)}}>{db.name}</Link></TableCell>
+                                </TableRow>
+                                )
+                            )}
+                        </TableBody>
+                    </Table>
+                    <Spacer y={5}/>
+                </>
+            )): <></>}
+            </div>
+        </>
 
 )
 
