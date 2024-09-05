@@ -8,7 +8,7 @@ import { MdMic } from 'react-icons/md';
 import useSpeechToText from 'react-hook-speech-to-text';
 
 export default function NaturalLanguage() {
-    const { databaseServerID } = useParams<{ databaseServerID: string }>(); // Move this to the top
+    const { databaseServerID } = useParams<{ databaseServerID: string }>(); 
     const [value, setValue] = useState("");
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const [queryLoaded, setQueryLoaded] = useState(false);
