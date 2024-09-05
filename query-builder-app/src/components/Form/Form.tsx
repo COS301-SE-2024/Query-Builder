@@ -5,7 +5,7 @@
 import "../../app/globals.css"
 import React, { useState } from "react";
 import { useParams } from 'next/navigation'
-import { Button, Spacer, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Card, CardHeader, CardBody, CardFooter, useDisclosure, ModalContent, Modal, ModalHeader, DropdownSection, ButtonGroup } from "@nextui-org/react";
+import { Button, Spacer, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Card, CardHeader, CardBody, CardFooter, useDisclosure, ModalContent, Modal, ModalHeader, DropdownSection, ButtonGroup, Tooltip } from "@nextui-org/react";
 import TableResponse from "../TableResponse/TableResponse";
 import { createClient } from "./../../utils/supabase/client";
 import { compoundCondition, condition, LogicalOperator, Query, table } from "@/interfaces/intermediateJSON";
@@ -187,8 +187,10 @@ export default function Form() {
 
         let json = await response.json();
 
-        if(response.ok){
-    
+        if (response.ok) {
+
+            console.log(json);
+
             //set the databases hook
             setDatabases(json.data);
 
@@ -296,30 +298,40 @@ export default function Form() {
                     <CardFooter>
                         <>
                             <div style={{ display: 'flex', gap: '3px' }}>
+                                <div style={{ display: "inline-block" }}>
+                                    <Tooltip
+                                        content="Please select at least one column to run a query"
+                                        placement="top"
+                                        isDisabled={query.queryParams.table.columns.length !== 0}
+                                    >
+                                        <div>
+                                            <Button
+                                                onPress={onOpen}
+                                                color="primary"
+                                                isDisabled={query.queryParams.table.columns.length === 0}
+                                            >
+                                                Query
+                                            </Button>
+                                        </div>
+                                    </Tooltip>
+                                </div>
+                                <SaveQueryModal query={query} />
                                 <Button
-                                    aria-label="query button"
-                                    onPress={onOpen}
                                     color="primary"
-                                >
-                                    Query
-                                </Button>
-                                <SaveQueryModal query={query}/>
-                                <Button
-                                    color="primary"
-                                    onClick={() => { 
-                                        setQuery({ 
-                                          databaseServerID: databaseServerID[0], 
-                                          queryParams: { 
-                                            language: "sql", 
-                                            query_type: "select", 
-                                            databaseName: "", 
-                                            table: { 
-                                              name: "", 
-                                              columns: [] 
-                                            } 
-                                          } 
-                                        }) 
-                                      }}                                >
+                                    onClick={() => {
+                                        setQuery({
+                                            databaseServerID: databaseServerID[0],
+                                            queryParams: {
+                                                language: "sql",
+                                                query_type: "select",
+                                                databaseName: "",
+                                                table: {
+                                                    name: "",
+                                                    columns: []
+                                                }
+                                            }
+                                        })
+                                    }}                                >
                                     Clear Form
                                 </Button>
                             </div>
