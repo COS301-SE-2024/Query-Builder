@@ -254,46 +254,97 @@ export default function TableList(props: TableListProps){
 
     }
 
-    function createTableCard(tableRef: table){
-
-        return(
+    function createTableCard(tableRef: table) {
+        return (
             <Card className="w-full">
                 <CardBody className="flex flex-row items-center space-x-2">
-        
-                {//div for the name
+                    {/* div for the name */}
                     <div className="flex flex-1">
                         {tableRef.name}
                     </div>
-                }
-        
-                {//make sure to include the join button for the last table
-                    (tableRef.join == null) && (joinableTables.length > 0) && (
+
+                    {/* Add button for removing the table */}
+                    {tableRef.name && (
+                        <Button
+                            variant="bordered"
+                            aria-label="remove table button"
+                            onClick={() => removeTableJoin(tableRef)}
+                        >
+                            -
+                        </Button>
+                    )}
+
+                    {/* Add button for joining a new table */}
+                    {tableRef.join == null && joinableTables.length > 0 && (
                         <Dropdown>
                             <DropdownTrigger>
                                 <Button variant="bordered" aria-label="add table button">+</Button>
                             </DropdownTrigger>
-                            <DropdownMenu 
-                                    className="max-h-[50vh] overflow-y-auto"
-                                    items={joinableTables} 
-                                    onAction={(key) => handleTableSelection(key, tableRef)}
-                                >
-                                    {(item:any) => (
-                                    <DropdownItem
-                                        key={item.table_name}
-                                    >
+                            <DropdownMenu
+                                className="max-h-[50vh] overflow-y-auto"
+                                items={joinableTables}
+                                onAction={(key) => handleTableSelection(key, tableRef)}
+                            >
+                                {(item: any) => (
+                                    <DropdownItem key={item.table_name}>
                                         {item.table_name}
                                     </DropdownItem>
-                                    )}
-                                </DropdownMenu>
+                                )}
+                            </DropdownMenu>
                         </Dropdown>
-                    )
-                }
-        
+                    )}
                 </CardBody>
             </Card>
-        )
-
+        );
     }
+
+    function removeTableJoin(tableRef: table) {
+        setTable((previousTableState) => {
+            function removeTable(tableState: table): table | null {
+                if (tableState.name === tableRef.name) {
+                    return null; 
+                }
+    
+                if (tableState.join) {
+                    const updatedJoin = removeTable(tableState.join.table2);
+    
+                    if (updatedJoin === null && tableState.join.table2.name === tableRef.name) {
+                        return {
+                            ...tableState,
+                            join: undefined 
+                        };
+                    }
+    
+                    return {
+                        ...tableState,
+                        join: {
+                            ...tableState.join,
+                            table2: updatedJoin || {
+                                name: "",
+                                columns: []
+                            }
+                        }
+                    };
+                }
+    
+                return tableState; 
+            }
+    
+            const updatedTable = removeTable(previousTableState);
+    
+            if (updatedTable === null) {
+                return {
+                    name: "",
+                    columns: []
+                };
+            }
+    
+            fetchJoinableTables(props.databaseName, updatedTable.name);
+    
+            return updatedTable;
+        });
+    }
+    
 
     //----------------------------CREATE THE ARRAYS OF TABLES AND TABLE FORMS------------------------------------//
 
