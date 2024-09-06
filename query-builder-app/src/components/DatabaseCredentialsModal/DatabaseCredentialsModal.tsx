@@ -3,13 +3,14 @@ import "../../app/globals.css"
 import React, { useState } from "react";
 import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Checkbox, Tooltip} from "@nextui-org/react";
 import { createClient } from "./../../utils/supabase/client";
+import { navigateToForm } from "@/app/serverActions";
 
 require("dotenv").config();
 
 //interface for the props to DatabaseCredentialsModal
 
 interface DatabaseCredentialsModalProps {
-  dbServerID: String
+  dbServerID: string
   disclosure: any
   onConnected: () => void
 }
@@ -52,7 +53,7 @@ export default function DatabaseCredentialsModal(props: DatabaseCredentialsModal
       return false;
     }, [username]);
 
-    async function connectToDatabaseServer(user:String, password:String){
+    async function connectToDatabaseServer(user:string, password:string){
 
       //if rememberDatabaseCredentials is set, save the db_secrets
       if(rememberDatabaseCredentials){
@@ -85,7 +86,7 @@ export default function DatabaseCredentialsModal(props: DatabaseCredentialsModal
               db_id: props.dbServerID,
               db_secrets: db_secrets_string
           })
-        })
+        });
 
         //log response body
         let json = await response.json();
@@ -95,7 +96,30 @@ export default function DatabaseCredentialsModal(props: DatabaseCredentialsModal
 
       //connect to the database, and navigate to the form if the connection is successful
 
-      //call the api/connect endpoint
+      //call the api/connect endpoint, and include databaseServerCredentials
+      let connectionResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/connect`, {
+        credentials: "include",
+        method: "PUT",
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + await getToken()
+        },
+        body: JSON.stringify({
+            databaseServerID: props.dbServerID,
+            databaseServerCredentials: {
+              username: user,
+              password: password
+            }
+        })
+      });
+
+      let json = await connectionResponse.json();
+
+      //if connection was successful, navigate to the form
+      if(json.success === true){
+        navigateToForm(props.dbServerID);
+      }
 
     }
 
