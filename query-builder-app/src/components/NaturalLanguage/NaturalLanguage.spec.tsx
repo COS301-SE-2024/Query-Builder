@@ -5,6 +5,21 @@ import React from 'react';
 import NaturalLanguage from './NaturalLanguage';
 import userEvent from '@testing-library/user-event';
 
+// Mock the useSpeechToText hook
+vi.mock('react-hook-speech-to-text', () => {
+  return {
+    __esModule: true,
+    default: vi.fn().mockImplementation(() => ({
+      error: false,
+      interimResult: '',
+      isRecording: false,
+      results: [],
+      startSpeechToText: vi.fn(),
+      stopSpeechToText: vi.fn(),
+    })),
+  };
+});
+
 // Mock out Supabase access token retrieval
 vi.mock("./../../utils/supabase/client", () => {
   return {
