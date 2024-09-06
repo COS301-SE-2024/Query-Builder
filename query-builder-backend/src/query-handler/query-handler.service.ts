@@ -23,7 +23,7 @@ export class QueryHandlerService {
 
     const { success, connectionID } =
       await this.connectionManagerService.connectToDatabase(
-        query.databaseServerID,
+        {databaseServerID: query.databaseServerID},
         session
       );
 

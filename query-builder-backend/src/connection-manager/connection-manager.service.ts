@@ -9,6 +9,7 @@ import { Supabase } from '../supabase';
 import { AppService } from '../app.service';
 import { ConfigService } from '@nestjs/config';
 import { MyLoggerService } from '../my-logger/my-logger.service';
+import { Connect_Dto } from './dto/connect.dto';
 
 export interface ConnectionStatus {
   success: boolean;
@@ -28,9 +29,10 @@ export class ConnectionManagerService {
   }
 
   async connectToDatabase(
-    db_id: string,
+    connect_dto: Connect_Dto,
     session: Record<string, any>
   ): Promise<ConnectionStatus> {
+
       const { data: user_data, error: user_error } = await this.supabase
         .getClient()
         .auth.getUser(this.supabase.getJwt());
@@ -43,7 +45,7 @@ export class ConnectionManagerService {
         .getClient()
         .from('db_envs')
         .select('host')
-        .eq('db_id', db_id)
+        .eq('db_id', connect_dto.databaseServerID)
         .single();
       if (error) {
         this.logger.error(error, ConnectionManagerService.name);
@@ -58,7 +60,6 @@ export class ConnectionManagerService {
 
       if (session.host === host) {
         //-----------------------------EXISTING CONNECTION TO THE RIGHT HOST---------------------//
-        //check if the hashed version of the password stored in the session matches the hash of the password in the query
         //Print out that you are reconnecting to an existing session and not a new one
         this.logger.log(`[Reconnecting] ${session.id} connected to ${host}`, ConnectionManagerService.name);
         return {
@@ -76,13 +77,22 @@ export class ConnectionManagerService {
         }
 
         let user: any, password: any;
-        try{
-          let { user: decryptedUser, password: decryptedPassword } = await this.decryptDbSecrets(db_id, session);
-          user = decryptedUser;
-          password = decryptedPassword;
+
+        //If database credentials are provided, then use those
+        if(connect_dto.databaseServerCredentials){
+          user = connect_dto.databaseServerCredentials.username;
+          password = connect_dto.databaseServerCredentials.password;
         }
-        catch(err){
-          throw err;
+        //Otherwise, try find and decrypt saved credentials for the database
+        else{
+          try{
+            let { user: decryptedUser, password: decryptedPassword } = await this.decryptDbSecrets(connect_dto.databaseServerID, session);
+            user = decryptedUser;
+            password = decryptedPassword;
+          }
+          catch(err){
+            throw err;
+          }
         }
 
         const connection = require('mysql').createConnection({

@@ -1,9 +1,6 @@
-import {Body, Controller, HttpCode, Post, Put, Session} from '@nestjs/common';
+import {Body, Controller, HttpCode, Post, Put, Session, ValidationPipe} from '@nestjs/common';
 import { ConnectionManagerService } from "../connection-manager/connection-manager.service";
-
-interface ConnectRequest{
-    databaseServerID: string
-}
+import { Connect_Dto } from './dto/connect.dto';
 
 @Controller('connect')
 export class ConnectionManagerController {
@@ -12,7 +9,7 @@ export class ConnectionManagerController {
 
     //end point to test connection to the database server
     @Put()
-    async connect(@Body() connectRequest: ConnectRequest, @Session() session: Record<string, any>) {
-        return this.connectionManagerService.connectToDatabase(connectRequest.databaseServerID, session);
+    async connect(@Body(ValidationPipe) connect_dto: Connect_Dto, @Session() session: Record<string, any>) {
+        return this.connectionManagerService.connectToDatabase(connect_dto, session);
     }
 }
