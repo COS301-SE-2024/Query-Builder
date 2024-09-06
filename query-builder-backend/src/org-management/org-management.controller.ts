@@ -99,7 +99,7 @@ export class OrgManagementController {
   }
 
   @Post ('setup-test-scenario')
-  async setupTestScenario(@Session() session: Record<string, any>) {
+  async setUpTestScenario(@Session() session: Record<string, any>) {
     return this.org_management_service.setUpTestScenario(session);
   }
 
