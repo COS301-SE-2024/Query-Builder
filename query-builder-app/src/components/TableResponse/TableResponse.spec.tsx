@@ -19,7 +19,7 @@ describe('TableResponse basic rendering tests', () => {
             }
         }
 
-        const {baseElement} = render(<TableResponse query={queryProp} />);
+        const {baseElement} = render(<TableResponse query={queryProp} metadata={{title:queryProp.queryParams.databaseName}}/>);
         expect(baseElement).toBeTruthy();
 
     });

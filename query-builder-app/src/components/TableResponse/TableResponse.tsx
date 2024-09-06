@@ -1,15 +1,30 @@
-"use client"
-import "../../app/globals.css"
-import React, { useEffect, useState } from "react";
-import {Table, TableHeader, TableBody, TableColumn, TableRow, TableCell, getKeyValue, Spinner, Pagination, Button, useDisclosure, Modal, ModalContent, ModalHeader} from "@nextui-org/react";
-import {useAsyncList} from "@react-stately/data";
-import Report from "../Report/Report";
-import csvDownload from 'json-to-csv-export'
-import { Query } from "@/interfaces/intermediateJSON";
-import { createClient } from "./../../utils/supabase/client";
-import SaveQueryModal from "../SaveQueryModal/SaveQueryModal";
-import {Metadata} from "../Report/Report"
-import { navigateToAuth } from "../../app/authentication/actions";
+'use client';
+import '../../app/globals.css';
+import React,{ useEffect, useState } from 'react';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableColumn,
+  TableRow,
+  TableCell,
+  getKeyValue,
+  Spinner,
+  Pagination,
+  Button,
+  useDisclosure,
+  Modal,
+  ModalContent,
+  ModalHeader,
+} from '@nextui-org/react';
+import { useAsyncList } from '@react-stately/data';
+import Report from '../Report/Report';
+import csvDownload from 'json-to-csv-export';
+import { Query } from '@/interfaces/intermediateJSON';
+import { createClient } from './../../utils/supabase/client';
+import SaveQueryModal from '../SaveQueryModal/SaveQueryModal';
+import { Metadata } from '../Report/Report';
+import { navigateToAuth } from '../../app/authentication/actions';
 
 interface Column {
   key: string;
@@ -86,26 +101,28 @@ export default function TableResponse(props: TableResponseProps) {
 
   async function getAllData() {
     //fetch the data from the endpoint
-    let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query`, {
-      credentials: "include",
-      method: "POST",
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + await getToken()
+    let response = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query`,
+      {
+        credentials: 'include',
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + (await getToken()),
+        },
+        body: JSON.stringify(props.query),
       },
-      body: JSON.stringify(props.query)
-    })
+    );
 
     let json = await response.json();
     let jsonData = json.data;
 
-    if(response.ok){
-
+    if (response.ok) {
       //remove qbee_id
-      jsonData.map(function(item: any) { 
-        delete item.qbee_id; 
-        return item; 
+      jsonData.map(function (item: any) {
+        delete item.qbee_id;
+        return item;
       });
 
       return jsonData;
@@ -116,9 +133,7 @@ export default function TableResponse(props: TableResponseProps) {
       if(json.response && json.response.message == 'You do not have a backend session'){
           navigateToAuth();
       }
-
     }
-
   }
 
   //Create an async list that will hold the query response data upon load
@@ -162,14 +177,14 @@ export default function TableResponse(props: TableResponseProps) {
 
       let json = await response.json();
 
-      if(response.ok){
+      if (response.ok) {
         setLoading(false);
 
         //set totalNumberOfPages
         const totalNumberOfRows = json.totalNumRows;
-        const totalNumberOfPages = Math.ceil(totalNumberOfRows/rowsPerPage);
+        const totalNumberOfPages = Math.ceil(totalNumberOfRows / rowsPerPage);
         setTotalPages(totalNumberOfPages);
-  
+
         return {
           items: json.data
         }; 
@@ -181,13 +196,10 @@ export default function TableResponse(props: TableResponseProps) {
         }
 
         return {
-          items: []
+          items: [],
         };
-
       }
-    
     },
-
   });
 
   //reload the tableData after updating pageNumber
@@ -195,7 +207,7 @@ export default function TableResponse(props: TableResponseProps) {
     tableData.reload();
   }, [pageNumber, rowsPerPage]);
 
-  //get all data on load of 
+  //get all data on load of
   useEffect(() => {
     const fetchData = async () => {
       setResults(await getAllData());
@@ -301,7 +313,10 @@ export default function TableResponse(props: TableResponseProps) {
             <ModalHeader className="flex flex-col gap-1">
               Query Report
             </ModalHeader>
-            <Report data={results as JSON[]} metadata={{ title: `${props.metadata.title}` }} />
+            <Report
+              data={results as JSON[]}
+              metadata={{ title: `${props.metadata.title}` }}
+            />
           </ModalContent>
         </Modal>
       </div>
