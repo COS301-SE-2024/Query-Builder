@@ -12,17 +12,21 @@ export default {
 // Can have multiple different variants of a component
 export const DefaultTableResponse = {
 
-    render: () => <TableResponse query={{
-        databaseServerID: "mockServerID",
-        queryParams: {
-            databaseName: "sakila",
-            language: "sql",
-            query_type: "select",
-            table: {
-                name: "film",
-                columns: [{name: "title"}, {name:"release_year"}, {name:"rating"}, {name:"rental_rate"}, {name:"rental_duration"}, {name:"language_id"}],
-            },
-        }
-    }}/> // this function specifies how we want to render this variant of the component
-
+    render: () =>
+    // <TableResponse
+    // query={{
+    //     databaseServerID: "mockServerID",
+    //     queryParams: {
+    //         databaseName: "sakila",
+    //         language: "sql",
+    //         query_type: "select",
+    //         table: {
+    //             name: "film",
+    //             columns: [{name: "title"}, {name:"release_year"}, {name:"rating"}, {name:"rental_rate"}, {name:"rental_duration"}, {name:"language_id"}],
+    //         },
+    //     }
+    // }}
+    // metadata = {{title: "Report on Sakila"}}
+    // /> // this function specifies how we want to render this variant of the component
+    <></>
 };
