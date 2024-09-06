@@ -33,8 +33,8 @@ import {
 } from '@/interfaces/intermediateJSON';
 import TableList from '../TableList/TableList';
 import FilterList from '../FilterList/FilterList';
-import { navigateToAuth } from "../../app/authentication/actions";
-import SaveQueryModal from "../SaveQueryModal/SaveQueryModal";
+import { navigateToAuth } from '../../app/authentication/actions';
+import SaveQueryModal from '../SaveQueryModal/SaveQueryModal';
 
 //----------------------------INTERFACES------------------------------------//
 
@@ -42,17 +42,17 @@ interface Database {
   SCHEMA_NAME: string;
 }
 
-export default function Form()  {
+export default function Form() {
   //----------------------------REACT HOOKS------------------------------------//
 
-    //React hook for URL params
-    const { databaseServerID } = useParams<{ databaseServerID: string }>();
+  //React hook for URL params
+  const { databaseServerID } = useParams<{ databaseServerID: string }>();
 
-    //React hook for results modal
-    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  //React hook for results modal
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-    //React hook for all the databases in the database server
-    const [databases, setDatabases] = useState<Database[]>([]);
+  //React hook for all the databases in the database server
+  const [databases, setDatabases] = useState<Database[]>([]);
 
   //React hook containing the Query the user is busy building
   const [query, setQuery] = useState<Query>({
@@ -143,9 +143,9 @@ export default function Form()  {
         credentials: 'include',
         method: 'PUT',
         headers: {
-          'Accept': 'application/json',
+          Accept: 'application/json',
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + (await getToken()),
+          Authorization: 'Bearer ' + (await getToken()),
         },
         body: JSON.stringify({
           query_id: databaseServerID[1],
@@ -179,9 +179,9 @@ export default function Form()  {
         credentials: 'include',
         method: 'PUT',
         headers: {
-          'Accept': 'application/json',
+          Accept: 'application/json',
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + (await getToken()),
+          Authorization: 'Bearer ' + (await getToken()),
         },
         body: JSON.stringify({
           databaseServerID: databaseServerID[0],
@@ -189,7 +189,7 @@ export default function Form()  {
       },
     );
 
-        let json = await response.json();
+    let json = await response.json();
 
         if(response.ok){
     
@@ -277,71 +277,74 @@ export default function Form()  {
 
             <Spacer y={2} />
 
-                        {/* Add filters */}
-                        {
-                            (query.queryParams.table.name != "") && (
-                                <FilterList
-                                    condition={query.queryParams.condition! as compoundCondition}
-                                    table={query.queryParams.table}
-                                    databaseServerID={databaseServerID[0]}
-                                    onChange={updateCondition}
-                                />
-                            )
-                        }
-                    </CardBody>
-                    <CardFooter>
-                        <>
-                            <div style={{ display: 'flex', gap: '3px' }}>
-                                <Button
-                                    aria-label="query button"
-                                    onPress={onOpen}
-                                    color="primary"
-                                >
-                                    Query
-                                </Button>
-                                <SaveQueryModal query={query}/>
-                                <Button
-                                    color="primary"
-                                    onClick={() => { 
-                                        setQuery({ 
-                                          databaseServerID: databaseServerID[0], 
-                                          queryParams: { 
-                                            language: "sql", 
-                                            query_type: "select", 
-                                            databaseName: "", 
-                                            table: { 
-                                              name: "", 
-                                              columns: [] 
-                                            } 
-                                          } 
-                                        }) 
-                                      }}                                >
-                                    Clear Form
-                                </Button>
-                            </div>
-                            <Modal
-                                isOpen={isOpen}
-                                onOpenChange={onOpenChange}
-                                placement="top-center"
-                                className="text-black h-100vh"
-                                size="full">
-                                <ModalContent>
-                                    {(onClose: any) => (
-                                        <>
-                                            <ModalHeader className="flex flex-col gap-1">Query Results</ModalHeader>
-                                            <TableResponse
-                                            query={getMergedQuery()}
-                                            metadata={{title: `Report on ${query?.queryParams.databaseName}`}}
-                                            />
-                                        </>
-                                    )}
-                                </ModalContent>
-                            </Modal>
-                        </>
-                    </CardFooter>
-                </Card>
-            </div>
-        </>
-    )
-
+            {/* Add filters */}
+            {query.queryParams.table.name != '' && (
+              <FilterList
+                condition={query.queryParams.condition! as compoundCondition}
+                table={query.queryParams.table}
+                databaseServerID={databaseServerID[0]}
+                onChange={updateCondition}
+              />
+            )}
+          </CardBody>
+          <CardFooter>
+            <>
+              <div style={{ display: 'flex', gap: '3px' }}>
+                <Button
+                  aria-label="query button"
+                  onPress={onOpen}
+                  color="primary"
+                >
+                  Query
+                </Button>
+                <SaveQueryModal query={query} />
+                <Button
+                  color="primary"
+                  onClick={() => {
+                    setQuery({
+                      databaseServerID: databaseServerID[0],
+                      queryParams: {
+                        language: 'sql',
+                        query_type: 'select',
+                        databaseName: '',
+                        table: {
+                          name: '',
+                          columns: [],
+                        },
+                      },
+                    });
+                  }}
+                >
+                  Clear Form
+                </Button>
+              </div>
+              <Modal
+                isOpen={isOpen}
+                onOpenChange={onOpenChange}
+                placement="top-center"
+                className="text-black h-100vh"
+                size="full"
+              >
+                <ModalContent>
+                  {(onClose: any) => (
+                    <>
+                      <ModalHeader className="flex flex-col gap-1">
+                        Query Results
+                      </ModalHeader>
+                      <TableResponse
+                        query={getMergedQuery()}
+                        metadata={{
+                          title: `Report on ${query?.queryParams.databaseName}`,
+                        }}
+                      />
+                    </>
+                  )}
+                </ModalContent>
+              </Modal>
+            </>
+          </CardFooter>
+        </Card>
+      </div>
+    </>
+  );
 }
