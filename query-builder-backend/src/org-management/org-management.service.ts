@@ -683,6 +683,83 @@ export class OrgManagementService {
   //   return { db_data };
   // }
 
+  async setUpTestScenario(session: Record<string, any>) {
+    const { data: user_data, error: user_error } = await this.supabase
+      .getClient()
+      .auth.getUser(this.supabase.getJwt());
+
+    if (user_error) {
+      throw user_error;
+    }
+
+    // Get name and surname
+    const { data: profile_data, error: profile_error } = await this.supabase
+      .getClient()
+      .from('profiles')
+      .select()
+      .eq('user_id', user_data.user.id);
+
+    if (profile_error) {
+      throw profile_error;
+    }
+
+    // Create org for them if it doesnt exist
+    let { data: org_data, error: org_error } = await this.supabase
+      .getClient()
+      .from('organisations')
+      .select()
+      .eq('owner_id', user_data.user.id)
+      .eq('name', `${profile_data[0].name}'s Organisation`);
+
+    if (org_error) {
+      throw org_error;
+    }
+
+    if (org_data.length === 0) {
+      const create_org_dto = {
+        owner_id: user_data.user.id,
+        name: `${profile_data[0].first_name}'s Organisation`
+      };
+
+      const { data: org_created_data } = await this.createOrg(create_org_dto);
+      org_data = org_created_data;
+    }
+
+    // Add database to organisation if not already added
+    let { data: db_data, error: db_error } = await this.supabase
+      .getClient()
+      .from('db_envs')
+      .select()
+      .eq('org_id', org_data[0].org_id)
+      .eq('name', 'Test Database');
+
+    if(db_error) {
+      throw db_error;
+    }
+
+    if (db_data.length === 0) {
+      const add_db_dto = {
+        org_id: org_data[0].org_id,
+        name: 'Test Database',
+        type: 'mysql',
+        host: '127.0.0.1'
+      };
+
+      const { data: db_created_data } = await this.addDb(add_db_dto);
+      db_data = db_created_data;
+    }
+
+    // Add database secrets to said database
+    const save_db_secrets_dto = {
+      db_id: db_data[0].db_id,
+      db_secrets: '{"username": "root", "password": "password"}'
+    };
+
+    const { data: db_secrets_data } = await this.saveDbSecrets(save_db_secrets_dto, session);
+
+    return { data: db_secrets_data };
+  }
+
   async giveDbAccess(give_db_access_dto: Give_Db_Access_Dto) {
     const { data: user_data, error: owner_error } = await this.supabase
       .getClient()
@@ -753,12 +830,14 @@ export class OrgManagementService {
       throw error;
     }
     if (data.length === 0) {
-      throw new UnauthorizedException('You do not have access to this database');
+      throw new UnauthorizedException(
+        'You do not have access to this database'
+      );
     }
 
     return {
       saved_db_credentials: data[0].db_secrets !== null ? true : false
-    }
+    };
   }
 
   async saveDbSecrets(
@@ -773,8 +852,10 @@ export class OrgManagementService {
       throw user_error;
     }
 
-    if(!session.sessionKey){
-      throw new InternalServerErrorException('You do not have a backend session');
+    if (!session.sessionKey) {
+      throw new InternalServerErrorException(
+        'You do not have a backend session'
+      );
     }
 
     const encryptedText = this.app_service.encrypt(

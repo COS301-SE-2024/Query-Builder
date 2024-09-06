@@ -98,6 +98,11 @@ export class OrgManagementController {
     return this.org_management_service.addDb(add_db_dto);
   }
 
+  @Post ('setup-test-scenario')
+  async setupTestScenario(@Session() session: Record<string, any>) {
+    return this.org_management_service.setUpTestScenario(session);
+  }
+
   @Post('give-db-access')
   async giveDbAccess(
     @Body(ValidationPipe) give_db_access_dto: Give_Db_Access_Dto
