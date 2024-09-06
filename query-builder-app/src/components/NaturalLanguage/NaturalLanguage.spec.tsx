@@ -53,87 +53,98 @@ describe('NaturalLanguage basic rendering tests', () => {
   });
 });
 
-// describe('NaturalLanguage query functionality', () => {
-//   it('can make a natural language query successfully', async () => {
-//     // Mock API calls
-//     global.fetch = vi.fn((url: string, config: any) => {
-//       if (url === `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/natural-language/query`) {
-//         return Promise.resolve({
-//           ok: true,
-//           json: () => Promise.resolve({
-//             databaseServerId: "1234",
-//             queryParams: {
-//               language: "sql",
-//               query_type: "select",
-//               databaseName: "sakila",
-//               table: {
-//                 name: "actor",
-//                 columns: [
-//                   { name: "first_name" },
-//                   { name: "last_name" }
-//                 ]
-//               }
-//             }
-//           }),
-//         });
-//       }
-//       return Promise.reject();
-//     }) as Mock;
+describe('NaturalLanguage make a query', () => {
+  it('can make a natural language query', async () => {
 
-//     // Create a user that can perform actions
-//     const user = userEvent.setup();
+    //Mock out the API calls
+    global.fetch = vi.fn((url: string, config: any) => {
 
-//     render(<NaturalLanguage />);
+      if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/natural-language/query`){
+          return Promise.resolve({
+              ok: true,
+              json: () => Promise.resolve({
+                databaseServerId: "1234",
+                queryParams: {
+                  language: "sql",
+                  query_type: "select",
+                  databaseName: "sakila",
+                  table: {name: "actor", columns: [{name: "first_name"}, {name: "last_name"}]}
+                }
+            }),
+          })
+      }
 
-//     // Get the input field
-//     const inputField = screen.getByPlaceholderText("Type your query here");
+      if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query`){
+        return Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve({
+                "totalNumRows": 1,
+                "data": [
+                  {
+                    "title": "ACADEMY DINOSAUR",
+                    "qbee_id": 0
+                  },
+                ]
+          }),
+        })
+    }
 
-//     // Type a natural language query into the input field
-//     await user.type(inputField, "List all the actors' first and last names");
+    }) as Mock;
 
-//     // Get the query button
-//     const queryButton = screen.getByText("Query");
+    // Create a user that can perform actions
+    const user = userEvent.setup();
 
-//     // Click the query button
-//     await user.click(queryButton);
+    render(<NaturalLanguage />);
 
-//     // Verify if the fetch call was made and results modal is displayed
-//     expect(global.fetch).toHaveBeenCalledTimes(1);
-//     expect(global.fetch).toHaveBeenCalledWith(
-//       `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/natural-language/query`,
-//       expect.anything()
-//     );
-//   });
+    // Get the input field
+    const inputField = screen.getByPlaceholderText("Type your query here");
 
-//   it('shows an error message if the query fails', async () => {
-//     // Mock API call to return an error
-//     global.fetch = vi.fn((url: string, config: any) => {
-//       if (url === `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/natural-language/query`) {
-//         return Promise.resolve({
-//           ok: false,
-//         });
-//       }
-//       return Promise.reject();
-//     }) as Mock;
+    // Type a natural language query into the input field
+    await user.type(inputField, "List all the actors' first and last names");
 
-//     // Create a user that can perform actions
-//     const user = userEvent.setup();
+    // Get the query button
+    const queryButton = screen.getByText("Query");
 
-//     render(<NaturalLanguage />);
+    // Click the query button
+    await user.click(queryButton);
 
-//     // Get the input field
-//     const inputField = screen.getByPlaceholderText("Type your query here");
+    // Verify if the fetch call was made and results modal is displayed
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+    expect(global.fetch).toHaveBeenCalledWith(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/natural-language/query`,
+      expect.anything()
+    );
+  });
 
-//     // Type a natural language query into the input field
-//     await user.type(inputField, "List all the actors' first and last names");
+  it('shows an error message if the query fails', async () => {
+    // Mock API call to return an error
+    global.fetch = vi.fn((url: string, config: any) => {
+      if (url === `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/natural-language/query`) {
+        return Promise.resolve({
+          ok: false,
+        });
+      }
+      return Promise.reject();
+    }) as Mock;
 
-//     // Get the query button
-//     const queryButton = screen.getByText("Query");
+    // Create a user that can perform actions
+    const user = userEvent.setup();
 
-//     // Click the query button
-//     await user.click(queryButton);
+    render(<NaturalLanguage />);
 
-//     // Verify that the error message is shown
-//     expect(await screen.findByText("This feature is still in Beta - try again?")).toBeInTheDocument();
-//   });
-// });
+    // Get the input field
+    const inputField = screen.getByPlaceholderText("Type your query here");
+
+    // Type a natural language query into the input field
+    await user.type(inputField, "List all the actors' first and last names");
+
+    // Get the query button
+    const queryButton = screen.getByText("Query");
+
+    // Click the query button
+    await user.click(queryButton);
+
+    // Verify that the error message is shown
+    expect(await screen.findByText("This feature is still in Beta - try again?")).toBeInTheDocument();
+  });
+});
