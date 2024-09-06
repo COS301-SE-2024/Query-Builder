@@ -101,7 +101,7 @@ export class ConnectionManagerService {
           password: password
         });
 
-        const promise = new Promise<ConnectionStatus>((resolve) => {
+        const promise = new Promise<ConnectionStatus>((resolve, reject) => {
           connection.connect((err) => {
             //if there is an error with the connection, reject
             if (err) {
@@ -110,9 +110,9 @@ export class ConnectionManagerService {
                 err.code == 'ER_ACCESS_DENIED_ERROR' ||
                 err.code == 'ER_NOT_SUPPORTED_AUTH_MODE'
               ) {
-                throw new UnauthorizedException('Please ensure that your database credentials are correct.');
+                return reject(new UnauthorizedException('Please ensure that your database credentials are correct.'));
               } else {
-                throw new BadGatewayException('Could not connect to the external database - are the host and port correct?'); // Reject with an error object
+                return reject(new BadGatewayException('Could not connect to the external database - are the host and port correct?'));
               }
             } else {
               //query the connected database if the connection is successful

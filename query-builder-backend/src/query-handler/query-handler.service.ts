@@ -44,12 +44,12 @@ export class QueryHandlerService {
     //secondly, get the number of rows of data
     const countCommand: string = `SELECT COUNT(*) AS numRows FROM \`${query.queryParams.databaseName}\`.\`${query.queryParams.table.name}\``;
 
-    const promise2 = new Promise((resolve) => {
+    const promise2 = new Promise((resolve, reject) => {
 
       connection.query(countCommand, async function (error, results, fields) {
-        
+
         if (error) {
-          throw error;
+          return reject(error);
         }
   
         const numRows = results[0].numRows;
@@ -61,13 +61,14 @@ export class QueryHandlerService {
         try {
           queryCommand = parser.convertJsonToQuery(query.queryParams);
         } catch (e) {
-          throw e;
+          return reject(e);
         }
   
-        const promise3 = new Promise((resolve) => {
+        const promise3 = new Promise((resolve, reject) => {
           connection.query(queryCommand, function (error, results, fields) {
+
             if (error) {
-              throw error;
+              return reject(error);
             }
     
             //add a unique key field to each returned row
@@ -85,7 +86,13 @@ export class QueryHandlerService {
           });
         });
 
-        resolve(await promise3);
+        try{
+          const queryResults = await promise3;
+          resolve(queryResults);
+        }
+        catch(error){
+          return reject(error);
+        }
 
       });
 
