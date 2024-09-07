@@ -1,4 +1,4 @@
-"use client"
+'use client';
 import React, { useEffect, useState } from 'react';
 import {
   Page,
@@ -50,6 +50,11 @@ const styles = StyleSheet.create({
     color: 'grey',
     textAlign: 'center',
     marginBottom: 20,
+  },
+  text: {
+    fontSize: 12,
+    color: 'grey',
+    textAlign: 'center'
   },
   header: {
     fontSize: 24,
@@ -106,37 +111,39 @@ export default function Report(props: ReportProps) {
 
   useEffect(() => {
     setChartsData([]);
-    const headings = Object.keys(
-      props.data[0],
-    ) as (keyof (typeof props.data)[0])[]; // stores the headings of each column (can be used to reference)
-    const numberColumns: boolean[] = Object.values(props.data[0]).map(
-      (value) => typeof value === 'number',
-    ); // stores the types of each column in the dataset
+    if (props.data.length > 0) {
+      const headings = Object.keys(
+        props.data[0],
+      ) as (keyof (typeof props.data)[0])[]; // stores the headings of each column (can be used to reference)
+      const numberColumns: boolean[] = Object.values(props.data[0]).map(
+        (value) => typeof value === 'number',
+      ); // stores the types of each column in the dataset
 
-    const firstKey: string[] = props.data.map(
-      (row) => row[headings[0]] as string,
-    ); // getting all of the classes
+      const firstKey: string[] = props.data.map(
+        (row) => row[headings[0]] as string,
+      ); // getting all of the classes
 
-    // We want to create a graph of every numeric value(y) against the first column(x)
-    numberColumns.forEach((column, index) => {
-      if (column) {
-        const currentChart: ChartData = {
-          labels: firstKey,
-          datasets: [
-            {
-              label: String(headings[index]),
-              data: props.data.map((item) => item[headings[index]]),
-              backgroundColor: `rgba(${index * 50}, 162, 235, 0.2)`,
-              borderColor: `rgba(${index * 50}, 162, 235, 1)`,
-              borderWidth: 1,
-            },
-          ],
-        };
+      // We want to create a graph of every numeric value(y) against the first column(x)
+      numberColumns.forEach((column, index) => {
+        if (column) {
+          const currentChart: ChartData = {
+            labels: firstKey,
+            datasets: [
+              {
+                label: String(headings[index]),
+                data: props.data.map((item) => item[headings[index]]),
+                backgroundColor: `rgba(${index * 50}, 162, 235, 0.2)`,
+                borderColor: `rgba(${index * 50}, 162, 235, 1)`,
+                borderWidth: 1,
+              },
+            ],
+          };
 
-        // adding the current chart to the chart array
-        setChartsData((prev) => [...prev, currentChart]);
-      }
-    });
+          // adding the current chart to the chart array
+          setChartsData((prev) => [...prev, currentChart]);
+        }
+      });
+    }
   }, []);
 
   return (
@@ -192,70 +199,96 @@ type MyDocumentProps = {
 };
 
 function MyDocument({ tableData, chartData, metadata, date }: MyDocumentProps) {
-  const headers = Object.keys(tableData[0]) as (keyof (typeof tableData)[0])[];
-  const numCols = headers.length;
-
-  return (
+  if (tableData.length === 0) {
+    return (
     <Document>
-      <Page size="A4" style={styles.page}>
-        <View
-          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
-        >
-          <Text style={styles.title}>{`Report on\n${metadata.title}`}</Text>
-          <Text
-            style={styles.subtitle}
-          >{`Generated on ${date.toLocaleString('en-UK', { day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZone: 'UTC' })} UTC using QBee`}</Text>
-        </View>
-      </Page>
-      <Page size="A4" style={styles.page}>
-        <View style={styles.section}>
-          <Text style={styles.header}>Results</Text>
-          <View style={styles.table}>
-            <View style={styles.tableRow}>
-              {headers.map((header, index) => (
-                <View key={index} style={tableCol(numCols)}>
-                  <Text style={styles.tableCell}>{String(header)}</Text>
-                </View>
-              ))}
-            </View>
-            {tableData.map((row, rowIndex) => (
-              <View key={rowIndex} style={styles.tableRow}>
-                {headers.map((header, cellIndex) => (
-                  <View key={cellIndex} style={tableCol(numCols)}>
-                    <Text style={styles.tableCell}>{row[header]}</Text>
+        <Page size="A4" style={styles.page}>
+          <View
+            style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+          >
+            <Text style={styles.title}>{`Report on\n${metadata.title}`}</Text>
+            <Text
+              style={styles.subtitle}
+            >{`Generated on ${date.toLocaleString('en-UK', { day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZone: 'UTC' })} UTC using QBee`}</Text>
+          </View>
+        </Page>
+        <Page size="A4" style={styles.page}>
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <Text style={styles.text}>There is no data to report on</Text>
+          </View>
+        </Page>
+      </Document>
+    );
+  }
+  else
+  {
+    const headers = Object.keys(
+      tableData[0],
+    ) as (keyof (typeof tableData)[0])[];
+    const numCols = headers.length;
+
+    return (
+      <Document>
+        <Page size="A4" style={styles.page}>
+          <View
+            style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+          >
+            <Text style={styles.title}>{`Report on\n${metadata.title}`}</Text>
+            <Text
+              style={styles.subtitle}
+            >{`Generated on ${date.toLocaleString('en-UK', { day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZone: 'UTC' })} UTC using QBee`}</Text>
+          </View>
+        </Page>
+        <Page size="A4" style={styles.page}>
+          <View style={styles.section}>
+            <Text style={styles.header}>Results</Text>
+            <View style={styles.table}>
+              <View style={styles.tableRow}>
+                {headers.map((header, index) => (
+                  <View key={index} style={tableCol(numCols)}>
+                    <Text style={styles.tableCell}>{String(header)}</Text>
                   </View>
                 ))}
               </View>
-            ))}
+              {tableData.map((row, rowIndex) => (
+                <View key={rowIndex} style={styles.tableRow}>
+                  {headers.map((header, cellIndex) => (
+                    <View key={cellIndex} style={tableCol(numCols)}>
+                      <Text style={styles.tableCell}>{row[header]}</Text>
+                    </View>
+                  ))}
+                </View>
+              ))}
+            </View>
           </View>
-        </View>
-        {chartData.length > 0 ? (
-          <View style={styles.section} break>
-            <Text style={styles.header}>Graphs</Text>
-            {chartData.map((data, index: number) => (
-              <Image
-                key={index}
-                src={(async () => {
-                  const ChartJsImage = require('chartjs-to-image');
+          {chartData.length > 0 ? (
+            <View style={styles.section} break>
+              <Text style={styles.header}>Graphs</Text>
+              {chartData.map((data, index: number) => (
+                <Image
+                  key={index}
+                  src={(async () => {
+                    const ChartJsImage = require('chartjs-to-image');
 
-                  const myChart = new ChartJsImage();
-                  myChart.setConfig({
-                    type: 'bar',
-                    data: {
-                      labels: data.labels,
-                      datasets: data.datasets,
-                    },
-                  });
-                  return await myChart.toDataUrl();
-                })()}
-                style={styles.chart}
-              />
-            ))}
-          </View>
-        ) : (
-          <></>
-        )}
-      </Page>
-    </Document>
-  );
+                    const myChart = new ChartJsImage();
+                    myChart.setConfig({
+                      type: 'bar',
+                      data: {
+                        labels: data.labels,
+                        datasets: data.datasets,
+                      },
+                    });
+                    return await myChart.toDataUrl();
+                  })()}
+                  style={styles.chart}
+                />
+              ))}
+            </View>
+          ) : (
+            <></>
+          )}
+        </Page>
+      </Document>
+    );
+  }
 }
