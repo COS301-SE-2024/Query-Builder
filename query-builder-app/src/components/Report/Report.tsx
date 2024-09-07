@@ -51,15 +51,24 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 20,
   },
-  text: {
+  errortext: {
     fontSize: 12,
     color: 'grey',
-    textAlign: 'center'
+    textAlign: 'center',
+  },
+  text: {
+    fontSize: 12,
+    textAlign: 'center',
   },
   header: {
     fontSize: 24,
     textAlign: 'left',
     marginBottom: 20,
+  },
+  subheader: {
+    fontSize: 20,
+    textAlign: 'left',
+    marginBottom: 10,
   },
   table: {
     display: 'flex',
@@ -68,6 +77,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRightWidth: 0,
     borderBottomWidth: 0,
+    marginBottom: 10,
   },
   tableRow: {
     flexDirection: 'row',
@@ -75,6 +85,11 @@ const styles = StyleSheet.create({
   tableCell: {
     margin: 5,
     fontSize: 10,
+  },
+  tableCellHeader: {
+    margin: 5,
+    fontSize: 10,
+    fontWeight: 'bold',
   },
   chart: {
     margin: '10px 0',
@@ -214,7 +229,7 @@ function MyDocument({ tableData, chartData, metadata, date }: MyDocumentProps) {
         </Page>
         <Page size="A4" style={styles.page}>
           <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text style={styles.text}>There is no data to report on</Text>
+            <Text style={styles.errortext}>There is no data to report on</Text>
           </View>
         </Page>
       </Document>
@@ -242,15 +257,16 @@ function MyDocument({ tableData, chartData, metadata, date }: MyDocumentProps) {
         <Page size="A4" style={styles.page}>
           <View style={styles.section}>
             <Text style={styles.header}>Results</Text>
+            <Text style={styles.subheader}>Preview</Text>
             <View style={styles.table}>
               <View style={styles.tableRow}>
                 {headers.map((header, index) => (
                   <View key={index} style={tableCol(numCols)}>
-                    <Text style={styles.tableCell}>{String(header)}</Text>
+                    <Text style={styles.tableCellHeader}>{String(header)}</Text>
                   </View>
                 ))}
               </View>
-              {tableData.map((row, rowIndex) => (
+              {tableData.slice(0, (tableData.length > 10) ? 10:tableData.length).map((row, rowIndex) => (
                 <View key={rowIndex} style={styles.tableRow}>
                   {headers.map((header, cellIndex) => (
                     <View key={cellIndex} style={tableCol(numCols)}>
@@ -260,6 +276,15 @@ function MyDocument({ tableData, chartData, metadata, date }: MyDocumentProps) {
                 </View>
               ))}
             </View>
+            {tableData.length > 10 ? (
+              <View>
+                <Text style={styles.text}>{tableData.length - 10} more rows</Text>
+              </View>
+            ) : (
+              <></>
+            )}
+            <Text style={styles.subheader}>Statistics</Text>
+            
           </View>
           {chartData.length > 0 ? (
             <View style={styles.section} break>
