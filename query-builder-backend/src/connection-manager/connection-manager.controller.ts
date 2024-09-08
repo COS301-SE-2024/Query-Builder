@@ -15,7 +15,7 @@ export class ConnectionManagerController {
     }
 
     //end point to determine whether the user has an active connection to the database server
-    @Get('has-active-connection')
+    @Post('has-active-connection')
     async hasActiveConnection(@Body(ValidationPipe) has_active_connection_dto: Has_Active_Connection_Dto, @Session() session: Record<string, any>){
         return this.connectionManagerService.hasActiveConnection(has_active_connection_dto, session);
     }
