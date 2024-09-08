@@ -56,9 +56,17 @@ const styles = StyleSheet.create({
     color: 'grey',
     textAlign: 'center',
   },
+  centertext: {
+    fontSize: 12,
+    color:'grey',
+    textAlign: 'center',
+  },
   text: {
     fontSize: 12,
-    textAlign: 'center',
+  },
+  underlinedtext: {
+    fontSize: 12,
+    textDecoration: 'underline',
   },
   header: {
     fontSize: 24,
@@ -216,7 +224,7 @@ type MyDocumentProps = {
 function MyDocument({ tableData, chartData, metadata, date }: MyDocumentProps) {
   if (tableData.length === 0) {
     return (
-    <Document>
+      <Document>
         <Page size="A4" style={styles.page}>
           <View
             style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
@@ -228,19 +236,22 @@ function MyDocument({ tableData, chartData, metadata, date }: MyDocumentProps) {
           </View>
         </Page>
         <Page size="A4" style={styles.page}>
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <View
+            style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+          >
             <Text style={styles.errortext}>There is no data to report on</Text>
           </View>
         </Page>
       </Document>
     );
-  }
-  else
-  {
+  } else {
     const headers = Object.keys(
       tableData[0],
     ) as (keyof (typeof tableData)[0])[];
     const numCols = headers.length;
+    const numberColumns: boolean[] = Object.values(tableData[0]).map(
+      (value) => typeof value === 'number',
+    );
 
     return (
       <Document>
@@ -266,48 +277,73 @@ function MyDocument({ tableData, chartData, metadata, date }: MyDocumentProps) {
                   </View>
                 ))}
               </View>
-              {tableData.slice(0, (tableData.length > 10) ? 10:tableData.length).map((row, rowIndex) => (
-                <View key={rowIndex} style={styles.tableRow}>
-                  {headers.map((header, cellIndex) => (
-                    <View key={cellIndex} style={tableCol(numCols)}>
-                      <Text style={styles.tableCell}>{row[header]}</Text>
-                    </View>
-                  ))}
-                </View>
-              ))}
+              {tableData
+                .slice(0, tableData.length > 10 ? 10 : tableData.length)
+                .map((row, rowIndex) => (
+                  <View key={rowIndex} style={styles.tableRow}>
+                    {headers.map((header, cellIndex) => (
+                      <View key={cellIndex} style={tableCol(numCols)}>
+                        <Text style={styles.tableCell}>{row[header]}</Text>
+                      </View>
+                    ))}
+                  </View>
+                ))}
             </View>
             {tableData.length > 10 ? (
               <View>
-                <Text style={styles.text}>{tableData.length - 10} more rows</Text>
+                <Text style={styles.centertext}>
+                  {tableData.length - 10} more rows
+                </Text>
               </View>
             ) : (
               <></>
             )}
-            <Text style={styles.subheader}>Statistics</Text>
-            
           </View>
           {chartData.length > 0 ? (
-            <View style={styles.section} break>
-              <Text style={styles.header}>Graphs</Text>
-              {chartData.map((data, index: number) => (
-                <Image
-                  key={index}
-                  src={(async () => {
-                    const ChartJsImage = require('chartjs-to-image');
+            <View style={styles.section}>
+              <View>
+                <Text style={styles.subheader}>Statistics</Text>
+                <Text style={styles.underlinedtext}>Total Rows:</Text>
+                <Text style={styles.text}>{ tableData.length}</Text>
+                {numberColumns.map((isNumberCol, index) =>
+                  isNumberCol ? (
+                    <View key = {index}>
+                    <Text style={styles.underlinedtext}>
+                      {String(headers[index])}:
+                      </Text>
+                      <Text style={styles.text}>Min: {}</Text>
+                      <Text style={styles.text}>Max: {}</Text>
+                      <Text style={styles.text}>Mean: {}</Text>
+                      <Text style={styles.text}>Standard Deviation: {}</Text>
+                      <Text style={styles.text}></Text>
+                    </View>
+                  ) : (
+                    <></>
+                  ),
+                )}
+              </View>
+              <View style={styles.section} break>
+                <Text style={styles.header}>Graphs</Text>
+                {chartData.map((data, index: number) => (
+                  <Image
+                    key={index}
+                    src={(async () => {
+                      const ChartJsImage = require('chartjs-to-image');
 
-                    const myChart = new ChartJsImage();
-                    myChart.setConfig({
-                      type: 'bar',
-                      data: {
-                        labels: data.labels,
-                        datasets: data.datasets,
-                      },
-                    });
-                    return await myChart.toDataUrl();
-                  })()}
-                  style={styles.chart}
-                />
-              ))}
+                      const myChart = new ChartJsImage();
+                      myChart.setConfig({
+                        type: 'bar',
+                        data: {
+                          labels: data.labels,
+                          datasets: data.datasets,
+                        },
+                      });
+                      return await myChart.toDataUrl();
+                    })()}
+                    style={styles.chart}
+                  />
+                ))}
+              </View>
             </View>
           ) : (
             <></>
