@@ -44,7 +44,7 @@ export class ConnectionManagerService {
       const { data: db_data, error: error } = await this.supabase
         .getClient()
         .from('db_envs')
-        .select('host')
+        .select('host, port')
         .eq('db_id', connect_dto.databaseServerID)
         .single();
       if (error) {
@@ -57,23 +57,25 @@ export class ConnectionManagerService {
       }
 
       let host = db_data.host;
+      let port = db_data.port;
 
-      if (session.host === host) {
-        //-----------------------------EXISTING CONNECTION TO THE RIGHT HOST---------------------//
+      if (session.host === host && session.port === port) {
+        //-----------------------------EXISTING CONNECTION TO THE RIGHT HOST AND PORT---------------------//
         //Print out that you are reconnecting to an existing session and not a new one
-        this.logger.log(`[Reconnecting] ${session.id} connected to ${host}`, ConnectionManagerService.name);
+        this.logger.log(`[Reconnecting] ${session.id} connected to ${host}:${port}`, ConnectionManagerService.name);
         return {
           success: true,
           connectionID: this.sessionStore.get(session.id).conn.threadID
         };
       } else {
-        //-------------------------NO EXISTING CONNECTION TO THE RIGHT HOST-------------------//
-        if (session.host !== undefined) {
-          //if there is an existing connection that needs to be changed to a different host
+        //-------------------------NO EXISTING CONNECTION TO THE RIGHT HOST AND PORT-------------------//
+        if (session.host !== undefined && session.port !== undefined) {
+          //if there is an existing connection that needs to be changed to a different host and port
           this.sessionStore.get(session.id).conn.end();
           this.sessionStore.remove(session.id);
           this.logger.log(`[Connection Disconnected] ${session.id}`, ConnectionManagerService.name);
           session.host = undefined;
+          session.port = undefined;
         }
 
         let user: any, password: any;
@@ -97,6 +99,7 @@ export class ConnectionManagerService {
 
         const connection = require('mysql').createConnection({
           host: host,
+          port: port,
           user: user,
           password: password
         });
@@ -117,6 +120,7 @@ export class ConnectionManagerService {
             } else {
               //query the connected database if the connection is successful
               session.host = host;
+              session.port = port;
   
               this.sessionStore.add({
                 id: session.id,
@@ -124,7 +128,7 @@ export class ConnectionManagerService {
               });
   
               this.logger.log(
-                `[Inital Connection] ${session.id} connected to ${host}`
+                `[Inital Connection] ${session.id} connected to ${host}:${port}`
               , ConnectionManagerService.name);
   
               resolve({
