@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString, IsUUID, ValidateIf, ValidateNested } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString, IsUUID, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
 
 export class Credentials_Dto {
