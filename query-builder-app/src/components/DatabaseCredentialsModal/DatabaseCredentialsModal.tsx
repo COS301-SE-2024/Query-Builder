@@ -6,6 +6,7 @@ import { createClient } from "./../../utils/supabase/client";
 import { navigateToForm } from "@/app/serverActions";
 import { EyeFilledIcon } from "../Authentication/EyeFilledIcon";
 import { EyeSlashFilledIcon } from "../Authentication/EyeSlashFilledIcon";
+import toast from "react-hot-toast";
 
 require("dotenv").config();
 
@@ -83,7 +84,7 @@ export default function DatabaseCredentialsModal(props: DatabaseCredentialsModal
       let json = await connectionResponse.json();
 
       //if connection was successful, save credentials if necessary, and then navigate to the form
-      if(json.success === true){
+      if(connectionResponse.ok === true && json.success === true){
 
         //if rememberDatabaseCredentials is set, save the db_secrets
         if(rememberDatabaseCredentials){
@@ -126,6 +127,13 @@ export default function DatabaseCredentialsModal(props: DatabaseCredentialsModal
 
         navigateToForm(props.dbServerID);
 
+      }
+      //if the connection was not successful, display an appropriate error message
+      else if(connectionResponse.ok === false && json.response.message){
+        toast.error(json.response.message);
+      }
+      else{
+        toast.error("Something went wrong. Please try again");
       }
 
     }

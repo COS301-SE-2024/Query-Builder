@@ -112,7 +112,7 @@ export class ConnectionManagerService {
               ) {
                 return reject(new UnauthorizedException('Please ensure that your database credentials are correct.'));
               } else {
-                return reject(new BadGatewayException('Could not connect to the external database - are the host and port correct?'));
+                return reject(new BadGatewayException('Could not connect to the database - has your database admin added it correctly?'));
               }
             } else {
               //query the connected database if the connection is successful

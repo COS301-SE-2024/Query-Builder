@@ -6,6 +6,7 @@ import { createClient } from "./../../utils/supabase/client";
 import AddOrganisationModal from "../AddOrganisationModal/AddOrganisationModal";
 import { navigateToForm } from "@/app/serverActions";
 import DatabaseCredentialsModal from "../DatabaseCredentialsModal/DatabaseCredentialsModal";
+import toast from "react-hot-toast";
 
 
 interface Database {
@@ -64,8 +65,36 @@ export default function SignedInHomePage(){
             setCurrentDBServerID(databaseServerID);
         }
         else{
-            //should actually successfully connect first
-            navigateToForm(databaseServerID);
+
+            //attempt a connection to the database, using saved credentials
+            //call the api/connect endpoint, and exclude databaseServerCredentials
+            let connectionResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/connect`, {
+                credentials: "include",
+                method: "PUT",
+                headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + await getToken()
+                },
+                body: JSON.stringify({
+                    databaseServerID: databaseServerID
+                })
+            });
+
+            let json = await connectionResponse.json();
+
+            //if connection was successful, navigate to the form
+            if(connectionResponse.ok === true && json.success === true){
+                navigateToForm(databaseServerID);
+            }
+            //if the connection was not successful, display an appropriate error message
+            else if(connectionResponse.ok === false && json.response.message){
+                toast.error(json.response.message);
+            }
+            else{
+                toast.error("Something went wrong. Please try again");
+            }
+
         }
 
     }
