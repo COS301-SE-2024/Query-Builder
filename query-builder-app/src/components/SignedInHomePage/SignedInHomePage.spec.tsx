@@ -54,10 +54,15 @@ global.fetch = vi.fn((url: string, config: any) => {
 //basic component rendering tests
 describe('SignedInHomePage basic rendering tests', () => {
 
-  it('should render successfully', () => {
+  it('should render successfully and display the org and its database server', async () => {
 
-      const {baseElement} = render(<SignedInHomePage/>);
-      expect(baseElement).toBeTruthy();
+      render(<SignedInHomePage/>);
+
+      const orgText = (await screen.findAllByText('Mock Org'))[0];
+      expect(orgText).toBeInTheDocument();
+
+      const serverText = (await screen.findAllByText('Mock Database Server'))[0];
+      expect(serverText).toBeInTheDocument();
 
   });
 
