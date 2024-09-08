@@ -40,5 +40,6 @@ export class table {
   @IsOptional()
   @ValidateNested()
   @Type(() => join)
+  @IsNotEmpty()
   join?: join;
 }

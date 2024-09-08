@@ -9,6 +9,7 @@ export class join {
 
   @ValidateNested()
   @Type(() => table)
+  @IsNotEmpty()
   table2: table;
 
   @IsString()
