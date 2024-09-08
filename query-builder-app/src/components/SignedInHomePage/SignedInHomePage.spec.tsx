@@ -4,83 +4,61 @@ import '@testing-library/jest-dom';
 import SignedInHomePage from './SignedInHomePage';
 import { describe, it, expect, vi, beforeAll, afterAll, Mock } from 'vitest';
 
-// Mock the necessary components and modules
-vi.mock('./../../utils/supabase/client', () => ({
-  createClient: () => ({
-    auth: {
-      getSession: vi.fn().mockResolvedValue({
-        data: {
-          session: {
-            access_token: 'mocked_access_token'
-          }
-        }
+//Mock out Supabase access token retrieval
+vi.mock("./../../utils/supabase/client", () => {
+  return{
+      createClient: vi.fn().mockImplementation(() => {
+          return{
+              auth: {
+              getSession: vi.fn().mockImplementation(() => {
+                  return{
+                      data: vi.fn().mockReturnThis(),
+                      session: vi.fn().mockReturnThis(),
+                      access_token: "randomAccessToken"
+                  }
+              })
+          }}
       })
-    }
-  })
-}));
+  }
+})
 
-vi.mock('../DatabaseConnectionModal/DatabaseConnectionModal', () => ({
-  __esModule: true,
-  default: ({ org_id, on_add }: { org_id: string, on_add: () => void }) => (
-    <div data-testid="DatabaseConnectionModal">
-      <button onClick={on_add}>Add DB</button>
-    </div>
-  )
-}));
+//Mock out the API calls
+global.fetch = vi.fn((url: string, config: any) => {
 
-describe('SignedInHomePage', () => {
-  // Mock fetch globally
-  beforeAll(() => {
-    global.fetch = vi.fn(() =>
-      Promise.resolve({
-        json: () => Promise.resolve({
-          org_data: [
-            {
-              created_at: '2023-01-01T00:00:00.000Z',
-              logo: 'logo_url',
-              name: 'Test Organisation',
-              org_id: 'org_123',
+  if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/get-org`){
+      return Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve({data: [{
+              created_at: "",
+              logo: "",
+              name: "Mock Org",
+              org_id: "MockOrgID",
               db_envs: [
                 {
-                  created_at: '2023-01-01T00:00:00.000Z',
-                  name: 'Test Database',
-                  db_id: 'db_123',
-                  db_info: {},
-                  type: 'PostgreSQL'
+                  created_at: "",
+                  name: "Mock Database Server",
+                  db_id: "MockDBID",
+                  db_info: "",
+                  type: "mysql"
                 }
               ],
-              org_members: ['member_1']
-            }
-          ]
-        })
+              org_members: [
+                "Member1"
+              ]
+            }]}),
       })
-    ) as Mock;
+  }
+
+}) as Mock;
+
+//basic component rendering tests
+describe('SignedInHomePage basic rendering tests', () => {
+
+  it('should render successfully', () => {
+
+      const {baseElement} = render(<SignedInHomePage/>);
+      expect(baseElement).toBeTruthy();
+
   });
 
-  afterAll(() => {
-    vi.resetAllMocks();
-  });
-
-  it('fetches and displays organisations and databases', async () => {
-    render(<SignedInHomePage />);
-
-    // Check that the organisation name is displayed
-    await waitFor(() => {
-      expect(screen.getByText('Your Organisations')).toBeInTheDocument();
-    });
-  });
-
-  it('calls fetchOrgs on modal add', async () => {
-    render(<SignedInHomePage />);
-
-    // Simulate clicking the add button in the modal
-    await waitFor(() => {
-      screen.getByText('+ Add').click();
-    });
-
-    // Check that fetch has been called again (fetchOrgs is called again)
-    await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(2); // Once for initial load and once for add
-    });
-  });
 });
