@@ -1,10 +1,10 @@
 "use client"
-import { Chip, Spacer, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Link, useDisclosure} from "@nextui-org/react"
+import { Spacer, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Link, useDisclosure} from "@nextui-org/react"
 import DatabaseAdditionModal from "../DatabaseAdditionModal/DatabaseAdditionModal"
 import React from "react";
 import { createClient } from "./../../utils/supabase/client";
 import AddOrganisationModal from "../AddOrganisationModal/AddOrganisationModal";
-import { navigateToForm } from "@/app/serverActions";
+import { navigateToForm } from "../../app/serverActions";
 import DatabaseCredentialsModal from "../DatabaseCredentialsModal/DatabaseCredentialsModal";
 import toast from "react-hot-toast";
 

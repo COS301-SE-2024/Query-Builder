@@ -65,7 +65,7 @@ describe('DatabaseAdditionModal modal popup tests', () => {
     await user.click(button);
 
     //get the screen text that should be displayed on the modal and assert that it is in the document
-    const text = screen.getByText("Connect a new database server");
+    const text = screen.getByText("Add a new database server to your organisation");
     expect(text).toBeInTheDocument();
 
   });
@@ -108,44 +108,6 @@ describe('DatabaseAdditionModal modal popup tests', () => {
 
   });
 
-  it('The Username field should be displayed', async () => {
-
-    //create a user that can perform actions
-    const user = userEvent.setup()
-
-    //render the component
-    render(<DatabaseAdditionModal org_id={"1234"} on_add={()=>{}}/>);
-
-    //get the button to add a database
-    const button = screen.getByText("+ Add");
-
-    //click the button to add a database
-    await user.click(button);
-
-    const usernameField = screen.getByLabelText("Username");
-    expect(usernameField).toBeInTheDocument();
-
-  });
-
-  it('The Password field should be displayed', async () => {
-
-    //create a user that can perform actions
-    const user = userEvent.setup()
-
-    //render the component
-    render(<DatabaseAdditionModal org_id={"1234"} on_add={()=>{}}/>);
-
-    //get the button to add a database
-    const button = screen.getByText("+ Add");
-
-    //click the button to add a database
-    await user.click(button);
-
-    const passwordField = screen.getByLabelText("Password");
-    expect(passwordField).toBeInTheDocument();
-
-  });
-
 });
 
 describe('DatabaseAdditionModal add database tests', () => {
@@ -176,23 +138,11 @@ describe('DatabaseAdditionModal add database tests', () => {
     //type a valid URL into the URL or Host Field
     await user.type(urlField, "www.mockurl.com");
 
-    //get the Username Field
-    const usernameField = screen.getByLabelText("Username");
-
-    //type a username into the Username Field
-    await user.type(usernameField, "username");
-
-    //get the Password Field
-    const passwordField = screen.getByLabelText("Password");
-
-    //type a password into the Password Field
-    await user.type(passwordField, "password");
-
-    //get the connect button
-    const connectButton = screen.getByText("Connect");
+    //get the add button
+    const addButton = screen.getByText("Add");
 
     //click the connect button
-    await user.click(connectButton);
+    await user.click(addButton);
 
   }, {timeout: 10000})
 
