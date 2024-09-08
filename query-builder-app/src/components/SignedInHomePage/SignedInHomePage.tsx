@@ -111,7 +111,7 @@ export default function SignedInHomePage(){
                     navigateToForm(databaseServerID);
                 }
                 //if the connection was not successful, display an appropriate error message
-                else if(connectionResponse.ok === false && json.response.message){
+                else if(connectionResponse.ok === false && json.response && json.response.message){
                     toast.error(json.response.message);
                 }
                 else{

@@ -75,7 +75,7 @@ export default function TableForm(props: TableFormProps){
         }
         else{
         
-            if(json.response.message == 'You do not have a backend session'){
+            if(json.response && json.response.message == 'You do not have a backend session'){
                 navigateToAuth();
             }
       

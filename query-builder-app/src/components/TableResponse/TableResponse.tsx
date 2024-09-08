@@ -118,7 +118,7 @@ export default function TableResponse(props: TableResponseProps){
     }
     else{
         
-      if(json.response.message == 'You do not have a backend session'){
+      if(json.response && json.response.message == 'You do not have a backend session'){
           navigateToAuth();
       }
 
@@ -180,7 +180,7 @@ export default function TableResponse(props: TableResponseProps){
       }
       else{
 
-        if(json.response.message == 'You do not have a backend session'){
+        if(json.response && json.response.message == 'You do not have a backend session'){
           navigateToAuth();
         }
 

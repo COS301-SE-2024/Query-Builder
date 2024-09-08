@@ -142,7 +142,7 @@ export default function TableList(props: TableListProps){
         }
         else{
         
-            if(json.response.message == 'You do not have a backend session'){
+            if(json.response && json.response.message == 'You do not have a backend session'){
                 navigateToAuth();
             }
       
@@ -184,7 +184,7 @@ export default function TableList(props: TableListProps){
         }
         else{
         
-            if(json.response.message == 'You do not have a backend session'){
+            if(json.response && json.response.message == 'You do not have a backend session'){
                 navigateToAuth();
             }
       
