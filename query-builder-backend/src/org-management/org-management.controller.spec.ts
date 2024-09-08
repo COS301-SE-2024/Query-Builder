@@ -136,7 +136,8 @@ describe('OrgManagementController', () => {
           org_id: '0000',
           name: 'Test DB',
           type: 'mysql',
-          host: 'localhost'
+          host: 'localhost',
+          port: 3306
         })
       ).toBe('0000');
     });
