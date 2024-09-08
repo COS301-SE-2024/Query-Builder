@@ -7,6 +7,7 @@ import { navigateToForm } from "../../app/serverActions";
 import { EyeFilledIcon } from "../Authentication/EyeFilledIcon";
 import { EyeSlashFilledIcon } from "../Authentication/EyeSlashFilledIcon";
 import toast from "react-hot-toast";
+import { navigateToAuth } from "../../app/authentication/actions";
 
 require("dotenv").config();
 
@@ -24,8 +25,6 @@ const getToken = async () => {
 
   const supabase = createClient();
   const token = (await supabase.auth.getSession()).data.session?.access_token
-
-  console.log(token)
 
   return token;
 };
@@ -98,12 +97,6 @@ export default function DatabaseCredentialsModal(props: DatabaseCredentialsModal
           //stringify the db_secrets
           const db_secrets_string = JSON.stringify(db_secrets);   
 
-          //log request body
-          console.log("BODY OF REQUEST: " + JSON.stringify({
-            db_id: props.dbServerID,
-            db_secrets: db_secrets_string
-          }))
-
           //call the save-db-secrets API endpoint
           let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/save-db-secrets`, {
             credentials: "include",
@@ -119,9 +112,11 @@ export default function DatabaseCredentialsModal(props: DatabaseCredentialsModal
             })
           });
 
-          //log response body
           let json = await response.json();
-          console.log("SAVE DB SECRETS RESPONSE " + JSON.stringify(json));
+
+          if(!response.ok && "You do not have a backend session"){
+            navigateToAuth();
+          }
 
         }
 
