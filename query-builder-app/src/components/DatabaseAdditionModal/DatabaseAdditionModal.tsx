@@ -9,7 +9,7 @@ require("dotenv").config();
 //map of database vendors to their default ports
 const portMap = new Map<string, string>([
   ["mysql", "3306"],
-  ["postgres", "5432"]
+  ["postgresql", "5432"]
 ]);
 
 //interface for the props to DatabaseAdditionModal
@@ -71,14 +71,15 @@ export default function DatabaseAdditionModal(props: DatabaseAdditionModalProps)
 
     }, [port]);
 
-    async function addDatabase(name: String, host:String){
+    async function addDatabase(name: string, type: string, host:string, port: number){
 
       //log request body
       console.log("BODY OF REQUEST: " + JSON.stringify({
         org_id: props.org_id,
         name: name,
-        type: "mysql",
-        host: host
+        type: type,
+        host: host,
+        port: port
       }))
 
       //call the add-db API endpoint
@@ -93,8 +94,9 @@ export default function DatabaseAdditionModal(props: DatabaseAdditionModalProps)
         body: JSON.stringify({
             org_id: props.org_id,
             name: name,
-            type: "mysql",
-            host: host
+            type: type,
+            host: host,
+            port: port
         })
       })
 
@@ -142,7 +144,7 @@ export default function DatabaseAdditionModal(props: DatabaseAdditionModalProps)
                       }}
                     >
                       <DropdownItem key="mysql">mysql</DropdownItem>
-                      <DropdownItem key="postgres">postgres</DropdownItem>
+                      <DropdownItem key="postgresql">postgresql</DropdownItem>
                     </DropdownMenu>
                   </Dropdown>
                   <Spacer y={0.5}></Spacer>
@@ -185,7 +187,7 @@ export default function DatabaseAdditionModal(props: DatabaseAdditionModalProps)
                   <Button 
                     color="primary" 
                     onPress={onClose}  
-                    onClick={() => addDatabase(dbName, url)}
+                    onClick={() => addDatabase(dbName, type, url, parseInt(port))}
                     isDisabled={isURLInvalid || isDbNameInvalid}
                     >
                     Add
