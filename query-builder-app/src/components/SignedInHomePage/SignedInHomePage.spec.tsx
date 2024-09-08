@@ -1,8 +1,10 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import SignedInHomePage from './SignedInHomePage';
-import { describe, it, expect, vi, beforeAll, afterAll, Mock } from 'vitest';
+import { describe, it, expect, vi, Mock } from 'vitest';
+import userEvent from '@testing-library/user-event'
+import * as ServerActions from '../../app/serverActions';
 
 //Mock out Supabase access token retrieval
 vi.mock("./../../utils/supabase/client", () => {
@@ -21,6 +23,11 @@ vi.mock("./../../utils/supabase/client", () => {
       })
   }
 })
+
+//Mock out Next redirects
+vi.mock('next/navigation', () => ({
+  redirect: (url: string) => {}
+}));
 
 //Mock out the API calls
 global.fetch = vi.fn((url: string, config: any) => {
@@ -46,10 +53,19 @@ global.fetch = vi.fn((url: string, config: any) => {
                 "Member1"
               ]
             }]}),
-      })
+      });
+  }
+  else if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/has-active-connection`){
+    return Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve({hasActiveConnection: false}),
+    });
   }
 
 }) as Mock;
+
+//Spy on navigateToForm
+vi.spyOn(ServerActions, 'navigateToForm');
 
 //basic component rendering tests
 describe('SignedInHomePage basic rendering tests', () => {
@@ -63,6 +79,65 @@ describe('SignedInHomePage basic rendering tests', () => {
 
       const serverText = (await screen.findAllByText('Mock Database Server'))[0];
       expect(serverText).toBeInTheDocument();
+
+  });
+
+});
+
+//query database tests
+describe('SignedInHomePage querying tests', () => {
+
+  it('should be able to query a database that has an active connection', async () => {
+
+    //Mock out the API calls
+    global.fetch = vi.fn((url: string, config: any) => {
+
+      if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/get-org`){
+          return Promise.resolve({
+                ok: true,
+                json: () => Promise.resolve({data: [{
+                  created_at: "",
+                  logo: "",
+                  name: "Mock Org",
+                  org_id: "MockOrgID",
+                  db_envs: [
+                    {
+                      created_at: "",
+                      name: "Mock Database Server",
+                      db_id: "MockDBID",
+                      db_info: "",
+                      type: "mysql"
+                    }
+                  ],
+                  org_members: [
+                    "Member1"
+                  ]
+                }]}),
+          });
+      }
+      else if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/has-active-connection`){
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({hasActiveConnection: true}),
+        });
+      }
+
+    }) as Mock;
+
+    //create a user that can perform actions
+    const user = userEvent.setup();
+
+    //render the component
+    render(<SignedInHomePage/>);
+
+    //find the database server link to click
+    const serverText = (await screen.findAllByText('Mock Database Server'))[0];
+
+    //click the database server link
+    await user.click(serverText);
+
+    //expect to be redirected to the query form
+    expect(ServerActions.navigateToForm).toBeCalled();
 
   });
 
