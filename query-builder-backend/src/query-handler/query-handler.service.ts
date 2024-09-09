@@ -2,9 +2,9 @@ import {
   Injectable,
   UnauthorizedException
 } from '@nestjs/common';
-import { JsonConverterService } from './../jsonConverter/jsonConverter.service';
+import { JsonConverterService } from './../json-converter/json-converter.service'
 import { ConnectionManagerService } from './../connection-manager/connection-manager.service';
-import { Query } from '../interfaces/intermediateJSON';
+import { Query } from '../interfaces/dto/query.dto'
 import { SessionStore } from '../session-store/session-store.service';
 import { MyLoggerService } from '../my-logger/my-logger.service';
 

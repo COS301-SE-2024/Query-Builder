@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { QueryHandlerController } from './query-handler.controller';
 import { QueryHandlerService } from './query-handler.service';
-import { JsonConverterModule } from '../jsonConverter/jsonConverter.module';
+import { JsonConverterModule } from '../json-converter/json-converter.module';
 import { SessionStoreModule } from '../session-store/session-store.module';
 import { ConnectionManagerModule } from '../connection-manager/connection-manager.module';
 import { MyLoggerModule } from '../my-logger/my-logger.module';
