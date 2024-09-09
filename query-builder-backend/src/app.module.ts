@@ -5,7 +5,6 @@ import { ConfigModule } from "@nestjs/config";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { ConnectionManagerModule } from "./connection-manager/connection-manager.module";
-import { JsonConverterModule } from "./jsonConverter/jsonConverter.module";
 import { SupabaseGuard, SupabaseModule } from "./supabase";
 import { APP_GUARD } from "@nestjs/core";
 import { UserManagementModule } from "./user-management/user-management.module";
@@ -16,6 +15,7 @@ import { QueryManagementModule } from './query-management/query-management.modul
 import { SessionStoreModule } from './session-store/session-store.module';
 import { NaturalLanguageModule } from './natural-language/natural-language.module';
 import { MyLoggerModule } from './my-logger/my-logger.module';
+import { JsonConverterModule } from './json-converter/json-converter.module';
 
 @Module({
   imports: [
