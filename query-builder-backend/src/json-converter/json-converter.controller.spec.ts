@@ -3,6 +3,7 @@ import { JsonConverterController } from './json-converter.controller';
 import { MongoJsonConverterService } from './mongo-json-converter/mongo-json-converter.service';
 import { MysqlJsonConverterService } from './mysql-json-converter/mysql-json-converter.service';
 import { PostgresJsonConverterService } from './postgres-json-converter/postgres-json-converter.service';
+import { JsonConverterService } from './json-converter.service';
 
 describe('JsonConverterController', () => {
   let controller: JsonConverterController;
@@ -10,7 +11,7 @@ describe('JsonConverterController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [JsonConverterController],
-      providers: [MongoJsonConverterService, MysqlJsonConverterService, PostgresJsonConverterService]
+      providers: [JsonConverterService, MongoJsonConverterService, MysqlJsonConverterService, PostgresJsonConverterService]
     }).compile();
 
     controller = module.get<JsonConverterController>(JsonConverterController);
