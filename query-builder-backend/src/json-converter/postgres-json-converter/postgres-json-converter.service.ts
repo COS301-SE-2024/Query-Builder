@@ -36,7 +36,7 @@ export class PostgresJsonConverterService extends JsonConverterService {
       throw new Error('Invalid language');
     }
 
-    return query;
+    return query
   }
 
   generateSelectClausePost(jsonData) {

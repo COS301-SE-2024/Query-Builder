@@ -15,4 +15,8 @@ describe('JsonConverterService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
+
+  it('null test', ()=>{
+    expect(true).toBe(true)
+  })
 });
