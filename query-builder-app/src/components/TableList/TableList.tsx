@@ -72,6 +72,18 @@ export default function TableList(props: TableListProps) {
 
     }, [table])
 
+        //React hook to fetch all tables upon update of table if no tables selected
+        React.useEffect(() => {
+
+            //check to exclude this code running on first render
+    
+            if (table == null || table.name == "") {
+
+                fetchAllTables(props.databaseName);
+            }
+    
+        }, [table])
+
     React.useEffect(() => {
 
         console.log(joinableTables);
