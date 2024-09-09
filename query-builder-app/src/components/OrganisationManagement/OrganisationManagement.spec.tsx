@@ -3,9 +3,12 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi,  beforeEach, afterEach  } from 'vitest';
 import React from 'react';
 import OrganisationManagement from './OrganisationManagement';
+// import { renderHook } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createClient } from './../../utils/supabase/client';
 import { useParams } from 'next/navigation';
+import toast from 'react-hot-toast';
+
 
 const getToken = vi.fn().mockResolvedValue('test-token');
 const setHashCodeCopyText = vi.fn();

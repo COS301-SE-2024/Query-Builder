@@ -189,6 +189,9 @@ importers:
       vitest:
         specifier: ^1.6.0
         version: 1.6.0(@types/node@20.14.8)(jsdom@24.1.0)(terser@5.31.1)
+      vitest-fetch-mock:
+        specifier: ^0.3.0
+        version: 0.3.0(vitest@1.6.0(@types/node@20.14.8)(jsdom@24.1.0)(terser@5.31.1))
 
 packages:
 
@@ -4223,6 +4226,9 @@ packages:
   cross-fetch@3.1.8:
     resolution: {integrity: sha512-cvA+JwZoU0Xq+h6WkMvAUqPEYy92Obet6UdKLfW60qn99ftItKjB5T+BkyWOFWe2pUyfQ+IJHmpOTznqk1M6Kg==}
 
+  cross-fetch@4.0.0:
+    resolution: {integrity: sha512-e4a5N8lVvuLgAWgnCrLr2PP0YyDOTHa9H/Rj54dirp61qXnNq46m82bRhNqIA5VccJtWBvPTFRV3TtvHUKPB1g==}
+
   cross-spawn@7.0.3:
     resolution: {integrity: sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==}
     engines: {node: '>= 8'}
@@ -7450,6 +7456,9 @@ packages:
   tslib@2.6.3:
     resolution: {integrity: sha512-xNvxJEOUiWPGhUuUdQgAJPKOOJfGnIyKySOc09XkKsgdUV/3E2zvwZYdejjmRgPCgcym1juLH3226yA7sEFJKQ==}
 
+  tslib@2.7.0:
+    resolution: {integrity: sha512-gLXCKdN1/j47AiHiOkJN69hJmcbGTHI0ImLmbYLHykhgeN0jVGola9yVjFgzCUklsZQMW55o+dW7IXv3RCXDzA==}
+
   tsutils@3.21.0:
     resolution: {integrity: sha512-mHKK3iUXL+3UF6xL5k0PEhKRUBKPBCv/+RkEOpjRWxxx27KKRBmmA60A9pgOUvMi8GKhRMPEmjBRPzs2W7O1OA==}
     engines: {node: '>= 6'}
@@ -7745,6 +7754,12 @@ packages:
         optional: true
       terser:
         optional: true
+
+  vitest-fetch-mock@0.3.0:
+    resolution: {integrity: sha512-g6upWcL8/32fXL43/5f4VHcocuwQIi9Fj5othcK9gPO8XqSEGtnIZdenr2IaipDr61ReRFt+vaOEgo8jiUUX5w==}
+    engines: {node: '>=14.14.0'}
+    peerDependencies:
+      vitest: '>=2.0.0'
 
   vitest@1.6.0:
     resolution: {integrity: sha512-H5r/dN06swuFnzNFhq/dnz37bPXnq8xB2xB5JOVk8K09rUtoeNN+LHWkoQ0A/i3hvbUKKcCei9KpbxqHMLhLLA==}
@@ -12864,7 +12879,7 @@ snapshots:
   '@yarnpkg/esbuild-plugin-pnp@3.0.0-rc.15(esbuild@0.20.2)':
     dependencies:
       esbuild: 0.20.2
-      tslib: 2.6.3
+      tslib: 2.7.0
 
   '@yarnpkg/fslib@2.10.3':
     dependencies:
@@ -13627,6 +13642,12 @@ snapshots:
       sha.js: 2.4.11
 
   cross-fetch@3.1.8:
+    dependencies:
+      node-fetch: 2.7.0
+    transitivePeerDependencies:
+      - encoding
+
+  cross-fetch@4.0.0:
     dependencies:
       node-fetch: 2.7.0
     transitivePeerDependencies:
@@ -17404,6 +17425,8 @@ snapshots:
 
   tslib@2.6.3: {}
 
+  tslib@2.7.0: {}
+
   tsutils@3.21.0(typescript@5.5.2):
     dependencies:
       tslib: 1.14.1
@@ -17683,6 +17706,13 @@ snapshots:
       '@types/node': 20.14.8
       fsevents: 2.3.3
       terser: 5.31.1
+
+  vitest-fetch-mock@0.3.0(vitest@1.6.0(@types/node@20.14.8)(jsdom@24.1.0)(terser@5.31.1)):
+    dependencies:
+      cross-fetch: 4.0.0
+      vitest: 1.6.0(@types/node@20.14.8)(jsdom@24.1.0)(terser@5.31.1)
+    transitivePeerDependencies:
+      - encoding
 
   vitest@1.6.0(@types/node@20.14.8)(jsdom@24.1.0)(terser@5.31.1):
     dependencies:

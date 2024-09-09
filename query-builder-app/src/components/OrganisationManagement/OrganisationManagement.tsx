@@ -89,7 +89,7 @@ export default function OrganisationManagement() {
       });
 
     } catch (error) {
-      throw new Error("Unexpected error while fetching members!");
+      toast.error("Unexpected error while fetching members!");
     }
   };
 
@@ -132,7 +132,10 @@ export default function OrganisationManagement() {
     try {
       getMembers();
     } catch (error) {
-      if (error) {
+      if(error instanceof Error) {
+        toast.error(error.message);
+      }
+      else if (error) {
         setErrorGetMembers("Unknown error has occurred, please refresh the page and try again!");
         toast.error("Unknown error has occurred, please refresh the page and try again!");
       }
