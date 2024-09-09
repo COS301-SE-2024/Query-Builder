@@ -3,7 +3,6 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
-  Put,
   UnauthorizedException
 } from '@nestjs/common';
 import { Supabase } from '../supabase';
@@ -29,7 +28,6 @@ import { Upload_Org_Logo_Dto } from './dto/upload-org-logo.dto';
 import { Join_Org_Dto } from './dto/join-org.dto';
 import { Create_Hash_Dto } from './dto/create-hash.dto';
 import * as crypto from 'crypto';
-import { createHash } from 'crypto';
 import { Has_Saved_Db_Creds_Dto } from './dto/has-saved-db-creds.dto';
 
 @Injectable()
@@ -1052,7 +1050,8 @@ export class OrgManagementService {
       name: update_db_dto.name,
       type: update_db_dto.type,
       db_info: update_db_dto.db_info,
-      host: update_db_dto.host
+      host: update_db_dto.host,
+      port: update_db_dto.port
     };
 
     const { data: db_data, error: db_error } = await this.supabase

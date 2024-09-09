@@ -1,86 +1,416 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import SignedInHomePage from './SignedInHomePage';
-import { describe, it, expect, vi, beforeAll, afterAll, Mock } from 'vitest';
+import { describe, it, expect, vi, Mock } from 'vitest';
+import userEvent from '@testing-library/user-event'
+import * as ServerActions from '../../app/serverActions';
+import toast from 'react-hot-toast';
 
-// Mock the necessary components and modules
-vi.mock('./../../utils/supabase/client', () => ({
-  createClient: () => ({
-    auth: {
-      getSession: vi.fn().mockResolvedValue({
-        data: {
-          session: {
-            access_token: 'mocked_access_token'
-          }
-        }
+//Mock out Supabase access token retrieval
+vi.mock("./../../utils/supabase/client", () => {
+  return{
+      createClient: vi.fn().mockImplementation(() => {
+          return{
+              auth: {
+              getSession: vi.fn().mockImplementation(() => {
+                  return{
+                      data: vi.fn().mockReturnThis(),
+                      session: vi.fn().mockReturnThis(),
+                      access_token: "randomAccessToken"
+                  }
+              })
+          }}
       })
-    }
-  })
+  }
+})
+
+//Mock out Next redirects
+vi.mock('next/navigation', () => ({
+  redirect: (url: string) => {}
 }));
 
-vi.mock('../DatabaseConnectionModal/DatabaseConnectionModal', () => ({
-  __esModule: true,
-  default: ({ org_id, on_add }: { org_id: string, on_add: () => void }) => (
-    <div data-testid="DatabaseConnectionModal">
-      <button onClick={on_add}>Add DB</button>
-    </div>
-  )
-}));
+//Mock out the API calls
+global.fetch = vi.fn((url: string, config: any) => {
 
-describe('SignedInHomePage', () => {
-  // Mock fetch globally
-  beforeAll(() => {
-    global.fetch = vi.fn(() =>
-      Promise.resolve({
-        json: () => Promise.resolve({
-          org_data: [
-            {
-              created_at: '2023-01-01T00:00:00.000Z',
-              logo: 'logo_url',
-              name: 'Test Organisation',
-              org_id: 'org_123',
+  if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/get-org`){
+      return Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve({data: [{
+              created_at: "",
+              logo: "",
+              name: "Mock Org",
+              org_id: "MockOrgID",
               db_envs: [
                 {
-                  created_at: '2023-01-01T00:00:00.000Z',
-                  name: 'Test Database',
-                  db_id: 'db_123',
-                  db_info: {},
-                  type: 'PostgreSQL'
+                  created_at: "",
+                  name: "Mock Database Server",
+                  db_id: "MockDBID",
+                  db_info: "",
+                  type: "mysql"
                 }
               ],
-              org_members: ['member_1']
-            }
-          ]
-        })
-      })
-    ) as Mock;
-  });
-
-  afterAll(() => {
-    vi.resetAllMocks();
-  });
-
-  it('fetches and displays organisations and databases', async () => {
-    render(<SignedInHomePage />);
-
-    // Check that the organisation name is displayed
-    await waitFor(() => {
-      expect(screen.getByText('Your Organisations')).toBeInTheDocument();
+              org_members: [
+                "Member1"
+              ]
+            }]}),
+      });
+  }
+  else if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/has-active-connection`){
+    return Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve({hasActiveConnection: false}),
     });
+  }
+
+}) as Mock;
+
+//Spy on navigateToForm
+vi.spyOn(ServerActions, 'navigateToForm');
+
+//Spy on toast.error
+vi.spyOn(toast, 'error');
+
+//basic component rendering tests
+describe('SignedInHomePage basic rendering tests', () => {
+
+  it('should render successfully and display the org and its database server', async () => {
+
+      render(<SignedInHomePage/>);
+
+      const orgText = (await screen.findAllByText('Mock Org'))[0];
+      expect(orgText).toBeInTheDocument();
+
+      const serverText = (await screen.findAllByText('Mock Database Server'))[0];
+      expect(serverText).toBeInTheDocument();
+
   });
 
-  it('calls fetchOrgs on modal add', async () => {
-    render(<SignedInHomePage />);
+});
 
-    // Simulate clicking the add button in the modal
-    await waitFor(() => {
-      screen.getByText('+ Add').click();
-    });
+//query database tests
+describe('SignedInHomePage querying tests', () => {
 
-    // Check that fetch has been called again (fetchOrgs is called again)
-    await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(2); // Once for initial load and once for add
-    });
+  it('should be able to query a database that has an active connection', async () => {
+
+    //Mock out the API calls
+    global.fetch = vi.fn((url: string, config: any) => {
+
+      if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/get-org`){
+          return Promise.resolve({
+                ok: true,
+                json: () => Promise.resolve({data: [{
+                  created_at: "",
+                  logo: "",
+                  name: "Mock Org",
+                  org_id: "MockOrgID",
+                  db_envs: [
+                    {
+                      created_at: "",
+                      name: "Mock Database Server",
+                      db_id: "MockDBID",
+                      db_info: "",
+                      type: "mysql"
+                    }
+                  ],
+                  org_members: [
+                    "Member1"
+                  ]
+                }]}),
+          });
+      }
+      else if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/has-active-connection`){
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({hasActiveConnection: true}),
+        });
+      }
+
+    }) as Mock;
+
+    //create a user that can perform actions
+    const user = userEvent.setup();
+
+    //render the component
+    render(<SignedInHomePage/>);
+
+    //find the database server link to click
+    const serverText = (await screen.findAllByText('Mock Database Server'))[0];
+
+    //click the database server link
+    await user.click(serverText);
+
+    //expect to be redirected to the query form
+    expect(ServerActions.navigateToForm).toBeCalled();
+
   });
+
+  it('should be able to query a database that has no active connection, but db secrets saved', async () => {
+
+    //Mock out the API calls
+    global.fetch = vi.fn((url: string, config: any) => {
+
+      if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/get-org`){
+          return Promise.resolve({
+                ok: true,
+                json: () => Promise.resolve({data: [{
+                  created_at: "",
+                  logo: "",
+                  name: "Mock Org",
+                  org_id: "MockOrgID",
+                  db_envs: [
+                    {
+                      created_at: "",
+                      name: "Mock Database Server",
+                      db_id: "MockDBID",
+                      db_info: "",
+                      type: "mysql"
+                    }
+                  ],
+                  org_members: [
+                    "Member1"
+                  ]
+                }]}),
+          });
+      }
+      else if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/has-active-connection`){
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({hasActiveConnection: false}),
+        });
+      }
+      else if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/has-saved-db-credentials`){
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({saved_db_credentials: true}),
+        });
+      }
+      else if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/connect`){
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({success: true}),
+        });
+      }
+
+    }) as Mock;
+
+    //create a user that can perform actions
+    const user = userEvent.setup();
+
+    //render the component
+    render(<SignedInHomePage/>);
+
+    //find the database server link to click
+    const serverText = (await screen.findAllByText('Mock Database Server'))[0];
+
+    //click the database server link
+    await user.click(serverText);
+
+    //expect to be redirected to the query form
+    expect(ServerActions.navigateToForm).toBeCalled();
+
+  });
+
+  it('should be able to query a database that has no active connection, and no db secrets saved', async () => {
+
+    //Mock out the API calls
+    global.fetch = vi.fn((url: string, config: any) => {
+
+      if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/get-org`){
+          return Promise.resolve({
+                ok: true,
+                json: () => Promise.resolve({data: [{
+                  created_at: "",
+                  logo: "",
+                  name: "Mock Org",
+                  org_id: "MockOrgID",
+                  db_envs: [
+                    {
+                      created_at: "",
+                      name: "Mock Database Server",
+                      db_id: "MockDBID",
+                      db_info: "",
+                      type: "mysql"
+                    }
+                  ],
+                  org_members: [
+                    "Member1"
+                  ]
+                }]}),
+          });
+      }
+      else if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/has-active-connection`){
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({hasActiveConnection: false}),
+        });
+      }
+      else if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/has-saved-db-credentials`){
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({saved_db_credentials: false}),
+        });
+      }
+      else if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/connect`){
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({success: true}),
+        });
+      }
+
+    }) as Mock;
+
+    //create a user that can perform actions
+    const user = userEvent.setup();
+
+    //render the component
+    render(<SignedInHomePage/>);
+
+    //find the database server link to click
+    const serverText = (await screen.findAllByText('Mock Database Server'))[0];
+
+    //click the database server link
+    await user.click(serverText);
+
+    //expect the DatabaseCredentialsModal to show
+    const modalText = (await screen.findAllByText('Connect to your database server'))[0];
+    expect(modalText).toBeInTheDocument();
+
+  });
+
+  it('should display an error when connection with saved credentials failed with message', async () => {
+
+    //Mock out the API calls
+    global.fetch = vi.fn((url: string, config: any) => {
+
+      if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/get-org`){
+          return Promise.resolve({
+                ok: true,
+                json: () => Promise.resolve({data: [{
+                  created_at: "",
+                  logo: "",
+                  name: "Mock Org",
+                  org_id: "MockOrgID",
+                  db_envs: [
+                    {
+                      created_at: "",
+                      name: "Mock Database Server",
+                      db_id: "MockDBID",
+                      db_info: "",
+                      type: "mysql"
+                    }
+                  ],
+                  org_members: [
+                    "Member1"
+                  ]
+                }]}),
+          });
+      }
+      else if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/has-active-connection`){
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({hasActiveConnection: false}),
+        });
+      }
+      else if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/has-saved-db-credentials`){
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({saved_db_credentials: true}),
+        });
+      }
+      else if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/connect`){
+        return Promise.resolve({
+          ok: false,
+          json: () => Promise.resolve({
+            response: {
+              message: "Can't connect"
+            }}),
+        });
+      }
+
+    }) as Mock;
+
+    //create a user that can perform actions
+    const user = userEvent.setup();
+
+    //render the component
+    render(<SignedInHomePage/>);
+
+    //find the database server link to click
+    const serverText = (await screen.findAllByText('Mock Database Server'))[0];
+
+    //click the database server link
+    await user.click(serverText);
+
+    //expect an error
+    expect(toast.error).toBeCalled();
+
+  });
+
+  it('should display an error when connection with saved credentials failed without message', async () => {
+
+    //Mock out the API calls
+    global.fetch = vi.fn((url: string, config: any) => {
+
+      if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/get-org`){
+          return Promise.resolve({
+                ok: true,
+                json: () => Promise.resolve({data: [{
+                  created_at: "",
+                  logo: "",
+                  name: "Mock Org",
+                  org_id: "MockOrgID",
+                  db_envs: [
+                    {
+                      created_at: "",
+                      name: "Mock Database Server",
+                      db_id: "MockDBID",
+                      db_info: "",
+                      type: "mysql"
+                    }
+                  ],
+                  org_members: [
+                    "Member1"
+                  ]
+                }]}),
+          });
+      }
+      else if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/has-active-connection`){
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({hasActiveConnection: false}),
+        });
+      }
+      else if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/has-saved-db-credentials`){
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({saved_db_credentials: true}),
+        });
+      }
+      else if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/connect`){
+        return Promise.resolve({
+          ok: false,
+          json: () => Promise.resolve({})
+        });
+      }
+
+    }) as Mock;
+
+    //create a user that can perform actions
+    const user = userEvent.setup();
+
+    //render the component
+    render(<SignedInHomePage/>);
+
+    //find the database server link to click
+    const serverText = (await screen.findAllByText('Mock Database Server'))[0];
+
+    //click the database server link
+    await user.click(serverText);
+
+    //expect an error
+    expect(toast.error).toBeCalled();
+
+  });
+
 });

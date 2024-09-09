@@ -2106,7 +2106,8 @@ describe('OrgManagementService', () => {
           name: 'TestDB',
           org_id: '0000',
           type: 'mysql',
-          host: '127.0.0.1'
+          host: '127.0.0.1',
+          port: 3306
         })
         .catch((error) => {
           expect(error).toBeDefined();
@@ -2135,7 +2136,8 @@ describe('OrgManagementService', () => {
           name: 'TestDB',
           org_id: '0000',
           type: 'mysql',
-          host: '127.0.0.1'
+          host: '127.0.0.1',
+          port: 3306
         })
         .catch((error) => {
           expect(error).toBeDefined();
@@ -2164,7 +2166,8 @@ describe('OrgManagementService', () => {
           name: 'TestDB',
           org_id: '0000',
           type: 'mysql',
-          host: '127.0.0.1'
+          host: '127.0.0.1',
+          port: 3306
         })
         .catch((error) => {
           expect(error).toBeDefined();
@@ -2212,7 +2215,8 @@ describe('OrgManagementService', () => {
           name: 'TestDB',
           org_id: '0000',
           type: 'mysql',
-          host: '127.0.0.1'
+          host: '127.0.0.1',
+          port: 3306
         })
         .catch((error) => {
           expect(error).toBeDefined();
@@ -2260,7 +2264,8 @@ describe('OrgManagementService', () => {
           name: 'TestDB',
           org_id: '0000',
           type: 'mysql',
-          host: '127.0.0.1'
+          host: '127.0.0.1',
+          port: 3306
         })
         .catch((error) => {
           expect(error).toBeDefined();
@@ -2309,7 +2314,8 @@ describe('OrgManagementService', () => {
           name: 'TestDB',
           org_id: '0000',
           type: 'mysql',
-          host: '127.0.0.1'
+          host: '127.0.0.1',
+          port: 3306
         })
         .catch((error) => {
           expect(error).toBeDefined();
@@ -2365,7 +2371,8 @@ describe('OrgManagementService', () => {
         name: 'TestDB',
         org_id: '0000',
         type: 'mysql',
-        host: '127.0.0.1'
+        host: '127.0.0.1',
+        port: 3306
       });
 
       expect(data).toBeDefined();

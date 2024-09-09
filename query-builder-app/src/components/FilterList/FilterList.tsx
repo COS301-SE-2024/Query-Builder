@@ -100,7 +100,7 @@ export default function FilterList(props: FilterListProps){
 
         if(!response.ok){
         
-            if(json.response.message == 'You do not have a backend session'){
+            if(json.response && json.response.message == 'You do not have a backend session'){
                 navigateToAuth();
             }
           
@@ -134,7 +134,7 @@ export default function FilterList(props: FilterListProps){
 
             if(!response.ok){
         
-                if(json.response.message == 'You do not have a backend session'){
+                if(json.response && json.response.message == 'You do not have a backend session'){
                     navigateToAuth();
                 }
               
