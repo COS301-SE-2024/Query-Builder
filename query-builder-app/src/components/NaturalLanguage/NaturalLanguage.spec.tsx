@@ -53,31 +53,42 @@ describe('NaturalLanguage basic rendering tests', () => {
   });
 });
 
-// describe('NaturalLanguage query functionality', () => {
-//   it('can make a natural language query successfully', async () => {
-//     // Mock API calls
+// describe('NaturalLanguage make a query', () => {
+//   it('can make a natural language query', async () => {
+
+//     //Mock out the API calls
 //     global.fetch = vi.fn((url: string, config: any) => {
-//       if (url === `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/natural-language/query`) {
-//         return Promise.resolve({
-//           ok: true,
-//           json: () => Promise.resolve({
-//             databaseServerId: "1234",
-//             queryParams: {
-//               language: "sql",
-//               query_type: "select",
-//               databaseName: "sakila",
-//               table: {
-//                 name: "actor",
-//                 columns: [
-//                   { name: "first_name" },
-//                   { name: "last_name" }
-//                 ]
-//               }
-//             }
-//           }),
-//         });
+
+//       if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/natural-language/query`){
+//           return Promise.resolve({
+//               ok: true,
+//               json: () => Promise.resolve({
+//                 databaseServerId: "1234",
+//                 queryParams: {
+//                   language: "sql",
+//                   query_type: "select",
+//                   databaseName: "sakila",
+//                   table: {name: "actor", columns: [{name: "first_name"}, {name: "last_name"}]}
+//                 }
+//             }),
+//           })
 //       }
-//       return Promise.reject();
+
+//       if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query`){
+//         return Promise.resolve({
+//             ok: true,
+//             json: () => Promise.resolve({
+//                 "totalNumRows": 1,
+//                 "data": [
+//                   {
+//                     "title": "ACADEMY DINOSAUR",
+//                     "qbee_id": 0
+//                   },
+//                 ]
+//           }),
+//         })
+//     }
+
 //     }) as Mock;
 
 //     // Create a user that can perform actions
