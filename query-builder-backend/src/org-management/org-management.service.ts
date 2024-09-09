@@ -742,7 +742,8 @@ export class OrgManagementService {
         org_id: org_data[0].org_id,
         name: 'Test Database',
         type: 'mysql',
-        host: '127.0.0.1'
+        host: '127.0.0.1',
+        port: 3306
       };
 
       const { data: db_created_data } = await this.addDb(add_db_dto);
