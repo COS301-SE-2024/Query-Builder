@@ -1,6 +1,6 @@
 //----------------------------IMPORTS------------------------------------//
 
-import {table} from "../../interfaces/intermediateJSON"
+import { table } from "../../interfaces/intermediateJSON"
 import React, { useState } from "react";
 import TableForm from "../TableForm/TableForm"
 import { Button, Card, CardBody, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spacer } from "@nextui-org/react";
@@ -27,7 +27,7 @@ interface JoinableTable {
     TABLE_SCHEMA?: string
 }
 
-export default function TableList(props: TableListProps){
+export default function TableList(props: TableListProps) {
 
     //----------------------------REACT HOOKS------------------------------------//
 
@@ -40,28 +40,28 @@ export default function TableList(props: TableListProps){
     //React hook to inform the parent component that the data model has changed
     React.useEffect(() => {
 
-        if((props.onChange != null)){
+        if ((props.onChange != null)) {
             props.onChange(table);
         }
 
-    },[table])
+    }, [table])
 
     //React hook to fetch the database's tables upon render of the TableList
     React.useEffect(() => {
 
         fetchAllTables(props.databaseName);
 
-    },[])
+    }, [])
 
     //React hook to fetch all joinable tables upon update of table
     React.useEffect(() => {
 
         //check to exclude this code running on first render
 
-        if(table.name != ""){
+        if (table.name != "") {
             //find the last table
             let tableRef: table = table;
-            while(tableRef.join != null){
+            while (tableRef.join != null) {
                 tableRef = tableRef.join.table2;
             }
             //tableRef is now the last table in the join linked list
@@ -70,13 +70,13 @@ export default function TableList(props: TableListProps){
             fetchJoinableTables(props.databaseName, tableRef.name);
         }
 
-    },[table])
+    }, [table])
 
     React.useEffect(() => {
 
         console.log(joinableTables);
 
-    },[joinableTables])
+    }, [joinableTables])
 
     //----------------------------HELPER FUNCTIONS------------------------------------//
 
@@ -94,28 +94,28 @@ export default function TableList(props: TableListProps){
     function updateTable(updatedTable: table) {
 
         setTable((previousTableState) => {
-      
-          function updateTableRef(tableRef: table): table {
-            if (tableRef.name === updatedTable.name) {
-                return {
-                    ...updatedTable, // Update name and columns from updatedTable
-                    join: tableRef.join // Keep the original join property
-                  };
-            } else if (tableRef.join) {
-              return {
-                ...tableRef,
-                join: {
-                    ...tableRef.join,
-                    table2: updateTableRef(tableRef.join.table2)
+
+            function updateTableRef(tableRef: table): table {
+                if (tableRef.name === updatedTable.name) {
+                    return {
+                        ...updatedTable, // Update name and columns from updatedTable
+                        join: tableRef.join // Keep the original join property
+                    };
+                } else if (tableRef.join) {
+                    return {
+                        ...tableRef,
+                        join: {
+                            ...tableRef.join,
+                            table2: updateTableRef(tableRef.join.table2)
+                        }
+                    };
                 }
-              };
+                return tableRef;
             }
-            return tableRef;
-          }
-      
-          return updateTableRef(previousTableState);
+
+            return updateTableRef(previousTableState);
         });
-      }
+    }
 
     //async function to fetch all the database's tables
     async function fetchAllTables(database: string) {
@@ -124,9 +124,9 @@ export default function TableList(props: TableListProps){
             credentials: "include",
             method: "PUT",
             headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + await getToken()
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + await getToken()
             },
             body: JSON.stringify({
                 databaseServerID: props.databaseServerID,
@@ -136,7 +136,7 @@ export default function TableList(props: TableListProps){
 
         let json = await response.json();
 
-        if(response.ok){
+        if (response.ok) {
             //set the tables hook
             setJoinableTables(json);
         }
@@ -145,11 +145,11 @@ export default function TableList(props: TableListProps){
             if(json.response && json.response.message == 'You do not have a backend session'){
                 navigateToAuth();
             }
-      
-          }
+
+        }
 
     }
-    
+
     //async function to fetch the joinable tables
     async function fetchJoinableTables(database: string, tableName: string) {
 
@@ -157,9 +157,9 @@ export default function TableList(props: TableListProps){
             credentials: "include",
             method: "PUT",
             headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + await getToken()
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + await getToken()
             },
             body: JSON.stringify({
                 databaseServerID: props.databaseServerID,
@@ -170,13 +170,13 @@ export default function TableList(props: TableListProps){
 
         let json = await response.json();
 
-        if(response.ok){
+        if (response.ok) {
             //remove any tables already in the query to prevent circular joins
             let tableRef: table = table;
-            json = json.filter((obj: JoinableTable) => {return obj.table_name != tableRef.name});
-            while(tableRef.join){
+            json = json.filter((obj: JoinableTable) => { return obj.table_name != tableRef.name });
+            while (tableRef.join) {
                 tableRef = tableRef.join.table2;
-                json = json.filter((obj: JoinableTable) => {return obj.table_name != tableRef.name});
+                json = json.filter((obj: JoinableTable) => { return obj.table_name != tableRef.name });
             }
 
             //set the joinable tables hook
@@ -187,35 +187,35 @@ export default function TableList(props: TableListProps){
             if(json.response && json.response.message == 'You do not have a backend session'){
                 navigateToAuth();
             }
-      
+
         }
 
     }
 
     //helper function called when a table is selected in the table DropdownMenu
-    function handleTableSelection(key: any, table: table){
-    
+    function handleTableSelection(key: any, table: table) {
+
         //if table.name is empty, add the key as the name
-        if(table.name == ""){
+        if (table.name == "") {
             setTable((previousTableState) => {
-                return {...previousTableState, name: key}
+                return { ...previousTableState, name: key }
             });
         }
         //else, join a new table, with name 'key', onto the table (or call the callback to do this)
-        else{
+        else {
 
             let table1MatchingColumnName: string;
             let table2MatchingColumnName: string;
 
             //use the key to search through joinableTables to find the correct column names to match on
-            for(let table of joinableTables){
-                if(table.table_name == key){
-                    if(table.REFERENCED_TABLE_SCHEMA){
+            for (let table of joinableTables) {
+                if (table.table_name == key) {
+                    if (table.REFERENCED_TABLE_SCHEMA) {
                         //from - so COLUMN_NAME is table1MatchingColumnName and REFERENCED_COLUMN_NAME is table2MatchingColumnName
                         table1MatchingColumnName = table.COLUMN_NAME;
                         table2MatchingColumnName = table.REFERENCED_COLUMN_NAME;
                     }
-                    else{
+                    else {
                         //to - so REFERENCED_COLUMN_NAME is table1MatchingColumnName and COLUMN_NAME is table2MatchingColumnName
                         table1MatchingColumnName = table.REFERENCED_COLUMN_NAME;
                         table2MatchingColumnName = table.COLUMN_NAME;
@@ -225,31 +225,31 @@ export default function TableList(props: TableListProps){
 
             setTable((previousTableState) => {
                 function addTableToJoin(tableState: table): table {
-                  if (!tableState.join) {
-                    return {
-                      ...tableState,
-                      join: {
-                        table1MatchingColumnName: table1MatchingColumnName,
-                        table2MatchingColumnName: table2MatchingColumnName,
-                        table2: {
-                          name: key,
-                          columns: []
-                        }
-                      }
-                    };
-                  } else {
-                    return {
-                      ...tableState,
-                      join: {
-                        ...tableState.join,
-                        table2: addTableToJoin(tableState.join.table2)
-                      }
-                    };
-                  }
+                    if (!tableState.join) {
+                        return {
+                            ...tableState,
+                            join: {
+                                table1MatchingColumnName: table1MatchingColumnName,
+                                table2MatchingColumnName: table2MatchingColumnName,
+                                table2: {
+                                    name: key,
+                                    columns: []
+                                }
+                            }
+                        };
+                    } else {
+                        return {
+                            ...tableState,
+                            join: {
+                                ...tableState.join,
+                                table2: addTableToJoin(tableState.join.table2)
+                            }
+                        };
+                    }
                 }
-              
+
                 return addTableToJoin(previousTableState);
-              });
+            });
         }
 
     }
@@ -275,22 +275,30 @@ export default function TableList(props: TableListProps){
                     )}
 
                     {/* Add button for joining a new table */}
-                    {tableRef.join == null && joinableTables.length > 0 && (
+                    {tableRef.join == null && (
                         <Dropdown>
                             <DropdownTrigger>
-                                <Button variant="bordered" aria-label="add table button">+</Button>
+                                <Button
+                                    variant="bordered"
+                                    aria-label="add table button"
+                                    disabled={joinableTables.length === 0}
+                                >
+                                    +
+                                </Button>
                             </DropdownTrigger>
-                            <DropdownMenu
-                                className="max-h-[50vh] overflow-y-auto"
-                                items={joinableTables}
-                                onAction={(key) => handleTableSelection(key, tableRef)}
-                            >
-                                {(item: any) => (
-                                    <DropdownItem key={item.table_name}>
-                                        {item.table_name}
-                                    </DropdownItem>
-                                )}
-                            </DropdownMenu>
+                            {joinableTables.length > 0 && (
+                                <DropdownMenu
+                                    className="max-h-[50vh] overflow-y-auto"
+                                    items={joinableTables}
+                                    onAction={(key) => handleTableSelection(key, tableRef)}
+                                >
+                                    {(item: any) => (
+                                        <DropdownItem key={item.table_name}>
+                                            {item.table_name}
+                                        </DropdownItem>
+                                    )}
+                                </DropdownMenu>
+                            )}
                         </Dropdown>
                     )}
                 </CardBody>
@@ -304,17 +312,17 @@ export default function TableList(props: TableListProps){
                 if (tableState.name === tableRef.name) {
                     return null;
                 }
-    
+
                 if (tableState.join) {
                     const updatedJoin = removeTable(tableState.join.table2);
-    
+
                     if (updatedJoin === null && tableState.join.table2.name === tableRef.name) {
                         return {
                             ...tableState,
                             join: undefined
                         };
                     }
-    
+
                     return {
                         ...tableState,
                         join: {
@@ -326,10 +334,10 @@ export default function TableList(props: TableListProps){
                         }
                     };
                 }
-    
+
                 return tableState;
             }
-    
+
             function findRightmostTableName(tableState: table): string {
                 let currentTable = tableState;
                 while (currentTable.join && currentTable.join.table2) {
@@ -337,24 +345,24 @@ export default function TableList(props: TableListProps){
                 }
                 return currentTable.name;
             }
-    
+
             const updatedTable = removeTable(previousTableState);
-    
+
             if (updatedTable === null) {
                 return {
                     name: "",
                     columns: []
                 };
             }
-    
+
             const rightmostTableName = findRightmostTableName(updatedTable);
-    
+
             fetchJoinableTables(props.databaseName, rightmostTableName);
-    
+
             return updatedTable;
         });
     }
-    
+
 
     //----------------------------CREATE THE ARRAYS OF TABLES AND TABLE FORMS------------------------------------//
 
@@ -372,7 +380,7 @@ export default function TableList(props: TableListProps){
     tableForms.push(<TableForm databaseServerID={props.databaseServerID} table={tableRef} onChange={updateTable} ></TableForm>)
 
     //iterate over the linked list of joined tables
-    while(tableRef.join != null){
+    while (tableRef.join != null) {
         tableRef = tableRef.join.table2;
         //add the table for the next table
         tables.push(createTableCard(tableRef));
@@ -382,14 +390,14 @@ export default function TableList(props: TableListProps){
 
     //----------------------------RENDER THE COMPONENT------------------------------------//
 
-    return(
+    return (
         <>
             <h2>Select some tables:</h2>
-            <Spacer y={2}/>
+            <Spacer y={2} />
             <div className="flex space-x-4">
                 {tables}
             </div>
-            <Spacer y={4}/>
+            <Spacer y={4} />
             {//Display the TableForms only if there is a table selected (table.name is not empty)
                 ((table.name != "") && (
                     <div className="flex space-x-4">
