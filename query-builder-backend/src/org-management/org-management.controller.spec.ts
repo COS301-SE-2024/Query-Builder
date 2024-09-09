@@ -20,6 +20,7 @@ describe('OrgManagementController', () => {
     createHash: jest.fn().mockResolvedValue('0000'),
     addMember: jest.fn().mockResolvedValue('0000'),
     addDb: jest.fn().mockResolvedValue('0000'),
+    setUpTestScenario: jest.fn().mockResolvedValue('0000'),
     giveDbAccess: jest.fn().mockResolvedValue('0000'),
     hasSavedDbCredentials: jest.fn().mockResolvedValue(false),
     saveDbSecrets: jest.fn().mockResolvedValue('0000'),
@@ -142,6 +143,12 @@ describe('OrgManagementController', () => {
       ).toBe('0000');
     });
   });
+
+  describe('setUpTestScenario', () => {
+    it('should return test scenario', async () => {
+      expect(await controller.setUpTestScenario({})).toBe('0000');
+    });
+  })
 
   describe('giveDbAccess', () => {
     it('should return db access', async () => {

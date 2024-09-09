@@ -1,2 +1,3 @@
 query-builder-backend/dump.rdb
 dump.rdb
+query-builder-app/cypress.env.json
