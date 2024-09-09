@@ -283,10 +283,10 @@ export default function OrganisationManagement() {
         return user.profiles.phone;
     }
   }, [hasAdminPermission, orgMembers]);
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   const renderUpdatePage = React.useCallback(() => {
     // console.log(loggedInUserRole);
-    const { isOpen, onOpen, onOpenChange } = useDisclosure();
     if (hasAdminPermission && (loggedInUserRole == "owner" || loggedInUserRole == "Owner")) {
       return (
         <>
@@ -515,7 +515,7 @@ export default function OrganisationManagement() {
         </>);
       }
     }
-  }, [loggedInUserRole, hasAdminPermission, profilePicURL, initialOrgName, updateQuery,useDisclosure]);
+  }, [loggedInUserRole, hasAdminPermission, profilePicURL, initialOrgName, updateQuery]);
 
   const renderOrgName = React.useCallback(() => {
     return (
