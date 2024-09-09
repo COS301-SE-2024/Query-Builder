@@ -38,5 +38,3 @@ cypress.env.json
 next-env.d.ts
 
 *storybook.log
-
-cypress.env.json
