@@ -34,10 +34,10 @@ export class NaturalLanguageService {
 
       //-----------Fetch DB metadata to inform the LLM of the database server's structure-----------//
       const metadataSummary =
-      await this.dbMetadataHandlerService.getSchemaSummary(
-        { databaseServerID: naturalLanguageQuery.databaseServerID },
-        session
-      );
+        await this.dbMetadataHandlerService.getSchemaSummary(
+          { databaseServerID: naturalLanguageQuery.databaseServerID },
+          session
+        );
       const metadataSummaryString = JSON.stringify(metadataSummary);
 
       //-------------------------------Create the prompt for the LLM-------------------------------//
@@ -256,6 +256,114 @@ export class NaturalLanguageService {
 
       prompt +=
         '\n\n The database structure is as follows: ' + metadataSummaryString;
+
+      prompt += '\n\n Please do not use "*" to select all columns but instead use all the names for them. ';
+      prompt += '\n\n For example: ';
+      prompt += '\n\n DO NOT DO: ';
+      prompt += `QueryParams = {
+                    "language": "sql",
+                    "query_type": "select",
+                    "databaseName": "your_database_name",
+                    "table": {
+                        "name": "table_name",
+                        "columns": [*]
+                    }
+                }`;
+      prompt += '\n\n RATHER DO: ';
+      prompt += `QueryParams = {
+                      "language": "sql",
+                      "query_type": "select",
+                      "databaseName": "your_database_name",
+                      "table": {
+                          "name": "table_name",
+                          "columns": [
+                              {"name": "column1"},
+                              {"name": "column2"},
+                              {"name": "column3"},
+                              {"name": "column4"}
+                          ]
+                      }
+                  }`;
+
+      prompt += '\n\n Please ensure you always use the symbols for operators for example "=", "<" ect rather than using EQUAL ect...  ';
+
+      prompt += '\n\n Here are a few examples of inputs and desired output: ';
+
+      prompt += '\n\n Example 1: ';
+      prompt += '\n\n Query: Give me country names starting with B ';
+      prompt += `QueryParams = {
+        "language": "sql",
+        "query_type": "select",
+        "databaseName": "sakila",
+        "table": {
+            "name": "country",
+            "columns": [{"name": "country"}]
+        },
+        "condition": {
+            "column": "country",
+            "operator": "LIKE",
+            "value": "B%"
+        }`;
+
+      prompt += '\n\n Example 2: ';
+      prompt += '\n\n Query: Give me all the actors with the first name Nick ';
+      prompt += `QueryParams = {
+                    "language": "sql",
+                    "query_type": "select",
+                    "databaseName": "sakila",
+                    "table": {
+                        "name": "actor",
+                        "columns": [
+                            {"name": "first_name"},
+                            {"name": "last_name"}
+                        ]
+                    },
+                    "condition": {
+                        "conditions": [
+                            {
+                                "tableName": "actor",
+                                "column": "first_name",
+                                "operator": "=",
+                                "value": "Nick"
+                            }
+                        ],
+                        "operator": "AND"
+                    }
+                }`;
+
+      prompt += '\n\n Example 3: ';
+      prompt += '\n\n Query: Get me all the names of active staff members as well as their payment amounts and dates ';
+      prompt += `QueryParams = {
+                    "language": "sql",
+                    "query_type": "select",
+                    "databaseName": "sakila",
+                    "table": {
+                        "name": "staff",
+                        "columns": [
+                            {"name": "active"},
+                            {"name": "first_name"},
+                            {"name": "last_name"}
+                        ],
+                        "join": {
+                            "table1MatchingColumnName": "staff_id",
+                            "table2MatchingColumnName": "staff_id",
+                            "table2": {
+                                "name": "payment",
+                                "columns": [
+                                    {"name": "amount"},
+                                    {"name": "payment_date"}
+                                ]
+                            }
+                        }
+                    }
+                }`;
+
+      prompt += '\n\n Please ensure the following before returning a response: ';
+      prompt += '\n\n 1. The QueryParams should always have all the brackets, please ensure all starting brackets have ending brackets';
+
+
+      prompt += '\n\n Please think really hard of the given query and analyze the examples before giving me an output ';
+
 
       //--------------------Get the JSON intermediate form result from the LLM---------------------//
 
