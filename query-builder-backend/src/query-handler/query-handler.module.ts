@@ -6,7 +6,7 @@ import { ConnectionManagerModule } from '../connection-manager/connection-manage
 import { MyLoggerModule } from '../my-logger/my-logger.module';
 
 @Module({
-  imports: [JsonConverterModule, ConnectionManagerModule, MyLoggerModule],
+  imports: [JsonConverterModule.forRoot('mysql'), ConnectionManagerModule, MyLoggerModule],
   controllers: [QueryHandlerController],
   providers: [QueryHandlerService],
   exports: [QueryHandlerService]
