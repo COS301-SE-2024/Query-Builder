@@ -103,23 +103,20 @@ export class compoundCondition extends condition {
   @Transform(
     ({ value }) =>
       value.map((item: any) => {
-        if (item.condtions !== undefined && item.operator !== undefined) {
+        if (
+          item.condtions !== undefined ||
+          (item.operator !== undefined && item.operator in LogicalOperator)
+        ) {
           return Object.assign(new compoundCondition(), item);
         }
+
         if (
-          item.value !== undefined &&
-          item.column !== undefined &&
-          item.operator !== undefined
+          item.value !== undefined ||
+          item.column !== undefined ||
+          (item.operator !== undefined && item.operator in ComparisonOperator)
         ) {
           return Object.assign(new primitiveCondition(), item);
         } else {
-          if (item.conditions !== undefined) {
-            return Object.assign(new compoundCondition(), item);
-          }
-          if (item.value !== undefined || item.column !== undefined) {
-            return Object.assign(new primitiveCondition(), item);
-          }
-
           return Object.assign(new primitiveCondition(), item);
         }
       }),
