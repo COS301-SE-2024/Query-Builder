@@ -302,7 +302,7 @@ export default function TableList(props: TableListProps){
         setTable((previousTableState) => {
             function removeTable(tableState: table): table | null {
                 if (tableState.name === tableRef.name) {
-                    return null; 
+                    return null;
                 }
     
                 if (tableState.join) {
@@ -311,7 +311,7 @@ export default function TableList(props: TableListProps){
                     if (updatedJoin === null && tableState.join.table2.name === tableRef.name) {
                         return {
                             ...tableState,
-                            join: undefined 
+                            join: undefined
                         };
                     }
     
@@ -327,7 +327,15 @@ export default function TableList(props: TableListProps){
                     };
                 }
     
-                return tableState; 
+                return tableState;
+            }
+    
+            function findRightmostTableName(tableState: table): string {
+                let currentTable = tableState;
+                while (currentTable.join && currentTable.join.table2) {
+                    currentTable = currentTable.join.table2;
+                }
+                return currentTable.name;
             }
     
             const updatedTable = removeTable(previousTableState);
@@ -339,7 +347,9 @@ export default function TableList(props: TableListProps){
                 };
             }
     
-            fetchJoinableTables(props.databaseName, updatedTable.name);
+            const rightmostTableName = findRightmostTableName(updatedTable);
+    
+            fetchJoinableTables(props.databaseName, rightmostTableName);
     
             return updatedTable;
         });
