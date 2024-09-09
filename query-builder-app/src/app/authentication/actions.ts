@@ -13,7 +13,7 @@ export async function login(email: string, password: string) {
         password: password,
     };
 
-    const { data ,error } = await supabase.auth.signInWithPassword(userDetails);
+    const { data, error } = await supabase.auth.signInWithPassword(userDetails);
 
     if (error) {
         // redirect("/error");
@@ -47,7 +47,7 @@ export async function signup(
         },
     };
 
-    const { data , error } = await supabase.auth.signUp(userDetails);
+    const { data, error } = await supabase.auth.signUp(userDetails);
 
     if (error) {
         // Check for the specific rate limit error by message
@@ -58,11 +58,11 @@ export async function signup(
         // Handle other types of errors
         throw new Error(error.message); // Generic error handling
     }
-    
+
     revalidatePath('/', 'layout');
     redirect('/');
 }
- 
+
 export async function navigateToAuth() {
     revalidatePath('/authentication', 'layout');
     redirect('/authentication');

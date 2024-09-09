@@ -5,36 +5,36 @@ import toast, { Toaster } from 'react-hot-toast';
 
 export default function Settings() {
 
-    return(
-      <div className="full-application">
-        <Toaster
+  return (
+    <div className="full-application">
+      <Toaster
         position="top-center"
         reverseOrder={false}
         gutter={8}
         containerClassName=""
         containerStyle={{}}
         toastOptions={{
-            // Define default options
-            className: '',
-            duration: 5000,
-            style: {
+          // Define default options
+          className: '',
+          duration: 5000,
+          style: {
             background: '#363636',
             color: '#fff',
-            },
+          },
 
-            // Default options for specific types
-            success: {
+          // Default options for specific types
+          success: {
             duration: 3000,
             iconTheme: {
-                primary: 'green',
-                secondary: 'black',
+              primary: 'green',
+              secondary: 'black',
             },
-            },
-        }}/>
-        <Sidebar/>
-        <div className="app">
-            <UserSettings/>
-        </div>
+          },
+        }} />
+      <Sidebar />
+      <div className="app">
+        <UserSettings />
       </div>
-    ) ;
+    </div>
+  );
 }

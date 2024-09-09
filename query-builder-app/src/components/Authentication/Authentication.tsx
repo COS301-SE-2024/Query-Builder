@@ -122,12 +122,12 @@ export default function Authentication() {
           credentials: "include",
           method: "PUT",
           headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
           },
-          body: JSON.stringify({email: email, password: password})
+          body: JSON.stringify({ email: email, password: password })
         });
-      
+
         let responseData = await response.json();
       } catch (error) {
         toast.error("Failed to generate session token! Please try logging in again");
@@ -171,24 +171,24 @@ export default function Authentication() {
     try {
       await signup(firstName, lastName, email, password);
     } catch (error) {
-      if(error instanceof AuthError) {
+      if (error instanceof AuthError) {
         toast.error(error.message);
-      } 
+      }
       else if (error) {
         // console.error(error);
-        if(error instanceof Error && error.message.includes("Too many sign-up attempts")){
+        if (error instanceof Error && error.message.includes("Too many sign-up attempts")) {
           toast.error(error.message);
         }
-        else{
+        else {
           toast.error("An unexpected error occurred");
         }
       }
     }
-    finally{
+    finally {
       setLoading(false);
     }
 
-    
+
   };
 
   return (
@@ -337,7 +337,7 @@ export default function Authentication() {
                       signUpEmail,
                       signUpPassword,
                     );
-                    
+
                   }}
                   variant="bordered"
                   isDisabled={
