@@ -3,21 +3,29 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "../../utils/supabase/server";
+import { AuthError } from "@supabase/supabase-js";
 
 export async function login(email: string, password: string) {
     const supabase = createClient();
 
-    const data = {
+    const userDetails = {
         email: email,
         password: password,
     };
 
-    const { error } = await supabase.auth.signInWithPassword(data);
+    const { data ,error } = await supabase.auth.signInWithPassword(userDetails);
 
     if (error) {
-        redirect("/error");
+        // redirect("/error");
+        throw new Error("Failed to login, please try again: " + error.message);
     }
 
+    if(data){
+        //console.log(data);
+        if(!data.user.confirmed_at){
+            throw new Error("Failed to login, please check your emails and verify your account!");
+        }
+    }
 }
 
 export async function signup(
@@ -28,24 +36,29 @@ export async function signup(
 ) {
     const supabase = createClient();
 
-    const data = {
+    const userDetails = {
         email: email,
         password: password,
         options: {
             data: {
                 first_name: firstName,
                 last_name: lastName,
-            },
-            channel: 'sms'
+            }
         },
     };
 
-    const { error } = await supabase.auth.signUp(data);
+    const { data , error } = await supabase.auth.signUp(userDetails);
 
     if (error) {
-        redirect("/error");
+        // Check for the specific rate limit error by message
+        if (error.message === 'Email rate limit exceeded') {
+            console.log(data);
+            throw new Error('Too many sign-up attempts. Please wait and try again.');
+        }
+        // Handle other types of errors
+        throw new Error(error.message); // Generic error handling
     }
-
+    
     revalidatePath('/', 'layout');
     redirect('/');
 }

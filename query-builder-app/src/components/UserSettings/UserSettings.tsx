@@ -5,6 +5,7 @@ import React, { useState, useEffect } from "react";
 import {Button, Card, CardBody, CardFooter, CardHeader, Input, Image} from "@nextui-org/react";
 import {EditIcon} from "../OrganisationManagement/EditIcon";
 import { createClient } from "./../../utils/supabase/client";
+import toast, { Toaster } from 'react-hot-toast';
 
 interface UpdateUserPersonalDetails {
     user_id?: string;
@@ -32,6 +33,8 @@ export default function UserSettings(){
     const [profilePic, setProfilePic] = useState('');
     const [file, setFile] = useState(null);
     const [profilePicURL, setProfilePicURL] = useState('');
+    const [loading, setLoading] = React.useState(false);
+
 
     // get user information with JWT token
    
@@ -93,7 +96,16 @@ export default function UserSettings(){
         return false;
     }, [updateLastName]);
 
+    const updateAll = async() => {
+        // setLoading(true);
+        await updateQuery();
+        await updateEmailFunction();
+        await updateProfileUrl();
+        setLoading(false);
+    };
+
     const updateQuery = async() => {    
+
         let updatedDetails: UpdateUserPersonalDetails = {};
 
         if (updateFirstName == initialFirstName && updateLastName == initialLastName) {
@@ -119,8 +131,18 @@ export default function UserSettings(){
               'Authorization': 'Bearer ' + await getToken()
             },
             body: JSON.stringify(updatedDetails)
-        })
-        console.log(response)
+        }).then(async (response) => {
+            if(response.status === 200 || response.status === 201){
+                if (updateFirstName != initialFirstName){
+                    setInitialFirstName(updateFirstName);
+                }
+        
+                if (updateLastName !=  initialLastName){
+                    setInitialLastName(updateLastName);
+                }
+            }
+        });
+        // console.log(response)
     };
 
     const updateProfileUrl = async () => {
@@ -145,8 +167,9 @@ export default function UserSettings(){
               'Authorization': 'Bearer ' + await getToken()
             },
             body: JSON.stringify(updatedDetails)
-        })
-        console.log(response)
+        });
+        // console.log(response)
+        
     };
 
     const updateEmailFunction = async() => {
@@ -319,10 +342,17 @@ export default function UserSettings(){
                 <CardBody>
                         <Button 
                             color="primary"  
+                            isLoading={loading}
                             onClick={() => {
-                                updateQuery();
-                                updateEmailFunction();
-                                updateProfileUrl();
+                                setLoading(true);
+                                toast.promise(
+                                    updateAll(),
+                                     {
+                                       loading: 'Saving...',
+                                       success: 'Successfully saved!',
+                                       error: (err) => `${err || "Unexpected error while saving, please try again!"}`,
+                                     }
+                                   );
                             }}
                         >
                             Update
@@ -331,7 +361,7 @@ export default function UserSettings(){
             </Card>
         </>);
 
-    }, [initialFirstName, initialLastName, initialEmail, profilePicURL]);
+    }, [initialFirstName, initialLastName, initialEmail, profilePicURL, updateAll]);
 
     return (
         <>{renderUserDetails()}</>

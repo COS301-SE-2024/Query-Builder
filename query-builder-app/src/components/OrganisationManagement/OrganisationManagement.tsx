@@ -10,7 +10,7 @@ import EditUserModal from "./EditUserModal";
 import {EditIcon} from "./EditIcon";
 import {CheckIcon} from "./CheckIcon";
 import Link from 'next/link';
-
+import toast from 'react-hot-toast';
 
 interface UpdateOrganisation {
     org_id: string;
@@ -46,6 +46,7 @@ export default function OrganisationManagement(){
     let [hasAdminPermission, setHasAdminPermission] = useState(false);
     let [table, setTable] = useState('');
     let [hashCodeCopyText, setHashCodeCopyText] = useState('Share Join Code');
+    let [errorGetMembers, setErrorGetMembers] = useState("");
 
     async function getMembers() {
       try {
@@ -60,7 +61,17 @@ export default function OrganisationManagement(){
         });
 
         if (!response.ok) {
-          throw new Error("Network response was not ok");
+          // console.log("YOURR ERROR " + (response.status) + " " + (response.statusText);
+          if(response.status === 401){
+            setErrorGetMembers("You are not authorized to view this! Please let an administrator verify your account in the organisation!");
+            toast.error("You are not authorized to view this! Please let an administrator verify your account in the organisation!");
+            return;
+          }
+          else{
+            setErrorGetMembers("Error occurred while trying to fetch members, please try again later!");
+            toast.error("Error occurred while trying to fetch members, please try again later!");
+            return;
+          }
         }
 
         let membersData = ((await response.json()).data);
@@ -69,8 +80,6 @@ export default function OrganisationManagement(){
 
         getUser().then((user) => {
           setLoggedInUserID(user as string);
-          // console.log(orgMembers);
-          // console.log(membersData);
           let role = membersData.find((orgMember:any) => orgMember.profiles.user_id === user).user_role;
           setLoggedInUserRole(role);
           // console.log(membersData.find((orgMember:any) => orgMember.profiles.user_id === user).user_role);
@@ -80,7 +89,7 @@ export default function OrganisationManagement(){
         });
 
       } catch (error) {
-        console.error("Failed to fetch members of the organisation:", error);
+          throw new Error("Unexpected error while fetching members!");
       }
     };
 
@@ -120,7 +129,14 @@ export default function OrganisationManagement(){
           }
         };
 
-        getMembers();
+        try {
+          getMembers();
+        } catch (error) {
+          if(error){
+              setErrorGetMembers("Unknown error has occurred, please refresh the page and try again!");
+              toast.error("Unknown error has occurred, please refresh the page and try again!");
+          }
+        }
         
         getOrganisationInfo();
       }, []);
@@ -667,7 +683,15 @@ export default function OrganisationManagement(){
                               )}
                           </TableBody>
                         </Table> 
-
+                        {errorGetMembers == "" ?
+                        (
+                          <>
+                          </>
+                        ): (
+                          <>
+                            <div className="m-4 flex flex-row text-center">{errorGetMembers}</div>
+                          </>
+                        )}
                         </CardBody>
 
                     </Card> 
@@ -675,8 +699,17 @@ export default function OrganisationManagement(){
                     <Tab key="orgDatabases" title="Databases">
                     <Card>
                         <CardBody>
-                            TO BE ADDED
-                            {/* TODO: Get end point to only show available databases in the organisation */}
+                          {errorGetMembers == "" ?
+                          (
+                            <>
+                            </>
+                          ): (
+                            <>
+                              <div className="m-4 flex flex-row text-center">{errorGetMembers}</div>
+                            </>
+                          )}
+                          {/* TODO: Get end point to only show available databases in the organisation */}
+
                         </CardBody>
                     </Card>  
                     </Tab>
