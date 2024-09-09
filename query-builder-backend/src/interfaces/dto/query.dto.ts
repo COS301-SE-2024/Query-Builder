@@ -8,8 +8,10 @@ import {
   Min
 } from 'class-validator';
 import {
+  ComparisonOperator,
   compoundCondition,
   condition,
+  LogicalOperator,
   primitiveCondition
 } from './conditions.dto';
 import { table } from './table.dto';
@@ -80,23 +82,20 @@ export class QueryParams {
   })
   @Transform(
     ({ value }) => {
-      if (value.condtions !== undefined && value.operator !== undefined) {
+      if (
+        value.condtions !== undefined ||
+        (value.operator !== undefined && value.operator in LogicalOperator)
+      ) {
         return Object.assign(new compoundCondition(), value);
       }
+
       if (
-        value.value !== undefined &&
-        value.column !== undefined &&
-        value.operator !== undefined
+        value.value !== undefined ||
+        value.column !== undefined ||
+        (value.operator !== undefined && value.operator in ComparisonOperator)
       ) {
         return Object.assign(new primitiveCondition(), value);
       } else {
-        if (value.conditions !== undefined) {
-          return Object.assign(new compoundCondition(), value);
-        }
-        if (value.value !== undefined || value.column !== undefined) {
-          return Object.assign(new primitiveCondition(), value);
-        }
-
         return Object.assign(new primitiveCondition(), value);
       }
     },

@@ -24,9 +24,4 @@ export class AppController {
   async hasSession(@Session() session: Record<string, any>) {
     return await this.appService.has_session(session);
   }
-
-  @Put('validate-dto')
-  async validateDTO(@Body() body: any) {
-    return await this.appService.validateDTO(body);
-  }
 }

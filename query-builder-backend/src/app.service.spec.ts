@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AppService } from './app.service';
 import { ConfigService } from '@nestjs/config';
 import * as crypto from 'crypto';
+import e from 'express';
 
 jest.mock('@nestjs/config', () => ({
   ConfigService: jest.fn().mockImplementation(() => ({
@@ -109,4 +110,6 @@ describe('AppService', () => {
       expect(decrypted).toBe('test');
     });
   });
+
+  
 });
