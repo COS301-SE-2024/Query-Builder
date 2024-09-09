@@ -515,7 +515,7 @@ export default function OrganisationManagement() {
         </>);
       }
     }
-  }, [loggedInUserRole, hasAdminPermission, profilePicURL, initialOrgName, updateQuery]);
+  }, [loggedInUserRole, hasAdminPermission, profilePicURL, initialOrgName, updateQuery,useDisclosure]);
 
   const renderOrgName = React.useCallback(() => {
     return (
@@ -597,7 +597,7 @@ export default function OrganisationManagement() {
     if (file) {
       updateProfilePicture();
     }
-  }, [file,updateProfilePicture]);
+  }, [file]);
 
   const handleProfilePicChange = async (event: any) => {
     const selectedFile = event.target.files[0];
