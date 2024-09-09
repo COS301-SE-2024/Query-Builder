@@ -13,7 +13,6 @@ interface FilterChipProps {
     key: React.Key,
     onChange?: (primitiveCondition: primitiveCondition) => void
     onRemove?: (primitiveCondition: primitiveCondition) => void; 
-
 }
 
 export default function FilterChip(props: FilterChipProps) {
