@@ -597,7 +597,7 @@ export default function OrganisationManagement() {
     if (file) {
       updateProfilePicture();
     }
-  }, [file]);
+  }, [file,updateProfilePicture]);
 
   const handleProfilePicChange = async (event: any) => {
     const selectedFile = event.target.files[0];
