@@ -301,6 +301,7 @@ export default function TableList(props: TableListProps) {
                             )}
                         </Dropdown>
                     )}
+
                 </CardBody>
             </Card>
         );
@@ -357,7 +358,12 @@ export default function TableList(props: TableListProps) {
 
             const rightmostTableName = findRightmostTableName(updatedTable);
 
-            fetchJoinableTables(props.databaseName, rightmostTableName);
+            if (rightmostTableName === "") {
+                fetchAllTables(props.databaseName);
+            }
+            else {
+                fetchJoinableTables(props.databaseName, rightmostTableName);
+            }
 
             return updatedTable;
         });
