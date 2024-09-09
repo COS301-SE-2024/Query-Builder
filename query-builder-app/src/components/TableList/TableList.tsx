@@ -275,7 +275,7 @@ export default function TableList(props: TableListProps) {
                     )}
 
                     {/* Add button for joining a new table */}
-                    {tableRef.join == null && (
+                    {tableRef.join == null && joinableTables.length > 0 && (
                         <Dropdown>
                             <DropdownTrigger>
                                 <Button
