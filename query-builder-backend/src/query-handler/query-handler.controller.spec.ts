@@ -11,7 +11,7 @@ describe('QueryHandlerController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [JsonConverterModule, ConnectionManagerModule, MyLoggerModule],
+      imports: [JsonConverterModule.forRoot('mysql'), ConnectionManagerModule, MyLoggerModule],
       controllers: [QueryHandlerController],
       providers: [QueryHandlerService]
     }).compile();
