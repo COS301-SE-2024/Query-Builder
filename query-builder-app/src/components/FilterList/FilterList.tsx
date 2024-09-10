@@ -210,13 +210,15 @@ export default function FilterList(props: FilterListProps){
 
     }
 
-    function removeCondition(primitiveConditionToRemove: primitiveCondition) {
-        const updatedConditions = condition.conditions.filter(cond => 
-            cond !== primitiveConditionToRemove
-        );
-        
-        setCondition((previousConditionState) => {
-            return { ...previousConditionState, conditions: updatedConditions };
+    function removeCondition(key: React.Key) {
+        const index = Number(key);
+        setCondition((prevCondition) => {
+            const updatedConditions = prevCondition.conditions.filter((_, i) => i !== index);
+    
+            return { 
+                ...prevCondition, 
+                conditions: updatedConditions 
+            };
         });
     }
     
