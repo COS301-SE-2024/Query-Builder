@@ -684,6 +684,7 @@ export class OrgManagementService {
   // }
 
   async setUpTestScenario(session: Record<string, any>) {
+
     const { data: user_data, error: user_error } = await this.supabase
       .getClient()
       .auth.getUser(this.supabase.getJwt());
@@ -703,13 +704,18 @@ export class OrgManagementService {
       throw profile_error;
     }
 
+    //Check if a user has already been onboarded
+    if(profile_data[0].onboarded){
+      return {data: "User has already been onboarded"};
+    }
+
     // Create org for them if it doesnt exist
     let { data: org_data, error: org_error } = await this.supabase
       .getClient()
       .from('organisations')
       .select()
       .eq('owner_id', user_data.user.id)
-      .eq('name', `${profile_data[0].name}'s Organisation`);
+      .eq('name', `${profile_data[0].first_name}'s Organisation`);
 
     if (org_error) {
       throw org_error;
@@ -758,7 +764,20 @@ export class OrgManagementService {
 
     const { data: db_secrets_data } = await this.saveDbSecrets(save_db_secrets_dto, session);
 
-    return { data: db_secrets_data };
+    //Confirm the user has been onboarded
+    const { data: onboard_data, error: onboard_error } = await this.supabase
+    .getClient()
+    .from('profiles')
+    .update({ onboarded: true })
+    .match({ user_id: user_data.user.id})
+    .select();
+
+    if(onboard_error){
+      throw onboard_error;
+    }
+
+    return { data: "User has been onboarded" };
+
   }
 
   async giveDbAccess(give_db_access_dto: Give_Db_Access_Dto) {
