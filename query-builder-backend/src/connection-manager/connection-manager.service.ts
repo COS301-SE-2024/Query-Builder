@@ -18,13 +18,13 @@ export interface ConnectionStatus {
 }
 
 @Injectable()
-export class ConnectionManagerService {
+export abstract class ConnectionManagerService {
   constructor(
-    private readonly sessionStore: SessionStore,
-    private readonly supabase: Supabase,
-    private readonly config_service: ConfigService,
-    private readonly app_service: AppService,
-    private logger: MyLoggerService
+    protected readonly sessionStore: SessionStore,
+    protected readonly supabase: Supabase,
+    protected readonly config_service: ConfigService,
+    protected readonly app_service: AppService,
+    protected logger: MyLoggerService
   ) {
     this.logger.setContext(ConnectionManagerService.name);
   }
