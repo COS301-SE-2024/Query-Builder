@@ -3,7 +3,7 @@ import '@testing-library/jest-dom/vitest'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vitest, vi, Mock } from 'vitest';
 import React from 'react';
-import DatabaseConnectionModal from './DatabaseConnectionModal';
+import DatabaseAdditionModal from './DatabaseAdditionModal';
 
 //Mock out Supabase access token retrieval
 vitest.mock("./../../utils/supabase/client", () => {
@@ -31,24 +31,24 @@ global.fetch = vi.fn(() =>
 ) as Mock;
 
 //basic component rendering tests
-describe('DatabaseConnectionModal basic rendering tests', () => {
+describe('DatabaseAdditionModal basic rendering tests', () => {
   it('should render successfully', () => {
-    const { baseElement } = render(<DatabaseConnectionModal org_id={"1234"} on_add={()=>{}}/>);
+    const { baseElement } = render(<DatabaseAdditionModal org_id={"1234"} on_add={()=>{}}/>);
     expect(baseElement).toBeTruthy();
   });
 });
 
 //button should say + Add
-describe('DatabaseConnectionModal initial tests', () => {
+describe('DatabaseAdditionModal initial tests', () => {
   it('should display the button to Add a new database', () => {
-    render(<DatabaseConnectionModal org_id={"1234"} on_add={()=>{}}/>);
+    render(<DatabaseAdditionModal org_id={"1234"} on_add={()=>{}}/>);
     const text = screen.getByText("+ Add");
     expect(text).toBeInTheDocument();
   });
 });
 
 //click the add button
-describe('DatabaseConnectionModal modal popup tests', () => {
+describe('DatabaseAdditionModal modal popup tests', () => {
 
   it('it should open the modal upon clicking the button', async () => {
 
@@ -56,7 +56,7 @@ describe('DatabaseConnectionModal modal popup tests', () => {
     const user = userEvent.setup()
 
     //render the component
-    render(<DatabaseConnectionModal org_id={"1234"} on_add={()=>{}}/>);
+    render(<DatabaseAdditionModal org_id={"1234"} on_add={()=>{}}/>);
 
     //get the button to add a database
     const button = screen.getByText("+ Add");
@@ -65,7 +65,7 @@ describe('DatabaseConnectionModal modal popup tests', () => {
     await user.click(button);
 
     //get the screen text that should be displayed on the modal and assert that it is in the document
-    const text = screen.getByText("Connect a new database server");
+    const text = screen.getByText("Add a new database server to your organisation");
     expect(text).toBeInTheDocument();
 
   });
@@ -76,7 +76,7 @@ describe('DatabaseConnectionModal modal popup tests', () => {
     const user = userEvent.setup()
 
     //render the component
-    render(<DatabaseConnectionModal org_id={"1234"} on_add={()=>{}}/>);
+    render(<DatabaseAdditionModal org_id={"1234"} on_add={()=>{}}/>);
 
     //get the button to add a database
     const button = screen.getByText("+ Add");
@@ -95,7 +95,7 @@ describe('DatabaseConnectionModal modal popup tests', () => {
     const user = userEvent.setup()
 
     //render the component
-    render(<DatabaseConnectionModal org_id={"1234"} on_add={()=>{}}/>);
+    render(<DatabaseAdditionModal org_id={"1234"} on_add={()=>{}}/>);
 
     //get the button to add a database
     const button = screen.getByText("+ Add");
@@ -108,47 +108,9 @@ describe('DatabaseConnectionModal modal popup tests', () => {
 
   });
 
-  it('The Username field should be displayed', async () => {
-
-    //create a user that can perform actions
-    const user = userEvent.setup()
-
-    //render the component
-    render(<DatabaseConnectionModal org_id={"1234"} on_add={()=>{}}/>);
-
-    //get the button to add a database
-    const button = screen.getByText("+ Add");
-
-    //click the button to add a database
-    await user.click(button);
-
-    const usernameField = screen.getByLabelText("Username");
-    expect(usernameField).toBeInTheDocument();
-
-  });
-
-  it('The Password field should be displayed', async () => {
-
-    //create a user that can perform actions
-    const user = userEvent.setup()
-
-    //render the component
-    render(<DatabaseConnectionModal org_id={"1234"} on_add={()=>{}}/>);
-
-    //get the button to add a database
-    const button = screen.getByText("+ Add");
-
-    //click the button to add a database
-    await user.click(button);
-
-    const passwordField = screen.getByLabelText("Password");
-    expect(passwordField).toBeInTheDocument();
-
-  });
-
 });
 
-describe('DatabaseConnectionModal add database tests', () => {
+describe('DatabaseAdditionModal add database tests', () => {
 
   it('Should be able to fill out the fields and add a database', async () => {
 
@@ -156,7 +118,7 @@ describe('DatabaseConnectionModal add database tests', () => {
     const user = userEvent.setup()
 
     //render the component
-    render(<DatabaseConnectionModal org_id={"1234"} on_add={()=>{}}/>);
+    render(<DatabaseAdditionModal org_id={"1234"} on_add={()=>{}}/>);
 
     //get the button to add a database
     const button = screen.getByText("+ Add");
@@ -176,23 +138,11 @@ describe('DatabaseConnectionModal add database tests', () => {
     //type a valid URL into the URL or Host Field
     await user.type(urlField, "www.mockurl.com");
 
-    //get the Username Field
-    const usernameField = screen.getByLabelText("Username");
-
-    //type a username into the Username Field
-    await user.type(usernameField, "username");
-
-    //get the Password Field
-    const passwordField = screen.getByLabelText("Password");
-
-    //type a password into the Password Field
-    await user.type(passwordField, "password");
-
-    //get the connect button
-    const connectButton = screen.getByText("Connect");
+    //get the add button
+    const addButton = screen.getByText("Add");
 
     //click the connect button
-    await user.click(connectButton);
+    await user.click(addButton);
 
   }, {timeout: 10000})
 

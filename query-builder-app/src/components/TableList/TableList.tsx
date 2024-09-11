@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import TableForm from "../TableForm/TableForm"
 import { Button, Card, CardBody, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spacer } from "@nextui-org/react";
 import { createClient } from "./../../utils/supabase/client";
+import { navigateToAuth } from "../../app/authentication/actions";
 
 //----------------------------INTERFACES------------------------------------//
 
@@ -135,10 +136,17 @@ export default function TableList(props: TableListProps){
 
         let json = await response.json();
 
-        console.log(json);
-
-        //set the tables hook
-        setJoinableTables(json);
+        if(response.ok){
+            //set the tables hook
+            setJoinableTables(json);
+        }
+        else{
+        
+            if(json.response && json.response.message == 'You do not have a backend session'){
+                navigateToAuth();
+            }
+      
+          }
 
     }
     
@@ -162,16 +170,25 @@ export default function TableList(props: TableListProps){
 
         let json = await response.json();
 
-        //remove any tables already in the query to prevent circular joins
-        let tableRef: table = table;
-        json = json.filter((obj: JoinableTable) => {return obj.table_name != tableRef.name});
-        while(tableRef.join){
-            tableRef = tableRef.join.table2;
+        if(response.ok){
+            //remove any tables already in the query to prevent circular joins
+            let tableRef: table = table;
             json = json.filter((obj: JoinableTable) => {return obj.table_name != tableRef.name});
-        }
+            while(tableRef.join){
+                tableRef = tableRef.join.table2;
+                json = json.filter((obj: JoinableTable) => {return obj.table_name != tableRef.name});
+            }
 
-        //set the joinable tables hook
-        setJoinableTables(json);
+            //set the joinable tables hook
+            setJoinableTables(json);
+        }
+        else{
+        
+            if(json.response && json.response.message == 'You do not have a backend session'){
+                navigateToAuth();
+            }
+      
+        }
 
     }
 

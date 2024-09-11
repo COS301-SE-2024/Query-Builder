@@ -1,4 +1,4 @@
-import { IsUUID, IsNotEmpty, IsString, IsJWT, IsOptional, IsEnum } from "class-validator";
+import { IsUUID, IsNotEmpty, IsString, IsOptional, IsEnum, IsInt, Min, Max } from "class-validator";
 
 export class Update_Db_Dto {
     @IsUUID()
@@ -25,6 +25,12 @@ export class Update_Db_Dto {
     @IsString()
     @IsNotEmpty()
     host?: string;
+
+    @IsOptional()
+    @IsInt()
+    @Min(0)
+    @Max(65535)
+    port?: number
 
     @IsOptional()
     @IsNotEmpty()

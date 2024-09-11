@@ -1,4 +1,4 @@
-import { IsEnum, IsJWT, IsNotEmpty, IsOptional, IsString, IsUUID } from "class-validator";
+import { IsEnum, IsInt, IsNotEmpty, IsOptional, IsPort, IsString, IsUUID, Max, Min } from "class-validator";
 
 export class Add_Db_Dto {
 
@@ -19,6 +19,11 @@ export class Add_Db_Dto {
     @IsString()
     @IsNotEmpty()
     host: string;
+
+    @IsInt()
+    @Min(0)
+    @Max(65535)
+    port: number
 
     @IsOptional()
     @IsNotEmpty()

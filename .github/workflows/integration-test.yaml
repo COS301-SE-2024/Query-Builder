@@ -1,0 +1,103 @@
+name: Cypress Tests
+
+on: 
+  push:
+    branches:
+      - feature/integration-testing
+  pull_request:
+    branches:
+      - dev
+      - main
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-22.04
+    steps:
+    
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: '9.1.2'
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+          cache-dependency-path: query-builder-app/pnpm-lock.yaml
+
+      - name: Install redis
+        run: sudo apt-get install -y redis-tools redis-server
+        
+      - name: Verify that redis is up
+        run: redis-cli ping
+
+      - name: start MySQL
+        run: |
+            sudo systemctl start mysql.service
+            sudo mysql --user=${{ secrets.CYPRESS_DB_USERNAME }} --password=${{ secrets.CYPRESS_DB_PASSWORD }} < sakila/sakila-schema.sql;
+            sudo mysql --user=${{ secrets.CYPRESS_DB_USERNAME }} --password=${{ secrets.CYPRESS_DB_PASSWORD }} < sakila/sakila-data.sql;
+            sudo mysql -e 'SHOW DATABASES;' -h 127.0.0.1 --port=3306 --user=${{ secrets.CYPRESS_DB_USERNAME }} --password=${{ secrets.CYPRESS_DB_PASSWORD }}
+      - name: Install Dependencies Backend
+        run: |
+            pnpm install --frozen-lockfile
+        working-directory: query-builder-backend
+
+      - name: Make backend env file
+        run: |
+          touch .env
+          echo SUPABASE_URL = ${{ secrets.SUPABASE_URL }} >> .env
+          echo SUPABASE_KEY = ${{ secrets.SUPABASE_ANON_KEY }} >> .env
+          echo SUPABASE_JWT_SECRET = ${{ secrets.SUPABASE_JWT_SECRET }} >> .env
+          echo UNI_KEY = ${{ secrets.UNI_KEY }} >> .env
+          echo SESSION_SECRET = ${{ secrets.SESSION_SECRET }} >> .env
+          echo REDIS_HOST = ${{ secrets.REDIS_HOST }} >> .env
+          echo FRONTEND_URL = http://localhost:3000 >> .env
+          echo OPENAI_API_KEY = ${{ secrets.OPENAI_API_KEY }} >> .env
+          echo GEMINI_API_KEY = ${{ secrets.GEMINI_API_KEY }} >> .env
+          cat .env
+        working-directory: query-builder-backend
+
+      - name: Build and start backend
+        run: |
+          pnpm run build &&
+          pnpm start &
+        working-directory: query-builder-backend        
+
+      - name: Install Dependencies App
+        run: |
+            pnpm install --frozen-lockfile
+        working-directory: query-builder-app
+
+      - name: Make frontend env file
+        run: |
+          touch .env
+          echo NEXT_PUBLIC_SUPABASE_URL = ${{ secrets.SUPABASE_URL }} >> .env
+          echo NEXT_PUBLIC_SUPABASE_ANON_KEY = ${{ secrets.SUPABASE_ANON_KEY }} >> .env
+          echo NEXT_PUBLIC_SUPABASE_PROJECT_ID = ${{ secrets.SUPABASE_SERVICE_ROLE_KEY}} >> .env
+          echo NEXT_PUBLIC_BACKEND_URL = http://127.0.0.1:55555 >> .env
+          cat .env
+        working-directory: query-builder-app
+
+      - name: Build and start frontend
+        run: |
+          pnpm run build &&
+          pnpm start &
+        working-directory: query-builder-app
+          
+      - name: Cypress run
+        uses: cypress-io/github-action@v6
+        env:
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          CYPRESS_test_username: ${{ secrets.CYPRESS_TEST_USERNAME }}
+          CYPRESS_test_password: ${{ secrets.CYPRESS_TEST_PASSWORD }}
+          CYPRESS_mysql_username: ${{ secrets.CYPRESS_DB_USERNAME }}
+          CYPRESS_mysql_password: ${{ secrets.CYPRESS_DB_PASSWORD }}
+        with:
+          record: true
+          working-directory: query-builder-app
+          wait-on: 'http://127.0.0.1:3000'
+          spec: cypress/e2e/auth.cy.js

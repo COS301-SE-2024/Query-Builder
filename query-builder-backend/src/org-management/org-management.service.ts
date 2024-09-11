@@ -1,8 +1,8 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
-  Put,
   UnauthorizedException
 } from '@nestjs/common';
 import { Supabase } from '../supabase';
@@ -28,7 +28,7 @@ import { Upload_Org_Logo_Dto } from './dto/upload-org-logo.dto';
 import { Join_Org_Dto } from './dto/join-org.dto';
 import { Create_Hash_Dto } from './dto/create-hash.dto';
 import * as crypto from 'crypto';
-import { createHash } from 'crypto';
+import { Has_Saved_Db_Creds_Dto } from './dto/has-saved-db-creds.dto';
 
 @Injectable()
 export class OrgManagementService {
@@ -132,7 +132,7 @@ export class OrgManagementService {
     if (org_error) {
       throw org_error;
     }
-    if (org_data.length === 0) {
+    if (org_data.length === 0 || org_data[0].verified === false) {
       throw new UnauthorizedException(
         'You are not a member of this organisation'
       );
@@ -183,11 +183,30 @@ export class OrgManagementService {
     if (org_error) {
       throw org_error;
     }
-    if (org_data.length === 0) {
+    if (org_data.length === 0 || org_data[0].verified === false) {
       throw new UnauthorizedException(
         'You are not a member of this organisation'
       );
     }
+
+    return org_data;
+  }
+
+  async getDbs_H2(user_id) {
+    const { data: db_data, error: db_error } = await this.supabase
+      .getClient()
+      .from('db_access')
+      .select('db_id')
+      .eq('user_id', user_id);
+
+    if (db_error) {
+      throw db_error;
+    }
+    if (db_data.length === 0) {
+      throw new NotFoundException('Databases not found');
+    }
+
+    return db_data;
   }
 
   async getDbs(get_dbs_dto: Get_Dbs_Dto) {
@@ -199,24 +218,47 @@ export class OrgManagementService {
       throw owner_error;
     }
 
-    await this.getDbs_H1(get_dbs_dto.org_id, user_data.user.id);
+    const org_data = await this.getDbs_H1(
+      get_dbs_dto.org_id,
+      user_data.user.id
+    );
 
-    // TODO: Add functionality to show only the databases that the user has access to
+    if (org_data[0].role_permissions.view_all_dbs === true) {
+      const { data, error } = await this.supabase
+        .getClient()
+        .from('db_envs')
+        .select('org_id, db_id, created_at, name, type')
+        .match({ ...get_dbs_dto });
 
-    const { data, error } = await this.supabase
-      .getClient()
-      .from('org_dbs')
-      .select('org_id, db_id, db_envs(created_at, name, type)')
-      .match({ ...get_dbs_dto });
+      if (error) {
+        throw error;
+      }
+      if (data.length === 0) {
+        throw new NotFoundException('Databases not found');
+      }
 
-    if (error) {
-      throw error;
+      return { data };
+    } else {
+      const db_data = await this.getDbs_H2(user_data.user.id);
+
+      const db_ids = db_data.map((db) => db.db_id);
+
+      const { data, error } = await this.supabase
+        .getClient()
+        .from('db_envs')
+        .select('org_id, db_id, created_at, name, type')
+        .eq('org_id', get_dbs_dto.org_id)
+        .in('db_id', db_ids);
+
+      if (error) {
+        throw error;
+      }
+      if (data.length === 0) {
+        throw new NotFoundException('Databases not found');
+      }
+
+      return { data };
     }
-    if (data.length === 0) {
-      throw new NotFoundException('Databases not found');
-    }
-
-    return { data };
   }
 
   async getOrgHash(create_hash_dto: Create_Hash_Dto) {
@@ -370,6 +412,8 @@ export class OrgManagementService {
       update_db_access: false
     };
 
+    await this.joinOrg_H1(hash_data, user_data);
+
     const { data, error } = await this.supabase
       .getClient()
       .from('org_members')
@@ -393,6 +437,22 @@ export class OrgManagementService {
     return { data };
   }
 
+  async joinOrg_H1(hash_data, user_data) {
+    const { data: in_org, error: in_org_error } = await this.supabase
+      .getClient()
+      .from('org_members')
+      .select()
+      .eq('org_id', hash_data[0].org_id)
+      .eq('user_id', user_data.user.id);
+
+    if (in_org_error) {
+      throw in_org_error;
+    }
+    if (in_org.length !== 0) {
+      throw new BadRequestException('You are already a member of this org');
+    }
+  }
+
   async createHash(create_hash_dto: Create_Hash_Dto) {
     const { data: user_data, error: user_error } = await this.supabase
       .getClient()
@@ -412,7 +472,7 @@ export class OrgManagementService {
     if (org_error) {
       throw org_error;
     }
-    if (org_data.length === 0) {
+    if (org_data.length === 0 || org_data[0].verified === false) {
       throw new UnauthorizedException(
         'You are not a member of this organisation'
       );
@@ -515,7 +575,7 @@ export class OrgManagementService {
     if (org_error) {
       throw org_error;
     }
-    if (org_data.length === 0) {
+    if (org_data.length === 0 || org_data[0].verified === false) {
       throw new UnauthorizedException(
         'You are not a member of this organisation'
       );
@@ -563,7 +623,7 @@ export class OrgManagementService {
     if (org_error) {
       throw org_error;
     }
-    if (org_data.length === 0) {
+    if (org_data.length === 0 || org_data[0].verified === false) {
       throw new UnauthorizedException(
         'You are not a member of this organisation'
       );
@@ -573,61 +633,132 @@ export class OrgManagementService {
       throw new UnauthorizedException('You do not have permission to add dbs');
     }
 
-    const { db_data } = await this.addDb_H1(add_db_dto);
-
     const { data, error } = await this.supabase
       .getClient()
-      .from('org_dbs')
-      .insert({ org_id: add_db_dto.org_id, db_id: db_data[0].db_id })
+      .from('db_envs')
+      .insert({ ...add_db_dto })
       .select();
 
     if (error) {
       throw error;
     }
     if (data.length === 0) {
-      await this.supabase
-        .getClient()
-        .from('db_envs')
-        .delete()
-        .eq('db_id', db_data[0].db_id);
       throw new InternalServerErrorException(
         'Database not added to organisation'
       );
     }
 
     let give_db_access_dto = {
-      db_id: db_data[0].db_id,
+      db_id: data[0].db_id,
       org_id: add_db_dto.org_id,
       user_id: user_data.user.id
     };
 
     await this.giveDbAccess(give_db_access_dto);
 
-    return { data: db_data };
+    return { data };
   }
 
-  async addDb_H1(add_db_dto: Add_Db_Dto) {
-    const db_fields = {
-      name: add_db_dto.name,
-      type: add_db_dto.type,
-      db_info: add_db_dto.db_info ? add_db_dto.db_info : {},
-      host: add_db_dto.host
-    };
+  // async addDb_H1(add_db_dto: Add_Db_Dto) {
+  //   const db_fields = {
+  //     name: add_db_dto.name,
+  //     type: add_db_dto.type,
+  //     db_info: add_db_dto.db_info ? add_db_dto.db_info : {},
+  //     host: add_db_dto.host
+  //   };
 
-    const { data: db_data, error: db_error } = await this.supabase
+  //   const { data: db_data, error: db_error } = await this.supabase
+  //     .getClient()
+  //     .from('db_envs')
+  //     .insert({ ...db_fields })
+  //     .select();
+
+  //   if (db_error) {
+  //     throw db_error;
+  //   }
+  //   if (db_data.length === 0) {
+  //     throw new InternalServerErrorException('Database not added');
+  //   }
+
+  //   return { db_data };
+  // }
+
+  async setUpTestScenario(session: Record<string, any>) {
+    const { data: user_data, error: user_error } = await this.supabase
+      .getClient()
+      .auth.getUser(this.supabase.getJwt());
+
+    if (user_error) {
+      throw user_error;
+    }
+
+    // Get name and surname
+    const { data: profile_data, error: profile_error } = await this.supabase
+      .getClient()
+      .from('profiles')
+      .select()
+      .eq('user_id', user_data.user.id);
+
+    if (profile_error) {
+      throw profile_error;
+    }
+
+    // Create org for them if it doesnt exist
+    let { data: org_data, error: org_error } = await this.supabase
+      .getClient()
+      .from('organisations')
+      .select()
+      .eq('owner_id', user_data.user.id)
+      .eq('name', `${profile_data[0].name}'s Organisation`);
+
+    if (org_error) {
+      throw org_error;
+    }
+
+    if (org_data.length === 0) {
+      const create_org_dto = {
+        owner_id: user_data.user.id,
+        name: `${profile_data[0].first_name}'s Organisation`
+      };
+
+      const { data: org_created_data } = await this.createOrg(create_org_dto);
+      org_data = org_created_data;
+    }
+
+    // Add database to organisation if not already added
+    let { data: db_data, error: db_error } = await this.supabase
       .getClient()
       .from('db_envs')
-      .insert({ ...db_fields })
-      .select();
+      .select()
+      .eq('org_id', org_data[0].org_id)
+      .eq('name', 'Test Database');
 
-    if (db_error) {
+    if(db_error) {
       throw db_error;
     }
+
     if (db_data.length === 0) {
-      throw new InternalServerErrorException('Database not added');
+      const add_db_dto = {
+        org_id: org_data[0].org_id,
+        name: 'Test Database',
+        type: 'mysql',
+        host: '127.0.0.1',
+        port: 3306
+      };
+
+      const { data: db_created_data } = await this.addDb(add_db_dto);
+      db_data = db_created_data;
     }
 
-    return { db_data };
+    // Add database secrets to said database
+    const save_db_secrets_dto = {
+      db_id: db_data[0].db_id,
+      db_secrets: '{"username": "root", "password": "password"}'
+    };
+
+    const { data: db_secrets_data } = await this.saveDbSecrets(save_db_secrets_dto, session);
+
+    return { data: db_secrets_data };
   }
 
   async giveDbAccess(give_db_access_dto: Give_Db_Access_Dto) {
@@ -649,7 +780,7 @@ export class OrgManagementService {
     if (org_error) {
       throw org_error;
     }
-    if (org_data.length === 0) {
+    if (org_data.length === 0 || org_data[0].verified === false) {
       throw new UnauthorizedException(
         'You are not a member of this organisation'
       );
@@ -680,6 +811,36 @@ export class OrgManagementService {
     return { data: db_data };
   }
 
+  async hasSavedDbCredentials(has_saved_db_creds_dto: Has_Saved_Db_Creds_Dto) {
+    const { data: user_data, error: user_error } = await this.supabase
+      .getClient()
+      .auth.getUser(this.supabase.getJwt());
+
+    if (user_error) {
+      throw user_error;
+    }
+
+    const { data, error } = await this.supabase
+      .getClient()
+      .from('db_access')
+      .select('db_secrets')
+      .eq('user_id', user_data.user.id)
+      .eq('db_id', has_saved_db_creds_dto.db_id);
+
+    if (error) {
+      throw error;
+    }
+    if (data.length === 0) {
+      throw new UnauthorizedException(
+        'You do not have access to this database'
+      );
+    }
+
+    return {
+      saved_db_credentials: data[0].db_secrets !== null ? true : false
+    };
+  }
+
   async saveDbSecrets(
     save_db_secrets_dto: Save_Db_Secrets_Dto,
     session: Record<string, any>
@@ -692,12 +853,11 @@ export class OrgManagementService {
       throw user_error;
     }
 
-    //get the session key
-    // const key = save_db_secrets_dto.session_key;
-
-    // use the session key to encrypt the database info
-    // console.log(key);
-    // console.log("second key length" + key.length);
+    if (!session.sessionKey) {
+      throw new InternalServerErrorException(
+        'You do not have a backend session'
+      );
+    }
 
     const encryptedText = this.app_service.encrypt(
       save_db_secrets_dto.db_secrets,
@@ -789,7 +949,7 @@ export class OrgManagementService {
     if (org_error) {
       throw org_error;
     }
-    if (org_data.length === 0) {
+    if (org_data.length === 0 || org_data[0].verified === false) {
       throw new UnauthorizedException(
         'You are not a member of this organisation'
       );
@@ -956,7 +1116,7 @@ export class OrgManagementService {
     if (org_error) {
       throw org_error;
     }
-    if (org_data.length === 0) {
+    if (org_data.length === 0 || org_data[0].verified === false) {
       throw new UnauthorizedException(
         'You are not a member of this organisation'
       );
@@ -972,13 +1132,14 @@ export class OrgManagementService {
       name: update_db_dto.name,
       type: update_db_dto.type,
       db_info: update_db_dto.db_info,
-      host: update_db_dto.host
+      host: update_db_dto.host,
+      port: update_db_dto.port
     };
 
     const { data: db_data, error: db_error } = await this.supabase
       .getClient()
       .from('db_envs')
-      .update({ ...db_fields})
+      .update({ ...db_fields })
       .match({ db_id: update_db_dto.db_id })
       .select();
 
@@ -1053,7 +1214,7 @@ export class OrgManagementService {
     if (org_error) {
       throw org_error;
     }
-    if (org_data.length === 0) {
+    if (org_data.length === 0 || org_data[0].verified === false) {
       throw new UnauthorizedException(
         'You are not a member of this organisation'
       );
@@ -1102,7 +1263,7 @@ export class OrgManagementService {
     if (org_error) {
       throw org_error;
     }
-    if (org_data.length === 0) {
+    if (org_data.length === 0 || org_data[0].verified === false) {
       throw new UnauthorizedException(
         'You are not a member of this organisation'
       );
@@ -1150,7 +1311,7 @@ export class OrgManagementService {
     if (org_error) {
       throw org_error;
     }
-    if (org_data.length === 0) {
+    if (org_data.length === 0 || org_data[0].verified === false) {
       throw new UnauthorizedException(
         'You are not a member of this organisation'
       );
