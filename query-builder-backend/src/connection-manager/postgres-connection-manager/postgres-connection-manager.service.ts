@@ -19,6 +19,7 @@ export class PostgresConnectionManagerService extends ConnectionManagerService {
         if (user_error) {
           return reject(user_error);
         }
+        //dad
 
         const { data: db_data, error: error } = await this.supabase
           .getClient()
