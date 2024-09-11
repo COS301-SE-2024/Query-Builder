@@ -17,8 +17,7 @@ export async function login(email: string, password: string) {
     if (error) {
         redirect("/error");
     }
-    revalidatePath("/", "layout");
-    redirect("/");
+
 }
 
 export async function signup(
@@ -54,4 +53,9 @@ export async function signup(
 export async function navigateToAuth() {
     revalidatePath('/authentication', 'layout');
     redirect('/authentication');
+}
+
+export async function navigateToSignedInHomePage() {
+    revalidatePath('/', 'layout');
+    redirect('/');
 }
