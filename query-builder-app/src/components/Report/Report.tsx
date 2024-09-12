@@ -181,7 +181,9 @@ export default function Report(props: ReportProps) {
           date={date}
         />
       </PDFViewer>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
+      <p style={styles.centertext}>NOTE: This document provides summary information for up to the first 200 results.</p>
+      <p style={styles.centertext}>If documents repeatedly do not load as expected, please try to requery for less data.</p>
+      <div style={{ display: 'flex', alignItems: 'center', marginTop: 10 }}>
         <div style={{ marginLeft: 20 }}>
           <PDFDownloadLink
             document={
@@ -299,7 +301,7 @@ function MyDocument({ tableData, chartData, metadata, date }: MyDocumentProps) {
           {chartData.length > 0 ? (
             <View style={styles.section} break>
               <Text style={styles.header}>Graphs</Text>
-              {chartData.map((data, index: number) => (
+              {chartData.slice(0, chartData.length > 200 ? 200 : chartData.length).map((data, index: number) => (
                 <Image
                   key={index}
                   src={(async () => {
