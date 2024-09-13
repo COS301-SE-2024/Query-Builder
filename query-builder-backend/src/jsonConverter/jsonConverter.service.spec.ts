@@ -733,4 +733,76 @@ it('should be able to convert queries using pagination, where, group by, and hav
 
     });
 
+    //----------------------------------- Complete count query conversion tests -----------------------------------//
+
+    it('should be able to generate a count query for a query using pagination, where, group by, and having conditions', () => {
+        const queryParams: QueryParams = {
+            language: 'SQL',
+            query_type: 'SELECT',
+            databaseName: "sakila",
+            table: {
+                name: 'users',
+                columns: [
+                    { name: 'id' },
+                    { name: 'first_name' },
+                    { name: 'last_name' },
+                    { name: 'age', aggregation: AggregateFunction.AVG }
+                ]
+            },
+            condition: {
+                column: 'age',
+                tableName: 'users',
+                operator: ComparisonOperator.GREATER_THAN,
+                value: 18,
+                aggregate: AggregateFunction.AVG // Adding aggregate function in the condition
+            },
+            pageParams: {
+                pageNumber: 3,
+                rowsPerPage: 10
+            }
+        };
+
+        const expectedQuery = 'SELECT COUNT(*) AS numRows FROM `sakila`.`users` HAVING AVG(`users`.`age`) > 18';
+        const result = service.convertJsonToCountQuery(queryParams);
+
+        expect(result).toEqual(expectedQuery);
+    });
+
+    it('Should be able to generate a count query for a query with a join and a having, with aggregate in first table', () => {
+        const jsonData: QueryParams = {
+                "language": "sql",
+                "query_type": "select",
+                "databaseName": "sakila",
+                "table": {
+                    "name":"city", 
+                    "columns":[{
+                        "name": "city_id",
+                        "aggregation": AggregateFunction.COUNT,
+                        "alias": "Number of cities per country"
+                    }],
+                    "join": {
+                        "table1MatchingColumnName": "country_id",
+                        "table2MatchingColumnName": "country_id",
+                        "table2": {
+                            "name": "country",
+                            "columns": [{"name": "country"}]
+                        }
+                    }
+                },
+                "condition": {
+                    "column": "city_id",
+                    "tableName": "city",
+                    "operator": ">",
+                    "value": 10,
+                    "aggregate":"COUNT"
+                },
+
+        }
+
+        const result = service.convertJsonToCountQuery(jsonData);
+
+        expect(result).toEqual('SELECT COUNT(*) AS numRows FROM `sakila`.`city` JOIN `sakila`.`country` ON `city`.`country_id`=`country`.`country_id` HAVING COUNT(`city`.`city_id`) > 10');
+
+    });
+
 });
