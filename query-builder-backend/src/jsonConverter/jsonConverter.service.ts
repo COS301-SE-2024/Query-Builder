@@ -42,7 +42,7 @@ export class JsonConverterService {
     }
 
     //helper function to generate a string of a column
-    generateColumnString(column: column, tableName: string) : string {
+    private generateColumnString(column: column, tableName: string) : string {
 
         let columnString = '';
 
@@ -65,7 +65,7 @@ export class JsonConverterService {
     }
 
     //helper function to generate string of all the columns to be returned from a table
-    generateListOfColumns(table: table) : string {
+    private generateListOfColumns(table: table) : string {
 
         let tableColumns = '';
 
@@ -85,7 +85,7 @@ export class JsonConverterService {
 
     }
 
-    generateSelectClause(queryParams: QueryParams): string {
+    private generateSelectClause(queryParams: QueryParams): string {
 
         let selectClause = '';
         
@@ -113,7 +113,7 @@ export class JsonConverterService {
 
     }
 
-    generateFromClause(queryParams: QueryParams): string {
+    private generateFromClause(queryParams: QueryParams): string {
 
         let fromClause = '';
 
@@ -140,7 +140,7 @@ export class JsonConverterService {
 
     }
 
-    generateOrderByClause(queryParams: QueryParams): string {
+    private generateOrderByClause(queryParams: QueryParams): string {
 
         let orderBy = '';
 
@@ -165,7 +165,7 @@ export class JsonConverterService {
 
     }
 
-    generateLimitClause(queryParams: QueryParams): string {
+    private generateLimitClause(queryParams: QueryParams): string {
 
         let limit = '';
 
