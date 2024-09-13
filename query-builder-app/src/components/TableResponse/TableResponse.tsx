@@ -56,11 +56,19 @@ export default function TableResponse(props: TableResponseProps) {
     columnObjects = columnObjects.concat(tableRef.columns);
   }
 
+  //add all the columnObjects' names to the TableResponse's list of columns
   const columns: Column[] = [];
   for (const columnObject of columnObjects) {
-    if (columnObject.alias) {
+    //if the columnObject has an alias, then the column in the table should be named this alias
+    if(columnObject.alias) {
       columns.push({ key: columnObject.alias, label: columnObject.alias });
-    } else {
+    }
+    //otherwise, if the columnObject has aggregation applied to it, then the column should be named with the aggregate
+    else if(columnObject.aggregation){
+      columns.push({ key: columnObject.aggregation + '(' + columnObject.name + ')', label: columnObject.aggregation + '(' + columnObject.name + ')'});
+    }
+    //otherwise, simply name the column the column name
+    else {
       columns.push({ key: columnObject.name, label: columnObject.name });
     }
   }

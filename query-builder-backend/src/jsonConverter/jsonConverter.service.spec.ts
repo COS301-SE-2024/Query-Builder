@@ -542,7 +542,7 @@ describe('JSONConverterService', () => {
         expect(result).toEqual(expectedQuery);
     });
 
-    it('should be able to convert queries using pagination, where, group by, and having conditions', () => {
+    it('should be able to convert queries using pagination, group by, and having conditions', () => {
         const queryParams: QueryParams = {
             language: 'SQL',
             query_type: 'SELECT',
@@ -569,13 +569,13 @@ describe('JSONConverterService', () => {
             }
         };
 
-        const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name`, AVG(`users`.`age`) FROM `sakila`.`users` GROUP BY `users`.`id`, `users`.`first_name`, `users`.`last_name` HAVING AVG(`users`.`age`) > 18 LIMIT 10 OFFSET 20';
+        const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name`, AVG(`users`.`age`) AS `AVG(age)` FROM `sakila`.`users` GROUP BY `users`.`id`, `users`.`first_name`, `users`.`last_name` HAVING AVG(`users`.`age`) > 18 LIMIT 10 OFFSET 20';
         const result = service.convertJsonToQuery(queryParams);
 
         expect(result).toEqual(expectedQuery);
     });
 
-    it('should be able to convert queries using pagination, where, and group by conditions', () => {
+    it('should be able to convert queries using pagination, group by, and where conditions', () => {
         const queryParams: QueryParams = {
             language: 'SQL',
             query_type: 'SELECT',
@@ -735,7 +735,7 @@ describe('JSONConverterService', () => {
 
     //----------------------------------- Complete count query conversion tests -----------------------------------//
 
-    it('should be able to generate a count query for a query using pagination, where, group by, and having conditions', () => {
+    it('should be able to generate a count query for a query using pagination, group by, and having conditions', () => {
         const queryParams: QueryParams = {
             language: 'SQL',
             query_type: 'SELECT',
@@ -762,7 +762,7 @@ describe('JSONConverterService', () => {
             }
         };
 
-        const expectedQuery = 'SELECT COUNT(*) AS numRows FROM (SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name`, AVG(`users`.`age`) FROM `sakila`.`users` GROUP BY `users`.`id`, `users`.`first_name`, `users`.`last_name` HAVING AVG(`users`.`age`) > 18) AS subquery';
+        const expectedQuery = 'SELECT COUNT(*) AS numRows FROM (SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name`, AVG(`users`.`age`) AS `AVG(age)` FROM `sakila`.`users` GROUP BY `users`.`id`, `users`.`first_name`, `users`.`last_name` HAVING AVG(`users`.`age`) > 18) AS subquery';
         const result = service.convertJsonToCountQuery(queryParams);
 
         expect(result).toEqual(expectedQuery);

@@ -101,6 +101,10 @@ export class JsonConverterService {
 
         if(column.aggregation){
             columnString += ')'
+            //give a custom alias if one is not provided
+            if(!column.alias){
+                columnString += ' AS `' + column.aggregation + '(' + column.name + ')`';
+            }
         }
 
         if(column.alias){
