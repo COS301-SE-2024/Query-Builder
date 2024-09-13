@@ -134,6 +134,23 @@ jest.mock('express-session', () => {
   };
 });
 
+class MockConnectionManagerService extends ConnectionManagerService {
+  async connectToDatabase(connect_dto: any, session: Record<string, any>) {
+    return { success: true, connectionID: 1 };
+  }
+
+  async hasActiveConnection(
+    has_active_connection_dto: any,
+    session: Record<string, any>
+  ) {
+    return super.hasActiveConnection(has_active_connection_dto, session);
+  }
+
+  async decryptDbSecrets(db_id: string, session: Record<string, any>) {
+    return super.decryptDbSecrets(db_id, session);
+  }
+}
+
 describe('ConnectionManagerService', () => {
   let service: ConnectionManagerService;
 
@@ -147,7 +164,14 @@ describe('ConnectionManagerService', () => {
         SessionStoreModule,
         MyLoggerModule
       ],
-      providers: [ConnectionManagerService, AppService, ConfigService]
+      providers: [
+        {
+          provide: ConnectionManagerService,
+          useClass: MockConnectionManagerService
+        },
+        AppService,
+        ConfigService
+      ]
     }).compile();
 
     service = module.get<ConnectionManagerService>(ConnectionManagerService);

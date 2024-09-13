@@ -44,8 +44,14 @@ export class ConnectionManagerModule {
 
     return {
       module: ConnectionManagerModule,
+      imports: [
+        SupabaseModule,
+        ConfigModule.forRoot({ isGlobal: true }),
+        SessionStoreModule,
+        MyLoggerModule
+      ],
       controllers: [ConnectionManagerController],
-      providers: [provider],
+      providers: [provider, AppService],
       exports: [provider]
     };
   }

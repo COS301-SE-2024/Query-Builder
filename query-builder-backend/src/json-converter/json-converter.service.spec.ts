@@ -6,6 +6,9 @@ class MockJsonConverterService extends JsonConverterService {
   convertJsonToQuery(query: QueryParams) {
     return JSON.stringify(query);
   }
+  convertJsonToCountQuery(jsonData: QueryParams) {
+    return JSON.stringify(jsonData);
+  }
 }
 
 describe('JsonConverterService', () => {

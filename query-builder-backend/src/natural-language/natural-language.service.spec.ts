@@ -6,6 +6,7 @@ import OpenAI from 'openai';
 import { GenerativeModel, GoogleGenerativeAI } from '@google/generative-ai';
 import { response } from 'express';
 import { stringify } from 'querystring';
+import { AppService } from '../app.service';
 
 jest.mock('openai', () => {
   return {
@@ -75,7 +76,7 @@ describe('NaturalLanguageService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [DbMetadataHandlerModule],
-      providers: [NaturalLanguageService, ConfigService]
+      providers: [NaturalLanguageService, ConfigService, AppService]
     }).compile();
 
     service = await module.resolve<NaturalLanguageService>(

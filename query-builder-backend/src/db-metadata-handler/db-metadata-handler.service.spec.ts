@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DbMetadataHandlerService } from './db-metadata-handler.service';
 import { QueryHandlerModule } from '../query-handler/query-handler.module';
+import { AppService } from '../app.service';
 
 describe('DbMetadataHandlerService', () => {
   let service: DbMetadataHandlerService;
@@ -8,7 +9,7 @@ describe('DbMetadataHandlerService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [QueryHandlerModule],
-      providers: [DbMetadataHandlerService]
+      providers: [DbMetadataHandlerService, AppService]
     }).compile();
 
     service = module.get<DbMetadataHandlerService>(DbMetadataHandlerService);
