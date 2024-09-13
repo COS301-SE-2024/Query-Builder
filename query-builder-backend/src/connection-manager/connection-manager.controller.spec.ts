@@ -9,68 +9,57 @@ import { MyLoggerModule } from '../my-logger/my-logger.module';
 import { MySqlConnectionManagerService } from './my-sql-connection-manager/my-sql-connection-manager.service';
 import { PostgresConnectionManagerService } from './postgres-connection-manager/postgres-connection-manager.service';
 
+class MockConnectionManagerService {
+  connectToDatabase() {
+    return 'mocked connection';
+  }
+  hasActiveConnection() {
+    return 'mocked active connection';
+  }
+}
+
 describe('ConnectionManagerController', () => {
-  describe('ConnectionManagerController (providing MySqlConnectionManagerService)', () => {
-    let controller: ConnectionManagerController;
+  let controller: ConnectionManagerController;
 
-    beforeEach(async () => {
-      const module: TestingModule = await Test.createTestingModule({
-        imports: [
-          SupabaseModule,
-          ConfigModule.forRoot({ isGlobal: true }),
-          SessionStoreModule,
-          MyLoggerModule
-        ],
-        controllers: [ConnectionManagerController],
-        providers: [
-          {
-            provide: ConnectionManagerService,
-            useClass: MySqlConnectionManagerService
-          },
-          AppService,
-          ConfigService
-        ]
-      }).compile();
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      imports: [
+        SupabaseModule,
+        ConfigModule.forRoot({ isGlobal: true }),
+        SessionStoreModule,
+        MyLoggerModule
+      ],
+      controllers: [ConnectionManagerController],
+      providers: [
+        {
+          provide: ConnectionManagerService,
+          useClass: MockConnectionManagerService
+        },
+        AppService,
+        ConfigService
+      ]
+    }).compile();
 
-      controller = module.get<ConnectionManagerController>(
-        ConnectionManagerController
-      );
-    });
+    controller = module.get<ConnectionManagerController>(
+      ConnectionManagerController
+    );
+  });
 
-    it('should be defined', () => {
-      expect(controller).toBeDefined();
+  it('should be defined', () => {
+    expect(controller).toBeDefined();
+  });
+
+  describe('connect', () => {
+    it('should return "mocked connection"', async () => {
+      expect(await controller.connect(null, null)).toBe('mocked connection');
     });
   });
 
-  describe('ConnectionManagerController (providing PostgresConnectionManagerService)', () => {
-    let controller: ConnectionManagerController;
-
-    beforeEach(async () => {
-      const module: TestingModule = await Test.createTestingModule({
-        imports: [
-          SupabaseModule,
-          ConfigModule.forRoot({ isGlobal: true }),
-          SessionStoreModule,
-          MyLoggerModule
-        ],
-        controllers: [ConnectionManagerController],
-        providers: [
-          {
-            provide: ConnectionManagerService,
-            useClass: PostgresConnectionManagerService
-          },
-          AppService,
-          ConfigService
-        ]
-      }).compile();
-
-      controller = module.get<ConnectionManagerController>(
-        ConnectionManagerController
+  describe('hasActiveConnection', () => {
+    it('should return "mocked active connection"', async () => {
+      expect(await controller.hasActiveConnection(null, null)).toBe(
+        'mocked active connection'
       );
-    });
-
-    it('should be defined', () => {
-      expect(controller).toBeDefined();
     });
   });
 });
