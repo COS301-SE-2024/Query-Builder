@@ -1,7 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { JsonConverterService } from '../json-converter.service';
 import { QueryParams } from '../../interfaces/dto/query.dto';
-import { primitiveCondition, compoundCondition, ComparisonOperator, condition } from '../../interfaces/dto/conditions.dto';
+import {
+  primitiveCondition,
+  compoundCondition,
+  ComparisonOperator,
+  condition
+} from '../../interfaces/dto/conditions.dto';
 
 @Injectable()
 export class MongoJsonConverterService extends JsonConverterService {
@@ -28,6 +33,10 @@ export class MongoJsonConverterService extends JsonConverterService {
     }
 
     return query;
+  }
+
+  convertJsonToCountQuery(queryParams: QueryParams) {
+    return { message: 'Not implemented' };
   }
 
   generateFindString(queryParams: QueryParams) {

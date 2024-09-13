@@ -50,6 +50,10 @@ export class MysqlJsonConverterService extends JsonConverterService {
     return query;
   }
 
+  convertJsonToCountQuery(jsonData: QueryParams) {
+      return { message: 'Not implemented' };
+  }
+
   generateSelectClausePost(jsonData) {
     if (!jsonData.table || !jsonData.table.columns) {
       return '*';

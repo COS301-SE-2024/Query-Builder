@@ -36,7 +36,11 @@ export class PostgresJsonConverterService extends JsonConverterService {
       throw new Error('Invalid language');
     }
 
-    return query
+    return query;
+  }
+
+  convertJsonToCountQuery(jsonData: QueryParams) {
+    return { message: 'Not implemented' };
   }
 
   generateSelectClausePost(jsonData) {

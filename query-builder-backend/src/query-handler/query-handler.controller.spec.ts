@@ -13,7 +13,7 @@ describe('QueryHandlerController', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         JsonConverterModule.forRoot('mysql'),
-        ConnectionManagerModule,
+        ConnectionManagerModule.forRoot('mysql'),
         MyLoggerModule
       ],
       controllers: [QueryHandlerController],

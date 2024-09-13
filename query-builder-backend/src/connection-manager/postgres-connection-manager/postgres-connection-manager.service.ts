@@ -4,11 +4,12 @@ import {
   ConnectionStatus
 } from '../connection-manager.service';
 import { Client } from 'pg';
+import { Connect_Dto } from '../dto/connect.dto';
 
 @Injectable()
 export class PostgresConnectionManagerService extends ConnectionManagerService {
   async connectToDatabase(
-    db_id: string,
+    connect_dto: Connect_Dto,
     session: Record<string, any>
   ): Promise<ConnectionStatus> {
     {
@@ -25,7 +26,7 @@ export class PostgresConnectionManagerService extends ConnectionManagerService {
           .getClient()
           .from('db_envs')
           .select('host')
-          .eq('db_id', db_id)
+          .eq('db_id', connect_dto.databaseServerID)
           .single();
         if (error) {
           this.logger.error(error, PostgresConnectionManagerService.name);
@@ -65,7 +66,7 @@ export class PostgresConnectionManagerService extends ConnectionManagerService {
             session.host = undefined;
           }
 
-          let { user, password } = await this.decryptDbSecrets(db_id, session);
+          let { user, password } = await this.decryptDbSecrets(connect_dto.databaseServerID, session);
 
           const postgresClient = new Client({
             user: user,
