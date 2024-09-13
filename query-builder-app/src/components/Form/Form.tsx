@@ -313,6 +313,7 @@ export default function Form() {
                         },
                       },
                     });
+                    setCondition(undefined);
                   }}
                 >
                   Clear Form

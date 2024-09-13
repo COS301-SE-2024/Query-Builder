@@ -54,16 +54,29 @@ export class JsonConverterService {
                     throw new Error('Invalid query');
                 }
 
-                //Include a from clause as joins can affect the numbers of rows
+                //Make the original query, without pagination and ordering, a subquery
+                //then count the number of rows it returns
+
+                //Include a select clause as aggregates can affect the number of rows
+                const select = this.generateSelectClause(jsonData);
+
+                //Include a from clause as joins can affect the number of rows
                 const from = this.generateFromClause(jsonData);
 
                 //Include a where clause as filters can affect the number of rows
                 const where   = this.conditionWhereSQL(jsonData.condition);
 
+                //Include a group by clause as aggregates can affect the number of rows
+                const groupBy = this.groupBySQL(jsonData);
+
                 //Include a having clause as filters can affect the number of rows
                 const having  = this.havingSQL(jsonData);
 
-                query = `SELECT COUNT(*) AS numRows FROM ${from}${where}${having}`;
+                //Exclude an orderBy clause sorting doesn't affect the total number of rows
+
+                //Exclude a limit clause as we want to ignore pagination
+
+                query = `SELECT COUNT(*) AS numRows FROM (SELECT ${select} FROM ${from}${where}${groupBy}${having}) AS subquery`;
                 
             } else {
                 throw new Error('Unsupported query type');
