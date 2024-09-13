@@ -253,7 +253,7 @@ export default function TableResponse(props: TableResponseProps) {
       </Table>
 
       <div
-        className="flex w-full justify-between"
+        className="flex w-full justify-between gap-1"
         style={{
           position: 'absolute',
           bottom: '0',
@@ -295,14 +295,13 @@ export default function TableResponse(props: TableResponseProps) {
         <SaveQueryModal query={props.query} />
         <Button
           color="primary"
-          className="mx-1"
           onClick={() => {
             downloadCSV();
           }}
         >
           Export Data
         </Button>
-        <Button onPress={onOpen} color="primary" className="mx-1">
+        <Button onPress={onOpen} color="primary">
           Generate Report
         </Button>
         <Modal
