@@ -3,23 +3,23 @@ import { JsonConverterService } from './jsonConverter.service';
 import { QueryParams, AggregateFunction, ComparisonOperator } from '../interfaces/intermediateJSON';
 
 describe('JSONConverterService', () => {
-  let service: JsonConverterService;
+    let service: JsonConverterService;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [JsonConverterService],
-    }).compile();
+    beforeEach(async () => {
+        const module: TestingModule = await Test.createTestingModule({
+            providers: [JsonConverterService],
+        }).compile();
 
-    service = module.get<JsonConverterService>(JsonConverterService);
-  });
+        service = module.get<JsonConverterService>(JsonConverterService);
+    });
 
-  //------------------------------------- Service setup test -------------------------------------//
+    //------------------------------------- Service setup test -------------------------------------//
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
+    it('should be defined', () => {
+        expect(service).toBeDefined();
+    });
 
-  //------------------------------------- Individual functions tests -------------------------------------//
+    //------------------------------------- Individual functions tests -------------------------------------//
 
     //conditionWhereSQLHelp()
 
@@ -53,24 +53,24 @@ describe('JSONConverterService', () => {
         expect(result).toBe('`is_active` = FALSE');
     });
 
-  //conditionWhereSQL()
+    //conditionWhereSQL()
 
-  it('should be able to convert primitive conditions', () => {
-    
-    const condition = {
-        column: "name",
-        operator: "=",
-        value: "value"
-    }
+    it('should be able to convert primitive conditions', () => {
 
-    const result = service.conditionWhereSQL(condition);
+        const condition = {
+            column: "name",
+            operator: "=",
+            value: "value"
+        }
 
-    expect(result).toEqual(" WHERE `name` = 'value'");
+        const result = service.conditionWhereSQL(condition);
 
-});
+        expect(result).toEqual(" WHERE `name` = 'value'");
 
-it('should be able to convert compound conditions', () => {
-    
+    });
+
+    it('should be able to convert compound conditions', () => {
+
         const condition = {
             conditions: [
                 {
@@ -86,11 +86,11 @@ it('should be able to convert compound conditions', () => {
             ],
             operator: "AND"
         }
-    
+
         const result = service.conditionWhereSQL(condition);
-    
+
         expect(result).toEqual(" WHERE (`name` = 'value' AND `age` > 18)");
-    
+
     });
 
     it('should be able to convert compound conditions with AND and OR', () => {
@@ -125,24 +125,24 @@ it('should be able to convert compound conditions', () => {
             ],
             operator: "AND"
         }
-    
+
         const result = service.conditionWhereSQL(condition);
-    
+
         expect(result).toEqual(" WHERE (`name` = 'value' AND `age` > 18 AND (`city` = 'New York' OR `status` != 'inactive'))");
-    
+
     });
-    
+
 
     it('should return an empty string if no condition is provided', () => {
-    
+
         const result = service.conditionWhereSQL(null);
-    
+
         expect(result).toEqual("");
-    
+
     });
 
     //getAggregateConditions()
-    
+
     it('should return SQL for a simple aggregate condition', () => {
         const condition = {
             aggregate: "SUM",
@@ -150,9 +150,9 @@ it('should be able to convert compound conditions', () => {
             operator: ">",
             value: 50000
         };
-    
+
         const result = service.getAggregateConditions(condition);
-    
+
         expect(result).toEqual(["SUM(`salary`) > 50000"]);
     });
 
@@ -174,9 +174,9 @@ it('should be able to convert compound conditions', () => {
             ],
             operator: "AND"
         };
-    
+
         const result = service.getAggregateConditions(condition);
-    
+
         expect(result).toEqual(["SUM(`salary`) > 50000", "COUNT(`id`) > 10"]);
     });
 
@@ -270,9 +270,9 @@ it('should be able to convert compound conditions', () => {
             },
             condition: null
         };
-    
+
         const result = service.havingSQL(jsonData);
-    
+
         expect(result).toEqual('');
     });
 
@@ -291,12 +291,12 @@ it('should be able to convert compound conditions', () => {
                 ]
             }
         };
-    
+
         const result = service.groupBySQL(jsonData);
-    
+
         expect(result).toEqual('');
     });
-    
+
     it('should return GROUP BY clause for columns without aggregation', () => {
         const jsonData: QueryParams = {
             language: "SQL",
@@ -311,269 +311,269 @@ it('should be able to convert compound conditions', () => {
                 ]
             }
         };
-    
+
         const result = service.groupBySQL(jsonData);
-    
+
         expect(result).toEqual(' GROUP BY `test_table`.`id`, `test_table`.`age`');
     });
 
     //------------------------------------- Complete query conversion tests -------------------------------------//
 
-  it('should report an error when no columns are specified for a table', () => {
+    it('should report an error when no columns are specified for a table', () => {
 
-    const queryParams: QueryParams = {
-        language: 'SQL',
-        query_type: 'SELECT',
-        databaseName: "sakila",
-        table: {name: 'users', columns: []},
-      };
-  
-      try{
-        service.convertJsonToQuery(queryParams)
-      }
-      catch(e){
-        expect(e.message).toBe("No columns specified for table 'users'");
-      }
+        const queryParams: QueryParams = {
+            language: 'SQL',
+            query_type: 'SELECT',
+            databaseName: "sakila",
+            table: { name: 'users', columns: [] },
+        };
 
-  });
+        try {
+            service.convertJsonToQuery(queryParams)
+        }
+        catch (e) {
+            expect(e.message).toBe("No columns specified for table 'users'");
+        }
 
-  it('should be able to convert queries with multiple columns selected', () => {
+    });
 
-    const queryParams: QueryParams = {
-        language: 'SQL',
-        query_type: 'SELECT',
-        databaseName: "sakila",
-        table: {name: 'users', columns: [{name: 'id'}, {name: "first_name"}, {name: "last_name"}]},
-      };
-  
-      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `sakila`.`users`';
-  
-      const result = service.convertJsonToQuery(queryParams);
-  
-      expect(result).toEqual(expectedQuery);
+    it('should be able to convert queries with multiple columns selected', () => {
 
-  });
+        const queryParams: QueryParams = {
+            language: 'SQL',
+            query_type: 'SELECT',
+            databaseName: "sakila",
+            table: { name: 'users', columns: [{ name: 'id' }, { name: "first_name" }, { name: "last_name" }] },
+        };
 
-  it('should be able to convert queries with aggregation and aliasing', () => {
+        const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `sakila`.`users`';
 
-    const queryParams: QueryParams = {
-        language: 'SQL',
-        query_type: 'SELECT',
-        databaseName: "sakila",
-        table: {name: 'users', columns: [{name: 'id', aggregation: AggregateFunction.COUNT, alias: "Number"}]},
-      };
-  
-      const expectedQuery = 'SELECT COUNT(`users`.`id`) AS `Number` FROM `sakila`.`users`';
-  
-      const result = service.convertJsonToQuery(queryParams);
-  
-      expect(result).toEqual(expectedQuery);
+        const result = service.convertJsonToQuery(queryParams);
 
-  });
+        expect(result).toEqual(expectedQuery);
 
-  it('should be able to convert queries with joins', () => {
+    });
 
-    const queryParams: QueryParams = {
-        language: 'SQL',
-        query_type: 'SELECT',
-        databaseName: "sakila",
-        table: {
-            name: 'users', 
-            columns: [{name: 'id'}],
-            join: {
-                table1MatchingColumnName: "id",
-                table2MatchingColumnName: "user_id",
-                table2: {
-                    name: "actors",
-                    columns: [{name: "role"}]
+    it('should be able to convert queries with aggregation and aliasing', () => {
+
+        const queryParams: QueryParams = {
+            language: 'SQL',
+            query_type: 'SELECT',
+            databaseName: "sakila",
+            table: { name: 'users', columns: [{ name: 'id', aggregation: AggregateFunction.COUNT, alias: "Number" }] },
+        };
+
+        const expectedQuery = 'SELECT COUNT(`users`.`id`) AS `Number` FROM `sakila`.`users`';
+
+        const result = service.convertJsonToQuery(queryParams);
+
+        expect(result).toEqual(expectedQuery);
+
+    });
+
+    it('should be able to convert queries with joins', () => {
+
+        const queryParams: QueryParams = {
+            language: 'SQL',
+            query_type: 'SELECT',
+            databaseName: "sakila",
+            table: {
+                name: 'users',
+                columns: [{ name: 'id' }],
+                join: {
+                    table1MatchingColumnName: "id",
+                    table2MatchingColumnName: "user_id",
+                    table2: {
+                        name: "actors",
+                        columns: [{ name: "role" }]
+                    }
                 }
+            },
+        };
+
+        const expectedQuery = 'SELECT `users`.`id`, `actors`.`role` FROM `sakila`.`users` JOIN `sakila`.`actors` ON `users`.`id`=`actors`.`user_id`';
+
+        const result = service.convertJsonToQuery(queryParams);
+
+        expect(result).toEqual(expectedQuery);
+
+    });
+
+    it('should be able to convert queries with sorting in descending order', () => {
+
+        const queryParams: QueryParams = {
+            language: 'SQL',
+            query_type: 'SELECT',
+            databaseName: "sakila",
+            table: { name: 'users', columns: [{ name: 'id' }, { name: "first_name" }, { name: "last_name" }] },
+            sortParams: {
+                column: 'first_name',
+                direction: "descending"
             }
-        },
-      };
-  
-      const expectedQuery = 'SELECT `users`.`id`, `actors`.`role` FROM `sakila`.`users` JOIN `sakila`.`actors` ON `users`.`id`=`actors`.`user_id`';
-  
-      const result = service.convertJsonToQuery(queryParams);
-  
-      expect(result).toEqual(expectedQuery);
+        };
 
-  });
+        const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `sakila`.`users` ORDER BY `first_name` DESC';
 
-  it('should be able to convert queries with sorting in descending order', () => {
+        const result = service.convertJsonToQuery(queryParams);
 
-    const queryParams: QueryParams = {
-        language: 'SQL',
-        query_type: 'SELECT',
-        databaseName: "sakila",
-        table: {name: 'users', columns: [{name: 'id'}, {name: "first_name"}, {name: "last_name"}]},
-        sortParams: {
-            column: 'first_name',
-            direction: "descending"
+        expect(result).toEqual(expectedQuery);
+
+    });
+
+    it('should be able to convert queries with sorting in ascending order', () => {
+
+        const queryParams: QueryParams = {
+            language: 'SQL',
+            query_type: 'SELECT',
+            databaseName: "sakila",
+            table: { name: 'users', columns: [{ name: 'id' }, { name: "first_name" }, { name: "last_name" }] },
+            sortParams: {
+                column: 'first_name'
+            }
+        };
+
+        const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `sakila`.`users` ORDER BY `first_name` ASC';
+
+        const result = service.convertJsonToQuery(queryParams);
+
+        expect(result).toEqual(expectedQuery);
+
+    });
+
+    it('should be able to convert queries using pagination', () => {
+
+        const queryParams: QueryParams = {
+            language: 'SQL',
+            query_type: 'SELECT',
+            databaseName: "sakila",
+            table: { name: 'users', columns: [{ name: 'id' }, { name: "first_name" }, { name: "last_name" }] },
+            pageParams: {
+                pageNumber: 3,
+                rowsPerPage: 10
+            }
+        };
+
+        const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `sakila`.`users` LIMIT 10 OFFSET 20';
+
+        const result = service.convertJsonToQuery(queryParams);
+
+        expect(result).toEqual(expectedQuery);
+
+    });
+
+    it('should be able to throw an error if mandatory fields are missing', () => {
+
+        // @ts-ignore
+        const queryParams: QueryParams = {
+            language: 'SQL',
+            query_type: 'SELECT',
+        };
+
+        try {
+            service.convertJsonToQuery(queryParams)
         }
-      };
-  
-      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `sakila`.`users` ORDER BY `first_name` DESC';
-  
-      const result = service.convertJsonToQuery(queryParams);
-  
-      expect(result).toEqual(expectedQuery);
-
-  });
-
-  it('should be able to convert queries with sorting in ascending order', () => {
-
-    const queryParams: QueryParams = {
-        language: 'SQL',
-        query_type: 'SELECT',
-        databaseName: "sakila",
-        table: {name: 'users', columns: [{name: 'id'}, {name: "first_name"}, {name: "last_name"}]},
-        sortParams: {
-            column: 'first_name'
+        catch (e) {
+            expect(e.message).toBe('Invalid query');
         }
-      };
-  
-      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `sakila`.`users` ORDER BY `first_name` ASC';
-  
-      const result = service.convertJsonToQuery(queryParams);
-  
-      expect(result).toEqual(expectedQuery);
 
-  });
+    });
 
-  it('should be able to convert queries using pagination', () => {
+    it('should be able to throw an error if it is an unsupported query type', () => {
 
-    const queryParams: QueryParams = {
-        language: 'SQL',
-        query_type: 'SELECT',
-        databaseName: "sakila",
-        table: {name: 'users', columns: [{name: 'id'}, {name: "first_name"}, {name: "last_name"}]},
-        pageParams: {
-            pageNumber: 3,
-            rowsPerPage: 10
+        // @ts-ignore
+        const queryParams: QueryParams = {
+            language: 'SQL',
+            query_type: 'UPDATE',
+        };
+
+        try {
+            service.convertJsonToQuery(queryParams)
         }
-      };
-  
-      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `sakila`.`users` LIMIT 10 OFFSET 20';
-  
-      const result = service.convertJsonToQuery(queryParams);
-  
-      expect(result).toEqual(expectedQuery);
-
-  });
-
-  it('should be able to throw an error if mandatory fields are missing', () => {
-
-    // @ts-ignore
-    const queryParams: QueryParams = {
-        language: 'SQL',
-        query_type: 'SELECT',
-      };
-
-      try{
-        service.convertJsonToQuery(queryParams)
-      }
-      catch(e){
-        expect(e.message).toBe('Invalid query');
-      }
-
-  });
-
-  it('should be able to throw an error if it is an unsupported query type', () => {
-
-    // @ts-ignore
-    const queryParams: QueryParams = {
-        language: 'SQL',
-        query_type: 'UPDATE',
-      };
-
-      try{
-        service.convertJsonToQuery(queryParams)
-      }
-      catch(e){
-        expect(e.message).toBe('Unsupported query type');
-      }
-
-  });
-
-  it('should be able to throw an error if it is an Invalid language', () => {
-
-    // @ts-ignore
-    const queryParams: QueryParams = {
-        language: 'ABC',
-        query_type: 'SELECT',
-      };
-
-      try{
-        service.convertJsonToQuery(queryParams)
-      }
-      catch(e){
-        expect(e.message).toBe('Invalid language');
-      }
-
-  });
-
-  it('should be able to convert queries using pagination and a where condition', () => {
-    const queryParams: QueryParams = {
-        language: 'SQL',
-        query_type: 'SELECT',
-        databaseName: "sakila",
-        table: {
-            name: 'users',
-            columns: [
-                { name: 'id' },
-                { name: 'first_name' },
-                { name: 'last_name' }
-            ]
-        },
-        condition: {
-            column: 'age',
-            operator: ComparisonOperator.GREATER_THAN,
-            value: 18
-        },
-        pageParams: {
-            pageNumber: 3,
-            rowsPerPage: 10
+        catch (e) {
+            expect(e.message).toBe('Unsupported query type');
         }
-    };
 
-    const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `sakila`.`users` WHERE `age` > 18 LIMIT 10 OFFSET 20';
-    const result = service.convertJsonToQuery(queryParams);
+    });
 
-    expect(result).toEqual(expectedQuery);
-});
+    it('should be able to throw an error if it is an Invalid language', () => {
 
-it('should be able to convert queries using pagination, where, group by, and having conditions', () => {
-    const queryParams: QueryParams = {
-        language: 'SQL',
-        query_type: 'SELECT',
-        databaseName: "sakila",
-        table: {
-            name: 'users',
-            columns: [
-                { name: 'id' },
-                { name: 'first_name' },
-                { name: 'last_name' },
-                { name: 'age', aggregation: AggregateFunction.AVG }
-            ]
-        },
-        condition: {
-            column: 'age',
-            tableName: 'users',
-            operator: ComparisonOperator.GREATER_THAN,
-            value: 18,
-            aggregate: AggregateFunction.AVG // Adding aggregate function in the condition
-        },
-        pageParams: {
-            pageNumber: 3,
-            rowsPerPage: 10
+        // @ts-ignore
+        const queryParams: QueryParams = {
+            language: 'ABC',
+            query_type: 'SELECT',
+        };
+
+        try {
+            service.convertJsonToQuery(queryParams)
         }
-    };
+        catch (e) {
+            expect(e.message).toBe('Invalid language');
+        }
 
-    const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name`, AVG(`users`.`age`) FROM `sakila`.`users` GROUP BY `users`.`id`, `users`.`first_name`, `users`.`last_name` HAVING AVG(`users`.`age`) > 18 LIMIT 10 OFFSET 20';
-    const result = service.convertJsonToQuery(queryParams);
+    });
 
-    expect(result).toEqual(expectedQuery);
-});
+    it('should be able to convert queries using pagination and a where condition', () => {
+        const queryParams: QueryParams = {
+            language: 'SQL',
+            query_type: 'SELECT',
+            databaseName: "sakila",
+            table: {
+                name: 'users',
+                columns: [
+                    { name: 'id' },
+                    { name: 'first_name' },
+                    { name: 'last_name' }
+                ]
+            },
+            condition: {
+                column: 'age',
+                operator: ComparisonOperator.GREATER_THAN,
+                value: 18
+            },
+            pageParams: {
+                pageNumber: 3,
+                rowsPerPage: 10
+            }
+        };
+
+        const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `sakila`.`users` WHERE `age` > 18 LIMIT 10 OFFSET 20';
+        const result = service.convertJsonToQuery(queryParams);
+
+        expect(result).toEqual(expectedQuery);
+    });
+
+    it('should be able to convert queries using pagination, where, group by, and having conditions', () => {
+        const queryParams: QueryParams = {
+            language: 'SQL',
+            query_type: 'SELECT',
+            databaseName: "sakila",
+            table: {
+                name: 'users',
+                columns: [
+                    { name: 'id' },
+                    { name: 'first_name' },
+                    { name: 'last_name' },
+                    { name: 'age', aggregation: AggregateFunction.AVG }
+                ]
+            },
+            condition: {
+                column: 'age',
+                tableName: 'users',
+                operator: ComparisonOperator.GREATER_THAN,
+                value: 18,
+                aggregate: AggregateFunction.AVG // Adding aggregate function in the condition
+            },
+            pageParams: {
+                pageNumber: 3,
+                rowsPerPage: 10
+            }
+        };
+
+        const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name`, AVG(`users`.`age`) FROM `sakila`.`users` GROUP BY `users`.`id`, `users`.`first_name`, `users`.`last_name` HAVING AVG(`users`.`age`) > 18 LIMIT 10 OFFSET 20';
+        const result = service.convertJsonToQuery(queryParams);
+
+        expect(result).toEqual(expectedQuery);
+    });
 
     it('should be able to convert queries using pagination, where, and group by conditions', () => {
         const queryParams: QueryParams = {
@@ -608,32 +608,32 @@ it('should be able to convert queries using pagination, where, group by, and hav
 
     it('Should be able to convert a query with a join and a having, with aggregate in first table', () => {
         const jsonData: QueryParams = {
-                "language": "sql",
-                "query_type": "select",
-                "databaseName": "sakila",
-                "table": {
-                    "name":"city", 
-                    "columns":[{
-                        "name": "city_id",
-                        "aggregation": AggregateFunction.COUNT,
-                        "alias": "Number of cities per country"
-                    }],
-                    "join": {
-                        "table1MatchingColumnName": "country_id",
-                        "table2MatchingColumnName": "country_id",
-                        "table2": {
-                            "name": "country",
-                            "columns": [{"name": "country"}]
-                        }
+            "language": "sql",
+            "query_type": "select",
+            "databaseName": "sakila",
+            "table": {
+                "name": "city",
+                "columns": [{
+                    "name": "city_id",
+                    "aggregation": AggregateFunction.COUNT,
+                    "alias": "Number of cities per country"
+                }],
+                "join": {
+                    "table1MatchingColumnName": "country_id",
+                    "table2MatchingColumnName": "country_id",
+                    "table2": {
+                        "name": "country",
+                        "columns": [{ "name": "country" }]
                     }
-                },
-                "condition": {
-                    "column": "city_id",
-                    "tableName": "city",
-                    "operator": ">",
-                    "value": 10,
-                    "aggregate":"COUNT"
-                },
+                }
+            },
+            "condition": {
+                "column": "city_id",
+                "tableName": "city",
+                "operator": ">",
+                "value": 10,
+                "aggregate": "COUNT"
+            },
 
         }
 
@@ -645,32 +645,32 @@ it('should be able to convert queries using pagination, where, group by, and hav
 
     it('Should be able to convert a query with a join and a having, with aggregate in second table', () => {
         const jsonData: QueryParams = {
-                "language": "sql",
-                "query_type": "select",
-                "databaseName": "sakila",
-                "table": {
-                    "name":"country", 
-                    "columns":[{"name": "country"}],
-                    "join": {
-                        "table1MatchingColumnName": "country_id",
-                        "table2MatchingColumnName": "country_id",
-                        "table2": {
-                            "name": "city",
-                            "columns": [{
-                                "name": "city_id",
-                                "aggregation": AggregateFunction.COUNT,
-                                "alias": "Number of cities per country"
-                            }]
-                        }
+            "language": "sql",
+            "query_type": "select",
+            "databaseName": "sakila",
+            "table": {
+                "name": "country",
+                "columns": [{ "name": "country" }],
+                "join": {
+                    "table1MatchingColumnName": "country_id",
+                    "table2MatchingColumnName": "country_id",
+                    "table2": {
+                        "name": "city",
+                        "columns": [{
+                            "name": "city_id",
+                            "aggregation": AggregateFunction.COUNT,
+                            "alias": "Number of cities per country"
+                        }]
                     }
-                },
-                "condition": {
-                    "column": "city_id",
-                    "tableName": "city",
-                    "operator": ">",
-                    "value": 10,
-                    "aggregate":"COUNT"
-                },
+                }
+            },
+            "condition": {
+                "column": "city_id",
+                "tableName": "city",
+                "operator": ">",
+                "value": 10,
+                "aggregate": "COUNT"
+            },
 
         }
 
@@ -686,8 +686,8 @@ it('should be able to convert queries using pagination, where, group by, and hav
             "query_type": "select",
             "databaseName": "sakila",
             "table": {
-                "name":"city", 
-                "columns":[{
+                "name": "city",
+                "columns": [{
                     "name": "city_id",
                 }],
                 "join": {
@@ -695,7 +695,7 @@ it('should be able to convert queries using pagination, where, group by, and hav
                     "table2MatchingColumnName": "country_id",
                     "table2": {
                         "name": "country",
-                        "columns": [{"name": "country"}]
+                        "columns": [{ "name": "country" }]
                     }
                 }
             },
@@ -712,18 +712,18 @@ it('should be able to convert queries using pagination, where, group by, and hav
 
     it('Should convert a query finding country names starting with B', () => {
         const jsonData: QueryParams = {
-                "language": "sql",
-                "query_type": "select",
-                "databaseName": "sakila",
-                "table": {
-                    "name": "country",
-                    "columns": [{"name": "country"}]
-                },
-                "condition": {
-                    "column": "country",
-                    "operator": "LIKE",
-                    "value": "B%"
-                },
+            "language": "sql",
+            "query_type": "select",
+            "databaseName": "sakila",
+            "table": {
+                "name": "country",
+                "columns": [{ "name": "country" }]
+            },
+            "condition": {
+                "column": "country",
+                "operator": "LIKE",
+                "value": "B%"
+            },
 
         }
 
@@ -762,7 +762,7 @@ it('should be able to convert queries using pagination, where, group by, and hav
             }
         };
 
-        const expectedQuery = 'SELECT COUNT(*) AS numRows FROM `sakila`.`users` HAVING AVG(`users`.`age`) > 18';
+        const expectedQuery = 'SELECT COUNT(*) AS numRows FROM (SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name`, `users`.`age` FROM `sakila`.`users` WHERE `age` > 18) AS subquery';
         const result = service.convertJsonToCountQuery(queryParams);
 
         expect(result).toEqual(expectedQuery);
@@ -770,38 +770,89 @@ it('should be able to convert queries using pagination, where, group by, and hav
 
     it('Should be able to generate a count query for a query with a join and a having, with aggregate in first table', () => {
         const jsonData: QueryParams = {
-                "language": "sql",
-                "query_type": "select",
-                "databaseName": "sakila",
-                "table": {
-                    "name":"city", 
-                    "columns":[{
-                        "name": "city_id",
-                        "aggregation": AggregateFunction.COUNT,
-                        "alias": "Number of cities per country"
-                    }],
-                    "join": {
-                        "table1MatchingColumnName": "country_id",
-                        "table2MatchingColumnName": "country_id",
-                        "table2": {
-                            "name": "country",
-                            "columns": [{"name": "country"}]
-                        }
+            "language": "sql",
+            "query_type": "select",
+            "databaseName": "sakila",
+            "table": {
+                "name": "city",
+                "columns": [{
+                    "name": "city_id",
+                    "aggregation": AggregateFunction.COUNT,
+                    "alias": "Number of cities per country"
+                }],
+                "join": {
+                    "table1MatchingColumnName": "country_id",
+                    "table2MatchingColumnName": "country_id",
+                    "table2": {
+                        "name": "country",
+                        "columns": [{ "name": "country" }]
                     }
-                },
-                "condition": {
-                    "column": "city_id",
-                    "tableName": "city",
-                    "operator": ">",
-                    "value": 10,
-                    "aggregate":"COUNT"
-                },
+                }
+            },
+            "condition": {
+                "column": "city_id",
+                "tableName": "city",
+                "operator": ">",
+                "value": 10,
+                "aggregate": "COUNT"
+            },
 
         }
 
         const result = service.convertJsonToCountQuery(jsonData);
 
-        expect(result).toEqual('SELECT COUNT(*) AS numRows FROM `sakila`.`city` JOIN `sakila`.`country` ON `city`.`country_id`=`country`.`country_id` HAVING COUNT(`city`.`city_id`) > 10');
+        expect(result).toEqual('SELECT COUNT(*) AS numRows FROM (SELECT COUNT(`city`.`city_id`) AS `Number of cities per country`, `country`.`country` FROM `sakila`.`city` JOIN `sakila`.`country` ON `city`.`country_id`=`country`.`country_id` GROUP BY `country`.`country` HAVING COUNT(`city`.`city_id`) > 10) AS subquery');
+
+    });
+
+    it('should be able to throw an error if mandatory fields are missing', () => {
+
+        // @ts-ignore
+        const queryParams: QueryParams = {
+            language: 'SQL',
+            query_type: 'SELECT',
+        };
+
+        try {
+            service.convertJsonToCountQuery(queryParams)
+        }
+        catch (e) {
+            expect(e.message).toBe('Invalid query');
+        }
+
+    });
+
+    it('should be able to throw an error if it is an unsupported query type', () => {
+
+        // @ts-ignore
+        const queryParams: QueryParams = {
+            language: 'SQL',
+            query_type: 'UPDATE',
+        };
+
+        try {
+            service.convertJsonToCountQuery(queryParams)
+        }
+        catch (e) {
+            expect(e.message).toBe('Unsupported query type');
+        }
+
+    });
+
+    it('should be able to throw an error if it is an Invalid language', () => {
+
+        // @ts-ignore
+        const queryParams: QueryParams = {
+            language: 'ABC',
+            query_type: 'SELECT',
+        };
+
+        try {
+            service.convertJsonToCountQuery(queryParams)
+        }
+        catch (e) {
+            expect(e.message).toBe('Invalid language');
+        }
 
     });
 
