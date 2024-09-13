@@ -4,7 +4,8 @@ import { condition, compoundCondition, primitiveCondition, QueryParams, table, c
 @Injectable()
 export class JsonConverterService {
 
-    convertJsonToQuery(jsonData: QueryParams): string {
+    //function to convert an entire QueryParams object into a query string
+    public convertJsonToQuery(jsonData: QueryParams): string {
         let query = '';
         jsonData.language = jsonData.language.toLowerCase();
         jsonData.query_type = jsonData.query_type.toLowerCase();
@@ -30,6 +31,39 @@ export class JsonConverterService {
                 const limit = this.generateLimitClause(jsonData);
 
                 query = `SELECT ${select} FROM ${from}${where}${groupBy}${having}${orderBy}${limit}`;
+                
+            } else {
+                throw new Error('Unsupported query type');
+            }
+        } else {
+            throw new Error('Invalid language');
+        }
+    
+        return query;
+    }
+
+    //function that generates a query that counts the number of rows the query would return without pagination
+    public convertJsonToCountQuery(jsonData: QueryParams): string {
+        let query = '';
+        jsonData.language = jsonData.language.toLowerCase();
+        jsonData.query_type = jsonData.query_type.toLowerCase();
+    
+        if (jsonData.language === 'sql') {
+            if (jsonData.query_type === 'select') {
+                if (!jsonData.table || !jsonData.table.name || !jsonData.table.columns) {
+                    throw new Error('Invalid query');
+                }
+
+                //Include a from clause as joins can affect the numbers of rows
+                const from = this.generateFromClause(jsonData);
+
+                //Include a where clause as filters can affect the number of rows
+                const where   = this.conditionWhereSQL(jsonData.condition);
+
+                //Include a having clause as filters can affect the number of rows
+                const having  = this.havingSQL(jsonData);
+
+                query = `SELECT COUNT(*) AS numRows FROM ${from}${where}${having}`;
                 
             } else {
                 throw new Error('Unsupported query type');

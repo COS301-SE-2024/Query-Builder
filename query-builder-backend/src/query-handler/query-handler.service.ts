@@ -42,7 +42,7 @@ export class QueryHandlerService {
     let connection = this.sessionStore.get(session.id).conn;
 
     //secondly, get the number of rows of data
-    const countCommand: string = `SELECT COUNT(*) AS numRows FROM \`${query.queryParams.databaseName}\`.\`${query.queryParams.table.name}\``;
+    const countCommand: string = parser.convertJsonToCountQuery(query.queryParams);
 
     const promise2 = new Promise((resolve, reject) => {
 
