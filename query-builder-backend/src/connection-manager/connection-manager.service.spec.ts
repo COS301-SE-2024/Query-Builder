@@ -8,14 +8,6 @@ import { MyLoggerModule } from '../my-logger/my-logger.module';
 import { Supabase } from '../supabase/supabase';
 import { SupabaseClient } from '@supabase/supabase-js';
 
-const SELECT = 0;
-const UPDATE = 1;
-const AUTH_ADMIN = 2;
-const AUTH = 3;
-const INSERT = 4;
-const DELETE = 5;
-const STORAGE = 6;
-
 jest.mock('../supabase/supabase.ts', () => ({
   Supabase: jest.fn().mockImplementation(() => ({
     getClient: jest.fn(),
