@@ -5,8 +5,8 @@ import { SupabaseModule } from '../supabase/supabase.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppService } from '../app.service';
 import { MyLoggerModule } from '../my-logger/my-logger.module';
-import exp from 'node:constants';
-import { stat } from 'node:fs';
+import { Supabase } from '../supabase/supabase';
+import { SupabaseClient } from '@supabase/supabase-js';
 
 const SELECT = 0;
 const UPDATE = 1;
@@ -16,115 +16,12 @@ const INSERT = 4;
 const DELETE = 5;
 const STORAGE = 6;
 
-jest.mock('../supabase/supabase.ts', () => {
-  let testData: any[] = [];
-  let testError: any[] = [];
-
-  return {
-    Supabase: jest.fn().mockImplementation(() => {
-      return {
-        getJwt: jest.fn(),
-        getClient: jest.fn().mockImplementation(() => {
-          return {
-            from: jest.fn().mockReturnThis(),
-            select: jest.fn().mockImplementation(() => ({
-              eq: jest.fn().mockReturnThis(),
-              in: jest.fn().mockReturnThis(),
-              is: jest.fn().mockReturnThis(),
-              order: jest.fn().mockReturnThis(),
-              gte: jest.fn().mockReturnThis(),
-              lte: jest.fn().mockReturnThis(),
-              match: jest.fn().mockReturnThis(),
-              single: jest.fn().mockReturnThis(),
-              data: testData[SELECT], // Use the data variable here
-              error: testError[SELECT]
-            })),
-            update: jest.fn().mockImplementation(() => ({
-              eq: jest.fn().mockReturnThis(),
-              in: jest.fn().mockReturnThis(),
-              is: jest.fn().mockReturnThis(),
-              order: jest.fn().mockReturnThis(),
-              gte: jest.fn().mockReturnThis(),
-              lte: jest.fn().mockReturnThis(),
-              match: jest.fn().mockReturnThis(),
-              select: jest.fn().mockReturnThis(),
-              data: testData[UPDATE], // Use the data variable here
-              error: testError[UPDATE]
-            })),
-            insert: jest.fn().mockImplementation(() => ({
-              eq: jest.fn().mockReturnThis(),
-              in: jest.fn().mockReturnThis(),
-              is: jest.fn().mockReturnThis(),
-              order: jest.fn().mockReturnThis(),
-              gte: jest.fn().mockReturnThis(),
-              lte: jest.fn().mockReturnThis(),
-              match: jest.fn().mockReturnThis(),
-              select: jest.fn().mockReturnThis(),
-              data: testData[INSERT],
-              error: testError[INSERT]
-            })),
-            upsert: jest.fn().mockImplementation(() => ({
-              eq: jest.fn().mockReturnThis(),
-              in: jest.fn().mockReturnThis(),
-              is: jest.fn().mockReturnThis(),
-              order: jest.fn().mockReturnThis(),
-              gte: jest.fn().mockReturnThis(),
-              lte: jest.fn().mockReturnThis(),
-              match: jest.fn().mockReturnThis(),
-              select: jest.fn().mockReturnThis(),
-              data: testData[INSERT],
-              error: testError[INSERT]
-            })),
-            delete: jest.fn().mockImplementation(() => ({
-              eq: jest.fn().mockReturnThis(),
-              in: jest.fn().mockReturnThis(),
-              is: jest.fn().mockReturnThis(),
-              order: jest.fn().mockReturnThis(),
-              gte: jest.fn().mockReturnThis(),
-              lte: jest.fn().mockReturnThis(),
-              match: jest.fn().mockReturnThis(),
-              select: jest.fn().mockReturnThis(),
-              data: testData[DELETE],
-              error: testError[DELETE]
-            })),
-            storage: {
-              from: jest.fn().mockReturnThis(),
-              upload: jest.fn().mockReturnThis(),
-              getPublicUrl: jest.fn().mockReturnThis(),
-              data: testData[STORAGE],
-              error: testError[STORAGE]
-            },
-            auth: {
-              admin: {
-                createUser: jest.fn().mockReturnThis(),
-                deleteUser: jest.fn().mockReturnThis(),
-                data: testData[AUTH_ADMIN],
-                error: testError[AUTH_ADMIN]
-              },
-              getUser: jest.fn().mockReturnThis(),
-              signUp: jest.fn().mockReturnThis(),
-              signInWithPassword: jest.fn().mockReturnThis(),
-              data: testData[AUTH],
-              error: testError[AUTH]
-            }
-          };
-        })
-      };
-    }),
-    setTestData: (newData: any[]) => {
-      testData = newData;
-    },
-    setTestError: (newError: any[]) => {
-      testError = newError;
-    },
-    getTestData: () => {
-      return testData;
-    },
-    getTestError: () => {
-      return testError;
-    }
-  };
-});
+jest.mock('../supabase/supabase.ts', () => ({
+  Supabase: jest.fn().mockImplementation(() => ({
+    getClient: jest.fn(),
+    getJwt: jest.fn()
+  }))
+}));
 
 jest.mock('express-session', () => {
   return {
@@ -166,8 +63,7 @@ class MockAppService {
 
 describe('ConnectionManagerService', () => {
   let service: ConnectionManagerService;
-
-  const { setTestData, setTestError } = require('../supabase/supabase.ts');
+  let supabase: Supabase;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -194,6 +90,7 @@ describe('ConnectionManagerService', () => {
     }).compile();
 
     service = module.get<ConnectionManagerService>(ConnectionManagerService);
+    supabase = module.get<Supabase>(Supabase);
   });
 
   it('should be defined', () => {
@@ -208,28 +105,33 @@ describe('ConnectionManagerService', () => {
 
   describe('hasActiveConnection', () => {
     it('should rethrow the error generated by the Supabase client when fetching the database', async () => {
-      let testData = [];
-      let testError = [];
+      const testError = { message: 'Internal Server Exception', status: 500 };
 
-      testError[SELECT] = { message: 'Internal Server Exception', status: 500 };
-
-      setTestData(testData);
-      setTestError(testError);
+      jest.spyOn(supabase, 'getClient').mockReturnValue({
+        from: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        single: jest.fn().mockReturnThis(),
+        data: [],
+        error: testError
+      } as unknown as SupabaseClient);
 
       await service
         .hasActiveConnection({ databaseServerID: 'db_id' }, { host: 'host' })
         .catch((error) => {
           expect(error).toBeDefined();
-          expect(error).toEqual(testError[SELECT]);
+          expect(error).toEqual(testError);
         });
     });
 
     it('should throw an error when the database does not exist', async () => {
-      let testData = [];
-      let testError = [];
-
-      setTestData(testData);
-      setTestError(testError);
+      jest.spyOn(supabase, 'getClient').mockReturnValue({
+        from: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        single: jest.fn().mockReturnThis(),
+        data: []
+      } as unknown as SupabaseClient);
 
       await service
         .hasActiveConnection({ databaseServerID: 'db_id' }, { host: 'host' })
@@ -241,14 +143,34 @@ describe('ConnectionManagerService', () => {
         });
     });
 
+    it('should throw an error when the user does not have access to the database', async () => {
+      jest.spyOn(supabase, 'getClient').mockReturnValue({
+        from: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        single: jest.fn().mockReturnThis()
+      } as unknown as SupabaseClient);
+
+      await service
+        .hasActiveConnection({ databaseServerID: 'db_id' }, { host: 'host2' })
+        .catch((error) => {
+          expect(error).toBeDefined();
+          expect(error.message).toEqual(
+            'You do not have access to this database'
+          );
+        });
+    })
+
     it('should return true when the user has an active connection to the database server', async () => {
-      let testData = [];
-      let testError = [];
+      const testData = { host: 'host', port: 'port' };
 
-      testData[SELECT] = { host: 'host', port: 'port' };
-
-      setTestData(testData);
-      setTestError(testError);
+      jest.spyOn(supabase, 'getClient').mockReturnValue({
+        from: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        single: jest.fn().mockReturnThis(),
+        data: testData
+      } as unknown as SupabaseClient);
 
       const result = await service.hasActiveConnection(
         { databaseServerID: 'db_id' },
@@ -259,13 +181,15 @@ describe('ConnectionManagerService', () => {
     });
 
     it('should return false when the user does not have an active connection to the database server', async () => {
-      let testData = [];
-      let testError = [];
+      const testData = { host: 'host', port: 'port' };
 
-      testData[SELECT] = { host: 'host', port: 'port' };
-
-      setTestData(testData);
-      setTestError(testError);
+      jest.spyOn(supabase, 'getClient').mockReturnValue({
+        from: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        single: jest.fn().mockReturnThis(),
+        data: testData
+      } as unknown as SupabaseClient);
 
       const result = await service.hasActiveConnection(
         { databaseServerID: 'db_id' },
@@ -278,47 +202,62 @@ describe('ConnectionManagerService', () => {
 
   describe('decryptDbSecrets', () => {
     it('should rethrow the error generated by the Supabase client when the user is not logged in', async () => {
-      let testData = [];
-      let testError = [];
+      const testError = { message: 'User not logged in', status: 401 };
 
-      testError[AUTH] = { message: 'User not logged in', status: 401 };
-
-      setTestData(testData);
-      setTestError(testError);
+      jest.spyOn(supabase, 'getClient').mockReturnValue({
+        auth: {
+          getUser: jest.fn().mockReturnValue({ error: testError })
+        }
+      } as unknown as SupabaseClient);
 
       await service
         .decryptDbSecrets('db_id', { host: 'host' })
         .catch((error) => {
-          expect(error).toEqual(testError[AUTH]);
+          expect(error).toEqual(testError);
         });
     });
 
     it('should rethrow the error generated by the Supabase client when there is an error querying the db_access table', async () => {
-      let testData = [];
-      let testError = [];
+      const testData = { user: { id: 'user_id' } };
+      const testError = { message: 'Database not found', status: 404 };
 
-      testData[AUTH] = { user: { id: 'user_id' } };
-      testError[SELECT] = { message: 'Database not found', status: 404 };
+      jest.spyOn(supabase, 'getClient').mockReturnValueOnce({
+        auth: {
+          getUser: jest.fn().mockReturnValue({ data: testData })
+        }
+      } as unknown as SupabaseClient);
 
-      setTestData(testData);
-      setTestError(testError);
+      jest.spyOn(supabase, 'getClient').mockReturnValueOnce({
+        from: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        data: [],
+        error: testError
+      } as unknown as SupabaseClient);
 
       await service
         .decryptDbSecrets('db_id', { host: 'host' })
         .catch((error) => {
-          expect(error).toEqual(testError[SELECT]);
+          expect(error).toEqual(testError);
         });
     });
 
     it('should rethrow the error generated by the Supabase client when the database secret is not found', async () => {
-      let testData = [];
-      let testError = [];
+      const testData_1 = { user: { id: 'user_id' } };
+      const testData_2 = [];
 
-      testData[AUTH] = { user: { id: 'user_id' } };
-      testData[SELECT] = [];
+      jest.spyOn(supabase, 'getClient').mockReturnValueOnce({
+        auth: {
+          getUser: jest.fn().mockReturnValue({ data: testData_1 })
+        }
+      } as unknown as SupabaseClient);
 
-      setTestData(testData);
-      setTestError(testError);
+      jest.spyOn(supabase, 'getClient').mockReturnValueOnce({
+        from: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        data: testData_2
+      } as unknown as SupabaseClient);
 
       await service
         .decryptDbSecrets('db_id', { host: 'host' })
@@ -331,14 +270,21 @@ describe('ConnectionManagerService', () => {
     });
 
     it('should return the database secret when it is found', async () => {
-      let testData = [];
-      let testError = [];
+      const testData_1 = { user: { id: 'user_id' } };
+      const testData_2 = [{ db_secrets: 'db_secrets' }];
 
-      testData[AUTH] = { user: { id: 'user_id' } };
-      testData[SELECT] = [{ db_secrets: 'db_secrets' }];
+      jest.spyOn(supabase, 'getClient').mockReturnValueOnce({
+        auth: {
+          getUser: jest.fn().mockReturnValue({ data: testData_1 })
+        }
+      } as unknown as SupabaseClient);
 
-      setTestData(testData);
-      setTestError(testError);
+      jest.spyOn(supabase, 'getClient').mockReturnValueOnce({
+        from: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        data: testData_2
+      } as unknown as SupabaseClient);
 
       const result = await service.decryptDbSecrets('db_id', {
         host: 'host',
@@ -350,14 +296,21 @@ describe('ConnectionManagerService', () => {
     });
 
     it("should throw an InternalServerErrorException when the user doesn't have a session", async () => {
-      let testData = [];
-      let testError = [];
+      const testData_1 = { user: { id: 'user_id' } };
+      const testData_2 = [{ db_secrets: 'db_secrets' }];
 
-      testData[AUTH] = { user: { id: 'user_id' } };
-      testData[SELECT] = [{ db_secrets: 'db_secrets' }];
+      jest.spyOn(supabase, 'getClient').mockReturnValueOnce({
+        auth: {
+          getUser: jest.fn().mockReturnValue({ data: testData_1 })
+        }
+      } as unknown as SupabaseClient);
 
-      setTestData(testData);
-      setTestError(testError);
+      jest.spyOn(supabase, 'getClient').mockReturnValueOnce({
+        from: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnThis(),
+        data: testData_2
+      } as unknown as SupabaseClient);
 
       await service
         .decryptDbSecrets('db_id', {
@@ -368,21 +321,5 @@ describe('ConnectionManagerService', () => {
           expect(error.message).toEqual('You do not have a backend session');
         });
     });
-
-    // it('should rethrow the error generated by the Supabase client when the user is not authorized', async () => {
-    //   let testData = [];
-    //   let testError = [];
-
-    //   testError[SELECT] = { message: 'User not authorized', status: 403 };
-
-    //   setTestData(testData);
-    //   setTestError(testError);
-
-    //   await service
-    //     .decryptDbSecrets('db_id', { host: 'host' })
-    //     .catch((error) => {
-    //       expect(error).toEqual(testError[AUTH]);
-    //     });
-    // });
   });
 });

@@ -115,8 +115,6 @@ export abstract class ConnectionManagerService {
         session.sessionKey
       );
 
-      console.log(decryptedText2);
-
       let decryptedSecrets = JSON.parse(decryptedText2);
 
       return {
