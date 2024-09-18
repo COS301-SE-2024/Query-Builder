@@ -10,7 +10,9 @@ import { QueryParams } from '../../interfaces/dto/query.dto';
 
 @Injectable()
 export class MysqlJsonConverterService extends JsonConverterService {
-  convertJsonToQuery(jsonData: QueryParams) {
+
+  //function to convert an entire QueryParams object into a query string
+  public convertJsonToQuery(jsonData: QueryParams) {
     let query = '';
     jsonData.language = jsonData.language.toLowerCase();
     jsonData.query_type = jsonData.query_type.toLowerCase();
@@ -50,6 +52,7 @@ export class MysqlJsonConverterService extends JsonConverterService {
     return query;
   }
 
+  //function that generates a query that counts the number of rows the query would return without pagination
   public convertJsonToCountQuery(jsonData: QueryParams): string {
     let query = '';
     jsonData.language = jsonData.language.toLowerCase();
@@ -98,51 +101,8 @@ export class MysqlJsonConverterService extends JsonConverterService {
     return query;
   }
 
-  generateSelectClausePost(jsonData) {
-    if (!jsonData.table || !jsonData.table.columns) {
-      return '*';
-    }
-
-    return jsonData.table.columns
-      .map((col) => {
-        const columnName = typeof col === 'object' && col.name ? col.name : col;
-        return `"${columnName}"`;
-      })
-      .join(', ');
-  }
-
-  generateFromClausePost(jsonData) {
-    const tableName = jsonData.table.name;
-    return `"${tableName}"`;
-  }
-
-  conditionWhereSQLPost(condition) {
-    if (
-      !condition ||
-      !condition.column ||
-      !condition.operator ||
-      condition.value === undefined
-    )
-      return '';
-
-    const column = `"${condition.column}"`;
-    const operator = condition.operator.toUpperCase();
-    const value =
-      typeof condition.value === 'string'
-        ? `'${condition.value.replace(/'/g, "''")}'`
-        : condition.value; // Handle single quotes in strings
-
-    return ` WHERE ${column} ${operator} ${value}`;
-  }
-
-  groupBySQLPost(jsonData) {
-    if (!jsonData.groupBy || jsonData.groupBy.length === 0) return '';
-
-    return ` GROUP BY ${jsonData.groupBy.map((col) => `"${col}"`).join(', ')}`;
-  }
-
   //helper function to generate a string of a column
-  generateColumnString(column: column, tableName: string): string {
+  private generateColumnString(column: column, tableName: string): string {
     let columnString = '';
 
     if (column.aggregation) {
@@ -153,6 +113,10 @@ export class MysqlJsonConverterService extends JsonConverterService {
 
     if (column.aggregation) {
       columnString += ')';
+      //give a custom alias if one is not provided
+      if(!column.alias){
+        columnString += ' AS `' + column.aggregation + '(' + column.name + ')`';
+      }
     }
 
     if (column.alias) {
@@ -163,7 +127,7 @@ export class MysqlJsonConverterService extends JsonConverterService {
   }
 
   //helper function to generate string of all the columns to be returned from a table
-  generateListOfColumns(table: table): string {
+  private generateListOfColumns(table: table): string {
     let tableColumns = '';
 
     //don't need to select columns from every table in the case of joins
@@ -190,7 +154,7 @@ export class MysqlJsonConverterService extends JsonConverterService {
     return tableColumns;
   }
 
-  generateSelectClause(queryParams: QueryParams): string {
+  private generateSelectClause(queryParams: QueryParams): string {
     let selectClause = '';
 
     //get a reference to the first table
@@ -214,7 +178,7 @@ export class MysqlJsonConverterService extends JsonConverterService {
     return selectClause;
   }
 
-  generateFromClause(queryParams: QueryParams): string {
+  private generateFromClause(queryParams: QueryParams): string {
     let fromClause = '';
 
     //get a reference to the first table
@@ -250,7 +214,7 @@ export class MysqlJsonConverterService extends JsonConverterService {
     return fromClause;
   }
 
-  generateOrderByClause(queryParams: QueryParams): string {
+  private generateOrderByClause(queryParams: QueryParams): string {
     let orderBy = '';
 
     if (queryParams.sortParams) {
@@ -272,7 +236,7 @@ export class MysqlJsonConverterService extends JsonConverterService {
     return orderBy;
   }
 
-  generateLimitClause(queryParams: QueryParams): string {
+  private generateLimitClause(queryParams: QueryParams): string {
     let limit = '';
 
     if (queryParams.pageParams) {
