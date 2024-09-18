@@ -209,18 +209,17 @@ export default function Form() {
 
     }
 
-  const handleDatabaseSelection = (key: any) => {
-    setQuery({
-      ...query,
-      queryParams: {
-        ...query.queryParams,
-        databaseName: key,
-      },
-    });
-  };
+    const handleDatabaseSelection = (key: any) => {
+
+        setQuery({
+            ...query,
+            queryParams: {
+                ...query.queryParams,
+                databaseName: key
+            }
+        });
 
     };
-  
 
   return (
     <>
@@ -309,9 +308,7 @@ export default function Form() {
                                         <div>
                                             <Button
                                                 onPress={() => {
-                                                    if (!containsForbiddenKeywords(query)) {
-                                                        onOpen();
-                                                    }
+                                                    onOpen();
                                                 }}
                                                 color="primary"
                                                 isDisabled={query.queryParams.table.columns.length === 0}
