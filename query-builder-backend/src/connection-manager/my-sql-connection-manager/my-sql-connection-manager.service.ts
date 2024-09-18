@@ -15,6 +15,7 @@ export class MySqlConnectionManagerService extends ConnectionManagerService {
     connect_dto: Connect_Dto,
     session: Record<string, any>
   ): Promise<ConnectionStatus> {
+
     const { data: user_data, error: user_error } = await this.supabase
       .getClient()
       .auth.getUser(this.supabase.getJwt());
@@ -28,7 +29,7 @@ export class MySqlConnectionManagerService extends ConnectionManagerService {
       .eq('db_id', connect_dto.databaseServerID)
       .single();
     if (error) {
-      this.logger.error(error, ConnectionManagerService.name);
+      this.logger.error(error, MySqlConnectionManagerService.name);
       throw error;
     }
     if (!db_data) {
@@ -43,7 +44,7 @@ export class MySqlConnectionManagerService extends ConnectionManagerService {
       //Print out that you are reconnecting to an existing session and not a new one
       this.logger.log(
         `[Reconnecting] ${session.id} connected to ${host}:${port}`,
-        ConnectionManagerService.name
+        MySqlConnectionManagerService.name
       );
       return {
         success: true,
@@ -57,7 +58,7 @@ export class MySqlConnectionManagerService extends ConnectionManagerService {
         this.sessionStore.remove(session.id);
         this.logger.log(
           `[Connection Disconnected] ${session.id}`,
-          ConnectionManagerService.name
+          MySqlConnectionManagerService.name
         );
         session.host = undefined;
         session.port = undefined;
@@ -89,7 +90,7 @@ export class MySqlConnectionManagerService extends ConnectionManagerService {
         connection.connect((err) => {
           //if there is an error with the connection, reject
           if (err) {
-            this.logger.error(err, ConnectionManagerService.name);
+            this.logger.error(err, MySqlConnectionManagerService.name);
             if (
               err.code == 'ER_ACCESS_DENIED_ERROR' ||
               err.code == 'ER_NOT_SUPPORTED_AUTH_MODE'
@@ -116,7 +117,7 @@ export class MySqlConnectionManagerService extends ConnectionManagerService {
             });
             this.logger.log(
               `[Inital Connection] ${session.id} connected to ${host}:${port}`,
-              ConnectionManagerService.name
+              MySqlConnectionManagerService.name
             );
             resolve({
               success: true,
