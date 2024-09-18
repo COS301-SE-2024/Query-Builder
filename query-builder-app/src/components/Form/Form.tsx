@@ -218,27 +218,6 @@ export default function Form() {
 
     };
 
-    function containsForbiddenKeywords(query: Query): boolean {
-        const forbiddenKeywords = [
-            "dropdatabase",
-            "droptable",
-            "deletefrom",
-            "$"
-        ];
-
-        const queryString = JSON.stringify(query).toLowerCase();
-
-        const hasForbiddenKeyword = forbiddenKeywords.some(keyword => queryString.includes(keyword.toLowerCase()));
-
-        if (hasForbiddenKeyword) {
-            // toast.error("Please check your query for nono words");
-             alert("Please check your query for nono words");
-            return true;
-        }
-
-        return false;
-    }
-
     return (
 
         <>
@@ -329,9 +308,7 @@ export default function Form() {
                                         <div>
                                             <Button
                                                 onPress={() => {
-                                                    if (!containsForbiddenKeywords(query)) {
-                                                        onOpen();
-                                                    }
+                                                    onOpen();
                                                 }}
                                                 color="primary"
                                                 isDisabled={query.queryParams.table.columns.length === 0}
