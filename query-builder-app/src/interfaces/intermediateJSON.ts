@@ -38,6 +38,7 @@ export interface join {
 }
 
 export interface condition {
+    id: string | number | bigint;
 }
 
 export interface compoundCondition extends condition{
