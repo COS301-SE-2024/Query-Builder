@@ -5,7 +5,6 @@ import { AggregateFunction, column, primitiveCondition, ComparisonOperator } fro
 import { FiMoreVertical } from "react-icons/fi";
 import { useEffect, useRef, useState } from "react";
 import React from "react";
-import sql from "mysql";
 
 //----------------------------INTERFACES------------------------------------//
 
@@ -117,8 +116,6 @@ export default function FilterChip(props: FilterChipProps) {
         else {
             value = Number(valueString);
         }
-
-        value = sql.escape(value);
 
         setPrimitiveCondition((previousPrimitiveConditionState) => {
             return { ...previousPrimitiveConditionState, value: value };
