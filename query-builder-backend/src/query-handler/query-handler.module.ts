@@ -8,7 +8,7 @@ import { MyLoggerModule } from '../my-logger/my-logger.module';
 @Module({
   imports: [
     JsonConverterModule.forRoot('mysql'),
-    ConnectionManagerModule.forRoot('mysql'),
+    ConnectionManagerModule,
     MyLoggerModule
   ],
   controllers: [QueryHandlerController],

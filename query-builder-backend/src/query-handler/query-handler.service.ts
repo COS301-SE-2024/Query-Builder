@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JsonConverterService } from '../json-converter/json-converter.service';
 import { ConnectionManagerService } from './../connection-manager/connection-manager.service';
 import { Query } from '../interfaces/dto/query.dto';
@@ -9,7 +9,7 @@ import { MyLoggerService } from '../my-logger/my-logger.service';
 export class QueryHandlerService {
   constructor(
     private readonly jsonConverterService: JsonConverterService,
-    private readonly connectionManagerService: ConnectionManagerService,
+    @Inject('ConnectionManagerService') private readonly connectionManagerService: ConnectionManagerService,
     private readonly sessionStore: SessionStore,
     private logger: MyLoggerService
   ) {
