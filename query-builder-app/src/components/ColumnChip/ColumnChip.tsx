@@ -3,6 +3,7 @@ import { AggregateFunction, column } from "../../interfaces/intermediateJSON"
 import { FiMoreVertical } from "react-icons/fi";
 import { useEffect, useRef, useState } from "react";
 import React from "react";
+import sql from "mysql";
 
 interface ColumnChipProps {
     column: column,
@@ -91,7 +92,7 @@ export default function ColumnChip(props: ColumnChipProps) {
                                             return { ...previousColumnState, alias: undefined };
                                         }
                                         else {
-                                            return { ...previousColumnState, alias: value };
+                                            return { ...previousColumnState, alias: sql.escape(value) };
                                         }
                                     })
                                 }}
