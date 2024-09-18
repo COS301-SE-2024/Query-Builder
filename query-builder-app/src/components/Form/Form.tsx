@@ -13,6 +13,7 @@ import TableList from "../TableList/TableList";
 import FilterList from "../FilterList/FilterList";
 import { navigateToAuth } from "../../app/authentication/actions";
 import SaveQueryModal from "../SaveQueryModal/SaveQueryModal";
+import toast from "react-hot-toast";
 
 //----------------------------INTERFACES------------------------------------//
 
@@ -195,9 +196,9 @@ export default function Form() {
             setDatabases(json.data);
 
         }
-        else{
-            
-            if(json.response && json.response.message == 'You do not have a backend session'){
+        else {
+
+            if (json.response && json.response.message == 'You do not have a backend session') {
                 navigateToAuth();
             }
 
@@ -217,6 +218,27 @@ export default function Form() {
 
     };
 
+    function containsForbiddenKeywords(query: Query): boolean {
+        const forbiddenKeywords = [
+            "dropdatabase",
+            "droptable",
+            "deletefrom",
+            "$"
+        ];
+
+        const queryString = JSON.stringify(query).toLowerCase();
+
+        const hasForbiddenKeyword = forbiddenKeywords.some(keyword => queryString.includes(keyword.toLowerCase()));
+
+        if (hasForbiddenKeyword) {
+            // toast.error("Please check your query for nono words");
+             alert("Please check your query for nono words");
+            return true;
+        }
+
+        return false;
+    }
+
     return (
 
         <>
@@ -234,35 +256,35 @@ export default function Form() {
                         <Card className="w-full">
                             <CardBody className="flex flex-row items-center space-x-2">
 
-                                                                {//div for the name
+                                {//div for the name
                                     <div className="flex flex-1">
-                                    {query.queryParams.databaseName}
-                                </div>
-                            }
+                                        {query.queryParams.databaseName}
+                                    </div>
+                                }
 
-                            {//include the add button if no database is selected yet
-                                (query.queryParams.databaseName == "") && (
-                                    <Dropdown>
-                                        <DropdownTrigger>
-                                            <Button variant="bordered">+</Button>
-                                        </DropdownTrigger>
-                                        <DropdownMenu 
+                                {//include the add button if no database is selected yet
+                                    (query.queryParams.databaseName == "") && (
+                                        <Dropdown>
+                                            <DropdownTrigger>
+                                                <Button variant="bordered">+</Button>
+                                            </DropdownTrigger>
+                                            <DropdownMenu
                                                 className="max-h-[50vh] overflow-y-auto"
                                                 emptyContent="Loading databases..."
-                                                items={databases} 
+                                                items={databases}
                                                 onAction={(key) => handleDatabaseSelection(key)}
                                             >
-                                                {(item:any) => (
-                                                <DropdownItem
-                                                    key={item.SCHEMA_NAME}
-                                                >
-                                                    {item.SCHEMA_NAME}
-                                                </DropdownItem>
+                                                {(item: any) => (
+                                                    <DropdownItem
+                                                        key={item.SCHEMA_NAME}
+                                                    >
+                                                        {item.SCHEMA_NAME}
+                                                    </DropdownItem>
                                                 )}
                                             </DropdownMenu>
-                                    </Dropdown>
-                                )
-                            }
+                                        </Dropdown>
+                                    )
+                                }
 
                             </CardBody>
                         </Card>
@@ -306,7 +328,11 @@ export default function Form() {
                                     >
                                         <div>
                                             <Button
-                                                onPress={onOpen}
+                                                onPress={() => {
+                                                    if (!containsForbiddenKeywords(query)) {
+                                                        onOpen();
+                                                    }
+                                                }}
                                                 color="primary"
                                                 isDisabled={query.queryParams.table.columns.length === 0}
                                             >
@@ -334,6 +360,7 @@ export default function Form() {
                                     }}                                >
                                     Clear Form
                                 </Button>
+                                {JSON.stringify(query, null, 2)}
                             </div>
                             <Modal
                                 isOpen={isOpen}
