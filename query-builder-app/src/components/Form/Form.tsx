@@ -199,9 +199,9 @@ export default function Form() {
             setDatabases(json.data);
 
         }
-        else{
-            
-            if(json.response && json.response.message == 'You do not have a backend session'){
+        else {
+
+            if (json.response && json.response.message == 'You do not have a backend session') {
                 navigateToAuth();
             }
 
@@ -220,6 +220,7 @@ export default function Form() {
   };
 
     };
+  
 
   return (
     <>
@@ -243,29 +244,29 @@ export default function Form() {
                   </div>
                 }
 
-                            {//include the add button if no database is selected yet
-                                (query.queryParams.databaseName == "") && (
-                                    <Dropdown>
-                                        <DropdownTrigger>
-                                            <Button variant="bordered">+</Button>
-                                        </DropdownTrigger>
-                                        <DropdownMenu 
+                                {//include the add button if no database is selected yet
+                                    (query.queryParams.databaseName == "") && (
+                                        <Dropdown>
+                                            <DropdownTrigger>
+                                                <Button variant="bordered">+</Button>
+                                            </DropdownTrigger>
+                                            <DropdownMenu
                                                 className="max-h-[50vh] overflow-y-auto"
                                                 emptyContent="Loading databases..."
-                                                items={databases} 
+                                                items={databases}
                                                 onAction={(key) => handleDatabaseSelection(key)}
                                             >
-                                                {(item:any) => (
-                                                <DropdownItem
-                                                    key={item.SCHEMA_NAME}
-                                                >
-                                                    {item.SCHEMA_NAME}
-                                                </DropdownItem>
+                                                {(item: any) => (
+                                                    <DropdownItem
+                                                        key={item.SCHEMA_NAME}
+                                                    >
+                                                        {item.SCHEMA_NAME}
+                                                    </DropdownItem>
                                                 )}
                                             </DropdownMenu>
-                                    </Dropdown>
-                                )
-                            }
+                                        </Dropdown>
+                                    )
+                                }
 
                             </CardBody>
                         </Card>
@@ -307,7 +308,11 @@ export default function Form() {
                                     >
                                         <div>
                                             <Button
-                                                onPress={onOpen}
+                                                onPress={() => {
+                                                    if (!containsForbiddenKeywords(query)) {
+                                                        onOpen();
+                                                    }
+                                                }}
                                                 color="primary"
                                                 isDisabled={query.queryParams.table.columns.length === 0}
                                             >
@@ -336,6 +341,7 @@ export default function Form() {
                                     }}                                >
                                     Clear Form
                                 </Button>
+                                {JSON.stringify(query, null, 2)}
                             </div>
                             <Modal
                                 isOpen={isOpen}
