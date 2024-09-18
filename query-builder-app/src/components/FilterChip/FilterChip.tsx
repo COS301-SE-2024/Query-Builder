@@ -12,7 +12,8 @@ interface FilterChipProps {
     primitiveCondition: primitiveCondition,
     key: React.Key,
     onChange?: (primitiveCondition: primitiveCondition) => void
-    onRemove?: (key: React.Key) => void; 
+    onRemove?: (id: string) => void; 
+    id: string;
 }
 
 export default function FilterChip(props: FilterChipProps) {
@@ -221,7 +222,7 @@ export default function FilterChip(props: FilterChipProps) {
                                 color="primary"
                                 onClick={() => {
                                     if (props.onRemove) {
-                                        props.onRemove(props.key);
+                                        props.onRemove(props.id);
                                     }
                                 }}
                             >
