@@ -34,13 +34,18 @@ export class PostgresConnectionManagerService extends ConnectionManagerService {
         'You do not have access to this database'
       );
     }
+
+    //the connection details we want to connect with
     let host = db_data.host;
     let port = db_data.port;
-    if (session.host === host && session.port === port) {
-      //-----------------------------EXISTING CONNECTION TO THE RIGHT HOST AND PORT---------------------//
+    //the default postgres database to connect to, if none is provided, is 'template1'
+    let databaseName = connect_dto.databaseName ? connect_dto.databaseName : "template1";
+
+    if (session.host === host && session.port === port && session.databaseName === databaseName) {
+      //-------------EXISTING CONNECTION TO THE RIGHT HOST AND PORT AND DATABASE-------------//
       //Print out that you are reconnecting to an existing session and not a new one
       this.logger.log(
-        `[Reconnecting] ${session.id} connected to ${host}:${port}`,
+        `[Reconnecting] ${session.id} connected to ${host}:${port} ${databaseName}`,
         PostgresConnectionManagerService.name
       );
       return {
@@ -48,9 +53,9 @@ export class PostgresConnectionManagerService extends ConnectionManagerService {
         connectionID: this.sessionStore.get(session.id).conn.threadID
       };
     } else {
-      //-------------------------NO EXISTING CONNECTION TO THE RIGHT HOST AND PORT-------------------//
-      if (session.host !== undefined && session.port !== undefined) {
-        //if there is an existing connection that needs to be changed to a different host and port
+      //----------NO EXISTING CONNECTION TO THE RIGHT HOST AND PORT AND DATABASE------------//
+      if (session.host !== undefined && session.port !== undefined && session.databaseName !== undefined) {
+        //if there is an existing connection that needs to be changed to a different host and port and database
         this.sessionStore.get(session.id).conn.end();
         this.sessionStore.remove(session.id);
         this.logger.log(
@@ -59,6 +64,7 @@ export class PostgresConnectionManagerService extends ConnectionManagerService {
         );
         session.host = undefined;
         session.port = undefined;
+        session.databaseName = undefined;
       }
       let user: any, password: any;
       //If database credentials are provided, then use those
@@ -83,12 +89,13 @@ export class PostgresConnectionManagerService extends ConnectionManagerService {
         password: password,
         host: host,
         port: port,
-        database: 'template1'
+        database: databaseName
       });
 
       await postgresClient.connect();
       session.host = host;
       session.port = port;
+      session.databaseName = databaseName;
 
       this.sessionStore.add({
         id: session.id,
@@ -96,7 +103,7 @@ export class PostgresConnectionManagerService extends ConnectionManagerService {
       });
 
       this.logger.log(
-        `[Inital Connection] ${session.id} connected to ${host}:${port}`,
+        `[Inital Connection] ${session.id} connected to ${host}:${port} ${databaseName}`,
         PostgresConnectionManagerService.name
       );
       return {
