@@ -250,8 +250,16 @@ export default function Form() {
                                                 <Button variant="bordered">+</Button>
                                             </DropdownTrigger>
                                             <DropdownMenu
+                                {//include the add button if no database is selected yet
+                                    (query.queryParams.databaseName == "") && (
+                                        <Dropdown>
+                                            <DropdownTrigger>
+                                                <Button variant="bordered">+</Button>
+                                            </DropdownTrigger>
+                                            <DropdownMenu
                                                 className="max-h-[50vh] overflow-y-auto"
                                                 emptyContent="Loading databases..."
+                                                items={databases}
                                                 items={databases}
                                                 onAction={(key) => handleDatabaseSelection(key)}
                                             >
@@ -261,8 +269,17 @@ export default function Form() {
                                                     >
                                                         {item.SCHEMA_NAME}
                                                     </DropdownItem>
+                                                {(item: any) => (
+                                                    <DropdownItem
+                                                        key={item.SCHEMA_NAME}
+                                                    >
+                                                        {item.SCHEMA_NAME}
+                                                    </DropdownItem>
                                                 )}
                                             </DropdownMenu>
+                                        </Dropdown>
+                                    )
+                                }
                                         </Dropdown>
                                     )
                                 }

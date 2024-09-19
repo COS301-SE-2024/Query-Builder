@@ -1601,7 +1601,6 @@ packages:
       extend: 3.0.2
       forever-agent: 0.6.1
       form-data: 4.0.0
-      form-data: 4.0.0
       http-signature: 1.4.0
       is-typedarray: 1.0.0
       isstream: 0.1.2
@@ -3511,7 +3510,6 @@ packages:
       '@nextui-org/theme': '>=2.1.0'
       react: '>=18'
     dependencies:
-      '@nextui-org/theme': 2.2.9(tailwindcss@3.4.11)
       '@nextui-org/theme': 2.2.9(tailwindcss@3.4.11)
       '@react-types/shared': 3.23.1(react@18.3.1)
       clsx: 1.2.1
@@ -5752,7 +5750,6 @@ packages:
       dequal: 2.0.3
       polished: 4.3.1
       storybook: 8.3.0
-      storybook: 8.3.0
       uuid: 9.0.1
     dev: true
 
@@ -5764,7 +5761,6 @@ packages:
       '@storybook/global': 5.0.0
       memoizerific: 1.11.3
       storybook: 8.3.0
-      storybook: 8.3.0
       ts-dedent: 2.2.0
     dev: true
 
@@ -5774,10 +5770,8 @@ packages:
       storybook: ^8.3.0
     dependencies:
       '@storybook/global': 5.0.0
-      '@storybook/global': 5.0.0
       dequal: 2.0.3
       lodash: 4.17.21
-      storybook: 8.3.0
       storybook: 8.3.0
       ts-dedent: 2.2.0
     dev: true
@@ -5798,7 +5792,6 @@ packages:
       react-dom: 18.3.1(react@18.3.1)
       rehype-external-links: 3.0.0
       rehype-slug: 6.0.0
-      storybook: 8.3.0
       storybook: 8.3.0
       ts-dedent: 2.2.0
     transitivePeerDependencies:
@@ -5842,10 +5835,7 @@ packages:
       '@storybook/global': 5.0.0
       '@storybook/instrumenter': 8.3.0(storybook@8.3.0)
       '@storybook/test': 8.3.0(storybook@8.3.0)
-      '@storybook/instrumenter': 8.3.0(storybook@8.3.0)
-      '@storybook/test': 8.3.0(storybook@8.3.0)
       polished: 4.3.1
-      storybook: 8.3.0
       storybook: 8.3.0
       ts-dedent: 2.2.0
     dev: true
@@ -5873,7 +5863,6 @@ packages:
     dependencies:
       '@storybook/global': 5.0.0
       storybook: 8.3.0
-      storybook: 8.3.0
       tiny-invariant: 1.3.3
     dev: true
 
@@ -5883,7 +5872,6 @@ packages:
       storybook: ^8.3.0
     dependencies:
       react-confetti: 6.1.0(react@18.3.1)
-      storybook: 8.3.0
       storybook: 8.3.0
     transitivePeerDependencies:
       - react
@@ -5895,7 +5883,6 @@ packages:
       storybook: ^8.3.0
     dependencies:
       '@storybook/global': 5.0.0
-      storybook: 8.3.0
       storybook: 8.3.0
       ts-dedent: 2.2.0
     dev: true
@@ -5959,8 +5946,6 @@ packages:
     dependencies:
       '@storybook/core-webpack': 8.3.0(storybook@8.3.0)
       '@types/node': 22.5.4
-      '@storybook/core-webpack': 8.3.0(storybook@8.3.0)
-      '@types/node': 22.5.4
       '@types/semver': 7.5.8
       browser-assert: 1.2.1
       case-sensitive-paths-webpack-plugin: 2.4.0
@@ -6012,8 +5997,6 @@ packages:
     dependencies:
       '@types/node': 22.5.4
       storybook: 8.3.0
-      '@types/node': 22.5.4
-      storybook: 8.3.0
       ts-dedent: 2.2.0
     dev: true
 
@@ -6026,12 +6009,8 @@ packages:
       esbuild: 0.23.1
       esbuild-register: 3.6.0(esbuild@0.23.1)
       express: 4.21.0
-      esbuild: 0.23.1
-      esbuild-register: 3.6.0(esbuild@0.23.1)
-      express: 4.21.0
       process: 0.11.10
       recast: 0.23.9
-      semver: 7.6.3
       semver: 7.6.3
       util: 0.12.5
       ws: 8.18.0
@@ -6207,12 +6186,10 @@ packages:
       resolve: 1.22.8
       semver: 7.6.3
       storybook: 8.3.0
-      storybook: 8.3.0
       tsconfig-paths: 4.2.0
       typescript: 5.6.2
       webpack: 5.94.0(esbuild@0.23.1)
     transitivePeerDependencies:
-      - '@storybook/test'
       - '@storybook/test'
       - '@swc/core'
       - esbuild
@@ -6241,10 +6218,7 @@ packages:
       flat-cache: 3.2.0
       micromatch: 4.0.8
       react-docgen-typescript: 2.2.2(typescript@5.6.2)
-      react-docgen-typescript: 2.2.2(typescript@5.6.2)
       tslib: 2.7.0
-      typescript: 5.6.2
-      webpack: 5.94.0(esbuild@0.23.1)
       typescript: 5.6.2
       webpack: 5.94.0(esbuild@0.23.1)
     transitivePeerDependencies:
@@ -6279,7 +6253,6 @@ packages:
         optional: true
     dependencies:
       '@storybook/components': 8.3.0(storybook@8.3.0)
-      '@storybook/components': 8.3.0(storybook@8.3.0)
       '@storybook/global': 5.0.0
       '@storybook/manager-api': 8.3.0(storybook@8.3.0)
       '@storybook/preview-api': 8.3.0(storybook@8.3.0)
@@ -6288,7 +6261,6 @@ packages:
       '@storybook/theming': 8.3.0(storybook@8.3.0)
       '@types/escodegen': 0.0.6
       '@types/estree': 0.0.51
-      '@types/node': 22.5.4
       '@types/node': 22.5.4
       acorn: 7.4.1
       acorn-jsx: 5.3.2(acorn@7.4.1)
@@ -6300,7 +6272,6 @@ packages:
       react-dom: 18.3.1(react@18.3.1)
       react-element-to-jsx-string: 15.0.0(react-dom@18.3.1)(react@18.3.1)
       semver: 7.6.3
-      storybook: 8.3.0
       storybook: 8.3.0
       ts-dedent: 2.2.0
       type-fest: 2.19.0
@@ -6314,14 +6285,6 @@ packages:
       storybook: ^8.3.0
     dependencies:
       '@storybook/csf': 0.1.11
-      '@storybook/global': 5.0.0
-      '@storybook/instrumenter': 8.3.0(storybook@8.3.0)
-      '@testing-library/dom': 10.4.0
-      '@testing-library/jest-dom': 6.5.0
-      '@testing-library/user-event': 14.5.2(@testing-library/dom@10.4.0)
-      '@vitest/expect': 2.0.5
-      '@vitest/spy': 2.0.5
-      storybook: 8.3.0
       '@storybook/global': 5.0.0
       '@storybook/instrumenter': 8.3.0(storybook@8.3.0)
       '@testing-library/dom': 10.4.0
@@ -6384,7 +6347,6 @@ packages:
       '@supabase/supabase-js': ^2.33.1
     dependencies:
       '@supabase/supabase-js': 2.45.4
-      '@supabase/supabase-js': 2.45.4
       cookie: 0.5.0
       ramda: 0.29.1
     dev: false
@@ -6401,7 +6363,6 @@ packages:
       '@supabase/auth-js': 2.65.0
       '@supabase/functions-js': 2.4.1
       '@supabase/node-fetch': 2.6.15
-      '@supabase/postgrest-js': 1.16.1
       '@supabase/postgrest-js': 1.16.1
       '@supabase/realtime-js': 2.10.2
       '@supabase/storage-js': 2.7.0
@@ -6807,7 +6768,6 @@ packages:
     resolution: {integrity: sha512-VwYCweNo3ERajwy0IUlqqcyZ8/A7Zwa9ZP3MnENWcB11AejO+tLy3pu850goUW2FC/IJMdZUfKpX/yxL1gymCA==}
     dependencies:
       undici-types: 6.19.8
-      undici-types: 6.19.8
 
   /@types/node@22.5.4:
     resolution: {integrity: sha512-FDuKUJQm/ju9fT/SeX/6+gBzoPzlVCzfzmGkwKvRHQVxi4BntVbyIwf6a4Xn62mrvndLiml6z/UBXIdEVjQLXg==}
@@ -6926,10 +6886,7 @@ packages:
     dependencies:
       '@eslint-community/regexpp': 4.11.0
       '@typescript-eslint/parser': 7.18.0(eslint@8.57.0)(typescript@5.6.2)
-      '@typescript-eslint/parser': 7.18.0(eslint@8.57.0)(typescript@5.6.2)
       '@typescript-eslint/scope-manager': 7.18.0
-      '@typescript-eslint/type-utils': 7.18.0(eslint@8.57.0)(typescript@5.6.2)
-      '@typescript-eslint/utils': 7.18.0(eslint@8.57.0)(typescript@5.6.2)
       '@typescript-eslint/type-utils': 7.18.0(eslint@8.57.0)(typescript@5.6.2)
       '@typescript-eslint/utils': 7.18.0(eslint@8.57.0)(typescript@5.6.2)
       '@typescript-eslint/visitor-keys': 7.18.0
@@ -6956,7 +6913,6 @@ packages:
       '@typescript-eslint/scope-manager': 7.18.0
       '@typescript-eslint/types': 7.18.0
       '@typescript-eslint/typescript-estree': 7.18.0(typescript@5.6.2)
-      '@typescript-eslint/typescript-estree': 7.18.0(typescript@5.6.2)
       '@typescript-eslint/visitor-keys': 7.18.0
       debug: 4.3.7(supports-color@8.1.1)
       eslint: 8.57.0
@@ -6977,7 +6933,6 @@ packages:
     dependencies:
       '@typescript-eslint/scope-manager': 7.2.0
       '@typescript-eslint/types': 7.2.0
-      '@typescript-eslint/typescript-estree': 7.2.0(typescript@5.6.2)
       '@typescript-eslint/typescript-estree': 7.2.0(typescript@5.6.2)
       '@typescript-eslint/visitor-keys': 7.2.0
       debug: 4.3.7(supports-color@8.1.1)
@@ -7021,8 +6976,6 @@ packages:
       typescript:
         optional: true
     dependencies:
-      '@typescript-eslint/typescript-estree': 7.18.0(typescript@5.6.2)
-      '@typescript-eslint/utils': 7.18.0(eslint@8.57.0)(typescript@5.6.2)
       '@typescript-eslint/typescript-estree': 7.18.0(typescript@5.6.2)
       '@typescript-eslint/utils': 7.18.0(eslint@8.57.0)(typescript@5.6.2)
       debug: 4.3.7(supports-color@8.1.1)
@@ -7125,7 +7078,6 @@ packages:
       '@typescript-eslint/scope-manager': 5.62.0
       '@typescript-eslint/types': 5.62.0
       '@typescript-eslint/typescript-estree': 5.62.0(typescript@5.6.2)
-      '@typescript-eslint/typescript-estree': 5.62.0(typescript@5.6.2)
       eslint: 8.57.0
       eslint-scope: 5.1.1
       semver: 7.6.3
@@ -7143,7 +7095,6 @@ packages:
       '@eslint-community/eslint-utils': 4.4.0(eslint@8.57.0)
       '@typescript-eslint/scope-manager': 7.18.0
       '@typescript-eslint/types': 7.18.0
-      '@typescript-eslint/typescript-estree': 7.18.0(typescript@5.6.2)
       '@typescript-eslint/typescript-estree': 7.18.0(typescript@5.6.2)
       eslint: 8.57.0
     transitivePeerDependencies:
@@ -7932,7 +7883,6 @@ packages:
       iconv-lite: 0.4.24
       on-finished: 2.4.1
       qs: 6.13.0
-      qs: 6.13.0
       raw-body: 2.5.2
       type-is: 1.6.18
       unpipe: 1.0.0
@@ -8633,7 +8583,6 @@ packages:
     requiresBuild: true
     dependencies:
       '@cypress/request': 3.0.5
-      '@cypress/request': 3.0.5
       '@cypress/xvfb': 1.2.4(supports-color@8.1.1)
       '@types/sinonjs__fake-timers': 8.1.1
       '@types/sizzle': 2.3.8
@@ -9286,7 +9235,6 @@ packages:
     dependencies:
       debug: 4.3.7(supports-color@8.1.1)
       esbuild: 0.23.1
-      esbuild: 0.23.1
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -9395,7 +9343,6 @@ packages:
       '@next/eslint-plugin-next': 14.2.3
       '@rushstack/eslint-patch': 1.10.4
       '@typescript-eslint/parser': 7.2.0(eslint@8.57.0)(typescript@5.6.2)
-      '@typescript-eslint/parser': 7.2.0(eslint@8.57.0)(typescript@5.6.2)
       eslint: 8.57.0
       eslint-import-resolver-node: 0.3.9
       eslint-import-resolver-typescript: 3.6.3(@typescript-eslint/parser@7.2.0)(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.30.0)(eslint@8.57.0)
@@ -9440,7 +9387,6 @@ packages:
       eslint-module-utils: 2.11.0(@typescript-eslint/parser@7.2.0)(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.0)
       eslint-plugin-import: 2.30.0(@typescript-eslint/parser@7.2.0)(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.0)
       fast-glob: 3.3.2
-      get-tsconfig: 4.8.1
       get-tsconfig: 4.8.1
       is-bun-module: 1.2.1
       is-glob: 4.0.3
@@ -9585,7 +9531,6 @@ packages:
       eslint: '>=6'
     dependencies:
       '@storybook/csf': 0.0.1
-      '@typescript-eslint/utils': 5.62.0(eslint@8.57.0)(typescript@5.6.2)
       '@typescript-eslint/utils': 5.62.0(eslint@8.57.0)(typescript@5.6.2)
       eslint: 8.57.0
       requireindex: 1.2.0
@@ -9782,7 +9727,6 @@ packages:
       accepts: 1.3.8
       array-flatten: 1.1.1
       body-parser: 1.20.3
-      body-parser: 1.20.3
       content-disposition: 0.5.4
       content-type: 1.0.5
       cookie: 0.6.0
@@ -9790,27 +9734,20 @@ packages:
       debug: 2.6.9
       depd: 2.0.0
       encodeurl: 2.0.0
-      encodeurl: 2.0.0
       escape-html: 1.0.3
       etag: 1.8.1
       finalhandler: 1.3.1
-      finalhandler: 1.3.1
       fresh: 0.5.2
       http-errors: 2.0.0
-      merge-descriptors: 1.0.3
       merge-descriptors: 1.0.3
       methods: 1.1.2
       on-finished: 2.4.1
       parseurl: 1.3.3
       path-to-regexp: 0.1.10
-      path-to-regexp: 0.1.10
       proxy-addr: 2.0.7
-      qs: 6.13.0
       qs: 6.13.0
       range-parser: 1.2.1
       safe-buffer: 5.2.1
-      send: 0.19.0
-      serve-static: 1.16.2
       send: 0.19.0
       serve-static: 1.16.2
       setprototypeof: 1.2.0
@@ -9920,7 +9857,6 @@ packages:
     engines: {node: '>= 0.8'}
     dependencies:
       debug: 2.6.9
-      encodeurl: 2.0.0
       encodeurl: 2.0.0
       escape-html: 1.0.3
       on-finished: 2.4.1
@@ -11678,7 +11614,6 @@ packages:
       '@swc/helpers': 0.5.5
       busboy: 1.6.0
       caniuse-lite: 1.0.30001660
-      caniuse-lite: 1.0.30001660
       graceful-fs: 4.2.11
       postcss: 8.4.31
       react: 18.3.1
@@ -12170,7 +12105,6 @@ packages:
     engines: {node: '>=6'}
     dependencies:
       ts-pnp: 1.2.0(typescript@5.6.2)
-      ts-pnp: 1.2.0(typescript@5.6.2)
     transitivePeerDependencies:
       - typescript
     dev: true
@@ -12236,7 +12170,6 @@ packages:
       webpack:
         optional: true
     dependencies:
-      cosmiconfig: 9.0.0(typescript@5.6.2)
       cosmiconfig: 9.0.0(typescript@5.6.2)
       jiti: 1.21.6
       postcss: 8.4.45
@@ -12611,7 +12544,6 @@ packages:
       country-flag-icons: 1.5.13
       input-format: 0.3.10
       libphonenumber-js: 1.11.8
-      libphonenumber-js: 1.11.8
       prop-types: 15.8.1
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
@@ -12681,7 +12613,6 @@ packages:
       history: 4.10.1
       hoist-non-react-statics: 3.3.2
       loose-envify: 1.4.0
-      path-to-regexp: 1.9.0
       path-to-regexp: 1.9.0
       prop-types: 15.8.1
       react: 18.3.1
@@ -12873,7 +12804,6 @@ packages:
       '@babel/regjsgen': 0.8.0
       regenerate: 1.4.2
       regenerate-unicode-properties: 10.2.0
-      regenerate-unicode-properties: 10.2.0
       regjsparser: 0.9.1
       unicode-match-property-ecmascript: 2.0.0
       unicode-match-property-value-ecmascript: 2.2.0
@@ -13023,22 +12953,6 @@ packages:
     dependencies:
       '@types/estree': 1.0.5
     optionalDependencies:
-      '@rollup/rollup-android-arm-eabi': 4.21.3
-      '@rollup/rollup-android-arm64': 4.21.3
-      '@rollup/rollup-darwin-arm64': 4.21.3
-      '@rollup/rollup-darwin-x64': 4.21.3
-      '@rollup/rollup-linux-arm-gnueabihf': 4.21.3
-      '@rollup/rollup-linux-arm-musleabihf': 4.21.3
-      '@rollup/rollup-linux-arm64-gnu': 4.21.3
-      '@rollup/rollup-linux-arm64-musl': 4.21.3
-      '@rollup/rollup-linux-powerpc64le-gnu': 4.21.3
-      '@rollup/rollup-linux-riscv64-gnu': 4.21.3
-      '@rollup/rollup-linux-s390x-gnu': 4.21.3
-      '@rollup/rollup-linux-x64-gnu': 4.21.3
-      '@rollup/rollup-linux-x64-musl': 4.21.3
-      '@rollup/rollup-win32-arm64-msvc': 4.21.3
-      '@rollup/rollup-win32-ia32-msvc': 4.21.3
-      '@rollup/rollup-win32-x64-msvc': 4.21.3
       '@rollup/rollup-android-arm-eabi': 4.21.3
       '@rollup/rollup-android-arm64': 4.21.3
       '@rollup/rollup-darwin-arm64': 4.21.3
@@ -13208,10 +13122,8 @@ packages:
     engines: {node: '>= 0.8.0'}
     dependencies:
       encodeurl: 2.0.0
-      encodeurl: 2.0.0
       escape-html: 1.0.3
       parseurl: 1.3.3
-      send: 0.19.0
       send: 0.19.0
     transitivePeerDependencies:
       - supports-color
@@ -13421,7 +13333,6 @@ packages:
     hasBin: true
     dependencies:
       '@storybook/core': 8.3.0
-      '@storybook/core': 8.3.0
     transitivePeerDependencies:
       - bufferutil
       - supports-color
@@ -13543,7 +13454,6 @@ packages:
     resolution: {integrity: sha512-iq6eVVI64nQQTRYq2KtEg2d2uU7LElhTJwsH4YzIHZshxlgZms/wIc4VoDQTlG/IvVIrBKG06CrZnp0qv7hkcQ==}
     engines: {node: '>=12'}
     dependencies:
-      ansi-regex: 6.1.0
       ansi-regex: 6.1.0
 
   /strip-bom@3.0.0:
@@ -14102,7 +14012,6 @@ packages:
     engines: {node: '>=4'}
     dependencies:
       unicode-canonical-property-names-ecmascript: 2.0.1
-      unicode-canonical-property-names-ecmascript: 2.0.1
       unicode-property-aliases-ecmascript: 2.1.0
     dev: true
 
@@ -14409,7 +14318,6 @@ packages:
       esbuild: 0.21.5
       postcss: 8.4.45
       rollup: 4.21.3
-      rollup: 4.21.3
     optionalDependencies:
       fsevents: 2.3.3
     dev: true
@@ -14445,7 +14353,6 @@ packages:
       '@vitest/snapshot': 1.6.0
       '@vitest/spy': 1.6.0
       '@vitest/utils': 1.6.0
-      acorn-walk: 8.3.4
       acorn-walk: 8.3.4
       chai: 4.5.0
       debug: 4.3.7(supports-color@8.1.1)
