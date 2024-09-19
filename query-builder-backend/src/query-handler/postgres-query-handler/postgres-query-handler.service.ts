@@ -32,64 +32,28 @@ export class PostgresQueryHandlerService extends QueryHandlerService {
     
         let connection = this.sessionStore.get(session.id).conn;
     
-        //secondly, get the number of rows of data
+        //firstly, get the number of rows of data that would be returned without pagination
         const countCommand: string = parser.convertJsonToCountQuery(query.queryParams);
+        const countResults = await connection.query(countCommand);
+        const numRows = countResults.rows[0].numrows;
 
-        console.log(countCommand);
+        //secondly, query the database
+        const queryCommand = parser.convertJsonToQuery(query.queryParams);
+        const queryResults = await connection.query(queryCommand);
 
-        const results = await connection.query(countCommand);
+        //add a unique key field to each returned row
+        for (var i = 0; i < queryResults.rows.length; i++) {
+          queryResults.rows[i].qbee_id = i;
+        }
 
-        return results;
+        //return a response object with numRows and results
+        const response = {
+          totalNumRows: numRows,
+          data: queryResults.rows
+        };
+
+        return response;
     
-        const promise2 = new Promise((resolve, reject) => {
-          connection.query(countCommand, async function (error, results, fields) {
-            if (error) {
-              return reject(error);
-            }
-    
-            const numRows = results[0].numRows;
-    
-            //thirdly, query the database
-    
-            let queryCommand: string;
-    
-            try {
-              queryCommand = parser.convertJsonToQuery(query.queryParams);
-            } catch (e) {
-              return reject(e);
-            }
-    
-            const promise3 = new Promise((resolve, reject) => {
-              connection.query(queryCommand, function (error, results, fields) {
-                if (error) {
-                  return reject(error);
-                }
-    
-                //add a unique key field to each returned row
-                for (var i = 0; i < results.length; i++) {
-                  results[i].qbee_id = i; // Add "total": 2 to all objects in array
-                }
-    
-                //return a response object with numRows and results
-                const response = {
-                  totalNumRows: numRows,
-                  data: results
-                };
-    
-                resolve(response);
-              });
-            });
-    
-            try {
-              const queryResults = await promise3;
-              resolve(queryResults);
-            } catch (error) {
-              return reject(error);
-            }
-          });
-        });
-    
-        return await promise2;
     }
 
 }

@@ -29,7 +29,7 @@ export class MySqlQueryHandlerService extends QueryHandlerService {
     
         let connection = this.sessionStore.get(session.id).conn;
     
-        //secondly, get the number of rows of data
+        //firstly, get the number of rows of data that would be returned without pagination
         const countCommand: string = parser.convertJsonToCountQuery(query.queryParams);
     
         const promise2 = new Promise((resolve, reject) => {
@@ -40,7 +40,7 @@ export class MySqlQueryHandlerService extends QueryHandlerService {
     
             const numRows = results[0].numRows;
     
-            //thirdly, query the database
+            //secondly, query the database
     
             let queryCommand: string;
     
