@@ -9,7 +9,7 @@ import { MyLoggerService } from '../my-logger/my-logger.service';
 export abstract class QueryHandlerService {
 
   constructor(
-    protected readonly jsonConverterService: JsonConverterService,
+    @Inject('JsonConverterService') protected readonly jsonConverterService: JsonConverterService,
     @Inject('ConnectionManagerService') protected readonly connectionManagerService: ConnectionManagerService,
     protected readonly sessionStore: SessionStore,
     protected logger: MyLoggerService

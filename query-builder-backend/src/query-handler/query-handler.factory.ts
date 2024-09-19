@@ -17,14 +17,14 @@ export class QueryHandlerFactory{
         //get the language from the request
         const language = this.request?.body?.queryParams.language;
 
-        //create the QueryHandler based on the type
+        //create the QueryHandlerService based on the language
         switch(language){
             case 'mysql':
                 return this.mySqlQueryHandlerService;
             case 'postgresql':
                 return this.postgresQueryHandlerService;
             default:
-                throw new Error('Invalid database type');
+                throw new Error('Invalid language');
         }
 
     }
