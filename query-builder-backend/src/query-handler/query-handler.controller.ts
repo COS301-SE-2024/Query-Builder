@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, Inject, Post, Session } from '@nestjs/common';
+import { Body, Controller, HttpCode, Inject, Post, Session, ValidationPipe } from '@nestjs/common';
 import { QueryHandlerService } from './query-handler.service';
 import { Query } from '../interfaces/dto/query.dto';
 
@@ -9,7 +9,7 @@ export class QueryHandlerController {
   //end point to execute a query on a selected database
   @HttpCode(200)
   @Post()
-  async query(@Body() query: Query, @Session() session: Record<string, any>) {
+  async query(@Body(ValidationPipe) query: Query, @Session() session: Record<string, any>) {
     return this.queryHandlerService.queryDatabase(query, session);
   }
 }
