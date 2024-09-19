@@ -11,6 +11,7 @@ import { Connect_Dto } from '../dto/connect.dto';
 
 @Injectable()
 export class MySqlConnectionManagerService extends ConnectionManagerService {
+  
   async connectToDatabase(
     connect_dto: Connect_Dto,
     session: Record<string, any>

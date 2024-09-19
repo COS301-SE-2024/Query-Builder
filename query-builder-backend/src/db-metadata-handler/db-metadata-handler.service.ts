@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { QueryHandlerService } from '../query-handler/query-handler.service';
 import {
   ComparisonOperator,
@@ -41,7 +41,7 @@ interface ForeignKeyQuery {
 
 @Injectable()
 export class DbMetadataHandlerService {
-  constructor(private readonly queryHandlerService: QueryHandlerService) {}
+  constructor(@Inject('QueryHandlerService') private readonly queryHandlerService: QueryHandlerService) {}
 
   async getSchemaMetadata(
     schemaQuery: SchemaQuery,
