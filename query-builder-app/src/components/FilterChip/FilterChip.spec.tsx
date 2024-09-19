@@ -17,7 +17,7 @@ describe('Filter Chip basic rendering tests', () => {
             value: 10000
         }
 
-        const { baseElement } = render(<FilterChip primitiveCondition={primitiveConditionProp} />);
+        const { baseElement } = render(<FilterChip primitiveCondition={primitiveConditionProp} key={''} id={''} />);
         expect(baseElement).toBeTruthy();
 
     });
@@ -37,7 +37,7 @@ describe('Filter Chip edit tests', () => {
         const user = userEvent.setup();
 
         //render the component
-        render(<FilterChip primitiveCondition={primitiveConditionProp} />);
+        render(<FilterChip primitiveCondition={primitiveConditionProp} key={''} id={''} />);
 
         //get the edit button
         const button = screen.getAllByLabelText('edit')[0];
@@ -82,7 +82,7 @@ describe('Filter Chip aggregate function tests', () => {
         const user = userEvent.setup();
 
         //render the component
-        render(<FilterChip primitiveCondition={primitiveConditionProp} onChange={updatePrimitiveCondition} />);
+        render(<FilterChip primitiveCondition={primitiveConditionProp} onChange={updatePrimitiveCondition} key={''} id={''} />);
 
         //get the edit button
         const button = screen.getAllByLabelText('edit')[0];
@@ -137,7 +137,7 @@ describe('Filter Chip aggregate function tests', () => {
         const user = userEvent.setup();
 
         //render the component
-        render(<FilterChip primitiveCondition={primitiveConditionProp} onChange={updatePrimitiveCondition} />);
+        render(<FilterChip primitiveCondition={primitiveConditionProp} onChange={updatePrimitiveCondition} key={''} id={''} />);
 
         //get the edit button
         const button = screen.getAllByLabelText('edit')[0];
@@ -194,7 +194,7 @@ describe('Filter Chip comparison operator tests', () => {
         const user = userEvent.setup();
 
         //render the component
-        render(<FilterChip primitiveCondition={primitiveConditionProp} onChange={updatePrimitiveCondition} />);
+        render(<FilterChip primitiveCondition={primitiveConditionProp} onChange={updatePrimitiveCondition} key={''} id={''} />);
 
         //get the edit button
         const button = screen.getAllByLabelText('edit')[0];
@@ -251,7 +251,7 @@ describe('Filter Chip value tests', () => {
         const user = userEvent.setup();
 
         //render the component
-        render(<FilterChip primitiveCondition={primitiveConditionProp} onChange={updatePrimitiveCondition} />);
+        render(<FilterChip primitiveCondition={primitiveConditionProp} onChange={updatePrimitiveCondition} key={''} id={''} />);
 
         //get the edit button
         const button = screen.getAllByLabelText('edit')[0];
@@ -301,7 +301,7 @@ describe('Filter Chip value tests', () => {
         const user = userEvent.setup();
 
         //render the component
-        render(<FilterChip primitiveCondition={primitiveConditionProp} onChange={updatePrimitiveCondition} />);
+        render(<FilterChip primitiveCondition={primitiveConditionProp} onChange={updatePrimitiveCondition} key={''} id={''} />);
 
         //get the edit button
         const button = screen.getAllByLabelText('edit')[0];
@@ -351,7 +351,7 @@ describe('Filter Chip value tests', () => {
         const user = userEvent.setup();
 
         //render the component
-        render(<FilterChip primitiveCondition={primitiveConditionProp} onChange={updatePrimitiveCondition} />);
+        render(<FilterChip primitiveCondition={primitiveConditionProp} onChange={updatePrimitiveCondition} key={''} id={''} />);
 
         //get the edit button
         const button = screen.getAllByLabelText('edit')[0];
@@ -401,7 +401,7 @@ describe('Filter Chip value tests', () => {
         const user = userEvent.setup();
 
         //render the component
-        render(<FilterChip primitiveCondition={primitiveConditionProp} onChange={updatePrimitiveCondition} />);
+        render(<FilterChip primitiveCondition={primitiveConditionProp} onChange={updatePrimitiveCondition} key={''} id={''} />);
 
         //get the edit button
         const button = screen.getAllByLabelText('edit')[0];
