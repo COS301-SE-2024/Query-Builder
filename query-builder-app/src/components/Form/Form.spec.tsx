@@ -1,14 +1,13 @@
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import Form from './Form';
 import React from 'react';
 import { describe, it, expect, vi, Mock } from 'vitest';
 
-// Mock next/navigation
 vi.mock('next/navigation', () => ({
   useParams: () => ({ databaseServerID: 'mock-database-server-id' })
 }));
 
-// Mock Supabase client
+// Mock out Supabase access token retrieval
 vi.mock('./../../utils/supabase/client', () => ({
   createClient: vi.fn().mockImplementation(() => ({
     auth: {
@@ -21,7 +20,7 @@ vi.mock('./../../utils/supabase/client', () => ({
   }))
 }));
 
-// Mock API calls
+// Mock out the API calls
 global.fetch = vi.fn((url: string, config: any) => {
   if (url === `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/schemas`) {
     return Promise.resolve({
@@ -40,15 +39,9 @@ global.fetch = vi.fn((url: string, config: any) => {
         }
       })
     });
-  } else if (url === `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query-management/possible-conditions`) {
-    return Promise.resolve({
-      ok: true,
-      json: () => Promise.resolve({ data: [{ name: 'condition1' }] })
-    });
   }
 }) as Mock;
 
-// Basic component rendering tests
 describe('Form basic rendering tests', () => {
 
   it('should render successfully', () => {
@@ -56,11 +49,12 @@ describe('Form basic rendering tests', () => {
     expect(baseElement).toBeTruthy();
   });
 
-  it('should have the correct structure for queryParams', async () => {
+  it('should have the correct initial structure for queryParams', async () => {
     render(<Form />);
-
-    // Assuming `getQueryParams` function is available in your Form component or you have some way to get it
+    
+    // Wait for the form to be populated with initial data
     await waitFor(() => {
+      // The queryParams should be initialized with the default values
       const queryParams = {
         language: 'sql',
         query_type: 'select',
@@ -70,16 +64,23 @@ describe('Form basic rendering tests', () => {
           columns: []
         }
       };
-      // Replace with actual logic to retrieve queryParams if needed
-      expect(queryParams).toEqual({
-        language: 'sql',
-        query_type: 'select',
-        databaseName: '',
-        table: {
-          name: '',
-          columns: []
-        }
-      });
+      // Check that the queryParams state is initialized correctly
+      expect(screen.getByText(queryParams.databaseName)).toBeInTheDocument();
+    });
+  });
+
+  it('should clear the form when "Clear Form" button is clicked', async () => {
+    render(<Form />);
+    
+    // Wait for the form to be populated with initial data
+    await waitFor(() => {
+      // Click the "Clear Form" button
+      const clearButton = screen.getByText('Clear Form');
+      fireEvent.click(clearButton);
+      
+      // Check if the databaseName field is empty
+      expect(screen.queryByText('sakila')).toBeNull(); // Check if the old databaseName is not present
+      expect(screen.getByText('')).toBeInTheDocument(); // Check if the databaseName field is empty
     });
   });
 
