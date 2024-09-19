@@ -17,7 +17,7 @@ export class MysqlJsonConverterService extends JsonConverterService {
     jsonData.language = jsonData.language.toLowerCase();
     jsonData.query_type = jsonData.query_type.toLowerCase();
 
-    if (jsonData.language === 'mysql' || jsonData.language === 'postgresql') {
+    if (jsonData.language === 'mysql') {
       if (jsonData.query_type === 'select') {
         if (
           !jsonData.table ||
@@ -58,7 +58,7 @@ export class MysqlJsonConverterService extends JsonConverterService {
     jsonData.language = jsonData.language.toLowerCase();
     jsonData.query_type = jsonData.query_type.toLowerCase();
 
-    if (jsonData.language === 'mysql' || jsonData.language === 'postgresql') {
+    if (jsonData.language === 'mysql') {
       if (jsonData.query_type === 'select') {
         if (
           !jsonData.table ||
