@@ -338,7 +338,7 @@ export default function Form() {
                                     }}                                >
                                     Clear Form
                                 </Button>
-                                {JSON.stringify(query, null, 2)}
+                                {/* {JSON.stringify(query, null, 2)} ----------------------------------------------------------------------------------*/}
                             </div>
                             <Modal
                                 isOpen={isOpen}
