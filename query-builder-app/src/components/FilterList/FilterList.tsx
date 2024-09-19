@@ -73,6 +73,10 @@ export default function FilterList(props: FilterListProps) {
             })
         });
 
+        if (!response) {
+            return;
+        }
+
         let json = await response.json();
 
         if (!response.ok) {
@@ -141,11 +145,11 @@ export default function FilterList(props: FilterListProps) {
             <>
                 {condition.conditions.map(subCondition => (
                     <FilterChip
-                        key={subCondition.id}
+                        key={(subCondition as primitiveCondition).id ?? generateUUID()}
                         primitiveCondition={subCondition as primitiveCondition}
                         onChange={updateCondition}
                         onRemove={removeCondition}
-                        id={subCondition.id.toString()}
+                        id={(subCondition as primitiveCondition).id?.toString() ?? generateUUID()}
                     />
                 ))}
             </>
@@ -164,8 +168,8 @@ export default function FilterList(props: FilterListProps) {
     function updateCondition(updatedCondition: primitiveCondition) {
         setCondition(prevCondition => ({
             ...prevCondition,
-            conditions: prevCondition.conditions.map(cond =>
-                cond.id === updatedCondition.id ? updatedCondition : cond
+            primitiveCondition: prevCondition.conditions.map(cond =>
+                (cond as primitiveCondition).id === updatedCondition.id ? updatedCondition : cond
             )
         }));
     }
@@ -174,7 +178,7 @@ export default function FilterList(props: FilterListProps) {
         console.log(`Removing condition with id: ${id}`);
         setCondition(prevCondition => ({
             ...prevCondition,
-            conditions: prevCondition.conditions.filter(cond => cond.id !== id)
+            conditions: prevCondition.conditions.filter(cond => (cond as primitiveCondition).id !== id)
         }));
     }
 
