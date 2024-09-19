@@ -4810,7 +4810,7 @@ packages:
       '@babel/runtime': 7.25.6
       '@react-pdf/fns': 2.2.1
       bidi-js: 1.0.3
-      hyphen: 1.10.5
+      hyphen: 1.10.4
       unicode-properties: 1.4.1
     dev: false
 
