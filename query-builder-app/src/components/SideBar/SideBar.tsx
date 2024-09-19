@@ -27,10 +27,12 @@ const Sidebar = () => {
                 {/* Header */}
                 <div className="sidebar-header">
                     <div className="logo">
-                        <LogoIcon />
+                            <Link href="/" data-testid="homeNavIcon">
+                                <LogoIcon />
+                            </Link>
                     </div>
                     <div className='logo-title'>
-                        QBEE
+                        QBee
                     </div>
                 </div>
                 <hr className="sidebar-separator"></hr>

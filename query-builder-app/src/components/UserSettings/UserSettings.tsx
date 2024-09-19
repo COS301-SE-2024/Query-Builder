@@ -252,7 +252,7 @@ export default function UserSettings() {
         return (<>
             <Card
                 fullWidth
-                className="m-1 lg:pl-10 lg:pr-20">
+                className="m-0 lg:pl-10 lg:pr-20 h-full">
                 <CardBody className="mt-2 mb-2">
                     <div className="flex flex-col">
                         <div className="infield flex justify-center relative pb-4"  >

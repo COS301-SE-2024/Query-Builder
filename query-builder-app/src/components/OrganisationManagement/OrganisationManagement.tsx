@@ -9,13 +9,33 @@ import { useParams } from 'next/navigation'
 import EditUserModal from "./EditUserModal";
 import { EditIcon } from "./EditIcon";
 import { CheckIcon } from "./CheckIcon";
+import { navigateToForm } from "../../app/serverActions";
 import Link from 'next/link';
 import toast from 'react-hot-toast';
+import DatabaseCredentialsModal from "../DatabaseCredentialsModal/DatabaseCredentialsModal";
+
 
 interface UpdateOrganisation {
   org_id: string;
   name?: string;
   logo?: string;
+}
+
+interface Database {
+  created_at: String;
+  name: String;
+  db_id: any;
+  db_info: any;
+  type: String;
+}
+
+interface Organisation {
+  created_at: String;
+  logo: String;
+  name: String;
+  org_id: String;
+  db_envs: Database[];
+  org_members: String[];
 }
 
 const getToken = async () => {
@@ -47,6 +67,91 @@ export default function OrganisationManagement() {
   let [table, setTable] = useState('');
   let [hashCodeCopyText, setHashCodeCopyText] = useState('Share Join Code');
   let [errorGetMembers, setErrorGetMembers] = useState("");
+  const [organisations, setOrganisations] = React.useState([]);
+  const credentialsModalDisclosure = useDisclosure();
+  const [currentDBServerID, setCurrentDBServerID] = React.useState('');
+
+  async function queryDatabaseServer(databaseServerID: string) {
+
+    //first determine whether the user already has an active connection to the database server
+    let hasActiveConnectionResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/has-active-connection`, {
+        credentials: "include",
+        method: "POST",
+        headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + await getToken()
+        },
+        body: JSON.stringify({
+            databaseServerID: databaseServerID
+        })
+    });
+
+    const hasActiveConnection = (await hasActiveConnectionResponse.json()).hasActiveConnection;
+
+    //if the user has an active connection to the database server, navigate straight to the form
+    if(hasActiveConnection === true){
+        navigateToForm(databaseServerID);
+    }
+    //otherwise proceed to open a connection to the database server
+    else{
+
+        //determine whether the user has db secrets saved for the database server
+        let dbSecretsSavedResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/has-saved-db-credentials`, {
+            credentials: "include",
+            method: "POST",
+            headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + await getToken()
+            },
+            body: JSON.stringify({
+                db_id: databaseServerID
+            })
+        });
+
+        const dbSecretsSaved = (await dbSecretsSavedResponse.json()).saved_db_credentials;
+
+        //if the user doesn't have db credentials saved for that database, then prompt them for their credentials
+        if(dbSecretsSaved === false){
+            credentialsModalDisclosure.onOpen();
+            setCurrentDBServerID(databaseServerID);
+        }
+        else{
+
+            //attempt a connection to the database, using saved credentials
+            //call the api/connect endpoint, and exclude databaseServerCredentials
+            let connectionResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/connect`, {
+                credentials: "include",
+                method: "PUT",
+                headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + await getToken()
+                },
+                body: JSON.stringify({
+                    databaseServerID: databaseServerID
+                })
+            });
+
+            let json = await connectionResponse.json();
+
+            //if connection was successful, navigate to the form
+            if(connectionResponse.ok === true && json.success === true){
+                navigateToForm(databaseServerID);
+            }
+            //if the connection was not successful, display an appropriate error message
+            else if(connectionResponse.ok === false && json.response && json.response.message){
+                toast.error(json.response.message);
+            }
+            else{
+                toast.error("Something went wrong. Please try again");
+            }
+
+        }
+
+    }
+  }
 
   async function getMembers() {
     try {
@@ -118,7 +223,10 @@ export default function OrganisationManagement() {
           throw new Error("Network response was not ok");
         }
 
-        let orgData = (await response.json()).data[0];
+        let org = await response.json();
+        setOrganisations(org.data);
+        let orgData = org.data[0];
+
         setInitialOrgName(orgData.name);
         setInitialOrgLogo(orgData.logo);
         // setOrgMembers(orgData.org_members);
@@ -703,10 +811,28 @@ export default function OrganisationManagement() {
             <Card>
               <CardBody>
                 {errorGetMembers == "" ?
-                  (
-                    <>
-                    </>
-                  ) : (
+                  (<>
+                    <DatabaseCredentialsModal dbServerID={currentDBServerID} disclosure={credentialsModalDisclosure} onConnected={() => {navigateToForm(currentDBServerID)}}/>
+                    {organisations ? organisations.map((org: Organisation) => (
+                      <>
+                          <Table 
+                              removeWrapper aria-label="table with dynamic content">
+                              <TableHeader>
+                                  <TableColumn>Name</TableColumn>
+                              </TableHeader>
+                              <TableBody>
+                                  {org.db_envs.map((db: Database) => 
+                                      (
+                                      <TableRow key={db.db_id}>
+                                          <TableCell><Link  href="" onClick={() => {queryDatabaseServer(db.db_id)}}>{db.name}</Link></TableCell>
+                                      </TableRow>
+                                      )
+                                  )}
+                              </TableBody>
+                          </Table>
+                      </>
+                  )): <></>}
+                  </>) : (
                     <>
                       <div className="m-4 flex flex-row text-center">{errorGetMembers}</div>
                     </>
