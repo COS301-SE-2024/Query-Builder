@@ -146,6 +146,11 @@ export default function TableList(props: TableListProps) {
             })
         });
 
+        if (!response) {
+            return;
+        }
+
+
         let json = await response.json();
 
         if (response.ok) {
@@ -179,6 +184,10 @@ export default function TableList(props: TableListProps) {
                 table: tableName
             })
         });
+
+        if (!response) {
+            return;
+        }
 
         let json = await response.json();
 
