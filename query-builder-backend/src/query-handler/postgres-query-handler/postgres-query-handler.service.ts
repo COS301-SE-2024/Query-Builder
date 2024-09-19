@@ -9,7 +9,10 @@ export class PostgresQueryHandlerService extends QueryHandlerService {
         
         const { success, connectionID } =
         await this.connectionManagerService.connectToDatabase(
-          { databaseServerID: query.databaseServerID },
+          {
+            databaseServerID: query.databaseServerID,
+            databaseName: query.queryParams.databaseName
+          },
           session
         );
   
@@ -34,7 +37,7 @@ export class PostgresQueryHandlerService extends QueryHandlerService {
 
         console.log(countCommand);
 
-        const results = await connection.query("SELECT table_name FROM information_schema.tables WHERE table_schema='public'ORDER BY table_name;");
+        const results = await connection.query(countCommand);
 
         return results;
     
