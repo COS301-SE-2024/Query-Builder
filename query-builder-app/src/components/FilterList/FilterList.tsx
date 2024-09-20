@@ -73,12 +73,12 @@ export default function FilterList(props: FilterListProps) {
             })
         });
 
-        
-        let json = await response.json();
-        
         if (!response) {
             return;
         }
+        
+        let json = await response.json();
+        
         
         if (!response.ok) {
             if (json.response && json.response.message == 'You do not have a backend session') {
