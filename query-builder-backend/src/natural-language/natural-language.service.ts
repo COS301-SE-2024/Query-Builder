@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { Natural_Language_Query_Dto } from './dto/natural-language-query.dto';
 import { ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
 import { GenerativeModel, GoogleGenerativeAI } from '@google/generative-ai';
-import { Query } from '../interfaces/dto/query.dto';
+import { Query, QueryParams } from '../interfaces/dto/query.dto';
 import { DbMetadataHandlerService } from '../db-metadata-handler/db-metadata-handler.service';
+import { validate } from 'class-validator';
+import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class NaturalLanguageService {
@@ -26,31 +28,29 @@ export class NaturalLanguageService {
     this.geminiModel = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
   }
 
-  async query(
+  async open_ai_query(
     naturalLanguageQuery: Natural_Language_Query_Dto,
     session: Record<string, any>
   ) {
-    if (naturalLanguageQuery.llm === 'openAI') {
+    //-----------Fetch DB metadata to inform the LLM of the database server's structure-----------//
+    const metadataSummary =
+      await this.dbMetadataHandlerService.getSchemaSummary(
+        { databaseServerID: naturalLanguageQuery.databaseServerID },
+        session
+      );
+    const metadataSummaryString = JSON.stringify(metadataSummary);
 
-      //-----------Fetch DB metadata to inform the LLM of the database server's structure-----------//
-      const metadataSummary =
-        await this.dbMetadataHandlerService.getSchemaSummary(
-          { databaseServerID: naturalLanguageQuery.databaseServerID },
-          session
-        );
-      const metadataSummaryString = JSON.stringify(metadataSummary);
+    //-------------------------------Create the prompt for the LLM-------------------------------//
 
-      //-------------------------------Create the prompt for the LLM-------------------------------//
+    let prompt: string =
+      'Given the following QueryParams interface, write a QueryParams object for the natural language query ' +
+      naturalLanguageQuery.query +
+      '\n\n';
 
-      let prompt: string =
-        'Given the following QueryParams interface, write a QueryParams object for the natural language query ' +
-        naturalLanguageQuery.query +
-        '\n\n';
+    prompt +=
+      'Return only the object not in a code block without any comments or other text. Language should be sql and query type should be select \n\n';
 
-      prompt +=
-        'Return only the object not in a code block without any comments or other text. Language should be sql and query type should be select \n\n';
-
-      prompt += `export interface QueryParams {
+    prompt += `export interface QueryParams {
                             language: string,
                             query_type: string,
                             databaseName: string,
@@ -131,49 +131,66 @@ export class NaturalLanguageService {
                             IS_NOT = "IS NOT"
                         }`;
 
-      prompt +=
-        '\n\n The database structure is as follows: ' + metadataSummaryString;
+    prompt +=
+      '\n\n The database structure is as follows: ' + metadataSummaryString;
 
-      //--------------------Get the JSON intermediate form result from the LLM---------------------//
+    //--------------------Get the JSON intermediate form result from the LLM---------------------//
 
-      const openAiResponse = this.openAiService.chat.completions.create({
-        model: 'gpt-4',
-        messages: [{ role: 'user', content: prompt }]
-      });
+    const openAiResponse = this.openAiService.chat.completions.create({
+      model: 'gpt-4',
+      messages: [{ role: 'user', content: prompt }]
+    });
 
-      const textResponse = (await openAiResponse).choices[0].message.content;
+    const textResponse = (await openAiResponse).choices[0].message.content;
 
-      const jsonResponse = JSON.parse(textResponse);
+    console.log(textResponse);
 
-      //--------------------Send the JSON intermediate form to the QueryHandler--------------------//
+    // let jsonResponse;
+    // try {
+    //   jsonResponse = JSON.parse(textResponse);
+    // } catch (error) {
+    //   return new HttpException('Invalid JSON format', 400);
+    // }
 
-      const query: Query = {
-        databaseServerID: naturalLanguageQuery.databaseServerID,
-        queryParams: jsonResponse
-      };
+    const jsonResponse = JSON.parse(textResponse);
 
-      return query;
+    await this.validate_QueryParams_DTO(jsonResponse);
 
-    } else {
-      //-----------Fetch DB metadata to inform the LLM of the database server's structure-----------//
-      const metadataSummary =
-        await this.dbMetadataHandlerService.getSchemaSummary(
-          { databaseServerID: naturalLanguageQuery.databaseServerID },
-          session
-        );
-      const metadataSummaryString = JSON.stringify(metadataSummary);
+    //--------------------Send the JSON intermediate form to the QueryHandler--------------------//
 
-      //-------------------------------Create the prompt for the LLM-------------------------------//
+    const query: Query = {
+      databaseServerID: naturalLanguageQuery.databaseServerID,
+      queryParams: jsonResponse
+    };
 
-      let prompt: string =
-        'Given the following QueryParams interface, write a QueryParams object for the natural language query ' +
-        naturalLanguageQuery.query +
-        '\n\n';
+    await this.validate_Query_DTO(query);
 
-      prompt +=
-        'Return only the object not in a code block without any comments or other text. Language should be sql and query type should be select \n\n';
+    return { query: query };
+  }
 
-      prompt += `export interface QueryParams {
+  async gemini_query(
+    naturalLanguageQuery: Natural_Language_Query_Dto,
+    session: Record<string, any>
+  ) {
+    //-----------Fetch DB metadata to inform the LLM of the database server's structure-----------//
+    const metadataSummary =
+      await this.dbMetadataHandlerService.getSchemaSummary(
+        { databaseServerID: naturalLanguageQuery.databaseServerID },
+        session
+      );
+    const metadataSummaryString = JSON.stringify(metadataSummary);
+
+    //-------------------------------Create the prompt for the LLM-------------------------------//
+
+    let prompt: string =
+      'Given the following QueryParams interface, write a QueryParams object for the natural language query ' +
+      naturalLanguageQuery.query +
+      '\n\n';
+
+    prompt +=
+      'Return only the object not in a code block without any comments or other text. Language should be sql and query type should be select \n\n';
+
+    prompt += `export interface QueryParams {
                             language: string,
                             query_type: string,
                             databaseName: string,
@@ -254,13 +271,14 @@ export class NaturalLanguageService {
                             IS_NOT = "IS NOT"
                         }`;
 
-      prompt +=
-        '\n\n The database structure is as follows: ' + metadataSummaryString;
+    prompt +=
+      '\n\n The database structure is as follows: ' + metadataSummaryString;
 
-      prompt += '\n\n Please do not use "*" to select all columns but instead use all the names for them. ';
-      prompt += '\n\n For example: ';
-      prompt += '\n\n DO NOT DO: ';
-      prompt += `QueryParams = {
+    prompt +=
+      '\n\n Please do not use "*" to select all columns but instead use all the names for them. ';
+    prompt += '\n\n For example: ';
+    prompt += '\n\n DO NOT DO: ';
+    prompt += `QueryParams = {
                     "language": "sql",
                     "query_type": "select",
                     "databaseName": "your_database_name",
@@ -269,8 +287,8 @@ export class NaturalLanguageService {
                         "columns": [*]
                     }
                 }`;
-      prompt += '\n\n RATHER DO: ';
-      prompt += `QueryParams = {
+    prompt += '\n\n RATHER DO: ';
+    prompt += `QueryParams = {
                       "language": "sql",
                       "query_type": "select",
                       "databaseName": "your_database_name",
@@ -285,13 +303,14 @@ export class NaturalLanguageService {
                       }
                   }`;
 
-      prompt += '\n\n Please ensure you always use the symbols for operators for example "=", "<" ect rather than using EQUAL ect...  ';
+    prompt +=
+      '\n\n Please ensure you always use the symbols for operators for example "=", "<" ect rather than using EQUAL ect...  ';
 
-      prompt += '\n\n Here are a few examples of inputs and desired output: ';
+    prompt += '\n\n Here are a few examples of inputs and desired output: ';
 
-      prompt += '\n\n Example 1: ';
-      prompt += '\n\n Query: Give me country names starting with B ';
-      prompt += `QueryParams = {
+    prompt += '\n\n Example 1: ';
+    prompt += '\n\n Query: Give me country names starting with B ';
+    prompt += `QueryParams = {
         "language": "sql",
         "query_type": "select",
         "databaseName": "sakila",
@@ -305,9 +324,9 @@ export class NaturalLanguageService {
             "value": "B%"
         }`;
 
-      prompt += '\n\n Example 2: ';
-      prompt += '\n\n Query: Give me all the actors with the first name Nick ';
-      prompt += `QueryParams = {
+    prompt += '\n\n Example 2: ';
+    prompt += '\n\n Query: Give me all the actors with the first name Nick ';
+    prompt += `QueryParams = {
                     "language": "sql",
                     "query_type": "select",
                     "databaseName": "sakila",
@@ -331,9 +350,10 @@ export class NaturalLanguageService {
                     }
                 }`;
 
-      prompt += '\n\n Example 3: ';
-      prompt += '\n\n Query: Get me all the names of active staff members as well as their payment amounts and dates ';
-      prompt += `QueryParams = {
+    prompt += '\n\n Example 3: ';
+    prompt +=
+      '\n\n Query: Get me all the names of active staff members as well as their payment amounts and dates ';
+    prompt += `QueryParams = {
                     "language": "sql",
                     "query_type": "select",
                     "databaseName": "sakila",
@@ -358,39 +378,75 @@ export class NaturalLanguageService {
                     }
                 }`;
 
-      prompt += '\n\n Please ensure the following before returning a response: ';
-      prompt += '\n\n 1. The QueryParams should always have all the brackets, please ensure all starting brackets have ending brackets';
+    prompt += '\n\n Please ensure the following before returning a response: ';
+    prompt +=
+      '\n\n 1. The QueryParams should always have all the brackets, please ensure all starting brackets have ending brackets';
 
+    prompt +=
+      '\n\n Please think really hard of the given query and analyze the examples before giving me an output ';
 
-      prompt += '\n\n Please think really hard of the given query and analyze the examples before giving me an output ';
+    //--------------------Get the JSON intermediate form result from the LLM---------------------//
 
+    const result = await this.geminiModel.generateContent(prompt);
 
-      //--------------------Get the JSON intermediate form result from the LLM---------------------//
+    const response = await result.response;
+    const textResponse = await response.text();
 
-      const result = await this.geminiModel.generateContent(prompt);
+    // console.log(textResponse);
 
-      const response = await result.response;
-      const textResponse = response.text();
+    //-------------------Do some potential cleanup of the text response--------------------------//
+    const cleanedTextResponse = textResponse.replaceAll(
+      /(: |:)undefined/g,
+      ': null'
+    );
+    // console.log(cleanedTextResponse);
 
-      // console.log(textResponse);
+    // let jsonResponse;
+    // try {
+    //   jsonResponse = JSON.parse(cleanedTextResponse);
+    // } catch (error) {
+    //   return new HttpException('Invalid JSON format', 400);
+    // }
 
-      //-------------------Do some potential cleanup of the text response--------------------------//
-      const cleanedTextResponse = textResponse.replaceAll(
-        /(: |:)undefined/g,
-        ': null'
-      );
-      // console.log(cleanedTextResponse);
+    const jsonResponse = JSON.parse(cleanedTextResponse);
 
-      const jsonResponse = JSON.parse(cleanedTextResponse);
+    await this.validate_QueryParams_DTO(jsonResponse);
 
-      //--------------------Send the JSON intermediate form to the QueryHandler--------------------//
+    //--------------------Send the JSON intermediate form to the QueryHandler--------------------//
 
-      const query: Query = {
-        databaseServerID: naturalLanguageQuery.databaseServerID,
-        queryParams: jsonResponse
-      };
+    const query: Query = {
+      databaseServerID: naturalLanguageQuery.databaseServerID,
+      queryParams: jsonResponse
+    };
 
-      return query;
-    }
+    await this.validate_Query_DTO(query);
+
+    return { query: query };
+  }
+
+  async validate_QueryParams_DTO(body: any) {
+    const obj = plainToClass(QueryParams, body);
+
+    await validate(obj).then((errors) => {
+      if (errors.length > 0) {
+        // throw new HttpException({ message: 'Validation failed', errors }, 400);
+        throw new Error(`Validation failed: ${errors}`);
+      } else {
+        return { message: 'Validation passed' };
+      }
+    });
+  }
+
+  async validate_Query_DTO(body: any) {
+    const obj = plainToClass(Query, body);
+
+    await validate(obj).then((errors) => {
+      if (errors.length > 0) {
+        // throw new HttpException({ message: 'Validation failed', errors }, 400);
+        throw new Error(`Validation failed: ${errors}`);
+      } else {
+        return { message: 'Validation passed' };
+      }
+    });
   }
 }
