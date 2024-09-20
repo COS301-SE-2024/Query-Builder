@@ -29,6 +29,7 @@ import { Give_Db_Access_Dto } from './dto/give-db-access.dto';
 import { Remove_Db_Access_Dto } from './dto/remove-db-access.dto';
 import { Save_Db_Secrets_Dto } from './dto/save-db-secrets.dto';
 import { Upload_Org_Logo_Dto } from './dto/upload-org-logo.dto';
+import { Get_Db_Type_Dto } from './dto/get-db-type.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
 import { Join_Org_Dto } from './dto/join-org.dto';
@@ -57,6 +58,11 @@ export class OrgManagementController {
   @Put('get-dbs')
   async getDbs(@Body(ValidationPipe) get_dbs_dto: Get_Dbs_Dto) {
     return this.org_management_service.getDbs(get_dbs_dto);
+  }
+
+  @Put('get-db-type')
+  async getDbType(@Body(ValidationPipe) get_db_type_dto: Get_Db_Type_Dto) {
+    return this.org_management_service.getDbType(get_db_type_dto);
   }
 
   @Put('get-org-hash')

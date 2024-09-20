@@ -39,7 +39,7 @@ import SaveQueryModal from '../SaveQueryModal/SaveQueryModal';
 //----------------------------INTERFACES------------------------------------//
 
 interface Database {
-  SCHEMA_NAME: string;
+  database: string;
 }
 
 export default function Form() {
@@ -54,11 +54,14 @@ export default function Form() {
   //React hook for all the databases in the database server
   const [databases, setDatabases] = useState<Database[]>([]);
 
+  //React hook for the language type
+  const [type, setType] = useState('');
+
   //React hook containing the Query the user is busy building
   const [query, setQuery] = useState<Query>({
     databaseServerID: databaseServerID[0],
     queryParams: {
-      language: 'sql',
+      language: type,
       query_type: 'select',
       databaseName: '',
       table: {
@@ -173,8 +176,10 @@ export default function Form() {
 
   //async function to fetch the database server's databases
   async function fetchDatabases() {
-    let response = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/schemas`,
+
+    //first get the database type
+    let typeResponse = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/get-db-type`,
       {
         credentials: 'include',
         method: 'PUT',
@@ -184,26 +189,54 @@ export default function Form() {
           Authorization: 'Bearer ' + (await getToken()),
         },
         body: JSON.stringify({
-          databaseServerID: databaseServerID[0],
+          db_id: databaseServerID[0],
         }),
       },
     );
 
-    let json = await response.json();
+    if(typeResponse.ok){
 
-        if(response.ok){
-    
-            //set the databases hook
-            setDatabases(json.data);
+      const languageType = (await typeResponse.json()).type;
 
-        }
-        else{
-            
-            if(json.response && json.response.message == 'You do not have a backend session'){
-                navigateToAuth();
-            }
+      setType(languageType);
 
-        }
+      let response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/databases`,
+        {
+          credentials: 'include',
+          method: 'PUT',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + (await getToken()),
+          },
+          body: JSON.stringify({
+            databaseServerID: databaseServerID[0],
+            language: languageType
+          }),
+        },
+      );
+  
+      let json = await response.json();
+  
+      if(response.ok){
+  
+          //set the databases hook
+          setDatabases(json.data);
+  
+      }
+      else{
+          
+          if(json.response && json.response.message == 'You do not have a backend session'){
+              navigateToAuth();
+          }
+  
+      }
+
+    }
+    else{
+
+    }
 
     }
 
@@ -252,8 +285,8 @@ export default function Form() {
                         onAction={(key) => handleDatabaseSelection(key)}
                       >
                         {(item: any) => (
-                          <DropdownItem key={item.SCHEMA_NAME}>
-                            {item.SCHEMA_NAME}
+                          <DropdownItem key={item.database}>
+                            {item.database}
                           </DropdownItem>
                         )}
                       </DropdownMenu>
@@ -304,7 +337,7 @@ export default function Form() {
                     setQuery({
                       databaseServerID: databaseServerID[0],
                       queryParams: {
-                        language: 'sql',
+                        language: type,
                         query_type: 'select',
                         databaseName: '',
                         table: {

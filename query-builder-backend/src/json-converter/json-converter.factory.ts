@@ -24,7 +24,6 @@ export class JsonConverterFactory{
             language = this.request?.body?.language;
         }
 
-
         //create the JsonConverterService based on the language
         switch(language){
             case 'mysql':
