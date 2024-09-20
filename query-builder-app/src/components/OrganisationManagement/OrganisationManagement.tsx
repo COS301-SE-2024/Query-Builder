@@ -404,6 +404,7 @@ export default function OrganisationManagement() {
                 className="orgLogo rounded-full"
                 width={200}
                 height={100}
+                data-testid="updateOrgLogo"
                 alt="Organisation Logo"
                 src={profilePicURL}
               />
@@ -484,6 +485,7 @@ export default function OrganisationManagement() {
                   className="orgLogo rounded-full"
                   width={200}
                   height={100}
+                  data-testid="updateOrgLogo"
                   alt="Organisation Logo"
                   src={profilePicURL}
                 />
@@ -521,7 +523,7 @@ export default function OrganisationManagement() {
               Leave Organisation
             </Button>
             <>
-              <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+              <Modal isOpen={isOpen} onOpenChange={onOpenChange} >
                 <ModalContent>
                   {(onClose) => (
                     <>
@@ -632,6 +634,7 @@ export default function OrganisationManagement() {
         label="Organisation Name"
         defaultValue={initialOrgName}
         variant="bordered"
+        data-testid="orgName-change"
         placeholder={initialOrgName}
         onValueChange={setUpdateOrgName}
         onFocus={() => { setUpdateOrgNameHasBeenFocused(true); }}
@@ -751,6 +754,7 @@ export default function OrganisationManagement() {
               className="orgLogo md:rounded-1"
               width={200}
               height={100}
+              data-testid="OrganisationLogoImage"
               alt="Organisation Logo"
               src={profilePicURL}
             />
@@ -807,7 +811,7 @@ export default function OrganisationManagement() {
 
             </Card>
           </Tab>
-          <Tab key="orgDatabases" title="Databases">
+          <Tab key="orgDatabases" aria-label="orgDatabases" title="Databases">
             <Card>
               <CardBody>
                 {errorGetMembers == "" ?
@@ -816,7 +820,8 @@ export default function OrganisationManagement() {
                     {organisations ? organisations.map((org: Organisation) => (
                       <>
                           <Table 
-                              removeWrapper aria-label="table with dynamic content">
+                              aria-label="Organisation Database Table"
+                              removeWrapper >
                               <TableHeader>
                                   <TableColumn>Name</TableColumn>
                               </TableHeader>
