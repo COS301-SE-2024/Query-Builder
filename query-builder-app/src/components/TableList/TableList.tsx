@@ -145,13 +145,13 @@ export default function TableList(props: TableListProps) {
                 schema: database
             })
         });
-
-        if (!response) {
-            return;
-        }
-
-
+        
+        
         let json = await response.json();
+        
+                if (!response) {
+                    return;
+                }
 
         if (response.ok) {
             //set the tables hook
@@ -185,12 +185,12 @@ export default function TableList(props: TableListProps) {
             })
         });
 
+        
+        let json = await response.json();
+        
         if (!response) {
             return;
         }
-
-        let json = await response.json();
-
         if (response.ok) {
             //remove any tables already in the query to prevent circular joins
             let tableRef: table = table;
