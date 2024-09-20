@@ -23,7 +23,7 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
             language: 'mysql',
             query_type: 'select',
             databaseName: 'information_schema',
-            table: { name: 'schemata', columns: [{ name: 'schema_name' }] },
+            table: { name: 'schemata', columns: [{ name: 'schema_name', alias: "database" }] },
             condition: {
               operator: LogicalOperator.AND,
               conditions: [

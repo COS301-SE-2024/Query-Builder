@@ -13,9 +13,16 @@ export class QueryHandlerFactory{
     ){}
 
     createQueryHandlerService(){
-
+        
         //get the language from the request
-        const language = this.request?.body?.queryParams.language;
+        let language = '';
+        //the language may be in the body itself, or nested inside a queryParams object
+        if(this.request?.body?.queryParams){
+            language = this.request?.body?.queryParams.language;
+        }
+        else{
+            language = this.request?.body?.language;
+        }
 
         //create the QueryHandlerService based on the language
         switch(language){
