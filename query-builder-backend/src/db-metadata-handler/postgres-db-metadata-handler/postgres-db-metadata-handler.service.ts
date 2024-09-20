@@ -12,6 +12,7 @@ export class PostgresDbMetadataHandlerService extends DbMetadataHandlerService {
 
         /*
         SELECT datname FROM pg_database
+        WHERE datistemplate IS FALSE;
         */
 
         const query: Query = {
@@ -37,8 +38,44 @@ export class PostgresDbMetadataHandlerService extends DbMetadataHandlerService {
         return await this.queryHandlerService.queryDatabase(query, session);
 
     }
-    getTableMetadata(tableMetadataDto: Table_Metadata_Dto, session: Record<string, any>): Promise<any> {
-        throw new Error('Method not implemented.');
+
+    async getTableMetadata(tableMetadataDto: Table_Metadata_Dto, session: Record<string, any>): Promise<any> {
+        
+        /*
+        SELECT table_name
+        FROM information_schema.tables
+        WHERE table_schema='public'
+        ORDER BY table_name;
+        */
+
+        const query: Query = {
+            databaseServerID: tableMetadataDto.databaseServerID,
+            queryParams: {
+              language: 'postgresql',
+              query_type: 'select',
+              databaseName: tableMetadataDto.database,
+              table: {
+                name: 'information_schema"."tables',
+                columns: [{ name: 'table_name', alias: 'table_name' }]
+              },
+              condition: {
+                column: 'table_schema',
+                operator: ComparisonOperator.EQUAL,
+                value: 'public'
+              } as primitiveCondition,
+              sortParams: {
+                column: 'table_name'
+              }
+            }
+          };
+      
+          const response = await this.queryHandlerService.queryDatabase(
+            query,
+            session
+          );
+      
+          return response.data;
+
     }
     getFieldMetadata(fieldMetadataDto: Field_Metadata_Dto, session: Record<string, any>): Promise<any> {
         throw new Error('Method not implemented.');
