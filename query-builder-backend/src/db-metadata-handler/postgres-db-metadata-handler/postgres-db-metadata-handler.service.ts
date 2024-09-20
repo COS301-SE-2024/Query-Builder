@@ -121,9 +121,133 @@ export class PostgresDbMetadataHandlerService extends DbMetadataHandlerService {
         return await this.queryHandlerService.queryDatabase(query, session);
 
     }
-    getForeignKeyMetadata(foreignKeyMetadataDto: Foreign_Key_Metadata_Dto, session: Record<string, any>): Promise<any> {
-        throw new Error('Method not implemented.');
+
+    async getForeignKeyMetadata(foreignKeyMetadataDto: Foreign_Key_Metadata_Dto, session: Record<string, any>): Promise<any> {
+        
+        //constraint_column_usage has the columns being referenced 'to'
+        //referential_constraints has the foreign key constrains themselves
+        //key_column_usage has the columns with the constraints themselves ('from')
+
+        //First get foreign keys 'from' the table pointing 'to' other tables
+
+        const fromQuery: Query = {
+            databaseServerID: foreignKeyMetadataDto.databaseServerID,
+            queryParams: {
+              language: 'postgresql',
+              query_type: 'select',
+              databaseName: foreignKeyMetadataDto.database,
+              table: {
+                name: 'information_schema"."key_column_usage',
+                columns: [
+                  { name: 'column_name' }
+                ],
+                join: {
+                    table1MatchingColumnName: 'constraint_name',
+                    table2MatchingColumnName: 'constraint_name',
+                    table2: {
+                        name: 'information_schema"."referential_constraints',
+                        columns: [],
+                        join: {
+                            table1MatchingColumnName: 'constraint_name',
+                            table2MatchingColumnName: 'constraint_name',
+                            table2: {
+                                name: 'information_schema"."constraint_column_usage',
+                                columns: [
+                                    {name: 'table_schema', alias: "referenced_table_schema"},
+                                    {name: 'table_name'},
+                                    {name: 'column_name', alias: "referenced_column_name"}
+                                ]
+                            }
+                        }
+                    }
+                }
+              },
+              condition: {
+                operator: LogicalOperator.AND,
+                conditions: [
+                  {
+                    tableName: 'constraint_column_usage',
+                    column: 'constraint_schema',
+                    operator: ComparisonOperator.EQUAL,
+                    value: 'public'
+                  },
+                  {
+                    tableName: 'key_column_usage',
+                    column: 'table_name',
+                    operator: ComparisonOperator.EQUAL,
+                    value: foreignKeyMetadataDto.table
+                  }
+                ]
+              } as unknown as compoundCondition
+            }
+        };
+
+        const fromResponse = await this.queryHandlerService.queryDatabase(
+            fromQuery,
+            session
+        );
+
+        //Secondly get foreign keys 'from' other tables pointing 'to' the table
+    
+        const toQuery: Query = {
+            databaseServerID: foreignKeyMetadataDto.databaseServerID,
+            queryParams: {
+              language: 'postgresql',
+              query_type: 'select',
+              databaseName: foreignKeyMetadataDto.database,
+              table: {
+                name: 'information_schema"."key_column_usage',
+                columns: [
+                    { name: 'table_schema' },
+                    { name: 'table_name', alias: 'table_name' },
+                    { name: 'column_name'}
+                ],
+                join: {
+                    table1MatchingColumnName: 'constraint_name',
+                    table2MatchingColumnName: 'constraint_name',
+                    table2: {
+                        name: 'information_schema"."referential_constraints',
+                        columns: [],
+                        join: {
+                            table1MatchingColumnName: 'constraint_name',
+                            table2MatchingColumnName: 'constraint_name',
+                            table2: {
+                                name: 'information_schema"."constraint_column_usage',
+                                columns: [{name: 'column_name', alias: "referenced_column_name"}]
+                            }
+                        }
+                    }
+                }
+              },
+              condition: {
+                operator: LogicalOperator.AND,
+                conditions: [
+                  {
+                    tableName: 'constraint_column_usage',
+                    column: 'constraint_schema',
+                    operator: ComparisonOperator.EQUAL,
+                    value: 'public'
+                  },
+                  {
+                    tableName: 'constraint_column_usage',
+                    column: 'table_name',
+                    operator: ComparisonOperator.EQUAL,
+                    value: foreignKeyMetadataDto.table
+                  }
+                ]
+              } as unknown as compoundCondition
+            }
+        };
+    
+        const toResponse = await this.queryHandlerService.queryDatabase(
+            toQuery,
+            session
+        );
+    
+        return fromResponse.data.concat(toResponse.data);
+
     }
+
     getServerSummary(serverSummaryMetadataDto: Server_Summary_Metadata_Dto, session: Record<string, any>): Promise<any> {
         throw new Error('Method not implemented.');
     }
