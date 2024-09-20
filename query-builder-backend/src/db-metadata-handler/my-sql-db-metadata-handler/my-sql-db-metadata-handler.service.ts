@@ -276,7 +276,7 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
             databaseName: 'information_schema',
             table: {
             name: 'schemata',
-            columns: [{ name: 'schema_name' }],
+            columns: [{ name: 'schema_name', alias: "DATABASE_NAME" }],
             join: {
                 table1MatchingColumnName: 'schema_name',
                 table2MatchingColumnName: 'table_schema',

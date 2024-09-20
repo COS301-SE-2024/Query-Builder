@@ -28,10 +28,20 @@ export class PostgresDbMetadataHandlerService extends DbMetadataHandlerService {
                     ]
                 },
                 condition: {
-                    column: "datistemplate",
-                    operator: ComparisonOperator.IS,
-                    value: false
-                } as primitiveCondition
+                    operator: LogicalOperator.AND,
+                    conditions: [
+                        {
+                            column: "datistemplate",
+                            operator: ComparisonOperator.IS,
+                            value: false
+                        },
+                        {
+                            column: "datname",
+                            operator: ComparisonOperator.NOT_EQUAL,
+                            value: "postgres"
+                        }
+                    ]
+                } as unknown as compoundCondition
             }
         }
 
@@ -248,8 +258,62 @@ export class PostgresDbMetadataHandlerService extends DbMetadataHandlerService {
 
     }
 
-    getServerSummary(serverSummaryMetadataDto: Server_Summary_Metadata_Dto, session: Record<string, any>): Promise<any> {
-        throw new Error('Method not implemented.');
+    async getServerSummary(serverSummaryMetadataDto: Server_Summary_Metadata_Dto, session: Record<string, any>): Promise<any> {
+        
+        //Since postgres does different connections per database, a separate query has to be done per database
+        let response = [];
+
+        //First use getDatabaseMetadata to get all of the individual databases
+        const databaseMetadata = await this.getDatabaseMetadata(serverSummaryMetadataDto, session);
+
+        //Then, for each database, perform a single query to get the database's tables and their fields
+        for(let row of databaseMetadata.data){
+            
+            const query: Query = {
+                databaseServerID: serverSummaryMetadataDto.databaseServerID,
+                queryParams: {
+                language: 'postgresql',
+                query_type: 'select',
+                databaseName: row.database,
+                table: {
+                    name: 'information_schema"."tables',
+                    columns: [{ name: 'table_name', alias: 'table_name' }],
+                    join: {
+                        table1MatchingColumnName: "table_name",
+                        table2MatchingColumnName: "table_name",
+                        table2: {
+                            name: 'information_schema"."columns',
+                            columns: [{name: 'column_name'}]
+                        }
+                    }
+                },
+                condition: {
+                    tableName: 'information_schema"."tables',
+                    column: 'table_schema',
+                    operator: ComparisonOperator.EQUAL,
+                    value: 'public'
+                } as primitiveCondition,
+                sortParams: {
+                    column: 'table_name'
+                }
+                }
+            };
+
+            const queryResponse = await this.queryHandlerService.queryDatabase(
+                query,
+                session
+            );
+
+            for(let row2 of queryResponse.data){
+                row2.DATABASE_NAME = row.database;
+            }
+
+            response = response.concat(queryResponse.data)
+
+        }
+
+        return response;
+
     }
     
 }
