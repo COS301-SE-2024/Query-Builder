@@ -12,7 +12,8 @@ import { navigateToAuth } from "../../app/authentication/actions";
 interface TableListProps {
     databaseServerID: string,
     databaseName: string,
-    table: table
+    table: table,
+    language: string,
     onChange?: (table: table) => void
 }
 
@@ -130,7 +131,8 @@ export default function TableList(props: TableListProps){
             },
             body: JSON.stringify({
                 databaseServerID: props.databaseServerID,
-                schema: database
+                database: database,
+                language: props.language
             })
         });
 
@@ -163,8 +165,9 @@ export default function TableList(props: TableListProps){
             },
             body: JSON.stringify({
                 databaseServerID: props.databaseServerID,
-                schema: database,
-                table: tableName
+                database: database,
+                table: tableName,
+                language: props.language
             })
         });
 
@@ -308,7 +311,7 @@ export default function TableList(props: TableListProps){
     //add the table for the first (compulsory) table
     tables.push(createTableCard(tableRef));
     //add the TableForm for the first (compulsory) table
-    tableForms.push(<TableForm databaseServerID={props.databaseServerID} table={tableRef} onChange={updateTable} ></TableForm>)
+    tableForms.push(<TableForm databaseServerID={props.databaseServerID} database={props.databaseName} language={props.language} table={tableRef} onChange={updateTable} ></TableForm>)
 
     //iterate over the linked list of joined tables
     while(tableRef.join != null){
@@ -316,7 +319,7 @@ export default function TableList(props: TableListProps){
         //add the table for the next table
         tables.push(createTableCard(tableRef));
         //add the TableForm for the next table
-        tableForms.push(<TableForm databaseServerID={props.databaseServerID} table={tableRef} onChange={updateTable} ></TableForm>)
+        tableForms.push(<TableForm databaseServerID={props.databaseServerID} database={props.databaseName} language={props.language} table={tableRef} onChange={updateTable} ></TableForm>)
     }
 
     //----------------------------RENDER THE COMPONENT------------------------------------//

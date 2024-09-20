@@ -149,7 +149,7 @@ export class PostgresDbMetadataHandlerService extends DbMetadataHandlerService {
               table: {
                 name: 'information_schema"."key_column_usage',
                 columns: [
-                  { name: 'column_name' }
+                  { name: 'column_name', alias: 'COLUMN_NAME' }
                 ],
                 join: {
                     table1MatchingColumnName: 'constraint_name',
@@ -163,9 +163,9 @@ export class PostgresDbMetadataHandlerService extends DbMetadataHandlerService {
                             table2: {
                                 name: 'information_schema"."constraint_column_usage',
                                 columns: [
-                                    {name: 'table_schema', alias: "referenced_table_schema"},
+                                    {name: 'table_schema', alias: "REFERENCED_TABLE_SCHEMA"},
                                     {name: 'table_name'},
-                                    {name: 'column_name', alias: "referenced_column_name"}
+                                    {name: 'column_name', alias: "REFERENCED_COLUMN_NAME"}
                                 ]
                             }
                         }
@@ -208,9 +208,9 @@ export class PostgresDbMetadataHandlerService extends DbMetadataHandlerService {
               table: {
                 name: 'information_schema"."key_column_usage',
                 columns: [
-                    { name: 'table_schema' },
+                    { name: 'table_schema', alias: 'TABLE_SCHEMA' },
                     { name: 'table_name', alias: 'table_name' },
-                    { name: 'column_name'}
+                    { name: 'column_name', alias: 'COLUMN_NAME'}
                 ],
                 join: {
                     table1MatchingColumnName: 'constraint_name',
@@ -223,7 +223,7 @@ export class PostgresDbMetadataHandlerService extends DbMetadataHandlerService {
                             table2MatchingColumnName: 'constraint_name',
                             table2: {
                                 name: 'information_schema"."constraint_column_usage',
-                                columns: [{name: 'column_name', alias: "referenced_column_name"}]
+                                columns: [{name: 'column_name', alias: "REFERENCED_COLUMN_NAME"}]
                             }
                         }
                     }

@@ -54,14 +54,11 @@ export default function Form() {
   //React hook for all the databases in the database server
   const [databases, setDatabases] = useState<Database[]>([]);
 
-  //React hook for the language type
-  const [type, setType] = useState('');
-
   //React hook containing the Query the user is busy building
   const [query, setQuery] = useState<Query>({
     databaseServerID: databaseServerID[0],
     queryParams: {
-      language: type,
+      language: 'mysql',
       query_type: 'select',
       databaseName: '',
       table: {
@@ -198,7 +195,13 @@ export default function Form() {
 
       const languageType = (await typeResponse.json()).type;
 
-      setType(languageType);
+      setQuery({
+        ...query,
+        queryParams: {
+          ...query.queryParams,
+          language: languageType
+        }
+      });
 
       let response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/databases`,
@@ -234,11 +237,8 @@ export default function Form() {
       }
 
     }
-    else{
 
-    }
-
-    }
+  }
 
   const handleDatabaseSelection = (key: any) => {
     setQuery({
@@ -304,6 +304,7 @@ export default function Form() {
                 databaseServerID={databaseServerID[0]}
                 databaseName={query.queryParams.databaseName}
                 table={query.queryParams.table}
+                language={query.queryParams.language}
                 onChange={updateTable}
               />
             )}
@@ -314,8 +315,10 @@ export default function Form() {
             {query.queryParams.table.name != '' && (
               <FilterList
                 condition={query.queryParams.condition! as compoundCondition}
+                database={query.queryParams.databaseName}
                 table={query.queryParams.table}
                 databaseServerID={databaseServerID[0]}
+                language={query.queryParams.language}
                 onChange={updateCondition}
               />
             )}
@@ -334,17 +337,19 @@ export default function Form() {
                 <Button
                   color="primary"
                   onClick={() => {
-                    setQuery({
-                      databaseServerID: databaseServerID[0],
-                      queryParams: {
-                        language: type,
-                        query_type: 'select',
-                        databaseName: '',
-                        table: {
-                          name: '',
-                          columns: [],
+                    setQuery((previousQueryState) => {
+                      return{
+                        databaseServerID: databaseServerID[0],
+                        queryParams: {
+                          language: previousQueryState.queryParams.language,
+                          query_type: 'select',
+                          databaseName: '',
+                          table: {
+                            name: '',
+                            columns: [],
+                          },
                         },
-                      },
+                      };
                     });
                     setCondition(undefined);
                   }}
