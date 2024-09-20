@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  HttpException,
   InternalServerErrorException,
   Post,
   Put,
@@ -9,75 +10,69 @@ import {
 } from '@nestjs/common';
 import { NaturalLanguageService } from './natural-language.service';
 import { Natural_Language_Query_Dto } from './dto/natural-language-query.dto';
-import { query } from 'express';
+import { MyLoggerService } from '../my-logger/my-logger.service';
 
 @Controller('natural-language')
 export class NaturalLanguageController {
   constructor(
-    private readonly naturalLanguageService: NaturalLanguageService
-  ) {}
+    private readonly naturalLanguageService: NaturalLanguageService,
+    private readonly my_logger: MyLoggerService
+  ) {
+    this.my_logger.setContext(NaturalLanguageController.name);
+  }
 
-  @Post('query')
+  @Put('query')
   async getSchemaMetadata(
     @Body(ValidationPipe) naturalLanguageQuery: Natural_Language_Query_Dto,
     @Session() session: Record<string, any>
   ) {
     if (naturalLanguageQuery.llm === 'openAI') {
-      return this.naturalLanguageService.open_ai_query(
+      const { query } = await this.naturalLanguageService.open_ai_query(
         naturalLanguageQuery,
         session
       );
+      return query;
     } else if (naturalLanguageQuery.llm === 'gemini') {
-      return this.naturalLanguageService.gemini_query(
+      const { query } = await this.naturalLanguageService.gemini_query(
         naturalLanguageQuery,
         session
       );
+      return query;
     } else {
       // I want to run both queries in parallel and return the resulting query if it is not malformed. The function will throw an error if there is something wrong with the query.
-      const open_ai_call = this.naturalLanguageService.open_ai_query(
-        naturalLanguageQuery,
-        session
-      );
-
-      const gemini_call = this.naturalLanguageService.gemini_query(
-        naturalLanguageQuery,
-        session
-      );
 
       let open_ai_result;
       let gemini_result;
       let errors = [];
 
       try {
-        console.log('Awaiting openAI call');
-        open_ai_result = await Promise.resolve(open_ai_call);
-        console.log('openAI call completed');
-      } catch (error: any) {
-        console.log('Error in openAI call'); 
+        open_ai_result = await this.naturalLanguageService.open_ai_query(
+          naturalLanguageQuery,
+          session
+        );
+      } catch (error) {
         open_ai_result = { query: null };
         errors.push({ source: 'openAI', error: error.message });
-        console.log('Error in openAI call after push' + JSON.stringify(errors));
       }
 
       try {
-        console.log('Awaiting gemini call');
-        gemini_result = await Promise.resolve(gemini_call);
-        console.log('gemini call completed');
-      } catch (error: any) {
-        console.log('Error in gemini call');
+        gemini_result = await this.naturalLanguageService.gemini_query(
+          naturalLanguageQuery,
+          session
+        );
+      } catch (error) {
         gemini_result = { query: null };
         errors.push({ source: 'gemini', error: error.message });
-        console.log('Error in gemini call after push' + JSON.stringify(errors));
       }
 
       if (open_ai_result.query && gemini_result.query) {
-        console.log('Both queries returned a query');
+        // this.my_logger.log('Both queries returned a query');
         return open_ai_result.query; // or gemini_result.query, based on your preference
       } else if (open_ai_result?.query) {
-        console.log('Only openAI query returned a query');
+        // this.my_logger.log('Only openAI query returned a query');
         return open_ai_result.query;
       } else if (gemini_result?.query) {
-        console.log('Only gemini query returned a query');
+        // this.my_logger.log('Only gemini query returned a query');
         return gemini_result.query;
       } else {
         throw new InternalServerErrorException(
