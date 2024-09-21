@@ -170,6 +170,9 @@ export default function TableList(props: TableListProps) {
     //async function to fetch the joinable tables
     async function fetchJoinableTables(database: string, tableName: string) {
 
+        //set the joinable tables hook
+        setJoinableTables([]);
+
         let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/foreign-keys`, {
             credentials: "include",
             method: "PUT",
