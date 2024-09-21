@@ -38,12 +38,12 @@ export interface join {
 }
 
 export interface condition {
-    id?: string;
 }
 
 export interface compoundCondition extends condition{
     conditions: condition[],
     operator: LogicalOperator,
+    id?: string
 }
 
 export interface primitiveCondition extends condition{
@@ -51,7 +51,8 @@ export interface primitiveCondition extends condition{
     tableName?: string,
     column: string,
     operator: ComparisonOperator,
-    aggregate?: AggregateFunction
+    aggregate?: AggregateFunction,
+    id?: string
 }
 
 export interface SortParams {

@@ -179,13 +179,15 @@ export default function FilterList(props: FilterListProps){
     function renderFilterChips(compoundCondition: compoundCondition): JSX.Element {
         return (
             <>
-                {compoundCondition.conditions.map((subCondition) => (
-                    <FilterChip
-                        key={subCondition.id ?? uuidv4()} // Use the unique id as key
-                        primitiveCondition={subCondition as primitiveCondition}
-                        onChange={updateCondition}
-                        onRemove={() => subCondition.id && removeCondition(subCondition.id)} 
-                    />
+                {compoundCondition.conditions
+                    .filter((subCondition): subCondition is primitiveCondition => 'value' in subCondition && 'column' in subCondition && 'operator' in subCondition)
+                    .map((subCondition: primitiveCondition) => (
+                        <FilterChip
+                            key={subCondition.id ?? uuidv4()} // Use the unique id as key
+                            primitiveCondition={subCondition}
+                            onChange={updateCondition}
+                            onRemove={() => subCondition.id && removeCondition(subCondition.id)} 
+                        />
                 ))}
             </>
         );
@@ -198,7 +200,7 @@ export default function FilterList(props: FilterListProps){
             }
         }
     
-        const updatedConditions = condition.conditions.filter(cond => cond.id !== id);
+        const updatedConditions = condition.conditions.filter((cond): cond is primitiveCondition => 'id' in cond && cond.id !== id);
         setCondition(prevCondition => ({
             ...prevCondition,
             conditions: updatedConditions,
