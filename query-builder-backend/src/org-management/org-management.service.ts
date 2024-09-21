@@ -58,7 +58,7 @@ export class OrgManagementService {
     const { data, error } = await this.supabase
       .getClient()
       .from('organisations')
-      .select(`org_id, created_at, name, logo, org_members(*)`)
+      .select(`org_id, created_at, name, logo, org_members(*), db_envs(*)`)
       .match({ ...org });
 
     if (error) {
