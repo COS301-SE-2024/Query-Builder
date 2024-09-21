@@ -268,7 +268,7 @@ describe('MysqlJsonConverterService', () => {
 
   it('should return empty string when no having conditions are present', () => {
       const jsonData: QueryParams = {
-          language: "SQL",
+          language: "mysql",
           query_type: "SELECT",
           databaseName: "sakila",
           table: {
@@ -289,7 +289,7 @@ describe('MysqlJsonConverterService', () => {
 
   it('should return empty string when no group by columns are present', () => {
       const jsonData: QueryParams = {
-          language: "SQL",
+          language: "mysql",
           query_type: "SELECT",
           databaseName: "sakila",
           table: {
@@ -308,7 +308,7 @@ describe('MysqlJsonConverterService', () => {
 
   it('should return GROUP BY clause for columns without aggregation', () => {
       const jsonData: QueryParams = {
-          language: "SQL",
+          language: "mysql",
           query_type: "SELECT",
           databaseName: "sakila",
           table: {
@@ -331,7 +331,7 @@ describe('MysqlJsonConverterService', () => {
   it('should report an error when no columns are specified for a table', () => {
 
       const queryParams: QueryParams = {
-          language: 'SQL',
+          language: 'mysql',
           query_type: 'SELECT',
           databaseName: "sakila",
           table: { name: 'users', columns: [] },
@@ -349,7 +349,7 @@ describe('MysqlJsonConverterService', () => {
   it('should be able to convert queries with multiple columns selected', () => {
 
       const queryParams: QueryParams = {
-          language: 'SQL',
+          language: 'mysql',
           query_type: 'SELECT',
           databaseName: "sakila",
           table: { name: 'users', columns: [{ name: 'id' }, { name: "first_name" }, { name: "last_name" }] },
@@ -366,7 +366,7 @@ describe('MysqlJsonConverterService', () => {
   it('should be able to convert queries with aggregation and aliasing', () => {
 
       const queryParams: QueryParams = {
-          language: 'SQL',
+          language: 'mysql',
           query_type: 'SELECT',
           databaseName: "sakila",
           table: { name: 'users', columns: [{ name: 'id', aggregation: AggregateFunction.COUNT, alias: "Number" }] },
@@ -383,7 +383,7 @@ describe('MysqlJsonConverterService', () => {
   it('should be able to convert queries with joins', () => {
 
       const queryParams: QueryParams = {
-          language: 'SQL',
+          language: 'mysql',
           query_type: 'SELECT',
           databaseName: "sakila",
           table: {
@@ -411,7 +411,7 @@ describe('MysqlJsonConverterService', () => {
   it('should be able to convert queries with sorting in descending order', () => {
 
       const queryParams: QueryParams = {
-          language: 'SQL',
+          language: 'mysql',
           query_type: 'SELECT',
           databaseName: "sakila",
           table: { name: 'users', columns: [{ name: 'id' }, { name: "first_name" }, { name: "last_name" }] },
@@ -432,7 +432,7 @@ describe('MysqlJsonConverterService', () => {
   it('should be able to convert queries with sorting in ascending order', () => {
 
       const queryParams: QueryParams = {
-          language: 'SQL',
+          language: 'mysql',
           query_type: 'SELECT',
           databaseName: "sakila",
           table: { name: 'users', columns: [{ name: 'id' }, { name: "first_name" }, { name: "last_name" }] },
@@ -452,7 +452,7 @@ describe('MysqlJsonConverterService', () => {
   it('should be able to convert queries using pagination', () => {
 
       const queryParams: QueryParams = {
-          language: 'SQL',
+          language: 'mysql',
           query_type: 'SELECT',
           databaseName: "sakila",
           table: { name: 'users', columns: [{ name: 'id' }, { name: "first_name" }, { name: "last_name" }] },
@@ -474,7 +474,7 @@ describe('MysqlJsonConverterService', () => {
 
       // @ts-ignore
       const queryParams: QueryParams = {
-          language: 'SQL',
+          language: 'mysql',
           query_type: 'SELECT',
       };
 
@@ -491,7 +491,7 @@ describe('MysqlJsonConverterService', () => {
 
       // @ts-ignore
       const queryParams: QueryParams = {
-          language: 'SQL',
+          language: 'mysql',
           query_type: 'UPDATE',
       };
 
@@ -523,7 +523,7 @@ describe('MysqlJsonConverterService', () => {
 
   it('should be able to convert queries using pagination and a where condition', () => {
       const queryParams: QueryParams = {
-          language: 'SQL',
+          language: 'mysql',
           query_type: 'SELECT',
           databaseName: "sakila",
           table: {
@@ -553,7 +553,7 @@ describe('MysqlJsonConverterService', () => {
 
   it('should be able to convert queries using pagination, group by, and having conditions', () => {
       const queryParams: QueryParams = {
-          language: 'SQL',
+          language: 'mysql',
           query_type: 'SELECT',
           databaseName: "sakila",
           table: {
@@ -586,7 +586,7 @@ describe('MysqlJsonConverterService', () => {
 
   it('should be able to convert queries using pagination, group by, and where conditions', () => {
       const queryParams: QueryParams = {
-          language: 'SQL',
+          language: 'mysql',
           query_type: 'SELECT',
           databaseName: "sakila",
           table: {
@@ -617,7 +617,7 @@ describe('MysqlJsonConverterService', () => {
 
   it('Should be able to convert a query with a join and a having, with aggregate in first table', () => {
       const jsonData: QueryParams = {
-          language: "sql",
+          language: "mysql",
           query_type: "select",
           databaseName: "sakila",
           table: {
@@ -654,7 +654,7 @@ describe('MysqlJsonConverterService', () => {
 
   it('Should be able to convert a query with a join and a having, with aggregate in second table', () => {
       const jsonData: QueryParams = {
-          language: "sql",
+          language: "mysql",
           query_type: "select",
           databaseName: "sakila",
           table: {
@@ -691,7 +691,7 @@ describe('MysqlJsonConverterService', () => {
 
   it('Should not return GroupBY if there is no aggregates', () => {
       const jsonData: QueryParams = {
-          language: "sql",
+          language: "mysql",
           query_type: "select",
           databaseName: "sakila",
           table: {
@@ -721,7 +721,7 @@ describe('MysqlJsonConverterService', () => {
 
   it('Should convert a query finding country names starting with B', () => {
       const jsonData: QueryParams = {
-          language: "sql",
+          language: "mysql",
           query_type: "select",
           databaseName: "sakila",
           table: {
@@ -746,7 +746,7 @@ describe('MysqlJsonConverterService', () => {
 
   it('should be able to generate a count query for a query using pagination, group by, and having conditions', () => {
       const queryParams: QueryParams = {
-          language: 'SQL',
+          language: 'mysql',
           query_type: 'SELECT',
           databaseName: "sakila",
           table: {
@@ -779,7 +779,7 @@ describe('MysqlJsonConverterService', () => {
 
   it('Should be able to generate a count query for a query with a join and a having, with aggregate in first table', () => {
       const jsonData: QueryParams = {
-          language: "sql",
+          language: "mysql",
           query_type: "select",
           databaseName: "sakila",
           table: {
@@ -818,7 +818,7 @@ describe('MysqlJsonConverterService', () => {
 
       // @ts-ignore
       const queryParams: QueryParams = {
-          language: 'SQL',
+          language: 'mysql',
           query_type: 'SELECT',
       };
 
@@ -835,7 +835,7 @@ describe('MysqlJsonConverterService', () => {
 
       // @ts-ignore
       const queryParams: QueryParams = {
-          language: 'SQL',
+          language: 'mysql',
           query_type: 'UPDATE',
       };
 
