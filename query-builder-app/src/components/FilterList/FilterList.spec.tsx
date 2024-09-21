@@ -36,6 +36,33 @@ global.fetch = vi.fn((url: string, config: any) => {
 
 }) as Mock;
 
+import { condition, primitiveCondition } from "../../interfaces/intermediateJSON";
+
+function isPrimitiveCondition(condition: condition): condition is primitiveCondition {
+  return (condition as primitiveCondition).column !== undefined;
+}
+
+function cleanCondition(condition: compoundCondition): compoundCondition {
+  // Remove `id` from each condition in the `conditions` array
+  const cleanedConditions = condition.conditions.map(cond => {
+    if (isPrimitiveCondition(cond)) {
+      // cond is of type primitiveCondition
+      const { id, ...conditionRest } = cond;
+      return conditionRest;
+    }
+    // If not primitiveCondition, return as is
+    return cond;
+  });
+
+  // Return the cleaned condition with the `id` removed from the root if present
+  const { id, ...conditionRest } = condition;
+
+  return {
+    ...conditionRest,
+    conditions: cleanedConditions
+  };
+}
+
 //basic component rendering tests
 describe('FilterList basic rendering tests', () => {
 
@@ -117,7 +144,8 @@ describe('FilterList filter selection tests', () => {
       ]
     }
 
-    expect(conditionProp).toEqual(expectedCondition);
+    const cleanedConditionProp = conditionProp ? cleanCondition(conditionProp) : undefined;
+    expect(cleanedConditionProp).toEqual(expectedCondition);
 
   });
 });
