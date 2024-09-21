@@ -22,7 +22,7 @@ describe('Sidebar basic rendering tests', () => {
 describe('Sidebar initial tests', () => {
   it('should display the QBEE logo', () => {
     render(<Sidebar />);
-    const logo = screen.getByText("QBEE");
+    const logo = screen.getByText("QBee");
     expect(logo).toBeInTheDocument();
   });
 
