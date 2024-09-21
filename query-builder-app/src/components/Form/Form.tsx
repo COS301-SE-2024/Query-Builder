@@ -120,6 +120,10 @@ export default function Form() {
     }
   }
 
+  function removeAllCondition() {
+    setCondition(undefined);
+  }
+
   //merges query and condition
   function getMergedQuery() {
     if (condition != null) {
@@ -292,6 +296,7 @@ export default function Form() {
                   table={query.queryParams.table}
                   databaseServerID={databaseServerID[0]}
                   onChange={updateCondition}
+                  onRemove={removeAllCondition} 
                 />
               )
             }
@@ -338,7 +343,7 @@ export default function Form() {
                   }}                                >
                   Clear Form
                 </Button>
-                {/* {JSON.stringify(query, null, 2)} ----------------------------------------------------------------------------------*/}
+                {JSON.stringify(getMergedQuery(), null, 2)} 
               </div>
               <Modal
                 isOpen={isOpen}
