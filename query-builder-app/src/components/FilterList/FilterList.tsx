@@ -18,6 +18,7 @@ interface FilterListProps{
     table: table,
     databaseServerID: string
     onChange?: (condition: compoundCondition) => void
+    onRemove?: () => void; 
 }
 
 interface PossibleCondition{
@@ -191,6 +192,12 @@ export default function FilterList(props: FilterListProps){
     }
     
     function removeCondition(id: string) {
+        if (condition.conditions.length === 1) {
+            if (props.onRemove) {
+                props.onRemove();
+            }
+        }
+    
         const updatedConditions = condition.conditions.filter(cond => cond.id !== id);
         setCondition(prevCondition => ({
             ...prevCondition,
