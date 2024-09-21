@@ -1,7 +1,7 @@
 'use client';
 import SignedInHomePage from '@/components/SignedInHomePage/SignedInHomePage';
 import Sidebar from "../components/SideBar/SideBar";
-import toast, { Toaster } from 'react-hot-toast';
+import { Toaster } from 'react-hot-toast';
 
 
 export default function Page() {
@@ -32,8 +32,8 @@ export default function Page() {
             },
             },
         }}/>
-    <Sidebar/> 
-    <SignedInHomePage />
+      <Sidebar/> 
+      <SignedInHomePage />
   </div>
   </>);
 }

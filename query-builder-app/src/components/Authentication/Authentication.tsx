@@ -2,10 +2,12 @@
 import '../../app/globals.css';
 import './Authentication.css';
 import React, { useState, useEffect } from 'react';
-import { Button, Card, CardBody, Input, input } from '@nextui-org/react';
+import { Button, Card, CardBody, Input } from '@nextui-org/react';
 import { EyeFilledIcon } from './EyeFilledIcon';
 import { EyeSlashFilledIcon } from './EyeSlashFilledIcon';
 import {login, navigateToSignedInHomePage, signup} from '../../app/authentication/actions'
+import toast from 'react-hot-toast';
+import { AuthError } from '@supabase/supabase-js';
 import { createClient } from "./../../utils/supabase/client";
 
 export default function Authentication() {
@@ -113,29 +115,49 @@ export default function Authentication() {
     //sign into QBee server
     //call the sign-in API endpoint
     setLoading(true);
-    let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user-management/gen-session-key`, {
-      credentials: "include",
-      method: "PUT",
-      headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({email: email, password: password})
-    });
+    try {
+      let response;
+      try {
+        response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user-management/gen-session-key`, {
+          credentials: "include",
+          method: "PUT",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email: email, password: password })
+        });
 
-    await login(email, password);
-
-    let generateTestOrgResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/setup-test-scenario`, {
-      credentials: "include",
-      method: "POST",
-      headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + await getToken()
+        let responseData = await response.json();
+      } catch (error) {
+        toast.error("Failed to generate session token! Please try logging in again");
       }
-    });
 
-    navigateToSignedInHomePage();
+      await login(email, password);
+
+      let generateTestOrgResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/setup-test-scenario`, {
+        credentials: "include",
+        method: "POST",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + await getToken()
+        }
+      });
+  
+      navigateToSignedInHomePage();
+
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      }
+      else {
+        toast.error("Unexpected error, failed to login. Please try logging in again.");
+      }
+    }
+    finally {
+      setLoading(false);
+    }
 
   };
 
@@ -146,7 +168,27 @@ export default function Authentication() {
     password: string,
   ) => {
     setLoading(true);
-    signup(firstName, lastName, email, password);
+    try {
+      await signup(firstName, lastName, email, password);
+    } catch (error) {
+      if (error instanceof AuthError) {
+        toast.error(error.message);
+      }
+      else if (error) {
+        // console.error(error);
+        if (error instanceof Error && error.message.includes("Too many sign-up attempts")) {
+          toast.error(error.message);
+        }
+        else {
+          toast.error("An unexpected error occurred");
+        }
+      }
+    }
+    finally {
+      setLoading(false);
+    }
+
+
   };
 
   return (
@@ -295,7 +337,7 @@ export default function Authentication() {
                       signUpEmail,
                       signUpPassword,
                     );
-                    
+
                   }}
                   variant="bordered"
                   isDisabled={
