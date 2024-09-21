@@ -28,11 +28,17 @@ vi.mock("./../../utils/supabase/client", () => {
 //Mock out the API calls
 global.fetch = vi.fn((url: string, config: any) => {
 
-  if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/schemas`){
+  if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/databases`){
       return Promise.resolve({
             ok: true,
-            json: () => Promise.resolve({data: [{SCHEMA_NAME: "sakila"}]}),
+            json: () => Promise.resolve({data: [{database: "sakila"}]}),
       })
+  }
+  if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/get-db-type`){
+    return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({type: 'mysql'}),
+    })
   }
   else if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query-management/get-single-query`){
       return Promise.resolve({
