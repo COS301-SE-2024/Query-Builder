@@ -56,7 +56,7 @@ const Sidebar = () => {
                 {/* Footer */}
                 <div className="sidebar-footer">
                     
-                    <nav className="nav-links">
+                    <nav className=".footer-nav-links">
 
                     <div className="sidebar-item">
                         <Link href="/settings" data-testid="settingsNav">
