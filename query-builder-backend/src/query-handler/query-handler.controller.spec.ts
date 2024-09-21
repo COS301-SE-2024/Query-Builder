@@ -1,24 +1,39 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { QueryHandlerController } from './query-handler.controller';
-import { QueryHandlerService } from './query-handler.service';
-import { JsonConverterModule } from '../json-converter/json-converter.module';
-import { SessionStoreModule } from '../session-store/session-store.module';
-import { ConnectionManagerModule } from '../connection-manager/connection-manager.module';
-import { MyLoggerModule } from '../my-logger/my-logger.module';
-import { AppService } from '../app.service';
+import { Query, QueryParams } from './../interfaces/dto/query.dto';
+import { Connect_Dto } from './../connection-manager/dto/connect.dto';
+import { SessionStore } from './../session-store/session-store.service';
+import { MyLoggerService } from './../my-logger/my-logger.service';
 
 describe('QueryHandlerController', () => {
   let controller: QueryHandlerController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [
-        JsonConverterModule.forRoot('mysql'),
-        ConnectionManagerModule.forRoot('mysql'),
-        MyLoggerModule
-      ],
       controllers: [QueryHandlerController],
-      providers: [QueryHandlerService, AppService]
+      providers: [
+        {
+          provide: 'QueryHandlerService',
+          useValue: {
+            async queryDatabase(query: Query, session: Record<string, any>){return {}}
+          }
+        },
+        {
+          provide: 'JsonConverterService',
+          useValue: {
+            convertJsonToQuery(query: QueryParams){return "mocked result"},
+            convertJsonToCountQuery(query: QueryParams){return "mocked result"}
+          }
+        },
+        {
+          provide: 'ConnectionManagerService',
+          useValue: {
+            connectToDatabase(connectDto: Connect_Dto){return {success: true, connectionID: 1234}}
+          }
+        },
+        SessionStore,
+        MyLoggerService
+      ],
     }).compile();
 
     controller = module.get<QueryHandlerController>(QueryHandlerController);
