@@ -10,13 +10,12 @@ import React from "react";
 
 interface FilterChipProps {
     primitiveCondition: primitiveCondition,
-    key: React.Key,
+    key: string,
     onChange?: (primitiveCondition: primitiveCondition) => void
-    onRemove?: (id: string) => void; 
-    id: string;
-}
+    onRemove?: (key: string) => void; 
+  }
 
-export default function FilterChip(props: FilterChipProps) {
+export default function FilterChip(props: FilterChipProps){
 
     //----------------------------REACT HOOKS------------------------------------//
 
@@ -33,19 +32,19 @@ export default function FilterChip(props: FilterChipProps) {
     React.useEffect(() => {
 
         //inform the parent component that the data model has changed
-        if ((props.onChange != null)) {
+        if((props.onChange != null)){
             props.onChange(primitiveCondition);
         }
 
         //regenerate the primitiveConditionString
         setPrimitiveConditionString(generatePrimitiveConditionString);
 
-    }, [primitiveCondition])
+    },[primitiveCondition])
 
     //----------------------------HELPER FUNCTIONS------------------------------------//
 
     //helper functions for toggling the popup
-    function togglePopup() {
+    function togglePopup(){
         setOpenPopup((previousOpenPopup) => {
             return !previousOpenPopup;
         });
@@ -54,37 +53,37 @@ export default function FilterChip(props: FilterChipProps) {
     const menuRef = useRef<HTMLDivElement>(null)
 
     const handleClickOutside = (event: MouseEvent) => {
-        if (menuRef.current != null) { // Check if menuRef.current is not null
-            if (!menuRef.current.contains(event.target as Node)) {
-                setOpenPopup(false);
-            }
+      if (menuRef.current != null) { // Check if menuRef.current is not null
+        if (!menuRef.current.contains(event.target as Node)) {
+          setOpenPopup(false);
         }
+      }
     };
-
+  
     useEffect(() => {
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-
-        };
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);   
+  
+      };
     }, []);
 
     //helper function that generates a string representing the primitiveCondition
-    function generatePrimitiveConditionString(): string {
+    function generatePrimitiveConditionString() : string {
 
-        let output: string = "";
+        let output : string = "";
 
-        if (primitiveCondition.aggregate != null) {
+        if(primitiveCondition.aggregate != null){
             output += primitiveCondition.aggregate + "(";
         }
 
-        if (primitiveCondition.tableName != null) {
+        if(primitiveCondition.tableName != null){
             output += primitiveCondition.tableName + " - ";
         }
 
         output += primitiveCondition.column;
 
-        if (primitiveCondition.aggregate != null) {
+        if(primitiveCondition.aggregate != null){
             output += ")";
         }
 
@@ -97,23 +96,23 @@ export default function FilterChip(props: FilterChipProps) {
     }
 
     //not handling null which causes issues
-    function setConditionValue(valueString: string) {
+    function setConditionValue(valueString: string){
 
         let value: any;
 
-        if (valueString == "") {
+        if(valueString == ""){
             value = valueString;
         }
-        else if (valueString.toUpperCase() === "TRUE") {
+        else if(valueString.toUpperCase() === "TRUE"){
             value = true;
         }
-        else if (valueString.toUpperCase() === "FALSE") {
+        else if(valueString.toUpperCase() === "FALSE"){
             value = false;
         }
-        else if (isNaN(Number(valueString))) {
+        else if(isNaN(Number(valueString))){
             value = valueString;
         }
-        else {
+        else{
             value = Number(valueString);
         }
 
@@ -123,7 +122,7 @@ export default function FilterChip(props: FilterChipProps) {
 
     }
 
-    return (
+    return(
         <Chip
             size="lg"
             endContent={
@@ -131,9 +130,9 @@ export default function FilterChip(props: FilterChipProps) {
                     <FiMoreVertical onClick={togglePopup} aria-label="edit"/>
                     {(openPopup) && (<Card ref={menuRef} className="absolute z-1 top-8" style={{zIndex: "1"}}>
                         <CardBody>
-                            <Spacer y={2} />
+                            <Spacer y={2}/>
                             <h2>Use a summary statistic</h2>
-                            <Spacer y={2} />
+                            <Spacer y={2}/>
                             <Dropdown>
                                 <DropdownTrigger>
                                     <Button
@@ -152,10 +151,10 @@ export default function FilterChip(props: FilterChipProps) {
                                     onSelectionChange={(keys) => {
                                         const key = Array.from(keys)[0];
                                         setPrimitiveCondition((previousPrimitiveConditionState) => {
-                                            if (key == "NONE") {
+                                            if(key == "NONE"){
                                                 return { ...previousPrimitiveConditionState, aggregate: undefined };
                                             }
-                                            else {
+                                            else{
                                                 return { ...previousPrimitiveConditionState, aggregate: AggregateFunction[key as keyof typeof AggregateFunction] };
                                             }
                                         })
@@ -169,9 +168,9 @@ export default function FilterChip(props: FilterChipProps) {
                                     <DropdownItem key="MAX">Maximum</DropdownItem>
                                 </DropdownMenu>
                             </Dropdown>
-                            <Spacer y={2} />
+                            <Spacer y={2}/>
                             <h2>Sign</h2>
-                            <Spacer y={2} />
+                            <Spacer y={2}/>
                             <Dropdown>
                                 <DropdownTrigger>
                                     <Button
@@ -202,19 +201,15 @@ export default function FilterChip(props: FilterChipProps) {
                                     <DropdownItem key="NOT_EQUAL">&lt;&gt;</DropdownItem>
                                 </DropdownMenu>
                             </Dropdown>
-                            <Spacer y={2} />
+                            <Spacer y={2}/>
                             <h2>Value</h2>
-                            <Spacer y={2} />
-                            <Input
+                            <Spacer y={2}/>
+                            <Input 
                                 aria-label="Value input field"
-                                type="text"
+                                type="text" 
                                 value={primitiveCondition.value?.toString()}
-                                onValueChange={(value: string) => {
+                                onValueChange={(value:string) => {
                                     setConditionValue(value)
-                                }}
-                                style={{
-                                    backgroundColor: 'transparent',
-                                    color: '#333',
                                 }}
                             />
                             <Spacer y={4} />
@@ -222,7 +217,7 @@ export default function FilterChip(props: FilterChipProps) {
                                 color="primary"
                                 onClick={() => {
                                     if (props.onRemove) {
-                                        props.onRemove(props.id);
+                                        props.onRemove(props.key);
                                     }
                                 }}
                             >
