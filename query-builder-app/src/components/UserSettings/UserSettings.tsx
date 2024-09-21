@@ -258,8 +258,8 @@ export default function UserSettings() {
                         <div className="infield flex justify-center relative pb-4"  >
                             <Image
                                 className="orgLogo rounded-full"
-                                width={200}
-                                height={100}
+                                // width={200}
+                                height={200}
                                 alt="User Profile Picture"
                                 src={profilePicURL}
                             />

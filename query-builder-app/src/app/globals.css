@@ -33,8 +33,13 @@ body {
 .full-application {
   display: flex;
   flex-direction: row;
+  /* overflow-y: hidden; */
+  height: 100vh;
+
 }
 
 .app {
   width: 100%;
+  height: 100%;
+  overflow-y: scroll;
 }

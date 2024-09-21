@@ -49,12 +49,14 @@ const Sidebar = () => {
                 </div>
 
                 {/* Context Menu */}
-                <ContextMenu />
-
+                <div className="sidebar-contextMenu">
+                <ContextMenu/>
+                </div>
+                <hr className="sidebar-separator"></hr>
                 {/* Footer */}
                 <div className="sidebar-footer">
-                    <hr className="sidebar-separator"></hr>
-                    <nav className="nav-links">
+                    
+                    <nav className=".footer-nav-links">
 
                     <div className="sidebar-item">
                         <Link href="/settings" data-testid="settingsNav">
@@ -70,9 +72,10 @@ const Sidebar = () => {
                     </div>
                     <div className="sidebar-item">
                         <Link href="/authentication" className="logoutButton" data-testid="logoutNav">
-                            <Button 
+                            <Button
+                                 
                                 variant="solid" 
-                                color="danger" 
+                                color="primary" 
                                 isLoading={loading}
                                 onClick={() => signOut()}
                                 spinner={
