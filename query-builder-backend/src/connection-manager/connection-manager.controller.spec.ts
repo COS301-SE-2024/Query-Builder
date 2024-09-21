@@ -6,6 +6,17 @@ import { SupabaseModule } from '../supabase/supabase.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppService } from '../app.service';
 import { MyLoggerModule } from '../my-logger/my-logger.module';
+import { MySqlConnectionManagerService } from './my-sql-connection-manager/my-sql-connection-manager.service';
+import { PostgresConnectionManagerService } from './postgres-connection-manager/postgres-connection-manager.service';
+
+class MockConnectionManagerService {
+  connectToDatabase() {
+    return 'mocked connection';
+  }
+  hasActiveConnection() {
+    return 'mocked active connection';
+  }
+}
 
 describe('ConnectionManagerController', () => {
   let controller: ConnectionManagerController;
@@ -19,7 +30,14 @@ describe('ConnectionManagerController', () => {
         MyLoggerModule
       ],
       controllers: [ConnectionManagerController],
-      providers: [ConnectionManagerService, AppService, ConfigService]
+      providers: [
+        {
+          provide: ConnectionManagerService,
+          useClass: MockConnectionManagerService
+        },
+        AppService,
+        ConfigService
+      ]
     }).compile();
 
     controller = module.get<ConnectionManagerController>(
@@ -29,5 +47,19 @@ describe('ConnectionManagerController', () => {
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
+  });
+
+  describe('connect', () => {
+    it('should return "mocked connection"', async () => {
+      expect(await controller.connect(null, null)).toBe('mocked connection');
+    });
+  });
+
+  describe('hasActiveConnection', () => {
+    it('should return "mocked active connection"', async () => {
+      expect(await controller.hasActiveConnection(null, null)).toBe(
+        'mocked active connection'
+      );
+    });
   });
 });

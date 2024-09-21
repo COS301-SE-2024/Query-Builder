@@ -1,12 +1,16 @@
 import { Module } from '@nestjs/common';
 import { QueryHandlerController } from './query-handler.controller';
 import { QueryHandlerService } from './query-handler.service';
-import { JsonConverterModule } from '../jsonConverter/jsonConverter.module';
+import { JsonConverterModule } from '../json-converter/json-converter.module';
 import { ConnectionManagerModule } from '../connection-manager/connection-manager.module';
 import { MyLoggerModule } from '../my-logger/my-logger.module';
 
 @Module({
-  imports: [JsonConverterModule, ConnectionManagerModule, MyLoggerModule],
+  imports: [
+    JsonConverterModule.forRoot('mysql'),
+    ConnectionManagerModule.forRoot('mysql'),
+    MyLoggerModule
+  ],
   controllers: [QueryHandlerController],
   providers: [QueryHandlerService],
   exports: [QueryHandlerService]

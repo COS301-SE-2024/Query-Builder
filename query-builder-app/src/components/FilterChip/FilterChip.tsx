@@ -10,8 +10,9 @@ import React from "react";
 
 interface FilterChipProps {
     primitiveCondition: primitiveCondition,
-    key: React.Key,
+    key: string,
     onChange?: (primitiveCondition: primitiveCondition) => void
+    onRemove?: (key: string) => void; 
   }
 
 export default function FilterChip(props: FilterChipProps){
@@ -211,7 +212,18 @@ export default function FilterChip(props: FilterChipProps){
                                     setConditionValue(value)
                                 }}
                             />
-                            <Spacer y={2}/>
+                            <Spacer y={4} />
+                            <Button
+                                color="primary"
+                                onClick={() => {
+                                    if (props.onRemove) {
+                                        props.onRemove(props.key);
+                                    }
+                                }}
+                            >
+                                Remove
+                            </Button>
+                            <Spacer y={2} />
                         </CardBody>
                     </Card>)}
                 </div>

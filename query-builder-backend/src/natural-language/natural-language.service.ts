@@ -3,7 +3,7 @@ import { Natural_Language_Query_Dto } from './dto/natural-language-query.dto';
 import { ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
 import { GenerativeModel, GoogleGenerativeAI } from '@google/generative-ai';
-import { Query } from '../interfaces/intermediateJSON';
+import { Query } from '../interfaces/dto/query.dto';
 import { DbMetadataHandlerService } from '../db-metadata-handler/db-metadata-handler.service';
 
 @Injectable()

@@ -8,6 +8,8 @@ import { createClient } from "./../../utils/supabase/client";
 import FilterChip from "../FilterChip/FilterChip";
 import React from "react";
 import { navigateToAuth } from "../../app/authentication/actions";
+import { v4 as uuidv4 } from 'uuid'; // Import UUID generation
+
 
 //---------------------------INTERFACES---------------------------------//
 
@@ -16,6 +18,7 @@ interface FilterListProps{
     table: table,
     databaseServerID: string
     onChange?: (condition: compoundCondition) => void
+    onRemove?: () => void; 
 }
 
 interface PossibleCondition{
@@ -153,40 +156,55 @@ export default function FilterList(props: FilterListProps){
 
     }
 
-    const handleFilterSelection = (key: string) => {
 
+    const handleFilterSelection = (key: string) => {
         const stringSplit = key.split(" - ");
         const tableName = stringSplit[0];
         const columnName = stringSplit[1];
-
-        const newConditionsArray = condition.conditions;
-
+    
         const newPrimitiveCondition: primitiveCondition = {
             tableName: tableName,
             column: columnName,
             operator: ComparisonOperator.EQUAL,
-            value: 0
-        }
-
-        newConditionsArray.push(newPrimitiveCondition)
-
-        setCondition({
-            ...condition,
-            conditions: newConditionsArray
-        });
-
+            value: 0,
+            id: uuidv4(), // Add a unique id
+        };
+    
+        setCondition(prevCondition => ({
+            ...prevCondition,
+            conditions: [...prevCondition.conditions, newPrimitiveCondition],
+        }));
     };
-
+    
     function renderFilterChips(compoundCondition: compoundCondition): JSX.Element {
-
-            return(
-                <>
-                {compoundCondition.conditions.map((subCondition, index) => (
-                    <FilterChip key={index} primitiveCondition={subCondition as primitiveCondition} onChange={updateCondition} />
+        return (
+            <>
+                {compoundCondition.conditions
+                    .filter((subCondition): subCondition is primitiveCondition => 'value' in subCondition && 'column' in subCondition && 'operator' in subCondition)
+                    .map((subCondition: primitiveCondition) => (
+                        <FilterChip
+                            key={subCondition.id ?? uuidv4()} // Use the unique id as key
+                            primitiveCondition={subCondition}
+                            onChange={updateCondition}
+                            onRemove={() => subCondition.id && removeCondition(subCondition.id)} 
+                        />
                 ))}
-                </>
-            );
-
+            </>
+        );
+    }
+    
+    function removeCondition(id: string) {
+        if (condition.conditions.length === 1) {
+            if (props.onRemove) {
+                props.onRemove();
+            }
+        }
+    
+        const updatedConditions = condition.conditions.filter((cond): cond is primitiveCondition => 'id' in cond && cond.id !== id);
+        setCondition(prevCondition => ({
+            ...prevCondition,
+            conditions: updatedConditions,
+        }));
     }
 
     //callback function for FilterChip

@@ -1,11 +1,10 @@
 import { Module } from "@nestjs/common";
 import { PassportModule } from "@nestjs/passport";
 import { ConfigModule } from "@nestjs/config";
-
+import { JsonConverterModule } from "./json-converter/json-converter.module";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { ConnectionManagerModule } from "./connection-manager/connection-manager.module";
-import { JsonConverterModule } from "./jsonConverter/jsonConverter.module";
 import { SupabaseGuard, SupabaseModule } from "./supabase";
 import { APP_GUARD } from "@nestjs/core";
 import { UserManagementModule } from "./user-management/user-management.module";

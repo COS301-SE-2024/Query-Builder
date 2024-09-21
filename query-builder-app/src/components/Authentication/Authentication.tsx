@@ -2,10 +2,13 @@
 import '../../app/globals.css';
 import './Authentication.css';
 import React, { useState, useEffect } from 'react';
-import { Button, Card, CardBody, Input, input } from '@nextui-org/react';
+import { Button, Card, CardBody, Input } from '@nextui-org/react';
 import { EyeFilledIcon } from './EyeFilledIcon';
 import { EyeSlashFilledIcon } from './EyeSlashFilledIcon';
-import {login, signup} from '../../app/authentication/actions'
+import {login, navigateToSignedInHomePage, signup} from '../../app/authentication/actions'
+import toast from 'react-hot-toast';
+import { AuthError } from '@supabase/supabase-js';
+import { createClient } from "./../../utils/supabase/client";
 
 export default function Authentication() {
 
@@ -95,24 +98,66 @@ export default function Authentication() {
     }
   };
 
+    // This function gets the token from local storage.
+    // Supabase stores the token in local storage so we can access it from there.
+    const getToken = async () => {
+
+      const supabase = createClient();
+      const token = (await supabase.auth.getSession()).data.session?.access_token
+
+      console.log(token)
+
+      return token;
+  };
+
   const loginUser = async (email: string, password: string) => {
 
     //sign into QBee server
     //call the sign-in API endpoint
     setLoading(true);
-    let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user-management/gen-session-key`, {
-      credentials: "include",
-      method: "PUT",
-      headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({email: email, password: password})
-      })
+    try {
+      let response;
+      try {
+        response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user-management/gen-session-key`, {
+          credentials: "include",
+          method: "PUT",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email: email, password: password })
+        });
+
+        let responseData = await response.json();
+      } catch (error) {
+        toast.error("Failed to generate session token! Please try logging in again");
+      }
+
+      await login(email, password);
+
+      let generateTestOrgResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/setup-test-scenario`, {
+        credentials: "include",
+        method: "POST",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + await getToken()
+        }
+      });
   
-    let responseData = await response.json();
-    login(email, password);
-    setLoading(false);
+      navigateToSignedInHomePage();
+
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      }
+      else {
+        toast.error("Unexpected error, failed to login. Please try logging in again.");
+      }
+    }
+    finally {
+      setLoading(false);
+    }
 
   };
 
@@ -123,7 +168,27 @@ export default function Authentication() {
     password: string,
   ) => {
     setLoading(true);
-    signup(firstName, lastName, email, password);
+    try {
+      await signup(firstName, lastName, email, password);
+    } catch (error) {
+      if (error instanceof AuthError) {
+        toast.error(error.message);
+      }
+      else if (error) {
+        // console.error(error);
+        if (error instanceof Error && error.message.includes("Too many sign-up attempts")) {
+          toast.error(error.message);
+        }
+        else {
+          toast.error("An unexpected error occurred");
+        }
+      }
+    }
+    finally {
+      setLoading(false);
+    }
+
+
   };
 
   return (
@@ -272,7 +337,7 @@ export default function Authentication() {
                       signUpEmail,
                       signUpPassword,
                     );
-                    
+
                   }}
                   variant="bordered"
                   isDisabled={
@@ -280,6 +345,28 @@ export default function Authentication() {
                     isSignUpFirstNameInvalid ||
                     isSignUpLastNameInvalid ||
                     isSignUpPasswordInvalid
+                  }
+                  spinner={
+                    <svg
+                      className="animate-spin h-5 w-5 text-current"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        fill="currentColor"
+                      />
+                    </svg>
                   }
                 >
                   Sign Up
@@ -363,6 +450,28 @@ export default function Authentication() {
                   onClick={() => loginUser(loginEmail, loginPassword)}
                   variant="bordered"
                   isDisabled={isLoginEmailInvalid || isLoginPasswordInvalid}
+                  spinner={
+                    <svg
+                      className="animate-spin h-5 w-5 text-current"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  }
                 >
                   Login
                 </Button>

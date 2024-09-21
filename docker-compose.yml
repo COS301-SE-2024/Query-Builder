@@ -22,6 +22,8 @@ services:
     env_file:
       - ./query-builder-backend/.env
     restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   redis:
     image: redis:latest
