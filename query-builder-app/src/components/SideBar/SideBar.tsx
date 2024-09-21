@@ -72,9 +72,10 @@ const Sidebar = () => {
                     </div>
                     <div className="sidebar-item">
                         <Link href="/authentication" className="logoutButton" data-testid="logoutNav">
-                            <Button 
+                            <Button
+                                 
                                 variant="solid" 
-                                color="danger" 
+                                color="primary" 
                                 isLoading={loading}
                                 onClick={() => signOut()}
                                 spinner={

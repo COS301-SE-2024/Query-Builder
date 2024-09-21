@@ -87,3 +87,8 @@
 .footer-nav-links{
     width: 100%;
 }
+
+.sidebar-item > a.logoutButton > button:hover{
+    width: 100%;
+    background-color: #f31260;
+}
