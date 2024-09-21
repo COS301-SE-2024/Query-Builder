@@ -38,18 +38,17 @@ export interface join {
 }
 
 export interface condition {
+    id?: string;
 }
 
 export interface compoundCondition extends condition{
     conditions: condition[],
     operator: LogicalOperator,
-    id?: string;
 }
 
 export interface primitiveCondition extends condition{
     value: string | number | boolean | null,
     tableName?: string,
-    id?: string;
     column: string,
     operator: ComparisonOperator,
     aggregate?: AggregateFunction
