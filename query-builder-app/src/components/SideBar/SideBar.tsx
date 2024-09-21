@@ -49,11 +49,13 @@ const Sidebar = () => {
                 </div>
 
                 {/* Context Menu */}
-                <ContextMenu />
-
+                <div className="sidebar-contextMenu">
+                <ContextMenu/>
+                </div>
+                <hr className="sidebar-separator"></hr>
                 {/* Footer */}
                 <div className="sidebar-footer">
-                    <hr className="sidebar-separator"></hr>
+                    
                     <nav className="nav-links">
 
                     <div className="sidebar-item">
