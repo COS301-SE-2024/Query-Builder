@@ -286,6 +286,7 @@ export default function UserSettings() {
                         <Input
                             // isRequired
                             label="First Name"
+                            data-testid="first-name"
                             defaultValue={initialFirstName}
                             variant="bordered"
                             placeholder={initialFirstName}
@@ -317,6 +318,7 @@ export default function UserSettings() {
                         <Input
                             isRequired
                             label="Email"
+                            data-testid="email-test"
                             variant="bordered"
                             type="email"
                             placeholder={initialEmail}
@@ -342,6 +344,7 @@ export default function UserSettings() {
                 <CardBody>
                     <Button
                         color="primary"
+                        data-testid="update-user"
                         isLoading={loading}
                         onClick={() => {
                             setLoading(true);
