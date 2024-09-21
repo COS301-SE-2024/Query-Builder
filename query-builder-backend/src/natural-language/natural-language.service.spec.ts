@@ -56,27 +56,22 @@ jest.mock('@google/generative-ai', () => {
   };
 });
 
-jest.mock('../db-metadata-handler/db-metadata-handler.service', () => {
-  return {
-    DbMetadataHandlerService: jest.fn().mockImplementation(() => {
-      return {
-        getSchemaSummary: jest.fn().mockResolvedValue({
-          // mocked value for getSchemaSummary
-          databaseServerID: '0000'
-        })
-      };
-    })
-  };
-});
-
 describe('NaturalLanguageService', () => {
   let service: NaturalLanguageService;
-  let mockedOpenAI: jest.Mocked<typeof OpenAI>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [DbMetadataHandlerModule],
-      providers: [NaturalLanguageService, ConfigService, AppService]
+      providers: [
+        NaturalLanguageService,
+        ConfigService,
+        AppService,
+        {
+          provide: 'DbMetadataHandlerService',
+          useValue: {
+            getServerSummary(databaseServerID: string, language: string){return {}}
+          }
+        }
+      ]
     }).compile();
 
     service = await module.resolve<NaturalLanguageService>(
@@ -89,24 +84,12 @@ describe('NaturalLanguageService', () => {
   });
 
   describe('query', () => {
-    // describe('openAI', () => {
-    //   it('should return openAI response', async () => {
-    //     expect(
-    //       await service.query(
-    //         { llm: 'openAI', query: 'test', databaseServerID: '0000' },
-    //         {}
-    //       )
-    //     ).toStrictEqual({
-    //       choices: [{ message: { content: {name: "sakila"} } }]
-    //     });
-    //   });
-    // });
 
     describe('gemini', () => {
       it('should return openAI response', async () => {
         expect(
           await service.query(
-            { llm: 'gemini', query: 'test', databaseServerID: '0000' },
+            { llm: 'gemini', query: 'test', databaseServerID: '0000', language: 'mysql' },
             {}
           )
         ).toStrictEqual({
