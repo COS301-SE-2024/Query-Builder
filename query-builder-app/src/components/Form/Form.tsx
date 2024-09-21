@@ -343,7 +343,7 @@ export default function Form() {
                   }}                                >
                   Clear Form
                 </Button>
-                {JSON.stringify(getMergedQuery(), null, 2)} 
+                {/* {JSON.stringify(getMergedQuery(), null, 2)}  */}
               </div>
               <Modal
                 isOpen={isOpen}
