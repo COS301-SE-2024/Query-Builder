@@ -5,6 +5,7 @@ import * as session from 'express-session';
 import { createClient } from 'redis';
 import RedisStore from 'connect-redis';
 import { MyLoggerService } from './my-logger/my-logger.service';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -12,6 +13,16 @@ async function bootstrap() {
   });
 
   app.useLogger(new MyLoggerService());
+
+  const config = new DocumentBuilder()
+  .setTitle("QBee API Documentation")
+  .setDescription("API Documentation for QBee")
+  .setVersion("1.0")
+  .addTag("QBee")
+  .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
 
   const { httpAdapter } = app.get(HttpAdapterHost);
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
