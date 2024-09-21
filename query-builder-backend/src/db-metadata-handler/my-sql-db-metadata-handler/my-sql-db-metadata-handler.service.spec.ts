@@ -6,7 +6,13 @@ describe('MySqlDbMetadataHandlerService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [MySqlDbMetadataHandlerService],
+      providers: [
+        MySqlDbMetadataHandlerService,
+        {
+          provide: 'QueryHandlerService',
+          useValue: {}
+        }
+      ],
     }).compile();
 
     service = module.get<MySqlDbMetadataHandlerService>(MySqlDbMetadataHandlerService);

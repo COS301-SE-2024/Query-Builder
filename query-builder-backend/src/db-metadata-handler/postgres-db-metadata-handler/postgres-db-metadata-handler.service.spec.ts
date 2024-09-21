@@ -6,7 +6,13 @@ describe('PostgresDbMetadataHandlerService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [PostgresDbMetadataHandlerService],
+      providers: [
+        PostgresDbMetadataHandlerService,
+        {
+          provide: 'QueryHandlerService',
+          useValue: {}
+        }
+      ],
     }).compile();
 
     service = module.get<PostgresDbMetadataHandlerService>(PostgresDbMetadataHandlerService);

@@ -2,8 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { DbMetadataHandlerService } from '../db-metadata-handler.service';
 import { Database_Metadata_Dto, Table_Metadata_Dto, Field_Metadata_Dto, Foreign_Key_Metadata_Dto, Server_Summary_Metadata_Dto } from '../dto/metadata.dto';
 import { Query } from './../../interfaces/dto/query.dto';
-import { column } from 'src/interfaces/dto/table.dto';
-import { ComparisonOperator, compoundCondition, LogicalOperator, primitiveCondition } from 'src/interfaces/dto/conditions.dto';
+import { ComparisonOperator, compoundCondition, LogicalOperator, primitiveCondition } from './../../interfaces/dto/conditions.dto';
 
 @Injectable()
 export class PostgresDbMetadataHandlerService extends DbMetadataHandlerService {
