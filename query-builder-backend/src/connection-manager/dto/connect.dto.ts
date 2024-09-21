@@ -8,7 +8,6 @@ export class Credentials_Dto {
     username: string;
 
     @IsString()
-    @IsNotEmpty()
     password: string;
 }
 
