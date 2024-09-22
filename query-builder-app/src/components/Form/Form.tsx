@@ -3,7 +3,7 @@
 //----------------------------IMPORTS------------------------------------//
 
 import '../../app/globals.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import {
   Button,
@@ -20,18 +20,11 @@ import {
   ModalContent,
   Modal,
   ModalHeader,
-  DropdownSection,
   Tooltip,
 } from '@nextui-org/react';
 import TableResponse from '../TableResponse/TableResponse';
 import { createClient } from './../../utils/supabase/client';
-import {
-  compoundCondition,
-  condition,
-  LogicalOperator,
-  Query,
-  table,
-} from '@/interfaces/intermediateJSON';
+import { compoundCondition, Query, table } from '@/interfaces/intermediateJSON';
 import TableList from '../TableList/TableList';
 import FilterList from '../FilterList/FilterList';
 import { navigateToAuth } from '../../app/authentication/actions';
@@ -72,15 +65,16 @@ export default function Form() {
   //Separate React hook for the Query's condition
   const [condition, setCondition] = useState<compoundCondition>();
 
+
   //React hook to fetch the database server's databases upon rerender of the Form
-  React.useEffect(() => {
+  useEffect(() => {
     if (databaseServerID.length > 1) {
       getQuery();
     }
   }, [databaseServerID]);
 
   //React hook to fetch the database server's databases upon rerender of the Form
-  React.useEffect(() => {
+  useEffect(() => {
     fetchDatabases();
   }, []);
 
@@ -98,50 +92,43 @@ export default function Form() {
   };
 
   //callback function for TableList
-  function updateTable(updatedTable: table) {
-    setQuery((previousQueryState) => {
-      return {
-        ...previousQueryState,
-        queryParams: {
-          ...previousQueryState.queryParams,
-          table: updatedTable,
-        },
-      };
-    });
-  }
+  const updateTable = useCallback((updatedTable: table) => {
+    setQuery((previousQueryState) => ({
+      ...previousQueryState,
+      queryParams: {
+        ...previousQueryState.queryParams,
+        table: updatedTable,
+      },
+    }));
+  }, []);
 
   //callback function for FilterList
-  //fix infinite update loop problem
-  //need to only update part of queryParams, not the table part since that is not changing
-  //only the condition is changing
-  function updateCondition(updatedCondition: compoundCondition) {
+  const updateCondition = useCallback((updatedCondition: compoundCondition) => {
     if (updatedCondition.conditions.length > 0) {
       setCondition(updatedCondition);
     }
-  }
+  }, []);
 
-  function removeAllCondition() {
+  const removeAllCondition = useCallback(() => {
     setCondition(undefined);
-  }
+  }, []);
 
   //merges query and condition
-  function getMergedQuery() {
+  const getMergedQuery = useCallback(() => {
     if (condition != null) {
-      const mergedQuery: Query = {
+      return {
         ...query,
         queryParams: {
           ...query.queryParams,
           condition: condition,
         },
       };
-
-      return mergedQuery;
     } else {
       return query;
     }
-  }
+  }, [condition, query]);
 
-  async function getQuery() {
+  const getQuery = useCallback(async () => {
     let response = await fetch(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query-management/get-single-query`,
       {
@@ -162,23 +149,22 @@ export default function Form() {
 
     const newQueryParams = json.parameters;
 
-    setQuery((previousQueryState) => {
-      return {
-        ...previousQueryState,
-        queryParams: {
-          ...previousQueryState.queryParams,
-          databaseName: newQueryParams.databaseName,
-          language: newQueryParams.language,
-          query_type: newQueryParams.query_type,
-          table: newQueryParams.table,
-        },
-      };
-    });
-  }
+    setQuery((previousQueryState) => ({
+      ...previousQueryState,
+      queryParams: {
+        ...previousQueryState.queryParams,
+        databaseName: newQueryParams.databaseName,
+        language: newQueryParams.language,
+        query_type: newQueryParams.query_type,
+        table: newQueryParams.table,
+      },
+    }));
+
+    setCondition(newQueryParams.condition);
+  }, [databaseServerID]);
 
   //async function to fetch the database server's databases
-  async function fetchDatabases() {
-
+  const fetchDatabases = useCallback(async () => {
     //first get the database type
     let typeResponse = await fetch(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/get-db-type`,
@@ -196,17 +182,16 @@ export default function Form() {
       },
     );
 
-    if(typeResponse.ok){
-
+    if (typeResponse.ok) {
       const languageType = (await typeResponse.json()).type;
 
-      setQuery({
-        ...query,
+      setQuery((previousQueryState) => ({
+        ...previousQueryState,
         queryParams: {
-          ...query.queryParams,
-          language: languageType
-        }
-      });
+          ...previousQueryState.queryParams,
+          language: languageType,
+        },
+      }));
 
       let response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/databases`,
@@ -220,42 +205,36 @@ export default function Form() {
           },
           body: JSON.stringify({
             databaseServerID: databaseServerID[0],
-            language: languageType
+            language: languageType,
           }),
         },
       );
-  
+
       let json = await response.json();
-  
-      if(response.ok){
-  
-          //set the databases hook
-          setDatabases(json.data);
-  
-      }
-      else{
-          
-          if(json.response && json.response.message == 'You do not have a backend session'){
-              navigateToAuth();
-          }
-  
-      }
 
+      if (response.ok) {
+        //set the databases hook
+        setDatabases(json.data);
+      } else {
+        if (
+          json.response &&
+          json.response.message == 'You do not have a backend session'
+        ) {
+          navigateToAuth();
+        }
+      }
     }
+  }, [databaseServerID]);
 
-  }
-
-  const handleDatabaseSelection = (key: any) => {
-
-    setQuery({
-      ...query,
+  const handleDatabaseSelection = useCallback((key: any) => {
+    setQuery((previousQueryState) => ({
+      ...previousQueryState,
       queryParams: {
-        ...query.queryParams,
-        databaseName: key
-      }
-    });
-
-  };
+        ...previousQueryState.queryParams,
+        databaseName: key,
+      },
+    }));
+  }, []);
 
   return (
     <>
@@ -268,7 +247,9 @@ export default function Form() {
           </CardHeader>
           <CardBody className="overflow-visible">
             {/* Select a database */}
-            <h2>Select a database: <span style={{ color: 'red' }}>*</span></h2>
+            <h2>
+              Select a database: <span style={{ color: 'red' }}>*</span>
+            </h2>
             <Spacer y={2} />
             <Card className="w-full">
               <CardBody className="flex flex-row items-center space-x-2">
@@ -281,7 +262,7 @@ export default function Form() {
 
                 {
                   //include the add button if no database is selected yet
-                  query.queryParams.databaseName === "" && (
+                  query.queryParams.databaseName === '' && (
                     <Dropdown>
                       <DropdownTrigger>
                         <Button variant="bordered">+</Button>
@@ -301,8 +282,6 @@ export default function Form() {
                     </Dropdown>
                   )
                 }
-
-
               </CardBody>
             </Card>
 
@@ -322,24 +301,22 @@ export default function Form() {
             <Spacer y={2} />
 
             {/* Add filters */}
-            {
-              (query.queryParams.table.name != "") && (
-                <FilterList
-                  condition={query.queryParams.condition! as compoundCondition}
-                  database={query.queryParams.databaseName}
-                  table={query.queryParams.table}
-                  databaseServerID={databaseServerID[0]}
-                  language={query.queryParams.language}
-                  onChange={updateCondition}
-                  onRemove={removeAllCondition}
-                />
-              )
-            }
+            {query.queryParams.table.name != '' && (
+              <FilterList
+                condition={condition as compoundCondition}
+                database={query.queryParams.databaseName}
+                table={query.queryParams.table}
+                databaseServerID={databaseServerID[0]}
+                language={query.queryParams.language}
+                onChange={updateCondition}
+                onRemove={removeAllCondition}
+              />
+            )}
           </CardBody>
           <CardFooter>
             <>
               <div style={{ display: 'flex', gap: '3px' }}>
-                <div style={{ display: "inline-block" }}>
+                <div style={{ display: 'inline-block' }}>
                   <Tooltip
                     content="Oops! Maybe you forgot to select something, press the [+] icon to select required fields"
                     placement="top"
@@ -351,30 +328,30 @@ export default function Form() {
                           onOpen();
                         }}
                         color="primary"
-                        isDisabled={query.queryParams.table.columns.length === 0}
+                        isDisabled={
+                          query.queryParams.table.columns.length === 0
+                        }
                       >
                         Query
                       </Button>
                     </div>
                   </Tooltip>
                 </div>
-                <SaveQueryModal query={query} />
+                <SaveQueryModal query={getMergedQuery()} />
                 <Button
                   color="primary"
                   onClick={() => {
-                    setQuery((previousQueryState) => {
-                      return{
-                        databaseServerID: databaseServerID[0],
-                        queryParams: {
-                          language: previousQueryState.queryParams.language,
-                          query_type: 'select',
-                          databaseName: '',
-                          table: {
-                            name: '',
-                            columns: [],
-                          },
+                    setQuery({
+                      databaseServerID: databaseServerID[0],
+                      queryParams: {
+                        language: query.queryParams.language,
+                        query_type: 'select',
+                        databaseName: '',
+                        table: {
+                          name: '',
+                          columns: [],
                         },
-                      };
+                      },
                     });
                     setCondition(undefined);
                   }}
@@ -388,12 +365,16 @@ export default function Form() {
                 onOpenChange={onOpenChange}
                 placement="top-center"
                 className="text-black h-100vh"
-                size="full">
+                size="full"
+              >
                 <ModalContent>
                   {(onClose: any) => (
                     <>
-                      <ModalHeader className="flex flex-col gap-1">Query Results</ModalHeader>
-                      <TableResponse query={getMergedQuery()}
+                      <ModalHeader className="flex flex-col gap-1">
+                        Query Results
+                      </ModalHeader>
+                      <TableResponse
+                        query={getMergedQuery()}
                         metadata={{
                           title: `Report on ${query?.queryParams.databaseName}`,
                         }}
@@ -408,5 +389,4 @@ export default function Form() {
       </div>
     </>
   );
-
 }
