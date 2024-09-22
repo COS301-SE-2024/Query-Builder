@@ -71,7 +71,7 @@ describe('NaturalLanguageController', () => {
     expect(service.gemini_query).toHaveBeenCalled();
   });
 
-  it('should return openAI query result when both queries succeed', async () => {
+  it('should return Gemini query result when both queries succeed', async () => {
     const openAIResult: Query = {
       databaseServerID: 'someID',
       queryParams: {} as any
@@ -92,7 +92,7 @@ describe('NaturalLanguageController', () => {
       {}
     );
 
-    expect(response).toBe(openAIResult);
+    expect(response).toBe(geminiResult);
     expect(service.open_ai_query).toHaveBeenCalled();
     expect(service.gemini_query).toHaveBeenCalled();
   });

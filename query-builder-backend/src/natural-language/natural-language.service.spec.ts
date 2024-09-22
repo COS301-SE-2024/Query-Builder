@@ -82,8 +82,6 @@ describe('NaturalLanguageService', () => {
     const query = {
       databaseServerID: '0000',
       queryParams: {
-        language: 'sql',
-        query_type: 'select',
         databaseName: 'sakila',
         table: {
           name: 'actor',
@@ -116,7 +114,7 @@ describe('NaturalLanguageService', () => {
     const result = await service.open_ai_query(naturalLanguageQuery, session);
 
     expect(result).toEqual({
-      query: query
+      query: {...query, queryParams: {...query.queryParams, language: 'mysql', query_type: 'select'}}
     });
   });
 
@@ -131,8 +129,6 @@ describe('NaturalLanguageService', () => {
     const query = {
       databaseServerID: '0000',
       queryParams: {
-        language: 'sql',
-        query_type: 'select',
         databaseName: 'sakila',
         table: {
           name: 'actor',
@@ -161,7 +157,7 @@ describe('NaturalLanguageService', () => {
     const result = await service.gemini_query(naturalLanguageQuery, session);
 
     expect(result).toEqual({
-      query: query
+      query: {...query, queryParams: {...query.queryParams, language: 'mysql', query_type: 'select'}}
     });
   });
 
