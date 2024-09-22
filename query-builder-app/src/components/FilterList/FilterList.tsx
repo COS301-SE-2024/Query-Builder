@@ -15,8 +15,10 @@ import { v4 as uuidv4 } from 'uuid'; // Import UUID generation
 
 interface FilterListProps{
     condition: compoundCondition | undefined,
+    database: string,
     table: table,
-    databaseServerID: string
+    databaseServerID: string,
+    language: string
     onChange?: (condition: compoundCondition) => void
     onRemove?: () => void; 
 }
@@ -94,8 +96,9 @@ export default function FilterList(props: FilterListProps){
             },
             body: JSON.stringify({
                 databaseServerID: props.databaseServerID,
-                schema: "sakila",
-                table: tableRef.name
+                database: props.database,
+                table: tableRef.name,
+                language: props.language
             })
         });
 
@@ -128,8 +131,9 @@ export default function FilterList(props: FilterListProps){
                 },
                 body: JSON.stringify({
                     databaseServerID: props.databaseServerID,
-                    schema: "sakila",
-                    table: tableRef.name
+                    database: props.database,
+                    table: tableRef.name,
+                    language: props.language
                 })
             });
 

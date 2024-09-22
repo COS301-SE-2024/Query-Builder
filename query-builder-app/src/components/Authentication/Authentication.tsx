@@ -156,7 +156,7 @@ export default function Authentication() {
       }
     }
     finally {
-      setLoading(false);
+      // setLoading(false);
     }
 
   };

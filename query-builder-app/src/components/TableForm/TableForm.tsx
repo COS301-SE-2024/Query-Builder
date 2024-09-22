@@ -7,7 +7,9 @@ import { navigateToAuth } from "../../app/authentication/actions";
 
 interface TableFormProps {
     databaseServerID: string,
+    database: string,
     table: table,
+    language: string
     onChange?: (table: table) => void
 }
 
@@ -62,15 +64,15 @@ export default function TableForm(props: TableFormProps){
             },
             body: JSON.stringify({
                 databaseServerID: props.databaseServerID,
-                schema: "sakila",
-                table: table.name
+                database: props.database,
+                table: table.name,
+                language: props.language
             })
         });
 
         if (!response || typeof response.json !== 'function') {
             return;
         }
-
 
         let json = await response.json();
 
@@ -133,7 +135,8 @@ export default function TableForm(props: TableFormProps){
 
     return(
         <div className="w-full">
-            <h2>Select the columns to display from {table.name}:</h2>
+            <h2>Select the columns to display from {table.name}: <span style={{ color: 'red' }}>*</span></h2>
+
             <Spacer y={2}/>
             <Card className="overflow-visible">
                 <CardBody className="overflow-visible">
