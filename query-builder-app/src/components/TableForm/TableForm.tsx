@@ -67,6 +67,11 @@ export default function TableForm(props: TableFormProps){
             })
         });
 
+        if (!response || typeof response.json !== 'function') {
+            return;
+        }
+
+
         let json = await response.json();
 
         if(response.ok){
