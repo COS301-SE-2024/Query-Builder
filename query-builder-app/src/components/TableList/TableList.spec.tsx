@@ -85,7 +85,7 @@ describe('TableList table selection tests', () => {
         const user = userEvent.setup();
     
         //render the TableList
-        render(<TableList databaseServerID="1234" databaseName="sakila" table={tableProp} onChange={updateTable} />);
+        render(<TableList language='mysql' databaseServerID="1234" databaseName="sakila" table={tableProp} onChange={updateTable} />);
 
         //get the add button
         //make sure to wait for it to load once joinable tables are fetched from the API
