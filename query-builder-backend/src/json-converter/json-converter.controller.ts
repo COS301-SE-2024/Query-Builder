@@ -1,13 +1,13 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Inject, Post, ValidationPipe } from '@nestjs/common';
 import { QueryParams } from '../interfaces/dto/query.dto';
 import { JsonConverterService } from './json-converter.service';
 
 @Controller('json-converter')
 export class JsonConverterController {
-  constructor(private readonly jsonConverterService: JsonConverterService) {}
+  constructor(@Inject('JsonConverterService') private readonly jsonConverterService: JsonConverterService) {}
 
   @Post()
-  convert(@Body() queryParams: QueryParams) {
+  convert(@Body(ValidationPipe) queryParams: QueryParams) {
     return this.jsonConverterService.convertJsonToQuery(queryParams);
   }
 }

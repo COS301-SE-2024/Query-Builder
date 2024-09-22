@@ -46,7 +46,7 @@ export default function QueryBuilder() {
     <div className="full-application">
       <Sidebar />
     
-      <Card style={{ borderRadius: '0', boxShadow: 'none', display: 'flex', flexDirection: 'column', width: '100%' }}>
+      <Card style={{ borderRadius: '0', boxShadow: 'none', display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
       <Tabs 
         aria-label="Tabs" 
         color="primary" 
@@ -62,7 +62,7 @@ export default function QueryBuilder() {
           title="QueryForm"
           className="flex-1"
         >
-          <div style={{ width: '100%' }}>
+          <div style={{ width: '100%', height: '100%' }}>
             <Form />
           </div>
         </Tab>
@@ -71,7 +71,7 @@ export default function QueryBuilder() {
           title="QueryQuill"
           className="flex-1"
         >
-          <div style={{ width: '100%' }}>
+          <div style={{ width: '100%', height: '100%' }}>
             <NaturalLanguage />
           </div>
         </Tab>

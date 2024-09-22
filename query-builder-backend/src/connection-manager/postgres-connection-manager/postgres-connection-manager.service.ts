@@ -1,102 +1,172 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadGatewayException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import {
   ConnectionManagerService,
   ConnectionStatus
 } from '../connection-manager.service';
 import { Client } from 'pg';
 import { Connect_Dto } from '../dto/connect.dto';
+import { Has_Active_Connection_Dto } from '../dto/has-active-connection.dto';
 
 @Injectable()
 export class PostgresConnectionManagerService extends ConnectionManagerService {
+
+  //service to determine whether the user has an active connection to the database server
+  async hasActiveConnection(
+    has_active_connection_dto: Has_Active_Connection_Dto,
+    session: Record<string, any>
+  ) {
+    const { data: db_data, error: error } = await this.supabase
+      .getClient()
+      .from('db_envs')
+      .select('host, port')
+      .eq('db_id', has_active_connection_dto.databaseServerID)
+      .single();
+
+    if (error) {
+      this.logger.error(error, ConnectionManagerService.name);
+      throw error;
+    }
+
+    if (!db_data) {
+      throw new UnauthorizedException(
+        'You do not have access to this database'
+      );
+    }
+
+    let host = db_data.host;
+    let port = db_data.port;
+
+    if (session.host === host && session.port === port && session.databaseName && session.databaseName === has_active_connection_dto.databaseName) {
+      return { hasActiveConnection: true };
+    } else {
+      return { hasActiveConnection: false };
+    }
+  }
+
   async connectToDatabase(
     connect_dto: Connect_Dto,
     session: Record<string, any>
   ): Promise<ConnectionStatus> {
-    {
-      return new Promise(async (resolve, reject) => {
-        const { data: user_data, error: user_error } = await this.supabase
-          .getClient()
-          .auth.getUser(this.supabase.getJwt());
-        if (user_error) {
-          return reject(user_error);
+
+    const { data: user_data, error: user_error } = await this.supabase
+      .getClient()
+      .auth.getUser(this.supabase.getJwt());
+    if (user_error) {
+      throw user_error;
+    }
+    const { data: db_data, error: error } = await this.supabase
+      .getClient()
+      .from('db_envs')
+      .select('host, port')
+      .eq('db_id', connect_dto.databaseServerID)
+      .single();
+    if (error) {
+      this.logger.error(error, PostgresConnectionManagerService.name);
+      throw error;
+    }
+    if (!db_data) {
+      throw new UnauthorizedException(
+        'You do not have access to this database'
+      );
+    }
+
+    //the connection details we want to connect with
+    let host = db_data.host;
+    let port = db_data.port;
+    //the default postgres database to connect to, if none is provided, is 'template1'
+    let databaseName = connect_dto.databaseName ? connect_dto.databaseName : "template1";
+
+    if (session.host === host && session.port === port && session.databaseName === databaseName) {
+      //-------------EXISTING CONNECTION TO THE RIGHT HOST AND PORT AND DATABASE-------------//
+      //Print out that you are reconnecting to an existing session and not a new one
+      this.logger.log(
+        `[Reconnecting] ${session.id} connected to ${host}:${port} ${databaseName}`,
+        PostgresConnectionManagerService.name
+      );
+      return {
+        success: true,
+        connectionID: this.sessionStore.get(session.id).conn.threadID
+      };
+    } else {
+      //----------NO EXISTING CONNECTION TO THE RIGHT HOST AND PORT AND DATABASE------------//
+      if (session.host !== undefined && session.port !== undefined && session.databaseName !== undefined) {
+        //if there is an existing connection that needs to be changed to a different host and port and database
+        this.sessionStore.get(session.id).conn.end();
+        this.sessionStore.remove(session.id);
+        this.logger.log(
+          `[Connection Disconnected] ${session.id}`,
+          PostgresConnectionManagerService.name
+        );
+        session.host = undefined;
+        session.port = undefined;
+        session.databaseName = undefined;
+      }
+      let user: any, password: any;
+      //If database credentials are provided, then use those
+      if (connect_dto.databaseServerCredentials) {
+        user = connect_dto.databaseServerCredentials.username;
+        password = connect_dto.databaseServerCredentials.password;
+      }
+      //Otherwise, try find and decrypt saved credentials for the database, if there are saved credentials
+      else{
+        try {
+          let { user: decryptedUser, password: decryptedPassword } =
+            await this.decryptDbSecrets(connect_dto.databaseServerID, session);
+          user = decryptedUser;
+          password = decryptedPassword;
+        } catch (err) {
+          //Otherwise the only option is to re-ask the user for their credentials
+          //so they can open a connection to this specific database
+          throw new InternalServerErrorException('You do not have saved credentials for this database');
         }
-        //dad
+      }
 
-        const { data: db_data, error: error } = await this.supabase
-          .getClient()
-          .from('db_envs')
-          .select('host')
-          .eq('db_id', connect_dto.databaseServerID)
-          .single();
-        if (error) {
-          this.logger.error(error, PostgresConnectionManagerService.name);
-          return reject(error);
-        }
-
-        if (!db_data) {
-          return reject(
-            new UnauthorizedException('You do not have access to this database')
-          );
-        }
-
-        let host = db_data.host;
-
-        if (session.host === host) {
-          //-----------------------------EXISTING CONNECTION TO THE RIGHT HOST---------------------//
-          //check if the hashed version of the password stored in the session matches the hash of the password in the query
-          //Print out that you are reconnecting to an existing session and not a new one
-          this.logger.log(
-            `[Reconnecting] ${session.id} connected to ${host}`,
-            PostgresConnectionManagerService.name
-          );
-          return resolve({
-            success: true,
-            connectionID: this.sessionStore.get(session.id).conn.threadID
-          });
-        } else {
-          //-------------------------NO EXISTING CONNECTION TO THE RIGHT HOST-------------------//
-          if (session.host !== undefined) {
-            //if there is an existing connection that needs to be changed to a different host
-            this.sessionStore.get(session.id).conn.end();
-            this.sessionStore.remove(session.id);
-            this.logger.log(
-              `[Connection Disconnected] ${session.id}`,
-              PostgresConnectionManagerService.name
-            );
-            session.host = undefined;
-          }
-
-          let { user, password } = await this.decryptDbSecrets(connect_dto.databaseServerID, session);
-
-          const postgresClient = new Client({
-            user: user,
-            password: password,
-            host: host,
-            port: 0,
-            database: ''
-          });
-
-          try {
-            await postgresClient.connect();
-            session.host = host;
-
-            this.sessionStore.add({
-              id: session.id,
-              conn: postgresClient
-            });
-
-            this.logger.log(
-              `[Inital Connection] ${session.id} connected to ${host}`,
-              PostgresConnectionManagerService.name
-            );
-            return resolve({
-              success: true
-            });
-          } catch (error) {
-            return reject(error);
-          }
-        }
+      const postgresClient = new Client({
+        user: user,
+        password: password,
+        host: host,
+        port: port,
+        database: databaseName
       });
+
+      //try connect to the postgres database
+      try{
+        await postgresClient.connect();
+      }
+      //something went wrong with the connection
+      catch(e){
+        if(e.code === '28P01'){
+          throw new UnauthorizedException(
+            'Please ensure that your database credentials are correct.'
+          );
+        }
+        else if(e.code === 'ECONNREFUSED'){
+          throw new BadGatewayException(
+            'Could not connect to the database - has your database admin added it correctly?'
+          );
+        }
+        else{
+          throw e;
+        }
+      }
+
+      session.host = host;
+      session.port = port;
+      session.databaseName = databaseName;
+
+      this.sessionStore.add({
+        id: session.id,
+        conn: postgresClient
+      });
+
+      this.logger.log(
+        `[Inital Connection] ${session.id} connected to ${host}:${port} ${databaseName}`,
+        PostgresConnectionManagerService.name
+      );
+      return {
+        success: true
+      };
+
     }
   }
 }

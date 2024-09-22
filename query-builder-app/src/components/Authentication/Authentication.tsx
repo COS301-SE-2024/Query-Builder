@@ -2,7 +2,7 @@
 import '../../app/globals.css';
 import './Authentication.css';
 import React, { useState, useEffect } from 'react';
-import { Button, Card, CardBody, Input } from '@nextui-org/react';
+import { Button, Card, CardBody, Input, useDisclosure, Modal, ModalContent, ModalBody, Spacer } from '@nextui-org/react';
 import { EyeFilledIcon } from './EyeFilledIcon';
 import { EyeSlashFilledIcon } from './EyeSlashFilledIcon';
 import {login, navigateToSignedInHomePage, signup} from '../../app/authentication/actions'
@@ -12,6 +12,7 @@ import { createClient } from "./../../utils/supabase/client";
 
 export default function Authentication() {
 
+  const {isOpen, onOpen, onOpenChange} = useDisclosure();
   const [isVisible, setIsVisible] = useState(false);
   const toggleVisibility = () => setIsVisible(!isVisible);
   const [isLoginVisible, setLoginIsVisible] = useState(false);
@@ -156,7 +157,7 @@ export default function Authentication() {
       }
     }
     finally {
-      setLoading(false);
+      // setLoading(false);
     }
 
   };
@@ -193,328 +194,356 @@ export default function Authentication() {
 
   return (
     <>
-      <Card className="text-black">
-        <CardBody>
-          <div
-            className={'authenticationContainer ' + view}
-            id="authenticationContainer"
-          >
-            <div className="form-container sign-up-container">
-              <div className="form">
-                <h1>Create Account</h1>
-                <span>Use your email for registration</span>
-                <br />
-                <div className="infield">
-                  <Input
-                    isRequired
-                    label="First Name"
-                    variant="bordered"
-                    onValueChange={setSignUpFirstName}
-                    onFocus={() => {
-                      setSignUpPasswordHasBeenFocused(false);
-                      setSignUpEmailHasBeenFocused(false);
-                      setSignUpFirstNameHasBeenFocused(true);
-                      setSignUpLastNameHasBeenFocused(false);
-                      setLoginPasswordHasBeenFocused(false);
-                      setLoginEmailHasBeenFocused(false);
-                    }}
-                    isInvalid={
-                      isSignUpFirstNameInvalid && signUpFirstNameHasBeenFocused
-                    }
-                    color={
-                      !signUpFirstNameHasBeenFocused
-                        ? 'primary'
-                        : isSignUpFirstNameInvalid
-                          ? 'danger'
-                          : 'success'
-                    }
-                    errorMessage="Please enter a username"
-                  />
-                </div>
-                <div className="infield">
-                  <Input
-                    isRequired
-                    label="Last Name"
-                    variant="bordered"
-                    onValueChange={setSignUpLastName}
-                    onFocus={() => {
-                      setSignUpPasswordHasBeenFocused(false);
-                      setSignUpEmailHasBeenFocused(false);
-                      setSignUpFirstNameHasBeenFocused(false);
-                      setSignUpLastNameHasBeenFocused(true);
-                      setLoginPasswordHasBeenFocused(false);
-                      setLoginEmailHasBeenFocused(false);
-                    }}
-                    isInvalid={
-                      isSignUpLastNameInvalid && signUpLastNameHasBeenFocused
-                    }
-                    color={
-                      !signUpLastNameHasBeenFocused
-                        ? 'primary'
-                        : isSignUpLastNameInvalid
-                          ? 'danger'
-                          : 'success'
-                    }
-                    errorMessage="Please enter a username"
-                  />
-                </div>
-                <div className="infield">
-                  <Input
-                    isRequired
-                    label="Email"
-                    variant="bordered"
-                    type="email"
-                    onValueChange={setSignUpEmail}
-                    onFocus={() => {
-                      setSignUpPasswordHasBeenFocused(false);
-                      setSignUpEmailHasBeenFocused(true);
-                      setSignUpFirstNameHasBeenFocused(false);
-                      setSignUpLastNameHasBeenFocused(false);
-                      setLoginPasswordHasBeenFocused(false);
-                      setLoginEmailHasBeenFocused(false);
-                    }}
-                    isInvalid={
-                      isSignUpEmailInvalid && signUpEmailHasBeenFocused
-                    }
-                    color={
-                      !signUpEmailHasBeenFocused
-                        ? 'primary'
-                        : isSignUpEmailInvalid && signUpEmailHasBeenFocused
-                          ? 'danger'
-                          : 'success'
-                    }
-                    errorMessage="Please enter a valid email"
-                  />
-                </div>
-                <div className="infield">
-                  <Input
-                    isRequired
-                    label="Password"
-                    variant="bordered"
-                    onValueChange={setSignUpPassword}
-                    onFocus={() => {
-                      setSignUpPasswordHasBeenFocused(true);
-                      setSignUpEmailHasBeenFocused(false);
-                      setSignUpFirstNameHasBeenFocused(false);
-                      setSignUpLastNameHasBeenFocused(false);
-                      setLoginPasswordHasBeenFocused(false);
-                      setLoginEmailHasBeenFocused(false);
-                    }}
-                    isInvalid={
-                      isSignUpPasswordInvalid && signUpPasswordBeenFocused
-                    }
-                    color={
-                      !signUpPasswordBeenFocused
-                        ? 'primary'
-                        : isSignUpPasswordInvalid
-                          ? 'danger'
-                          : 'success'
-                    }
-                    errorMessage="Please enter a password"
-                    endContent={
-                      <button
-                        className="focus:outline-none"
-                        type="button"
-                        id="passwordVisibility"
-                        onClick={toggleVisibility}
-                      >
-                        {isVisible ? (
-                          <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
-                        ) : (
-                          <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none" />
-                        )}
-                      </button>
-                    }
-                    type={isVisible ? 'text' : 'password'}
-                  />
-                </div>
-                <Button
-                  isLoading={loading}
-                  onClick={() => {
-                    signUpUser(
-                      signUpFirstName,
-                      signUpLastName,
-                      signUpEmail,
-                      signUpPassword,
-                    );
+    <Button onPress={onOpen} 
+    className="md:w-full md:m-2 mt-0 mb-1 bg-default-cl text-white"
+    variant="solid"
+    // color="primary"
+    radius="full"
+    >Get Started</Button>
+    
+    <Modal 
+      backdrop="blur"
+      isOpen={isOpen} 
+      onOpenChange={onOpenChange}
+      placement="top-center"
+      className="px-0 w-9/12 max-w-full"
+      hideCloseButton
+      // size='full'
+      
+    >
+      <ModalContent
+      >
+        {(onClose : any) => (
+          <>
+          <ModalBody className='px-0' >
+              <div
+                className={'authenticationContainer ' + view}
+                id="authenticationContainer"
+              >
+                <div className="form-container sign-up-container">
+                  <div className="form">
+                    <h1>Create Account</h1>
+                    <span>Use your email for registration</span>
+                    <br />
+                    <div className="infield">
+                      <Input
+                        isRequired
+                        label="First Name"
+                        variant="bordered"
+                        onValueChange={setSignUpFirstName}
+                        onFocus={() => {
+                          setSignUpPasswordHasBeenFocused(false);
+                          setSignUpEmailHasBeenFocused(false);
+                          setSignUpFirstNameHasBeenFocused(true);
+                          setSignUpLastNameHasBeenFocused(false);
+                          setLoginPasswordHasBeenFocused(false);
+                          setLoginEmailHasBeenFocused(false);
+                        }}
+                        isInvalid={
+                          isSignUpFirstNameInvalid && signUpFirstNameHasBeenFocused
+                        }
+                        color={
+                          !signUpFirstNameHasBeenFocused
+                            ? 'primary'
+                            : isSignUpFirstNameInvalid
+                              ? 'danger'
+                              : 'success'
+                        }
+                        errorMessage="Please enter a username"
+                      />
+                    </div>
+                    <div className="infield">
+                      <Input
+                        isRequired
+                        label="Last Name"
+                        variant="bordered"
+                        onValueChange={setSignUpLastName}
+                        onFocus={() => {
+                          setSignUpPasswordHasBeenFocused(false);
+                          setSignUpEmailHasBeenFocused(false);
+                          setSignUpFirstNameHasBeenFocused(false);
+                          setSignUpLastNameHasBeenFocused(true);
+                          setLoginPasswordHasBeenFocused(false);
+                          setLoginEmailHasBeenFocused(false);
+                        }}
+                        isInvalid={
+                          isSignUpLastNameInvalid && signUpLastNameHasBeenFocused
+                        }
+                        color={
+                          !signUpLastNameHasBeenFocused
+                            ? 'primary'
+                            : isSignUpLastNameInvalid
+                              ? 'danger'
+                              : 'success'
+                        }
+                        errorMessage="Please enter a username"
+                      />
+                    </div>
+                    <div className="infield">
+                      <Input
+                        isRequired
+                        label="Email"
+                        variant="bordered"
+                        type="email"
+                        onValueChange={setSignUpEmail}
+                        onFocus={() => {
+                          setSignUpPasswordHasBeenFocused(false);
+                          setSignUpEmailHasBeenFocused(true);
+                          setSignUpFirstNameHasBeenFocused(false);
+                          setSignUpLastNameHasBeenFocused(false);
+                          setLoginPasswordHasBeenFocused(false);
+                          setLoginEmailHasBeenFocused(false);
+                        }}
+                        isInvalid={
+                          isSignUpEmailInvalid && signUpEmailHasBeenFocused
+                        }
+                        color={
+                          !signUpEmailHasBeenFocused
+                            ? 'primary'
+                            : isSignUpEmailInvalid && signUpEmailHasBeenFocused
+                              ? 'danger'
+                              : 'success'
+                        }
+                        errorMessage="Please enter a valid email"
+                      />
+                    </div>
+                    <div className="infield">
+                      <Input
+                        isRequired
+                        label="Password"
+                        variant="bordered"
+                        onValueChange={setSignUpPassword}
+                        onFocus={() => {
+                          setSignUpPasswordHasBeenFocused(true);
+                          setSignUpEmailHasBeenFocused(false);
+                          setSignUpFirstNameHasBeenFocused(false);
+                          setSignUpLastNameHasBeenFocused(false);
+                          setLoginPasswordHasBeenFocused(false);
+                          setLoginEmailHasBeenFocused(false);
+                        }}
+                        isInvalid={
+                          isSignUpPasswordInvalid && signUpPasswordBeenFocused
+                        }
+                        color={
+                          !signUpPasswordBeenFocused
+                            ? 'primary'
+                            : isSignUpPasswordInvalid
+                              ? 'danger'
+                              : 'success'
+                        }
+                        errorMessage="Please enter a password"
+                        endContent={
+                          <button
+                            className="focus:outline-none"
+                            type="button"
+                            id="passwordVisibility"
+                            onClick={toggleVisibility}
+                          >
+                            {isVisible ? (
+                              <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+                            ) : (
+                              <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+                            )}
+                          </button>
+                        }
+                        type={isVisible ? 'text' : 'password'}
+                      />
+                    </div>
+                    <Button
+                      isLoading={loading}
+                      onClick={() => {
+                        signUpUser(
+                          signUpFirstName,
+                          signUpLastName,
+                          signUpEmail,
+                          signUpPassword,
+                        );
 
-                  }}
-                  variant="bordered"
-                  isDisabled={
-                    isSignUpEmailInvalid ||
-                    isSignUpFirstNameInvalid ||
-                    isSignUpLastNameInvalid ||
-                    isSignUpPasswordInvalid
-                  }
-                  spinner={
-                    <svg
-                      className="animate-spin h-5 w-5 text-current"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
+                      }}
+                      variant="bordered"
+                      isDisabled={
+                        isSignUpEmailInvalid ||
+                        isSignUpFirstNameInvalid ||
+                        isSignUpLastNameInvalid ||
+                        isSignUpPasswordInvalid
+                      }
+                      spinner={
+                        <svg
+                          className="animate-spin h-5 w-5 text-current"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          />
+                          <path
+                            className="opacity-75"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            fill="currentColor"
+                          />
+                        </svg>
+                      }
                     >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      />
-                      <path
-                        className="opacity-75"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        fill="currentColor"
-                      />
-                    </svg>
-                  }
-                >
-                  Sign Up
-                </Button>
-              </div>
-            </div>
-            <div className="form-container sign-in-container">
-              <div className="form">
-                <h1>Sign in</h1>
-                <div className="infield">
-                  <Input
-                    isRequired
-                    label="Email"
-                    variant="bordered"
-                    type="email"
-                    onValueChange={setLoginEmail}
-                    onFocus={() => {
-                      setLoginPasswordHasBeenFocused(false);
-                      setLoginEmailHasBeenFocused(true);
-                      setSignUpPasswordHasBeenFocused(false);
-                      setSignUpEmailHasBeenFocused(false);
-                      setSignUpFirstNameHasBeenFocused(false);
-                      setSignUpLastNameHasBeenFocused(false);
-                    }}
-                    isInvalid={isLoginEmailInvalid && loginEmailHasBeenFocused}
-                    color={
-                      !loginEmailHasBeenFocused
-                        ? 'primary'
-                        : isLoginEmailInvalid && loginEmailHasBeenFocused
-                          ? 'danger'
-                          : 'success'
-                    }
-                    errorMessage="Please enter a valid email"
-                  />
+                      Sign Up
+                    </Button>
+                  </div>
                 </div>
-                <div className="infield">
-                  <Input
-                    isRequired
-                    label="Password"
-                    variant="bordered"
-                    onValueChange={setLoginPassword}
-                    onFocus={() => {
-                      setLoginPasswordHasBeenFocused(true);
-                      setLoginEmailHasBeenFocused(false);
-                      setSignUpPasswordHasBeenFocused(false);
-                      setSignUpEmailHasBeenFocused(false);
-                      setSignUpFirstNameHasBeenFocused(false);
-                      setSignUpLastNameHasBeenFocused(false);
-                    }}
-                    isInvalid={
-                      isLoginPasswordInvalid && loginPasswordBeenFocused
-                    }
-                    color={
-                      !loginPasswordBeenFocused
-                        ? 'primary'
-                        : isLoginPasswordInvalid
-                          ? 'danger'
-                          : 'success'
-                    }
-                    errorMessage="Please enter a password"
-                    endContent={
-                      <button
-                        className="focus:outline-none"
-                        type="button"
-                        id="passwordVisibility"
-                        onClick={toggleLoginVisibility}
-                      >
-                        {isLoginVisible ? (
-                          <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
-                        ) : (
-                          <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none" />
-                        )}
-                      </button>
-                    }
-                    type={isLoginVisible ? 'text' : 'password'}
-                  />
-                </div>
+                <div className="form-container sign-in-container">
+                  <div className="form">
+                    <h1>Sign in</h1>
+                    <div className="infield">
+                      <Input
+                        isRequired
+                        label="Email"
+                        variant="bordered"
+                        type="email"
+                        onValueChange={setLoginEmail}
+                        onFocus={() => {
+                          setLoginPasswordHasBeenFocused(false);
+                          setLoginEmailHasBeenFocused(true);
+                          setSignUpPasswordHasBeenFocused(false);
+                          setSignUpEmailHasBeenFocused(false);
+                          setSignUpFirstNameHasBeenFocused(false);
+                          setSignUpLastNameHasBeenFocused(false);
+                        }}
+                        isInvalid={isLoginEmailInvalid && loginEmailHasBeenFocused}
+                        color={
+                          !loginEmailHasBeenFocused
+                            ? 'primary'
+                            : isLoginEmailInvalid && loginEmailHasBeenFocused
+                              ? 'danger'
+                              : 'success'
+                        }
+                        errorMessage="Please enter a valid email"
+                      />
+                    </div>
+                    <div className="infield">
+                      <Input
+                        isRequired
+                        label="Password"
+                        variant="bordered"
+                        onValueChange={setLoginPassword}
+                        onFocus={() => {
+                          setLoginPasswordHasBeenFocused(true);
+                          setLoginEmailHasBeenFocused(false);
+                          setSignUpPasswordHasBeenFocused(false);
+                          setSignUpEmailHasBeenFocused(false);
+                          setSignUpFirstNameHasBeenFocused(false);
+                          setSignUpLastNameHasBeenFocused(false);
+                        }}
+                        isInvalid={
+                          isLoginPasswordInvalid && loginPasswordBeenFocused
+                        }
+                        color={
+                          !loginPasswordBeenFocused
+                            ? 'primary'
+                            : isLoginPasswordInvalid
+                              ? 'danger'
+                              : 'success'
+                        }
+                        errorMessage="Please enter a password"
+                        endContent={
+                          <button
+                            className="focus:outline-none"
+                            type="button"
+                            id="passwordVisibility"
+                            onClick={toggleLoginVisibility}
+                          >
+                            {isLoginVisible ? (
+                              <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+                            ) : (
+                              <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+                            )}
+                          </button>
+                        }
+                        type={isLoginVisible ? 'text' : 'password'}
+                      />
+                    </div>
 
-                <Button
-                  isLoading={loading}
-                  onClick={() => loginUser(loginEmail, loginPassword)}
-                  variant="bordered"
-                  isDisabled={isLoginEmailInvalid || isLoginPasswordInvalid}
-                  spinner={
-                    <svg
-                      className="animate-spin h-5 w-5 text-current"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
+                    <Button
+                      isLoading={loading}
+                      onClick={() => loginUser(loginEmail, loginPassword)}
+                      variant="bordered"
+                      isDisabled={isLoginEmailInvalid || isLoginPasswordInvalid}
+                      spinner={
+                        <svg
+                          className="animate-spin h-5 w-5 text-current"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          />
+                          <path
+                            className="opacity-75"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            fill="currentColor"
+                          />
+                        </svg>
+                      }
                     >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      />
-                      <path
-                        className="opacity-75"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        fill="currentColor"
-                      />
-                    </svg>
-                  }
-                >
-                  Login
-                </Button>
-              </div>
-            </div>
-            <div className="overlay-container" id="overlayCon">
-              <div className="overlay">
-                <div className="overlay-panel overlay-left">
-                  <h1>Welcome Back!</h1>
-                  <p>
-                    To keep connected with us please login with your personal
-                    info
-                  </p>
-                  <Button
-                    color="primary"
-                    onClick={() => changeView()}
-                    variant="bordered"
-                  >
-                    Log in
-                  </Button>
-                  <a id="cancelBTN2">Cancel</a>
+                      Login
+                    </Button>
+                  </div>
                 </div>
-                <div className="overlay-panel overlay-right">
-                  <h1>Hello, Friend!</h1>
-                  <p>
-                    Enter your personal details and start the journey with us
-                  </p>
-                  <Button
-                    color="primary"
-                    onClick={() => changeView()}
-                    variant="bordered"
-                  >
-                    Create an account
-                  </Button>
-                  <a id="cancelBTN" href="">
-                    Cancel
-                  </a>
+                <div className="overlay-container" id="overlayCon">
+                  <div className="overlay">
+                    <div className="overlay-panel overlay-left">
+                      <h1>Welcome Back!</h1>
+                      <p>
+                        To keep connected with us please login with your personal
+                        info
+                      </p>
+                      <Button
+                        color="primary"
+                        onClick={() => changeView()}
+                        variant="bordered"
+                      >
+                        Log in
+                      </Button>
+                      <Spacer/>
+                      <button id="cancelBTN" onClick={onClose}>
+                        Cancel
+                      </button>
+                    </div>
+                    <div className="overlay-panel overlay-right">
+                      <h1>Hello, Friend!</h1>
+                      <p>
+                        Enter your personal details and start the journey with us
+                      </p>
+                      <Button
+                        color="primary"
+                        onClick={() => changeView()}
+                        variant="bordered"
+                      >
+                        Create an account
+                      </Button>
+                      <Spacer/>
+                      <button id="cancelBTN" onClick={onClose}>
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </CardBody>
-      </Card>
+            
+          </ModalBody>
+        </>
+        )}
+      </ModalContent>
+      </Modal>
     </>
   );
 }

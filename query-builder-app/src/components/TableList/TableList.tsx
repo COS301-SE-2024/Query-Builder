@@ -3,28 +3,30 @@
 import { table } from "../../interfaces/intermediateJSON"
 import React, { useState } from "react";
 import TableForm from "../TableForm/TableForm"
-import { Button, Card, CardBody, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spacer } from "@nextui-org/react";
+import { Button, Card, CardBody, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spacer, useDisclosure } from "@nextui-org/react";
 import { createClient } from "./../../utils/supabase/client";
 import { navigateToAuth } from "../../app/authentication/actions";
+import DatabaseCredentialsModal from "../DatabaseCredentialsModal/DatabaseCredentialsModal";
 
 //----------------------------INTERFACES------------------------------------//
 
 interface TableListProps {
     databaseServerID: string,
     databaseName: string,
-    table: table
+    table: table,
+    language: string,
     onChange?: (table: table) => void
 }
 
 interface JoinableTable {
     table_name: string,
     qbee_id: number,
-    REFERENCED_COLUMN_NAME: string,
-    COLUMN_NAME: string,
+    referenced_column_name: string,
+    column_name: string,
     //present in from
-    REFERENCED_TABLE_SCHEMA?: string,
+    referenced_table_schema?: string,
     //present in to
-    TABLE_SCHEMA?: string
+    table_schema?: string
 }
 
 export default function TableList(props: TableListProps) {
@@ -36,6 +38,9 @@ export default function TableList(props: TableListProps) {
 
     //React hook for all the joinable tables in the database
     const [joinableTables, setJoinableTables] = useState<JoinableTable[]>([]);
+
+    //React hook to show the credentials modal
+    const credentialsModalDisclosure = useDisclosure();
 
     //React hook to inform the parent component that the data model has changed
     React.useEffect(() => {
@@ -142,7 +147,8 @@ export default function TableList(props: TableListProps) {
             },
             body: JSON.stringify({
                 databaseServerID: props.databaseServerID,
-                schema: database
+                database: database,
+                language: props.language
             })
         });
         
@@ -162,6 +168,10 @@ export default function TableList(props: TableListProps) {
             if(json.response && json.response.message == 'You do not have a backend session'){
                 navigateToAuth();
             }
+            //or they might have a backend session, but need to reconnect to a new postgres database
+            else if(json.response && json.response.message == 'You do not have saved credentials for this database'){
+                credentialsModalDisclosure.onOpen();
+            }
 
         }
 
@@ -169,6 +179,9 @@ export default function TableList(props: TableListProps) {
 
     //async function to fetch the joinable tables
     async function fetchJoinableTables(database: string, tableName: string) {
+
+        //set the joinable tables hook
+        setJoinableTables([]);
 
         let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/foreign-keys`, {
             credentials: "include",
@@ -180,8 +193,9 @@ export default function TableList(props: TableListProps) {
             },
             body: JSON.stringify({
                 databaseServerID: props.databaseServerID,
-                schema: database,
-                table: tableName
+                database: database,
+                table: tableName,
+                language: props.language
             })
         });
 
@@ -231,15 +245,15 @@ export default function TableList(props: TableListProps) {
             //use the key to search through joinableTables to find the correct column names to match on
             for (let table of joinableTables) {
                 if (table.table_name == key) {
-                    if (table.REFERENCED_TABLE_SCHEMA) {
-                        //from - so COLUMN_NAME is table1MatchingColumnName and REFERENCED_COLUMN_NAME is table2MatchingColumnName
-                        table1MatchingColumnName = table.COLUMN_NAME;
-                        table2MatchingColumnName = table.REFERENCED_COLUMN_NAME;
+                    if (table.referenced_table_schema) {
+                        //from - so column_name is table1MatchingColumnName and referenced_column_name is table2MatchingColumnName
+                        table1MatchingColumnName = table.column_name;
+                        table2MatchingColumnName = table.referenced_column_name;
                     }
                     else {
-                        //to - so REFERENCED_COLUMN_NAME is table1MatchingColumnName and COLUMN_NAME is table2MatchingColumnName
-                        table1MatchingColumnName = table.REFERENCED_COLUMN_NAME;
-                        table2MatchingColumnName = table.COLUMN_NAME;
+                        //to - so referenced_column_name is table1MatchingColumnName and column_name is table2MatchingColumnName
+                        table1MatchingColumnName = table.referenced_column_name;
+                        table2MatchingColumnName = table.column_name;
                     }
                 }
             }
@@ -404,7 +418,13 @@ export default function TableList(props: TableListProps) {
     //add the table for the first (compulsory) table
     tables.push(createTableCard(tableRef));
     //add the TableForm for the first (compulsory) table
-    tableForms.push(<TableForm databaseServerID={props.databaseServerID} table={tableRef} onChange={updateTable} ></TableForm>)
+    tableForms.push(<TableForm
+        databaseServerID={props.databaseServerID}
+        database={props.databaseName}
+        language={props.language}
+        table={tableRef}
+        onChange={updateTable}
+    />);
 
     //iterate over the linked list of joined tables
     while (tableRef.join != null) {
@@ -412,14 +432,22 @@ export default function TableList(props: TableListProps) {
         //add the table for the next table
         tables.push(createTableCard(tableRef));
         //add the TableForm for the next table
-        tableForms.push(<TableForm databaseServerID={props.databaseServerID} table={tableRef} onChange={updateTable} ></TableForm>)
+        tableForms.push(<TableForm
+            databaseServerID={props.databaseServerID}
+            database={props.databaseName}
+            language={props.language}
+            table={tableRef}
+            onChange={updateTable}
+        />);
     }
 
     //----------------------------RENDER THE COMPONENT------------------------------------//
 
     return (
         <>
-            <h2>Select some tables:</h2>
+            <DatabaseCredentialsModal dbServerID={props.databaseServerID} databaseName={props.databaseName} disclosure={credentialsModalDisclosure} onConnected={() => {fetchAllTables(props.databaseName);}}/>
+            <h2>Select some tables: <span style={{ color: 'red' }}>*</span></h2>
+
             <Spacer y={2} />
             <div className="flex space-x-4">
                 {tables}

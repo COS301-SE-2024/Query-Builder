@@ -27,6 +27,7 @@ export default function NaturalLanguage() {
   const [query, setQuery] = useState<Query>();
   const [loading, setLoading] = useState(false);
   const [showError, setShowError] = useState(false);
+  const [isStopped, setIsStopped] = useState(false);
 
   //This is the speech to text hook//
   const {
@@ -34,6 +35,7 @@ export default function NaturalLanguage() {
     interimResult,
     isRecording,
     results,
+    setResults,
     startSpeechToText,
     stopSpeechToText,
   } = useSpeechToText({
@@ -41,9 +43,17 @@ export default function NaturalLanguage() {
     useLegacyResults: false,
   });
 
+  //React hook for the language of the query
+  const [language, setLanguage] = useState('');
+
+  //React hook to get the language upon loading the component
+  React.useEffect(() => {
+    getLanguage();
+  }, []);
+
   useEffect(() => {
     const combinedResults = results
-      .map((result : any) => {
+      .map((result: any) => {
         if (typeof result === 'string') {
           return result;
         } else {
@@ -56,7 +66,11 @@ export default function NaturalLanguage() {
       : combinedResults;
 
     setValue(finalText);
-  }, [interimResult, results]);
+
+    if (!isStopped && !isRecording && finalText) {
+      setResults([]);
+    }
+  }, [interimResult, results, setValue, isStopped]);
 
   if (error) return <p>Web Speech API is not available in this browser 🤷‍</p>;
 
@@ -65,6 +79,31 @@ export default function NaturalLanguage() {
     const token = (await supabase.auth.getSession()).data.session?.access_token;
     return token;
   };
+
+  async function getLanguage() {
+
+    let typeResponse = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/get-db-type`,
+      {
+        credentials: 'include',
+        method: 'PUT',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + (await getToken()),
+        },
+        body: JSON.stringify({
+          db_id: databaseServerID[0],
+        }),
+      },
+    );
+
+    if(typeResponse.ok){
+      const languageType = (await typeResponse.json()).type;
+      setLanguage(languageType);
+    }
+
+  }
 
   async function getQuery() {
     setLoading(true);
@@ -82,6 +121,8 @@ export default function NaturalLanguage() {
         body: JSON.stringify({
           databaseServerID: databaseServerID[0],
           query: value,
+          language: language,
+          llm: 'gemini'
         }),
       },
     );
@@ -105,6 +146,20 @@ export default function NaturalLanguage() {
     setValue(event.target.value);
   };
 
+  const handleStartRecording = () => {
+    setResults(
+      value
+        .split(' ')
+        .map((word) => ({ transcript: word, timestamp: Date.now() })),
+    );
+    startSpeechToText();
+  };
+
+  const handleStopRecording = () => {
+    stopSpeechToText();
+    setIsStopped(true);
+  };
+
   return (
     <Card className="h-[40vh]">
       <CardHeader>Type what you would like to query</CardHeader>
@@ -125,7 +180,7 @@ export default function NaturalLanguage() {
             }}
           />
           <Button
-            onClick={isRecording ? stopSpeechToText : startSpeechToText}
+            onClick={isRecording ? handleStopRecording : handleStartRecording}
             color={isRecording ? 'danger' : 'primary'}
             className="absolute right-10 top-1/2 transform -translate-y-1/2 w-[40px] h-[40px] flex items-center justify-center rounded-full"
           >
@@ -135,7 +190,7 @@ export default function NaturalLanguage() {
       </CardBody>
       <CardFooter>
         <Button
-          isDisabled={value.length <= 1}
+          isDisabled={value.length <= 1 || language == ''}
           isLoading={loading}
           color="primary"
           onPress={() => {
@@ -143,6 +198,29 @@ export default function NaturalLanguage() {
             onOpen();
             setValue('');
           }}
+
+          spinner={
+            <svg
+              className="animate-spin h-5 w-5 text-current"
+              fill="none"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
+              <path
+                className="opacity-75"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                fill="currentColor"
+              />
+            </svg>
+          }
         >
           Query
         </Button>

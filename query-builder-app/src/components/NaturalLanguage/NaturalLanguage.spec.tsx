@@ -41,6 +41,18 @@ vi.mock("./../../utils/supabase/client", () => {
   };
 });
 
+//Mock out the API calls
+global.fetch = vi.fn((url: string, config: any) => {
+
+  if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/get-db-type`){
+    return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({type: 'mysql'}),
+    })
+  }
+
+}) as Mock;
+
 // Mock useParams from Next.js to return a mock databaseServerID
 vi.mock('next/navigation', () => ({
   useParams: () => ({ databaseServerID: 'mock-database-server-id' })
