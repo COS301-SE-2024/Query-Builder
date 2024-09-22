@@ -86,12 +86,29 @@ export default function AddOrganisationModal(props: AddOrganisationModalProps){
               hash: hashCode,
           }) 
         })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.statusCode !== 200 && data.statusCode !== 201) { // Check statusCode after resolving JSON
-            throw new Error(data.response.message || "Failed to join the organization");
+        .then(async (response) => {
+          const data = await response.json();
+    
+          // Check the actual HTTP status code
+          if (!response.ok) {
+            // If status is not 2xx, throw an error
+            throw new Error(data.response?.message || "Failed to join the organization");
           }
+          return data;
+        })
+        .then(() => {
+          // Reload the page after success
+          window.location.reload();
         }),
+        // .then((response) => response.json())
+        // .then((data) => {
+        //   if (data.statusCode !== 200 && data.statusCode !== 201) { // Check statusCode after resolving JSON
+        //     console.log("JOIN ORG RESPONSE EROR" + data.statusCode);
+
+        //     throw new Error(data.response.message || "Failed to join the organization");
+        //   }
+        // })
+        
          {
            loading: 'Joining...',
            success: 'Successfully joined!',
