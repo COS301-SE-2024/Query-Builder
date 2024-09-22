@@ -6,6 +6,7 @@ import { DbMetadataHandlerModule } from '../db-metadata-handler/db-metadata-hand
 import { AppService } from '../app.service';
 import { MyLoggerModule } from '../my-logger/my-logger.module';
 import { Query } from '../interfaces/dto/query.dto';
+import { query } from 'express';
 import { InternalServerErrorException } from '@nestjs/common';
 
 jest.mock('./natural-language.service.ts', () => ({
@@ -46,7 +47,7 @@ describe('NaturalLanguageController', () => {
     jest.spyOn(service, 'open_ai_query').mockResolvedValue({ query: result });
 
     const response = await controller.getSchemaMetadata(
-      { llm: 'openAI', query: 'some query', databaseServerID: 'someID' },
+      { llm: 'openAI', query: 'some query', databaseServerID: 'someID', language: 'mysql' },
       {}
     );
 
@@ -62,7 +63,7 @@ describe('NaturalLanguageController', () => {
     jest.spyOn(service, 'gemini_query').mockResolvedValue({ query: result });
 
     const response = await controller.getSchemaMetadata(
-      { llm: 'gemini', query: 'some query', databaseServerID: 'someID' },
+      { llm: 'gemini', query: 'some query', databaseServerID: 'someID', language: 'mysql' },
       {}
     );
 
@@ -87,7 +88,7 @@ describe('NaturalLanguageController', () => {
       .mockResolvedValue({ query: geminiResult });
 
     const response = await controller.getSchemaMetadata(
-      { databaseServerID: 'someID', query: 'some query' },
+      { databaseServerID: 'someID', query: 'some query', language: 'mysql' },
       {}
     );
 
@@ -109,7 +110,7 @@ describe('NaturalLanguageController', () => {
       .mockResolvedValue({ query: geminiResult });
 
     const response = await controller.getSchemaMetadata(
-      { databaseServerID: 'someID', query: 'some query' },
+      { databaseServerID: 'someID', query: 'some query', language: 'mysql' },
       {}
     );
 
@@ -118,27 +119,27 @@ describe('NaturalLanguageController', () => {
     expect(service.gemini_query).toHaveBeenCalled();
   });
 
-   it('should return openAI query result when gemini query fails', async () => {
-     const openAIResult: Query = {
-       databaseServerID: 'someID',
-       queryParams: {} as any
-     };
-     jest
-       .spyOn(service, 'gemini_query')
-       .mockRejectedValue(new Error('openAI error'));
-     jest
-       .spyOn(service, 'open_ai_query')
-       .mockResolvedValue({ query: openAIResult });
+  it('should return openAI query result when gemini query fails', async () => {
+    const openAIResult: Query = {
+      databaseServerID: 'someID',
+      queryParams: {} as any
+    };
+    jest
+      .spyOn(service, 'gemini_query')
+      .mockRejectedValue(new Error('openAI error'));
+    jest
+      .spyOn(service, 'open_ai_query')
+      .mockResolvedValue({ query: openAIResult });
 
-     const response = await controller.getSchemaMetadata(
-       { databaseServerID: 'someID', query: 'some query' },
-       {}
-     );
+    const response = await controller.getSchemaMetadata(
+      { databaseServerID: 'someID', query: 'some query', language: 'mysql' },
+      {}
+    );
 
-     expect(response).toBe(openAIResult);
-     expect(service.open_ai_query).toHaveBeenCalled();
-     expect(service.gemini_query).toHaveBeenCalled();
-   });
+    expect(response).toBe(openAIResult);
+    expect(service.open_ai_query).toHaveBeenCalled();
+    expect(service.gemini_query).toHaveBeenCalled();
+  });
 
   it('should throw InternalServerErrorException when both queries fail', async () => {
     jest
@@ -150,7 +151,7 @@ describe('NaturalLanguageController', () => {
 
     await expect(
       controller.getSchemaMetadata(
-        { databaseServerID: 'someID', query: 'some query' },
+        { databaseServerID: 'someID', query: 'some query', language: 'mysql' },
         {}
       )
     ).rejects.toThrow(InternalServerErrorException);

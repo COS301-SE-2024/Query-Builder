@@ -1,5 +1,6 @@
 import { Injectable, BadRequestException, Inject } from '@nestjs/common';
 import { Natural_Language_Query_Dto } from './dto/natural-language-query.dto';
+import { ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
 import { GenerativeModel, GoogleGenerativeAI } from '@google/generative-ai';
 import { Query, QueryParams } from '../interfaces/dto/query.dto';
@@ -13,7 +14,9 @@ export class NaturalLanguageService {
   private geminiModel: GenerativeModel;
 
   constructor(
-    @Inject('DbMetadataHandlerService') private readonly dbMetadataHandlerService: DbMetadataHandlerService,
+    @Inject('DbMetadataHandlerService')
+    private readonly dbMetadataHandlerService: DbMetadataHandlerService,
+    private configService: ConfigService
   ) {
     // Inject the OpenAIApi instance
     // Initialize OpenAIApi with the provided API key from the environment
@@ -34,9 +37,9 @@ export class NaturalLanguageService {
       //-----------Fetch DB metadata to inform the LLM of the database server's structure-----------//
       const metadataSummary =
         await this.dbMetadataHandlerService.getServerSummary(
-          { 
+          {
             databaseServerID: naturalLanguageQuery.databaseServerID,
-            language: naturalLanguageQuery.language 
+            language: naturalLanguageQuery.language
           },
           session
         );
@@ -184,7 +187,7 @@ export class NaturalLanguageService {
       //-----------Fetch DB metadata to inform the LLM of the database server's structure-----------//
       const metadataSummary =
         await this.dbMetadataHandlerService.getServerSummary(
-          { 
+          {
             databaseServerID: naturalLanguageQuery.databaseServerID,
             language: naturalLanguageQuery.language
           },

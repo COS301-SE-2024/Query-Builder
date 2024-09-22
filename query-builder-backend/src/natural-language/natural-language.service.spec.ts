@@ -4,8 +4,6 @@ import { ConfigService } from '@nestjs/config';
 import { DbMetadataHandlerModule } from '../db-metadata-handler/db-metadata-handler.module';
 import OpenAI from 'openai';
 import { GenerativeModel, GoogleGenerativeAI } from '@google/generative-ai';
-import { response } from 'express';
-import { stringify } from 'querystring';
 import { AppService } from '../app.service';
 import { DbMetadataHandlerService } from '../db-metadata-handler/db-metadata-handler.service';
 import { MyLoggerModule } from '../my-logger/my-logger.module';
@@ -45,20 +43,28 @@ describe('NaturalLanguageService', () => {
   let service: NaturalLanguageService;
   let openAiService: OpenAI;
   let geminiModel: GenerativeModel;
-  let db_metadata_handler_service: DbMetadataHandlerService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [DbMetadataHandlerModule, MyLoggerModule],
-      providers: [NaturalLanguageService, ConfigService, AppService]
+      imports: [MyLoggerModule],
+      providers: [
+        NaturalLanguageService,
+        ConfigService,
+        AppService,
+        {
+          provide: 'DbMetadataHandlerService',
+          useValue: {
+            getServerSummary(databaseServerID: string, language: string) {
+              return {databaseServerID: '0000'}
+            }
+          }
+        }
+      ]
     }).compile();
 
     service = module.get<NaturalLanguageService>(NaturalLanguageService);
     openAiService = service['openAiService'];
     geminiModel = service['geminiModel'];
-    db_metadata_handler_service = module.get<DbMetadataHandlerService>(
-      DbMetadataHandlerService
-    );
   });
 
   it('should be defined', () => {
@@ -68,7 +74,8 @@ describe('NaturalLanguageService', () => {
   it('should return a valid query object from open_ai_query', async () => {
     const naturalLanguageQuery = {
       databaseServerID: '0000',
-      query: 'Give me all the actors with the first name Nick'
+      query: 'Give me all the actors with the first name Nick',
+      language: 'mysql'
     };
     const session = {};
 
@@ -95,12 +102,6 @@ describe('NaturalLanguageService', () => {
         }
       }
     };
-
-    jest
-      .spyOn(db_metadata_handler_service, 'getSchemaSummary')
-      .mockResolvedValue({
-        databaseServerID: '0000'
-      });
 
     jest.spyOn(openAiService.chat.completions, 'create').mockResolvedValue({
       choices: [
@@ -122,7 +123,8 @@ describe('NaturalLanguageService', () => {
   it('should return a valid query object from gemini_query', async () => {
     const naturalLanguageQuery = {
       databaseServerID: '0000',
-      query: 'Give me country names starting with B'
+      query: 'Give me country names starting with B',
+      language: 'mysql'
     };
     const session = {};
 
@@ -149,12 +151,6 @@ describe('NaturalLanguageService', () => {
         }
       }
     };
-
-    jest
-      .spyOn(db_metadata_handler_service, 'getSchemaSummary')
-      .mockResolvedValue({
-        databaseServerID: '0000'
-      });
 
     jest.spyOn(geminiModel, 'generateContent').mockResolvedValue({
       response: {
@@ -178,7 +174,8 @@ describe('NaturalLanguageService', () => {
 
     const naturalLanguageQuery = {
       databaseServerID: '0000',
-      query: 'Give me all the actors with the first name Nick'
+      query: 'Give me all the actors with the first name Nick',
+      language: 'mysql'
     };
     const session = {};
 
@@ -196,7 +193,8 @@ describe('NaturalLanguageService', () => {
 
     const naturalLanguageQuery = {
       databaseServerID: '0000',
-      query: 'Give me country names starting with B'
+      query: 'Give me country names starting with B',
+      language: 'mysql'
     };
     const session = {};
 
