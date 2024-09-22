@@ -64,7 +64,7 @@ export default function NaturalLanguage() {
     const finalText = interimResult
       ? `${combinedResults} ${interimResult}`
       : combinedResults;
-      
+
     setValue(finalText);
 
     if (!isStopped && !isRecording && finalText) {
@@ -147,9 +147,13 @@ export default function NaturalLanguage() {
   };
 
   const handleStartRecording = () => {
-    setResults(value.split(' ').map((word) => ({ transcript: word, timestamp: Date.now() })));
+    setResults(
+      value
+        .split(' ')
+        .map((word) => ({ transcript: word, timestamp: Date.now() })),
+    );
     startSpeechToText();
-  }
+  };
 
   const handleStopRecording = () => {
     stopSpeechToText();
