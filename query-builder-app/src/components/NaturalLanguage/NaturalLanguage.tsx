@@ -41,6 +41,14 @@ export default function NaturalLanguage() {
     useLegacyResults: false,
   });
 
+  //React hook for the language of the query
+  const [language, setLanguage] = useState('');
+
+  //React hook to get the language upon loading the component
+  React.useEffect(() => {
+    getLanguage();
+  }, []);
+
   useEffect(() => {
     const combinedResults = results
       .map((result : any) => {
@@ -66,6 +74,31 @@ export default function NaturalLanguage() {
     return token;
   };
 
+  async function getLanguage() {
+
+    let typeResponse = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/get-db-type`,
+      {
+        credentials: 'include',
+        method: 'PUT',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + (await getToken()),
+        },
+        body: JSON.stringify({
+          db_id: databaseServerID[0],
+        }),
+      },
+    );
+
+    if(typeResponse.ok){
+      const languageType = (await typeResponse.json()).type;
+      setLanguage(languageType);
+    }
+
+  }
+
   async function getQuery() {
     setLoading(true);
 
@@ -82,6 +115,8 @@ export default function NaturalLanguage() {
         body: JSON.stringify({
           databaseServerID: databaseServerID[0],
           query: value,
+          language: language,
+          llm: 'gemini'
         }),
       },
     );
@@ -135,7 +170,7 @@ export default function NaturalLanguage() {
       </CardBody>
       <CardFooter>
         <Button
-          isDisabled={value.length <= 1}
+          isDisabled={value.length <= 1 || language == ''}
           isLoading={loading}
           color="primary"
           onPress={() => {
