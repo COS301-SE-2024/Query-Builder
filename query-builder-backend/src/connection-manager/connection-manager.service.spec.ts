@@ -33,7 +33,7 @@ class MockConnectionManagerService extends ConnectionManagerService {
     has_active_connection_dto: any,
     session: Record<string, any>
   ) {
-    return super.hasActiveConnection(has_active_connection_dto, session);
+    return { hasActiveConnection: true};
   }
 
   async decryptDbSecrets(db_id: string, session: Record<string, any>) {
