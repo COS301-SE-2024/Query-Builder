@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadGatewayException, Injectable, UnauthorizedException } from '@nestjs/common';
 import {
   ConnectionManagerService,
   ConnectionStatus
@@ -92,7 +92,27 @@ export class PostgresConnectionManagerService extends ConnectionManagerService {
         database: databaseName
       });
 
-      await postgresClient.connect();
+      //try connect to the postgres database
+      try{
+        await postgresClient.connect();
+      }
+      //something went wrong with the connection
+      catch(e){
+        if(e.code === '28P01'){
+          throw new UnauthorizedException(
+            'Please ensure that your database credentials are correct.'
+          );
+        }
+        else if(e.code === 'ECONNREFUSED'){
+          throw new BadGatewayException(
+            'Could not connect to the database - has your database admin added it correctly?'
+          );
+        }
+        else{
+          throw e;
+        }
+      }
+
       session.host = host;
       session.port = port;
       session.databaseName = databaseName;
