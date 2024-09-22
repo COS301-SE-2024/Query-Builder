@@ -5,7 +5,7 @@ import { Button } from "@nextui-org/react";
 import React, { useEffect, useRef } from 'react';
 import {LogoIcon} from "../../images/Logo";
 import Link from "next/link";
-import Authentication from '@/components/Authentication/Authentication';
+import Authentication from '../Authentication/Authentication';
 
 interface ConsoleTextProps {
     words: string[];
