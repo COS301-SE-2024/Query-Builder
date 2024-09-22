@@ -71,7 +71,7 @@ const Sidebar = () => {
                         </a>
                     </div>
                     <div className="sidebar-item">
-                        <Link href="/authentication" /*className="logoutButton"*/ data-testid="logoutNav">
+                        <Link href="/authentication" className="logoutButton" data-testid="logoutNav">
                             <Button
                                  
                                 variant="solid" 
