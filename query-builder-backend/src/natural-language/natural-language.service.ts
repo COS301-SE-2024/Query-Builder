@@ -1,6 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Natural_Language_Query_Dto } from './dto/natural-language-query.dto';
-import { ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
 import { GenerativeModel, GoogleGenerativeAI } from '@google/generative-ai';
 import { Query } from '../interfaces/dto/query.dto';
@@ -12,8 +11,7 @@ export class NaturalLanguageService {
   private geminiModel: GenerativeModel;
 
   constructor(
-    private readonly dbMetadataHandlerService: DbMetadataHandlerService,
-    private configService: ConfigService
+    @Inject('DbMetadataHandlerService') private readonly dbMetadataHandlerService: DbMetadataHandlerService,
   ) {
     // Inject the OpenAIApi instance
     // Initialize OpenAIApi with the provided API key from the environment
@@ -34,8 +32,11 @@ export class NaturalLanguageService {
 
       //-----------Fetch DB metadata to inform the LLM of the database server's structure-----------//
       const metadataSummary =
-        await this.dbMetadataHandlerService.getSchemaSummary(
-          { databaseServerID: naturalLanguageQuery.databaseServerID },
+        await this.dbMetadataHandlerService.getServerSummary(
+          { 
+            databaseServerID: naturalLanguageQuery.databaseServerID,
+            language: naturalLanguageQuery.language 
+          },
           session
         );
       const metadataSummaryString = JSON.stringify(metadataSummary);
@@ -157,8 +158,11 @@ export class NaturalLanguageService {
     } else {
       //-----------Fetch DB metadata to inform the LLM of the database server's structure-----------//
       const metadataSummary =
-        await this.dbMetadataHandlerService.getSchemaSummary(
-          { databaseServerID: naturalLanguageQuery.databaseServerID },
+        await this.dbMetadataHandlerService.getServerSummary(
+          { 
+            databaseServerID: naturalLanguageQuery.databaseServerID,
+            language: naturalLanguageQuery.language
+          },
           session
         );
       const metadataSummaryString = JSON.stringify(metadataSummary);
