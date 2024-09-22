@@ -3,9 +3,10 @@
 import { table } from "../../interfaces/intermediateJSON"
 import React, { useState } from "react";
 import TableForm from "../TableForm/TableForm"
-import { Button, Card, CardBody, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spacer } from "@nextui-org/react";
+import { Button, Card, CardBody, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spacer, useDisclosure } from "@nextui-org/react";
 import { createClient } from "./../../utils/supabase/client";
 import { navigateToAuth } from "../../app/authentication/actions";
+import DatabaseCredentialsModal from "../DatabaseCredentialsModal/DatabaseCredentialsModal";
 
 //----------------------------INTERFACES------------------------------------//
 
@@ -37,6 +38,9 @@ export default function TableList(props: TableListProps) {
 
     //React hook for all the joinable tables in the database
     const [joinableTables, setJoinableTables] = useState<JoinableTable[]>([]);
+
+    //React hook to show the credentials modal
+    const credentialsModalDisclosure = useDisclosure();
 
     //React hook to inform the parent component that the data model has changed
     React.useEffect(() => {
@@ -163,6 +167,10 @@ export default function TableList(props: TableListProps) {
         
             if(json.response && json.response.message == 'You do not have a backend session'){
                 navigateToAuth();
+            }
+            //or they might have a backend session, but need to reconnect to a new postgres database
+            else if(json.response && json.response.message == 'You do not have saved credentials for this database'){
+                credentialsModalDisclosure.onOpen();
             }
 
         }
@@ -437,6 +445,7 @@ export default function TableList(props: TableListProps) {
 
     return (
         <>
+            <DatabaseCredentialsModal dbServerID={props.databaseServerID} databaseName={props.databaseName} disclosure={credentialsModalDisclosure} onConnected={() => {fetchAllTables(props.databaseName);}}/>
             <h2>Select some tables:</h2>
             <Spacer y={2} />
             <div className="flex space-x-4">

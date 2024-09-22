@@ -15,6 +15,7 @@ require("dotenv").config();
 
 interface DatabaseCredentialsModalProps {
   dbServerID: string
+  databaseName?: string,
   disclosure: any
   onConnected: () => void
 }
@@ -66,6 +67,7 @@ export default function DatabaseCredentialsModal(props: DatabaseCredentialsModal
         },
         body: JSON.stringify({
             databaseServerID: props.dbServerID,
+            databaseName: props.databaseName,
             databaseServerCredentials: {
               username: user,
               password: password
@@ -113,7 +115,7 @@ export default function DatabaseCredentialsModal(props: DatabaseCredentialsModal
 
         }
 
-        navigateToForm(props.dbServerID);
+        props.onConnected();
 
       }
       //if the connection was not successful, display an appropriate error message

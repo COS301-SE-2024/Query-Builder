@@ -1,13 +1,48 @@
-import { BadGatewayException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadGatewayException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import {
   ConnectionManagerService,
   ConnectionStatus
 } from '../connection-manager.service';
 import { Client } from 'pg';
 import { Connect_Dto } from '../dto/connect.dto';
+import { Has_Active_Connection_Dto } from '../dto/has-active-connection.dto';
 
 @Injectable()
 export class PostgresConnectionManagerService extends ConnectionManagerService {
+
+  //service to determine whether the user has an active connection to the database server
+  async hasActiveConnection(
+    has_active_connection_dto: Has_Active_Connection_Dto,
+    session: Record<string, any>
+  ) {
+    const { data: db_data, error: error } = await this.supabase
+      .getClient()
+      .from('db_envs')
+      .select('host, port')
+      .eq('db_id', has_active_connection_dto.databaseServerID)
+      .single();
+
+    if (error) {
+      this.logger.error(error, ConnectionManagerService.name);
+      throw error;
+    }
+
+    if (!db_data) {
+      throw new UnauthorizedException(
+        'You do not have access to this database'
+      );
+    }
+
+    let host = db_data.host;
+    let port = db_data.port;
+
+    if (session.host === host && session.port === port && session.databaseName && session.databaseName === has_active_connection_dto.databaseName) {
+      return { hasActiveConnection: true };
+    } else {
+      return { hasActiveConnection: false };
+    }
+  }
+
   async connectToDatabase(
     connect_dto: Connect_Dto,
     session: Record<string, any>
@@ -72,15 +107,17 @@ export class PostgresConnectionManagerService extends ConnectionManagerService {
         user = connect_dto.databaseServerCredentials.username;
         password = connect_dto.databaseServerCredentials.password;
       }
-      //Otherwise, try find and decrypt saved credentials for the database
-      else {
+      //Otherwise, try find and decrypt saved credentials for the database, if there are saved credentials
+      else{
         try {
           let { user: decryptedUser, password: decryptedPassword } =
             await this.decryptDbSecrets(connect_dto.databaseServerID, session);
           user = decryptedUser;
           password = decryptedPassword;
         } catch (err) {
-          throw err;
+          //Otherwise the only option is to re-ask the user for their credentials
+          //so they can open a connection to this specific database
+          throw new InternalServerErrorException('You do not have saved credentials for this database');
         }
       }
 
