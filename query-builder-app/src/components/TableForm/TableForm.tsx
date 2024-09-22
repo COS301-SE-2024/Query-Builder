@@ -7,7 +7,9 @@ import { navigateToAuth } from "../../app/authentication/actions";
 
 interface TableFormProps {
     databaseServerID: string,
+    database: string,
     table: table,
+    language: string
     onChange?: (table: table) => void
 }
 
@@ -62,15 +64,15 @@ export default function TableForm(props: TableFormProps){
             },
             body: JSON.stringify({
                 databaseServerID: props.databaseServerID,
-                schema: "sakila",
-                table: table.name
+                database: props.database,
+                table: table.name,
+                language: props.language
             })
         });
 
         if (!response || typeof response.json !== 'function') {
             return;
         }
-
 
         let json = await response.json();
 

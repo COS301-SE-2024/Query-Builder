@@ -8,13 +8,49 @@ import {
   ConnectionStatus
 } from '../connection-manager.service';
 import { Connect_Dto } from '../dto/connect.dto';
+import { Has_Active_Connection_Dto } from '../dto/has-active-connection.dto';
 
 @Injectable()
 export class MySqlConnectionManagerService extends ConnectionManagerService {
+
+  //service to determine whether the user has an active connection to the database server
+  async hasActiveConnection(
+    has_active_connection_dto: Has_Active_Connection_Dto,
+    session: Record<string, any>
+  ) {
+    const { data: db_data, error: error } = await this.supabase
+      .getClient()
+      .from('db_envs')
+      .select('host, port')
+      .eq('db_id', has_active_connection_dto.databaseServerID)
+      .single();
+
+    if (error) {
+      this.logger.error(error, ConnectionManagerService.name);
+      throw error;
+    }
+
+    if (!db_data) {
+      throw new UnauthorizedException(
+        'You do not have access to this database'
+      );
+    }
+
+    let host = db_data.host;
+    let port = db_data.port;
+
+    if (session.host === host && session.port === port) {
+      return { hasActiveConnection: true };
+    } else {
+      return { hasActiveConnection: false };
+    }
+  }
+  
   async connectToDatabase(
     connect_dto: Connect_Dto,
     session: Record<string, any>
   ): Promise<ConnectionStatus> {
+
     const { data: user_data, error: user_error } = await this.supabase
       .getClient()
       .auth.getUser(this.supabase.getJwt());
@@ -28,7 +64,7 @@ export class MySqlConnectionManagerService extends ConnectionManagerService {
       .eq('db_id', connect_dto.databaseServerID)
       .single();
     if (error) {
-      this.logger.error(error, ConnectionManagerService.name);
+      this.logger.error(error, MySqlConnectionManagerService.name);
       throw error;
     }
     if (!db_data) {
@@ -43,7 +79,7 @@ export class MySqlConnectionManagerService extends ConnectionManagerService {
       //Print out that you are reconnecting to an existing session and not a new one
       this.logger.log(
         `[Reconnecting] ${session.id} connected to ${host}:${port}`,
-        ConnectionManagerService.name
+        MySqlConnectionManagerService.name
       );
       return {
         success: true,
@@ -57,7 +93,7 @@ export class MySqlConnectionManagerService extends ConnectionManagerService {
         this.sessionStore.remove(session.id);
         this.logger.log(
           `[Connection Disconnected] ${session.id}`,
-          ConnectionManagerService.name
+          MySqlConnectionManagerService.name
         );
         session.host = undefined;
         session.port = undefined;
@@ -89,7 +125,7 @@ export class MySqlConnectionManagerService extends ConnectionManagerService {
         connection.connect((err) => {
           //if there is an error with the connection, reject
           if (err) {
-            this.logger.error(err, ConnectionManagerService.name);
+            this.logger.error(err, MySqlConnectionManagerService.name);
             if (
               err.code == 'ER_ACCESS_DENIED_ERROR' ||
               err.code == 'ER_NOT_SUPPORTED_AUTH_MODE'
@@ -116,7 +152,7 @@ export class MySqlConnectionManagerService extends ConnectionManagerService {
             });
             this.logger.log(
               `[Inital Connection] ${session.id} connected to ${host}:${port}`,
-              ConnectionManagerService.name
+              MySqlConnectionManagerService.name
             );
             resolve({
               success: true,

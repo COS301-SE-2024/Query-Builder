@@ -35,37 +35,10 @@ export abstract class ConnectionManagerService {
   ): Promise<ConnectionStatus>;
 
   //service to determine whether the user has an active connection to the database server
-  async hasActiveConnection(
+  abstract hasActiveConnection(
     has_active_connection_dto: Has_Active_Connection_Dto,
     session: Record<string, any>
-  ) {
-    const { data: db_data, error: error } = await this.supabase
-      .getClient()
-      .from('db_envs')
-      .select('host, port')
-      .eq('db_id', has_active_connection_dto.databaseServerID)
-      .single();
-
-    if (error) {
-      this.logger.error(error, ConnectionManagerService.name);
-      throw error;
-    }
-
-    if (!db_data) {
-      throw new UnauthorizedException(
-        'You do not have access to this database'
-      );
-    }
-
-    let host = db_data.host;
-    let port = db_data.port;
-
-    if (session.host === host && session.port === port) {
-      return { hasActiveConnection: true };
-    } else {
-      return { hasActiveConnection: false };
-    }
-  }
+  );
 
   async decryptDbSecrets(db_id: string, session: Record<string, any>) {
     //Get the user

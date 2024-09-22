@@ -15,6 +15,7 @@ require("dotenv").config();
 
 interface DatabaseCredentialsModalProps {
   dbServerID: string
+  databaseName?: string,
   disclosure: any
   onConnected: () => void
 }
@@ -45,13 +46,6 @@ export default function DatabaseCredentialsModal(props: DatabaseCredentialsModal
     const [usernameHasBeenFocused, setUsernameHasBeenFocused] = useState(false);
     const [passwordBeenFocused, setPasswordHasBeenFocused] = useState(false);
 
-    //form validation
-    const isPasswordInvalid = React.useMemo(() => {
-      if (password === "") return true;
-  
-      return false;
-    }, [password]);
-
     const isUsernameInvalid = React.useMemo(() => {
       if (username === "") return true;
   
@@ -73,6 +67,7 @@ export default function DatabaseCredentialsModal(props: DatabaseCredentialsModal
         },
         body: JSON.stringify({
             databaseServerID: props.dbServerID,
+            databaseName: props.databaseName,
             databaseServerCredentials: {
               username: user,
               password: password
@@ -120,7 +115,7 @@ export default function DatabaseCredentialsModal(props: DatabaseCredentialsModal
 
         }
 
-        navigateToForm(props.dbServerID);
+        props.onConnected();
 
       }
       //if the connection was not successful, display an appropriate error message
@@ -165,8 +160,7 @@ export default function DatabaseCredentialsModal(props: DatabaseCredentialsModal
                     variant="bordered"
                     onValueChange={setPassword}
                     onFocus={() => setPasswordHasBeenFocused(true)}
-                    isInvalid={isPasswordInvalid && passwordBeenFocused}
-                    color={!passwordBeenFocused ? "primary" : isPasswordInvalid ? "danger" : "success"}
+                    color={!passwordBeenFocused ? "primary" : "success"}
                     errorMessage="Please enter a password"
                     endContent={
                       <button 
@@ -198,7 +192,7 @@ export default function DatabaseCredentialsModal(props: DatabaseCredentialsModal
                     color="primary" 
                     onPress={onClose}  
                     onClick={() => {connectToDatabaseServer(username, password)}}
-                    isDisabled={isUsernameInvalid || isPasswordInvalid}
+                    isDisabled={isUsernameInvalid}
                     >
                     Connect
                   </Button>
