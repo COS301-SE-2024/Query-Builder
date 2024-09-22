@@ -46,7 +46,6 @@ export default function NaturalLanguage() {
   useEffect(() => {
     const combinedResults = results
       .map((result: any) => {
-      .map((result: any) => {
         if (typeof result === 'string') {
           return result;
         } else {
