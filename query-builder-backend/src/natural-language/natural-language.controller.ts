@@ -67,7 +67,7 @@ export class NaturalLanguageController {
 
       if (open_ai_result.query && gemini_result.query) {
         // this.my_logger.log('Both queries returned a query');
-        return open_ai_result.query; // or gemini_result.query, based on your preference
+        return gemini_result.query; // or gemini_result.query, based on your preference
       } else if (open_ai_result?.query) {
         // this.my_logger.log('Only openAI query returned a query');
         return open_ai_result.query;

@@ -53,11 +53,9 @@ export class NaturalLanguageService {
         '\n\n';
 
       prompt +=
-        'Return only the object not in a code block without any comments or other text. Language should be sql and query type should be select \n\n';
+        'Return only the object not in a code block without any comments or other text.\n\n';
 
       prompt += `export interface QueryParams {
-                            language: string,
-                            query_type: string,
                             databaseName: string,
                             table: table,
                             condition?: condition,
@@ -162,6 +160,9 @@ export class NaturalLanguageService {
         });
       }
 
+      jsonResponse.language = naturalLanguageQuery.language;
+      jsonResponse.query_type = 'select';
+
       await this.validate_QueryParams_DTO(jsonResponse);
 
       //--------------------Send the JSON intermediate form to the QueryHandler--------------------//
@@ -203,11 +204,9 @@ export class NaturalLanguageService {
         '\n\n';
 
       prompt +=
-        'Return only the object not in a code block without any comments or other text. Language should be sql and query type should be select \n\n';
+        'Return only the object not in a code block without any comments or other text.\n\n';
 
       prompt += `export interface QueryParams {
-                            language: string,
-                            query_type: string,
                             databaseName: string,
                             table: table,
                             condition?: condition,
@@ -422,6 +421,9 @@ export class NaturalLanguageService {
           message: 'Invalid JSON format'
         });
       }
+
+      jsonResponse.language = naturalLanguageQuery.language;
+      jsonResponse.query_type = 'select';
 
       await this.validate_QueryParams_DTO(jsonResponse);
 
