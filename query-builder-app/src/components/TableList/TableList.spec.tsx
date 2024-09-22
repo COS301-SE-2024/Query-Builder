@@ -36,7 +36,7 @@ global.fetch = vi.fn((url: string, config: any) => {
     else if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/foreign-keys`){
         return Promise.resolve({
             ok: true,
-            json: () => Promise.resolve([{table_name: "payments", qbee_id: 1, REFERENCED_COLUMN_NAME: "id", COLUMN_NAME: "user_id", TABLE_SCHEMA: "sakila"}]),
+            json: () => Promise.resolve([{table_name: "payments", qbee_id: 1, referenced_column_name: "id", column_name: "user_id", table_schema: "sakila"}]),
         })
     }
     else if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/fields`){
@@ -58,7 +58,7 @@ describe('TableList basic rendering tests', () => {
           columns: []
       }
   
-      const { baseElement } = render(<TableList databaseServerID="1234" databaseName="sakila" table={tableProp} />);
+      const { baseElement } = render(<TableList language='mysql' databaseServerID="1234" databaseName="sakila" table={tableProp} />);
       expect(baseElement).toBeTruthy();
   
     });
@@ -85,7 +85,7 @@ describe('TableList table selection tests', () => {
         const user = userEvent.setup();
     
         //render the TableList
-        render(<TableList databaseServerID="1234" databaseName="sakila" table={tableProp} onChange={updateTable} />);
+        render(<TableList language='mysql' databaseServerID="1234" databaseName="sakila" table={tableProp} onChange={updateTable} />);
 
         //get the add button
         //make sure to wait for it to load once joinable tables are fetched from the API

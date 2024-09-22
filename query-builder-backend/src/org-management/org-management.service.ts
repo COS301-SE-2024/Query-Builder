@@ -29,6 +29,7 @@ import { Join_Org_Dto } from './dto/join-org.dto';
 import { Create_Hash_Dto } from './dto/create-hash.dto';
 import * as crypto from 'crypto';
 import { Has_Saved_Db_Creds_Dto } from './dto/has-saved-db-creds.dto';
+import { Get_Db_Type_Dto } from './dto/get-db-type.dto';
 
 @Injectable()
 export class OrgManagementService {
@@ -259,6 +260,26 @@ export class OrgManagementService {
 
       return { data };
     }
+  }
+
+  async getDbType(get_db_type_dto: Get_Db_Type_Dto){
+
+    const { data, error } = await this.supabase
+    .getClient()
+    .from('db_envs')
+    .select('type')
+    .match({ ...get_db_type_dto })
+    .single();
+
+    if (error) {
+      throw error;
+    }
+    if (!data || !data.type) {
+      throw new NotFoundException('Database not found');
+    }
+
+    return {type: data.type};
+
   }
 
   async getOrgHash(create_hash_dto: Create_Hash_Dto) {

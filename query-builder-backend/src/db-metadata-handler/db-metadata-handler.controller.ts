@@ -1,54 +1,34 @@
-import { Body, Controller, Put, Session } from '@nestjs/common';
+import { Body, Controller, Inject, Put, Session, ValidationPipe } from '@nestjs/common';
 import { DbMetadataHandlerService } from './db-metadata-handler.service';
-
-interface SchemaQuery {
-    databaseServerID: string
-}
-
-interface TableQuery {
-    databaseServerID: string,
-    schema: string;
-}
-
-interface FieldQuery {
-    databaseServerID: string,
-    schema: string;
-    table: string;
-}
-
-interface ForeignKeyQuery {
-    databaseServerID: string,
-    schema: string;
-    table: string;
-}
+import { Database_Metadata_Dto, Field_Metadata_Dto, Foreign_Key_Metadata_Dto, Server_Summary_Metadata_Dto, Table_Metadata_Dto } from './dto/metadata.dto';
 
 @Controller('metadata')
 export class DbMetadataHandlerController {
 
-    constructor(private readonly dbMetadataHandlerService: DbMetadataHandlerService) {}
+    constructor(@Inject('DbMetadataHandlerService') private readonly dbMetadataHandlerService: DbMetadataHandlerService) {}
 
-    @Put("schemas")
-    async getSchemaMetadata(@Body() schemaQuery: SchemaQuery, @Session() session: Record<string, any>) {
-        return this.dbMetadataHandlerService.getSchemaMetadata(schemaQuery, session);
+    @Put("databases")
+    async getSchemaMetadata(@Body(ValidationPipe) databaseMetadataDto: Database_Metadata_Dto, @Session() session: Record<string, any>) {
+        return this.dbMetadataHandlerService.getDatabaseMetadata(databaseMetadataDto, session);
     }
 
     @Put("tables")
-    async getTableMetadata(@Body() tableQuery: TableQuery, @Session() session: Record<string, any>) {
-        return this.dbMetadataHandlerService.getTableMetadata(tableQuery, session);
+    async getTableMetadata(@Body(ValidationPipe) tableMetadataDto: Table_Metadata_Dto, @Session() session: Record<string, any>) {
+        return this.dbMetadataHandlerService.getTableMetadata(tableMetadataDto, session);
     }
 
     @Put("fields")
-    async getFieldMetadata(@Body() fieldQuery: FieldQuery, @Session() session: Record<string, any>){
-        return this.dbMetadataHandlerService.getFieldMetadata(fieldQuery, session);
+    async getFieldMetadata(@Body(ValidationPipe) fieldMetadataDto: Field_Metadata_Dto, @Session() session: Record<string, any>){
+        return this.dbMetadataHandlerService.getFieldMetadata(fieldMetadataDto, session);
     }
 
     @Put("foreign-keys")
-    async getForeignKeyMetadata(@Body() foreignKeyQuery: ForeignKeyQuery, @Session() session: Record<string, any>){
-        return this.dbMetadataHandlerService.getForeignKeyMetadata(foreignKeyQuery, session);
+    async getForeignKeyMetadata(@Body(ValidationPipe) foreignKeyMetadataDto: Foreign_Key_Metadata_Dto, @Session() session: Record<string, any>){
+        return this.dbMetadataHandlerService.getForeignKeyMetadata(foreignKeyMetadataDto, session);
     }
 
     @Put("summary")
-    async getSchemaSummary(@Body() schemaQuery: SchemaQuery, @Session() session: Record<string, any>){
-        return this.dbMetadataHandlerService.getSchemaSummary(schemaQuery, session);
+    async getSchemaSummary(@Body(ValidationPipe) serverSummaryMetadataDto: Server_Summary_Metadata_Dto, @Session() session: Record<string, any>){
+        return this.dbMetadataHandlerService.getServerSummary(serverSummaryMetadataDto, session);
     }
 }

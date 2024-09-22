@@ -41,19 +41,6 @@ jest.mock('@google/generative-ai', () => {
   };
 });
 
-jest.mock('../db-metadata-handler/db-metadata-handler.service', () => {
-  return {
-    DbMetadataHandlerService: jest.fn().mockImplementation(() => {
-      return {
-        getSchemaSummary: jest.fn().mockResolvedValue({
-          // mocked value for getSchemaSummary
-          databaseServerID: '0000'
-        })
-      };
-    })
-  };
-});
-
 describe('NaturalLanguageService', () => {
   let service: NaturalLanguageService;
   let openAiService: OpenAI;

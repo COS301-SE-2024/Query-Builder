@@ -1,4 +1,4 @@
-import {Body, Controller, Post, Put, Session, ValidationPipe} from '@nestjs/common';
+import {Body, Controller, Inject, Post, Put, Session, ValidationPipe} from '@nestjs/common';
 import { ConnectionManagerService } from "../connection-manager/connection-manager.service";
 import { Connect_Dto } from './dto/connect.dto';
 import { Has_Active_Connection_Dto } from './dto/has-active-connection.dto';
@@ -6,7 +6,7 @@ import { Has_Active_Connection_Dto } from './dto/has-active-connection.dto';
 @Controller()
 export class ConnectionManagerController {
 
-    constructor(private readonly connectionManagerService: ConnectionManagerService) {}
+    constructor(@Inject('ConnectionManagerService') private readonly connectionManagerService: ConnectionManagerService) {}
 
     //end point to test connection to the database server
     @Put('connect')
