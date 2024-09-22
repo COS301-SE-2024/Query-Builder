@@ -14,6 +14,7 @@ import { Transform, Type } from 'class-transformer';
 import { InternalServerErrorException } from '@nestjs/common';
 // import { LogicalOperator, ComparisonOperator, AggregateFunction } from "../intermediateJSON.dto";
 
+
 export enum AggregateFunction {
   COUNT = 'COUNT',
   SUM = 'SUM',

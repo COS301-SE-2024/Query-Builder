@@ -27,6 +27,7 @@ export default function NaturalLanguage() {
   const [query, setQuery] = useState<Query>();
   const [loading, setLoading] = useState(false);
   const [showError, setShowError] = useState(false);
+  const [isStopped, setIsStopped] = useState(false);
 
   //This is the speech to text hook//
   const {
@@ -34,6 +35,7 @@ export default function NaturalLanguage() {
     interimResult,
     isRecording,
     results,
+    setResults,
     startSpeechToText,
     stopSpeechToText,
   } = useSpeechToText({
@@ -64,7 +66,11 @@ export default function NaturalLanguage() {
       : combinedResults;
 
     setValue(finalText);
-  }, [interimResult, results]);
+
+    if (!isStopped && !isRecording && finalText) {
+      setResults([]);
+    }
+  }, [interimResult, results, setValue, isStopped]);
 
   if (error) return <p>Web Speech API is not available in this browser 🤷‍</p>;
 
@@ -140,6 +146,20 @@ export default function NaturalLanguage() {
     setValue(event.target.value);
   };
 
+  const handleStartRecording = () => {
+    setResults(
+      value
+        .split(' ')
+        .map((word) => ({ transcript: word, timestamp: Date.now() })),
+    );
+    startSpeechToText();
+  };
+
+  const handleStopRecording = () => {
+    stopSpeechToText();
+    setIsStopped(true);
+  };
+
   return (
     <Card className="h-[40vh]">
       <CardHeader>Type what you would like to query</CardHeader>
@@ -160,7 +180,7 @@ export default function NaturalLanguage() {
             }}
           />
           <Button
-            onClick={isRecording ? stopSpeechToText : startSpeechToText}
+            onClick={isRecording ? handleStopRecording : handleStartRecording}
             color={isRecording ? 'danger' : 'primary'}
             className="absolute right-10 top-1/2 transform -translate-y-1/2 w-[40px] h-[40px] flex items-center justify-center rounded-full"
           >
