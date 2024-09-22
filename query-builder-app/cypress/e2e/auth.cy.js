@@ -5,6 +5,7 @@ describe('Authentication component', () => {
   beforeEach(() => {
     cy.viewport(1920, 1080);
     cy.visit('/');
+    cy.contains('Get Started').click();
   });
 
   it('should render sign up form', () => {

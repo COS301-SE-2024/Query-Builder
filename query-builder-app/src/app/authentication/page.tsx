@@ -1,5 +1,5 @@
 'use client';
-import LandingPage from '@/components/LandingPage/LandingPage';
+import LandingPage from '@/components/LandingPage/StartPage';
 import { Toaster } from 'react-hot-toast';
 
 export default function Auth() {

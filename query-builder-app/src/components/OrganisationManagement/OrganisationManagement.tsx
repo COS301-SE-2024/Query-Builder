@@ -402,8 +402,8 @@ export default function OrganisationManagement() {
             <div className="infield flex justify-center relative pb-4"  >
               <Image
                 className="orgLogo rounded-full"
-                width={200}
-                height={100}
+                // width={200}
+                height={200}
                 data-testid="updateOrgLogo"
                 alt="Organisation Logo"
                 src={profilePicURL}
@@ -752,8 +752,8 @@ export default function OrganisationManagement() {
           <div className="organisationHeader m-auto mt-0 mb-0 flex flex-col justify-center content-center ">
             <Image
               className="orgLogo md:rounded-1"
-              width={200}
-              height={100}
+              // width={200}
+              height={200}
               data-testid="OrganisationLogoImage"
               alt="Organisation Logo"
               src={profilePicURL}
