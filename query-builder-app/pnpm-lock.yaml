@@ -15953,6 +15953,10 @@ snapshots:
 
   ts-interface-checker@0.1.13: {}
 
+  ts-dedent@2.2.0: {}
+
+  ts-interface-checker@0.1.13: {}
+
   ts-pnp@1.2.0(typescript@5.6.2):
     dependencies:
       typescript: 5.6.2
@@ -16280,6 +16284,9 @@ snapshots:
       glob-to-regexp: 0.4.1
       graceful-fs: 4.2.11
 
+  webidl-conversions@3.0.1: {}
+
+  webidl-conversions@7.0.0: {}
   webidl-conversions@3.0.1: {}
 
   webidl-conversions@7.0.0: {}
