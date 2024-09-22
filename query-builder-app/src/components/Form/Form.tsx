@@ -21,6 +21,7 @@ import {
   Modal,
   ModalHeader,
   DropdownSection,
+  Tooltip,
 } from '@nextui-org/react';
 import TableResponse from '../TableResponse/TableResponse';
 import { createClient } from './../../utils/supabase/client';
@@ -117,6 +118,10 @@ export default function Form() {
     if (updatedCondition.conditions.length > 0) {
       setCondition(updatedCondition);
     }
+  }
+
+  function removeAllCondition() {
+    setCondition(undefined);
   }
 
   //merges query and condition
@@ -241,13 +246,15 @@ export default function Form() {
   }
 
   const handleDatabaseSelection = (key: any) => {
+
     setQuery({
       ...query,
       queryParams: {
         ...query.queryParams,
-        databaseName: key,
-      },
+        databaseName: key
+      }
     });
+
   };
 
   return (
@@ -274,25 +281,28 @@ export default function Form() {
 
                 {
                   //include the add button if no database is selected yet
-                  query.queryParams.databaseName == '' && (
+                  query.queryParams.databaseName === "" && (
                     <Dropdown>
                       <DropdownTrigger>
                         <Button variant="bordered">+</Button>
                       </DropdownTrigger>
                       <DropdownMenu
                         className="max-h-[50vh] overflow-y-auto"
+                        emptyContent="Loading databases..."
                         items={databases}
                         onAction={(key) => handleDatabaseSelection(key)}
                       >
-                        {(item: any) => (
+                        {databases.map((item: any) => (
                           <DropdownItem key={item.database}>
                             {item.database}
                           </DropdownItem>
-                        )}
+                        ))}
                       </DropdownMenu>
                     </Dropdown>
                   )
                 }
+
+
               </CardBody>
             </Card>
 
@@ -312,27 +322,42 @@ export default function Form() {
             <Spacer y={2} />
 
             {/* Add filters */}
-            {query.queryParams.table.name != '' && (
-              <FilterList
-                condition={query.queryParams.condition! as compoundCondition}
-                database={query.queryParams.databaseName}
-                table={query.queryParams.table}
-                databaseServerID={databaseServerID[0]}
-                language={query.queryParams.language}
-                onChange={updateCondition}
-              />
-            )}
+            {
+              (query.queryParams.table.name != "") && (
+                <FilterList
+                  condition={query.queryParams.condition! as compoundCondition}
+                  database={query.queryParams.databaseName}
+                  table={query.queryParams.table}
+                  databaseServerID={databaseServerID[0]}
+                  language={query.queryParams.language}
+                  onChange={updateCondition}
+                  onRemove={removeAllCondition} 
+                />
+              )
+            }
           </CardBody>
           <CardFooter>
             <>
               <div style={{ display: 'flex', gap: '3px' }}>
-                <Button
-                  aria-label="query button"
-                  onPress={onOpen}
-                  color="primary"
-                >
-                  Query
-                </Button>
+                <div style={{ display: "inline-block" }}>
+                  <Tooltip
+                    content="Please select at least one column to run a query"
+                    placement="top"
+                    isDisabled={query.queryParams.table.columns.length !== 0}
+                  >
+                    <div>
+                      <Button
+                        onPress={() => {
+                          onOpen();
+                        }}
+                        color="primary"
+                        isDisabled={query.queryParams.table.columns.length === 0}
+                      >
+                        Query
+                      </Button>
+                    </div>
+                  </Tooltip>
+                </div>
                 <SaveQueryModal query={query} />
                 <Button
                   color="primary"
@@ -356,22 +381,19 @@ export default function Form() {
                 >
                   Clear Form
                 </Button>
+                {/* {JSON.stringify(getMergedQuery(), null, 2)}  */}
               </div>
               <Modal
                 isOpen={isOpen}
                 onOpenChange={onOpenChange}
                 placement="top-center"
                 className="text-black h-100vh"
-                size="full"
-              >
+                size="full">
                 <ModalContent>
                   {(onClose: any) => (
                     <>
-                      <ModalHeader className="flex flex-col gap-1">
-                        Query Results
-                      </ModalHeader>
-                      <TableResponse
-                        query={getMergedQuery()}
+                      <ModalHeader className="flex flex-col gap-1">Query Results</ModalHeader>
+                      <TableResponse query={getMergedQuery()}
                         metadata={{
                           title: `Report on ${query?.queryParams.databaseName}`,
                         }}
@@ -386,4 +408,5 @@ export default function Form() {
       </div>
     </>
   );
+
 }
