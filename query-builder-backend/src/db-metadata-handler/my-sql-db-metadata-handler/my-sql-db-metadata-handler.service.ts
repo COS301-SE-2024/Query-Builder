@@ -165,10 +165,10 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
             table: {
               name: 'key_column_usage',
               columns: [
-                { name: 'column_name' },
-                { name: 'referenced_table_schema' },
+                { name: 'column_name', alias: 'column_name' },
+                { name: 'referenced_table_schema', alias: 'referenced_table_schema' },
                 { name: 'referenced_table_name', alias: 'table_name' },
-                { name: 'referenced_column_name' }
+                { name: 'referenced_column_name', alias: 'referenced_column_name' }
               ]
             },
             condition: {
@@ -220,10 +220,10 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
             table: {
               name: 'key_column_usage',
               columns: [
-                { name: 'table_schema' },
+                { name: 'table_schema', alias: 'table_schema' },
                 { name: 'table_name', alias: 'table_name' },
-                { name: 'column_name' },
-                { name: 'referenced_column_name' }
+                { name: 'column_name', alias: 'column_name' },
+                { name: 'referenced_column_name', alias: 'referenced_column_name' }
               ]
             },
             condition: {

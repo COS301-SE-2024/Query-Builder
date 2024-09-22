@@ -148,7 +148,7 @@ export class PostgresDbMetadataHandlerService extends DbMetadataHandlerService {
               table: {
                 name: 'information_schema"."key_column_usage',
                 columns: [
-                  { name: 'column_name', alias: 'COLUMN_NAME' }
+                  { name: 'column_name', alias: 'column_name' }
                 ],
                 join: {
                     table1MatchingColumnName: 'constraint_name',
@@ -162,9 +162,9 @@ export class PostgresDbMetadataHandlerService extends DbMetadataHandlerService {
                             table2: {
                                 name: 'information_schema"."constraint_column_usage',
                                 columns: [
-                                    {name: 'table_schema', alias: "REFERENCED_TABLE_SCHEMA"},
-                                    {name: 'table_name'},
-                                    {name: 'column_name', alias: "REFERENCED_COLUMN_NAME"}
+                                    {name: 'table_schema', alias: 'referenced_table_schema'},
+                                    {name: 'table_name', alias: 'table_name'},
+                                    {name: 'column_name', alias: 'referenced_column_name'}
                                 ]
                             }
                         }
@@ -207,9 +207,9 @@ export class PostgresDbMetadataHandlerService extends DbMetadataHandlerService {
               table: {
                 name: 'information_schema"."key_column_usage',
                 columns: [
-                    { name: 'table_schema', alias: 'TABLE_SCHEMA' },
+                    { name: 'table_schema', alias: 'table_schema' },
                     { name: 'table_name', alias: 'table_name' },
-                    { name: 'column_name', alias: 'COLUMN_NAME'}
+                    { name: 'column_name', alias: 'column_name'}
                 ],
                 join: {
                     table1MatchingColumnName: 'constraint_name',
@@ -222,7 +222,7 @@ export class PostgresDbMetadataHandlerService extends DbMetadataHandlerService {
                             table2MatchingColumnName: 'constraint_name',
                             table2: {
                                 name: 'information_schema"."constraint_column_usage',
-                                columns: [{name: 'column_name', alias: "REFERENCED_COLUMN_NAME"}]
+                                columns: [{name: 'column_name', alias: 'referenced_column_name'}]
                             }
                         }
                     }
