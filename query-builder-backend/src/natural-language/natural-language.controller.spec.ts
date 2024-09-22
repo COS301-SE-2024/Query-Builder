@@ -6,7 +6,6 @@ import { DbMetadataHandlerModule } from '../db-metadata-handler/db-metadata-hand
 import { AppService } from '../app.service';
 import { MyLoggerModule } from '../my-logger/my-logger.module';
 import { Query } from '../interfaces/dto/query.dto';
-import { query } from 'express';
 import { InternalServerErrorException } from '@nestjs/common';
 
 jest.mock('./natural-language.service.ts', () => ({

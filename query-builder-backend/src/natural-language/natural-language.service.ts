@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, Inject } from '@nestjs/common';
 import { Natural_Language_Query_Dto } from './dto/natural-language-query.dto';
 import OpenAI from 'openai';
 import { GenerativeModel, GoogleGenerativeAI } from '@google/generative-ai';
