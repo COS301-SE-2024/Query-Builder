@@ -1,6 +1,3 @@
-//This implementation makes the assumption that all conditions are simply "ADDED" together
-
-//----------------------------IMPORTS-----------------------------------//
 import {
   ComparisonOperator,
   compoundCondition,
@@ -24,9 +21,7 @@ import { createClient } from './../../utils/supabase/client';
 import FilterChip from '../FilterChip/FilterChip';
 import React from 'react';
 import { navigateToAuth } from '../../app/authentication/actions';
-import { v4 as uuidv4 } from 'uuid'; // Import UUID generation
-
-//---------------------------INTERFACES---------------------------------//
+import { v4 as uuidv4 } from 'uuid';
 
 interface FilterListProps {
   condition: compoundCondition | undefined;
@@ -44,8 +39,6 @@ interface PossibleCondition {
 }
 
 export default function FilterList(props: FilterListProps) {
-  //----------------------------REACT HOOKS------------------------------------//
-
   const [condition, setCondition] = useState<compoundCondition>({
     conditions: [],
     operator: LogicalOperator.AND,
@@ -61,8 +54,7 @@ export default function FilterList(props: FilterListProps) {
     }
   }, [props.condition]);
 
-  //React hook to refetch possible conditions when table changes
-  React.useEffect(() => {
+  useEffect(() => {
     fetchPossibleConditions();
   }, [props.table]);
 
@@ -72,23 +64,15 @@ export default function FilterList(props: FilterListProps) {
     }
   }, [condition, props.onChange]);
 
-  // This function gets the token from local storage.
-  // Supabase stores the token in local storage so we can access it from there.
   const getToken = async () => {
     const supabase = createClient();
     const token = (await supabase.auth.getSession()).data.session?.access_token;
-
-    console.log(token);
-
     return token;
   };
 
-  async function fetchPossibleConditions() {
-    console.log('FETCHING POSSIBLE CONDITIONS');
-
+  const fetchPossibleConditions = useCallback(async () => {
     let tableRef: table = props.table;
-
-   const newPossibleConditions: PossibleCondition[] = [];
+    const newPossibleConditions: PossibleCondition[] = [];
 
     const fetchFields = async (tableName: string) => {
       const response = await fetch(
