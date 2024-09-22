@@ -5,6 +5,7 @@ import { Button } from "@nextui-org/react";
 import React, { useEffect, useRef } from 'react';
 import {LogoIcon} from "../../images/Logo";
 import Link from "next/link";
+import Authentication from '@/components/Authentication/Authentication';
 
 interface ConsoleTextProps {
     words: string[];
@@ -115,24 +116,8 @@ export default function StartPage() {
                         <LogoIcon/>
                     </div>
                     <span className="text-center font-console font-medium mb-4 text-2xl">Welcome to QBee</span>
-                    <span className="text-center font-console font-semibold mb-3 text-lg font-">Get started</span>
                     <div className="flex flex-col md:flex-row justify-center">
-                        <Button 
-                            className="md:w-full md:m-2 mt-0 mb-1 bg-default-cl text-white"
-                            variant="solid"
-                            // color="primary"
-                            radius="full"
-                        >
-                            Login
-                        </Button>
-                        <Button 
-                            className="md:w-full md:m-2 mt-1 mb-0 bg-default-cl text-white"
-                            variant="ghost"
-                            color="primary"
-                            radius="full"
-                        >
-                            Sign Up
-                        </Button>
+                        <Authentication/>
                     </div>
                 </div>
                 <div className="basis-1/6">
