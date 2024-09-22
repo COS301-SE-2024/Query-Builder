@@ -21,7 +21,7 @@ export class NaturalLanguageController {
     this.my_logger.setContext(NaturalLanguageController.name);
   }
 
-  @Put('query')
+  @Post('query')
   async getSchemaMetadata(
     @Body(ValidationPipe) naturalLanguageQuery: Natural_Language_Query_Dto,
     @Session() session: Record<string, any>
