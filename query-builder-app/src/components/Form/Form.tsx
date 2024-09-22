@@ -268,7 +268,7 @@ export default function Form() {
           </CardHeader>
           <CardBody className="overflow-visible">
             {/* Select a database */}
-            <h2>Select a database:</h2>
+            <h2>Select a database: <span style={{ color: 'red' }}>*</span></h2>
             <Spacer y={2} />
             <Card className="w-full">
               <CardBody className="flex flex-row items-center space-x-2">
@@ -331,7 +331,7 @@ export default function Form() {
                   databaseServerID={databaseServerID[0]}
                   language={query.queryParams.language}
                   onChange={updateCondition}
-                  onRemove={removeAllCondition} 
+                  onRemove={removeAllCondition}
                 />
               )
             }
@@ -341,7 +341,7 @@ export default function Form() {
               <div style={{ display: 'flex', gap: '3px' }}>
                 <div style={{ display: "inline-block" }}>
                   <Tooltip
-                    content="Please select at least one column to run a query"
+                    content="Oops! Maybe you forgot to select something, press the [+] icon to select required fields"
                     placement="top"
                     isDisabled={query.queryParams.table.columns.length !== 0}
                   >

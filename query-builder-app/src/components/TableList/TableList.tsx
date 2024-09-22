@@ -446,7 +446,8 @@ export default function TableList(props: TableListProps) {
     return (
         <>
             <DatabaseCredentialsModal dbServerID={props.databaseServerID} databaseName={props.databaseName} disclosure={credentialsModalDisclosure} onConnected={() => {fetchAllTables(props.databaseName);}}/>
-            <h2>Select some tables:</h2>
+            <h2>Select some tables: <span style={{ color: 'red' }}>*</span></h2>
+
             <Spacer y={2} />
             <div className="flex space-x-4">
                 {tables}
