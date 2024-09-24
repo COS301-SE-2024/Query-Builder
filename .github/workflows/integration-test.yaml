@@ -1,9 +1,6 @@
 name: Cypress Tests
 
 on: 
-  push:
-    branches:
-      - feature/integration-testing
   pull_request:
     branches:
       - dev
@@ -97,6 +94,7 @@ jobs:
           CYPRESS_mysql_username: ${{ secrets.CYPRESS_DB_USERNAME }}
           CYPRESS_mysql_password: ${{ secrets.CYPRESS_DB_PASSWORD }}
         with:
+          install: false
           record: true
           working-directory: query-builder-app
           wait-on: 'http://127.0.0.1:3000'
