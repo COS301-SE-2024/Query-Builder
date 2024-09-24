@@ -40,7 +40,7 @@ export default function FilterList(props: FilterListProps){
     }
 
     //React hook for all possible conditions
-    const [possibleConditions, setPossibleConditions] = useState<PossibleCondition[]>();
+    const [possibleConditions, setPossibleConditions] = useState<PossibleCondition[]>([]);
 
     //React hook to refetch possible conditions when table changes
     React.useEffect(() => {
@@ -251,7 +251,8 @@ export default function FilterList(props: FilterListProps){
                                 </DropdownTrigger>
                                 <DropdownMenu 
                                         className="max-h-[50vh] overflow-y-auto"
-                                        items={possibleConditions} 
+                                        items={possibleConditions}
+                                        emptyContent="Loading filters..."
                                         onAction={(key) => handleFilterSelection(key as string)}
                                     >
                                         {(item:any) => (
