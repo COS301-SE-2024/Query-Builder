@@ -11,6 +11,7 @@ import { Get_Single_Query_Dto } from './dto/get-single-query.dto';
 import { Get_Shareable_Members_Dto } from './dto/get-shareable-members.dto';
 import { NotFoundError } from 'openai';
 import { first } from 'rxjs';
+import { Share_Query_Dto } from './dto/share-query.dto';
 
 @Injectable()
 export class QueryManagementService {
@@ -154,9 +155,31 @@ export class QueryManagementService {
       throw members_error;
     }
 
+    // Filter out the members who dont have access to the database in the query
+    const { data: db_access_data, error: db_access_error } = await this.supabase
+      .getClient()
+      .from('db_access')
+      .select('user_id')
+      .eq('db_id', get_shareable_members_dto.db_id)
+      .in(
+        'user_id',
+        members_data.map((member) => member.user_id)
+      );
+
+    if (db_access_error) {
+      throw db_access_error;
+    }
+
+    // Filter out the members who have access to the database
+    const shareable_members_data = members_data.filter((member) => {
+      return db_access_data.some(
+        (db_access) => db_access.user_id === member.user_id
+      );
+    });
+
     // unpack the members data such that it is an array of objects with the keys user_id and first_name and last_name
-    const updated_members_data = members_data.map((member) => {
-        const profiles: any = member.profiles;
+    const updated_members_data = shareable_members_data.map((member) => {
+      const profiles: any = member.profiles;
       return {
         user_id: member.user_id,
         first_name: profiles.first_name,
@@ -166,5 +189,53 @@ export class QueryManagementService {
     });
 
     return { data: updated_members_data };
+  }
+
+  async shareQuery(share_query_dto: Share_Query_Dto) {
+    const { data: user_data, error: user_error } = await this.supabase
+      .getClient()
+      .auth.getUser(this.supabase.getJwt());
+
+    if (user_error) {
+      throw user_error;
+    }
+
+    // Get the query to be shared
+    const { data: query_data, error: query_error } = await this.supabase
+      .getClient()
+      .from('saved_queries')
+      .select('parameters, queryTitle, query_id, db_id, type')
+      .eq('query_id', share_query_dto.query_id)
+      .single();
+
+    if (query_error) {
+      throw query_error;
+    }
+
+    // For each shareable member, add the query to the shared_queries table
+    for (const shareable_member of share_query_dto.shareable_members) {
+      const { data: share_data, error: share_error } = await this.supabase
+        .getClient()
+        .from('saved_queries')
+        .insert({
+          parameters: query_data.parameters,
+          user_id: shareable_member,
+          db_id: query_data.db_id,
+          queryTitle: query_data.queryTitle,
+          type: query_data.type
+        })
+        .select();
+
+      if (share_error) {
+        throw share_error;
+      }
+      if (share_data.length === 0) {
+        throw new InternalServerErrorException(
+          `Query not shared with ${shareable_member}`
+        );
+      }
+    }
+
+    return { message: 'Query shared successfully' };
   }
 }
