@@ -545,7 +545,7 @@ export default function OrganisationManagement() {
                           type="button"
                           onClick={() => deleteUserFromOrg(loggedInUserID)}
                         >
-                          Delete
+                          Leave
                         </Button>
                       </ModalFooter>
                     </>
@@ -614,7 +614,7 @@ export default function OrganisationManagement() {
                         type="button"
                         onClick={() => deleteUserFromOrg(loggedInUserID)}
                       >
-                        Delete
+                        Leave
                       </Button>
                     </ModalFooter>
                   </>

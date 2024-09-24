@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "../../utils/supabase/server";
-import { AuthError } from "@supabase/supabase-js";
+import { AuthApiError, AuthError } from "@supabase/supabase-js";
 
 export async function login(email: string, password: string) {
     const supabase = createClient();
@@ -17,7 +17,14 @@ export async function login(email: string, password: string) {
 
     if (error) {
         // redirect("/error");
-        throw new Error("Failed to login, please try again: " + error.message);
+        console.log(error);
+        if(error instanceof AuthApiError || error instanceof AuthError){
+            if (error.status == 400 && error.code == 'invalid_credentials'){
+                throw new AuthError("Failed to login, please try again: Invalid credentials", 400, 'invalid_credentials');
+            }
+
+        }
+        throw new Error("Failed to login, please try again: Unexpected error");
     }
 
     if(data){

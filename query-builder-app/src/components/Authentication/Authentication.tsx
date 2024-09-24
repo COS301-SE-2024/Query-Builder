@@ -149,15 +149,20 @@ export default function Authentication() {
       navigateToSignedInHomePage();
 
     } catch (error) {
-      if (error instanceof Error) {
-        toast.error(error.message);
+      if (error instanceof AuthError) {
+        toast.error("Failed to login in:\nInvalid Credentials, please check your email and password, and try again.");
+        // console.log(error);
       }
-      else {
+      else if (error instanceof Error) {
+        toast.error("Failed to login in:\nPlease check your email and password, and try again.");
+        // console.log(error);
+      }
+      else{
         toast.error("Unexpected error, failed to login. Please try logging in again.");
       }
     }
     finally {
-      // setLoading(false);
+      setLoading(false);
     }
 
   };
