@@ -1,6 +1,6 @@
 import { Type } from "class-transformer";
 import { IsNotEmpty, IsUUID, ValidateNested } from "class-validator";
-import { QueryParams } from "src/interfaces/dto/query.dto";
+import { QueryParams } from "./../../interfaces/dto/query.dto";
 
 export class Save_Query_Dto {
 
