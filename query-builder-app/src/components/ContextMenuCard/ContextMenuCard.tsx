@@ -16,7 +16,7 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure
 import { createClient } from "./../../utils/supabase/client";
 import { useRouter } from 'next/navigation';
 
-interface User {
+export interface User {
     id: number;
     name: string;
     profileImage: string | null; // profileImage can be null
