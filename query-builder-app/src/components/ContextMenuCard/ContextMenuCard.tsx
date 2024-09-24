@@ -206,7 +206,7 @@ export default function ContextMenuCard({
                             {openPopup && (
                                 <Card
                                     ref={menuRef}
-                                    className="absolute z-[1000]"
+                                    className="absolute z-[10]"
                                     style={{
                                         top: `${getCardPosition().top}px`,
                                         left: `${getCardPosition().left}px`,
@@ -220,7 +220,7 @@ export default function ContextMenuCard({
                                         {/* Search bar for filtering users */}
                                         <Input
                                             placeholder="Search Users..."
-                                            className="mb-2"
+                                            className="mb-2 z-[100]"
                                             value={searchTerm}
                                             onChange={(e) => setSearchTerm(e.target.value)}
                                         />
@@ -248,7 +248,7 @@ export default function ContextMenuCard({
                                             <h3 className="text-md font-medium mb-2">Enter New Description</h3>
                                             <Textarea
                                                 placeholder="Add a new description for this query"
-                                                className="w-full"
+                                                className="w-full z-[100]"
                                                 minRows={3}
                                                 maxRows={5}
                                             />
