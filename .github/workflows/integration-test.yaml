@@ -38,13 +38,6 @@ jobs:
             sudo mysql --user=${{ secrets.CYPRESS_DB_USERNAME }} --password=${{ secrets.CYPRESS_DB_PASSWORD }} < sakila/sakila-schema.sql;
             sudo mysql --user=${{ secrets.CYPRESS_DB_USERNAME }} --password=${{ secrets.CYPRESS_DB_PASSWORD }} < sakila/sakila-data.sql;
             sudo mysql -e 'SHOW DATABASES;' -h 127.0.0.1 --port=3306 --user=${{ secrets.CYPRESS_DB_USERNAME }} --password=${{ secrets.CYPRESS_DB_PASSWORD }}
-
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/Cypress
-          key: my-cache-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
       
       - name: Install Dependencies Backend
         run: |
@@ -75,6 +68,7 @@ jobs:
       - name: Install Dependencies App
         run: |
             pnpm install --frozen-lockfile
+            pnpm cypress install
         working-directory: query-builder-app
 
       - name: Make frontend env file
@@ -102,7 +96,6 @@ jobs:
           CYPRESS_mysql_username: ${{ secrets.CYPRESS_DB_USERNAME }}
           CYPRESS_mysql_password: ${{ secrets.CYPRESS_DB_PASSWORD }}
         with:
-          install: false
           record: true
           working-directory: query-builder-app
           wait-on: 'http://127.0.0.1:3000'
