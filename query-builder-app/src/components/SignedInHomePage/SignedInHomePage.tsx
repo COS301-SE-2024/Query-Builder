@@ -186,7 +186,7 @@ export default function SignedInHomePage(){
                             {org.db_envs.map((db: Database) => 
                                 (
                                 <TableRow key={db.db_id}>
-                                    <TableCell><Link onPress={() => {queryDatabaseServer(db.db_id)}}>{db.name}</Link></TableCell>
+                                    <TableCell><Link className="cursor-pointer" onPress={() => {queryDatabaseServer(db.db_id)}}>{db.name}</Link></TableCell>
                                 </TableRow>
                                 )
                             )}
