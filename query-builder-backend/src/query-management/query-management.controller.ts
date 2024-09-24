@@ -4,6 +4,7 @@ import { Delete_Query_Dto } from './dto/delete-query.dto';
 import { QueryManagementService } from './query-management.service';
 import { Get_Single_Query_Dto } from './dto/get-single-query.dto';
 import { Get_Shareable_Members_Dto } from './dto/get-shareable-members.dto';
+import { Share_Query_Dto } from './dto/share-query.dto';
 import { Get_Subqueries_Dto } from './dto/get-subqueries.dto';
 
 @Controller('query-management')
@@ -39,6 +40,11 @@ export class QueryManagementController {
   @Put("get-shareable-members")
   async getShareableMembers(@Body(ValidationPipe) get_shareable_members_dto: Get_Shareable_Members_Dto) {
     return this.query_management_service.getShareableMembers(get_shareable_members_dto);
+  }
+
+  @Post("share-query")
+  async shareQuery(@Body(ValidationPipe) share_query_dto: Share_Query_Dto) {
+    return this.query_management_service.shareQuery(share_query_dto);
   }
 
 }
