@@ -2,7 +2,6 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Supabase } from '../supabase';
 import { Save_Query_Dto } from './dto/save-query.dto';
 import { Delete_Query_Dto } from './dto/delete-query.dto';
-import { query } from 'express';
 import { Get_Single_Query_Dto } from './dto/get-single-query.dto';
 
 @Injectable()
@@ -20,6 +19,10 @@ export class QueryManagementService {
         if (user_error) {
             throw user_error;
         }
+
+        //ensure pageParams and sortParams are stripped from queries being saved
+        delete save_query_dto.parameters.pageParams;
+        delete save_query_dto.parameters.sortParams;
 
         //Secondly add the query to the saved_queries table
         const saved_query_fields = {
