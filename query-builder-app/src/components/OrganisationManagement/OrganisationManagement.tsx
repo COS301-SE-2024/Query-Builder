@@ -417,7 +417,7 @@ export default function OrganisationManagement() {
                     accept=".jpg,.jpeg,.png"
                     onInput={(event) => handleProfilePicChange(event)}
                   />
-                  <EditIcon />
+                  <EditIcon className="cursor-pointer" />
                 </label>
               </div>
             </div>
