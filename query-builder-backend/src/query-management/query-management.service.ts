@@ -3,6 +3,7 @@ import { Supabase } from '../supabase';
 import { Save_Query_Dto } from './dto/save-query.dto';
 import { Delete_Query_Dto } from './dto/delete-query.dto';
 import { Get_Single_Query_Dto } from './dto/get-single-query.dto';
+import { Get_Subqueries_Dto } from './dto/get-subqueries.dto';
 
 @Injectable()
 export class QueryManagementService {
@@ -51,7 +52,7 @@ export class QueryManagementService {
 
     async getQueries() {
 
-        //Firstly get the user who is saving the query
+        //Firstly get the user whose queries we are retrieving
         const { data: user_data, error: user_error } = await this.supabase
             .getClient()
             .auth.getUser(this.supabase.getJwt());
@@ -66,6 +67,7 @@ export class QueryManagementService {
             .from('saved_queries')
             .select('parameters, queryTitle, saved_at, query_id, db_id')
             .eq('user_id', user_data.user.id);
+
         if (query_error) {
             throw query_error;
         }
@@ -97,6 +99,33 @@ export class QueryManagementService {
         return query_data;
     }
 
+    async getSubqueries(get_subqueries_dto: Get_Subqueries_Dto) {
+
+        //Firstly get the user whose queries we are retrieving
+        const { data: user_data, error: user_error } = await this.supabase
+            .getClient()
+            .auth.getUser(this.supabase.getJwt());
+
+        if (user_error) {
+            throw user_error;
+        }
+
+        //Secondly get the queries saved by that user, for the requested database server, and for the requested database
+        const { data: query_data, error: query_error } = await this.supabase
+            .getClient()
+            .from('saved_queries')
+            .select('query_id, queryTitle, parameters')
+            .eq('user_id', user_data.user.id)
+            .eq('db_id', get_subqueries_dto.db_id)
+            .eq('parameters->>databaseName', get_subqueries_dto.database_name);
+
+        if (query_error) {
+            throw query_error;
+        }
+
+        return { query_data };
+
+    }
 
     async deleteQuery(delete_query_dto: Delete_Query_Dto) {
         try {
