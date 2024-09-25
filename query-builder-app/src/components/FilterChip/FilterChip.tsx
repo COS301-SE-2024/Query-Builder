@@ -1,18 +1,20 @@
 //----------------------------IMPORTS------------------------------------//
 
 import { Button, Card, CardBody, Chip, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input, Popover, PopoverContent, PopoverTrigger, Radio, RadioGroup, Spacer } from "@nextui-org/react";
-import { AggregateFunction, column, primitiveCondition, ComparisonOperator } from "../../interfaces/intermediateJSON"
+import { AggregateFunction, column, primitiveCondition, ComparisonOperator, QueryParams } from "../../interfaces/intermediateJSON"
 import { FiMoreVertical } from "react-icons/fi";
 import { useEffect, useRef, useState } from "react";
 import React from "react";
+import { Q } from "vitest/dist/reporters-yx5ZTtEV.js";
 
 //----------------------------INTERFACES------------------------------------//
 
 interface FilterChipProps {
     primitiveCondition: primitiveCondition,
     key: string,
+    // TODO - ADD SUBQUERY LIST
     onChange?: (primitiveCondition: primitiveCondition) => void
-    onRemove?: (key: string) => void; 
+    onRemove?: (key: string) => void;
   }
 
 export default function FilterChip(props: FilterChipProps){
@@ -63,7 +65,7 @@ export default function FilterChip(props: FilterChipProps){
     useEffect(() => {
       document.addEventListener('mousedown', handleClickOutside);
       return () => {
-        document.removeEventListener('mousedown', handleClickOutside);   
+        document.removeEventListener('mousedown', handleClickOutside); 
   
       };
     }, []);
@@ -112,6 +114,13 @@ export default function FilterChip(props: FilterChipProps){
         else if(isNaN(Number(valueString))){
             value = valueString;
         }
+        // else if()
+        // {
+        //     // if the value is a string that is not empty,
+        //     // TODO CHANGE THIS TO HANDLE SUBQUERY
+        //     // so if it is a subquery, put the json into the value
+        //     value = 
+        // }
         else{
             value = Number(valueString);
         }
@@ -199,19 +208,50 @@ export default function FilterChip(props: FilterChipProps){
                                     <DropdownItem key="LESS_THAN_EQUAL">&lt;=</DropdownItem>
                                     <DropdownItem key="GREATER_THAN_EQUAL">&gt;=</DropdownItem>
                                     <DropdownItem key="NOT_EQUAL">&lt;&gt;</DropdownItem>
+                                    <DropdownItem key="LIKE">LIKE</DropdownItem>
+                                    <DropdownItem key="IS">IS</DropdownItem>
+                                    <DropdownItem key="IS_NOT">IS NOT</DropdownItem>
+                                    <DropdownItem key="IN">IN</DropdownItem>
                                 </DropdownMenu>
                             </Dropdown>
                             <Spacer y={2}/>
                             <h2>Value</h2>
                             <Spacer y={2}/>
-                            <Input 
-                                aria-label="Value input field"
-                                type="text" 
-                                value={primitiveCondition.value?.toString()}
-                                onValueChange={(value:string) => {
-                                    setConditionValue(value)
-                                }}
-                            />
+                            <Dropdown>
+                                <DropdownTrigger>
+                                    <Button
+                                        variant="bordered"
+                                        aria-label="Choose a subquery"
+                                    />
+                                </DropdownTrigger>
+                                <DropdownMenu
+                                    aria-label="Choose between a value and a subquery from dropdown menu"
+                                    variant="flat"
+                                    disallowEmptySelection
+                                    selectionMode="single"
+                                    selectedKeys={/* TODO - change this so that it correctly populates when loading from saved query */}
+                                    onSelectionChange={(keys) => {
+                                        const key = Array.from(keys)[0];
+                                        if(key == "VALUE"){
+                                            <Input 
+                                                aria-label="Value input field"
+                                                type="text" 
+                                                value={primitiveCondition.value?.toString()}
+                                                onValueChange={(value:string) => {
+                                                    setConditionValue(value)
+                                                }}
+                                            />
+                                        }
+                                        else{
+                                            //TODO - HANDLE SUBQUERY
+                                        }
+                                    }}
+
+                                >
+                                    <DropdownItem key="VALUE">Value</DropdownItem>
+                                    {/* TODO - get all subqueries and display them here*/}
+                                </DropdownMenu>
+                            </Dropdown>
                             <Spacer y={4} />
                             <Button
                                 color="primary"
