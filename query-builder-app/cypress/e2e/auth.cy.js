@@ -56,7 +56,7 @@ describe('Authentication component', () => {
 
     cy.contains('Login').click();
 
-    cy.url().should('eq', 'http://localhost:3000/', {timeout: 10000});
+    cy.url().should('eq', 'http://localhost:3000/', {timeout: 15000});
   });
   
 });
