@@ -272,7 +272,7 @@ export default function UserSettings() {
                                         accept=".jpg,.jpeg,.png"
                                         onInput={(event) => handleProfilePicChange(event)}
                                     />
-                                    <EditIcon />
+                                    <EditIcon className="cursor-pointer" />
                                 </label>
                             </div>
                         </div>
