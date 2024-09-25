@@ -6,13 +6,10 @@ import {
   IsOptional,
   IsString,
   ValidateIf,
-  IsInstance,
-  ValidationError
 } from 'class-validator';
 import { IsType } from '../../type-validator';
 import { Transform, Type } from 'class-transformer';
-import { InternalServerErrorException } from '@nestjs/common';
-// import { LogicalOperator, ComparisonOperator, AggregateFunction } from "../intermediateJSON.dto";
+import { QueryParams } from './query.dto';
 
 
 export enum AggregateFunction {
@@ -38,7 +35,8 @@ export enum ComparisonOperator {
   NOT_EQUAL = '<>',
   LIKE = 'LIKE',
   IS = 'IS',
-  IS_NOT = 'IS NOT'
+  IS_NOT = 'IS NOT',
+  IN = 'IN'
 }
 
 export class condition {
@@ -58,9 +56,9 @@ export class primitiveCondition extends condition {
   }
 
   @ValidateIf(({ value }) => value !== null)
-  @IsType(['string', 'number', 'boolean'])
+  @IsType(['string', 'number', 'boolean', 'object'])
   @IsNotEmpty()
-  value: string | number | boolean | null;
+  value: string | number | boolean | QueryParams | null;
 
   @IsOptional()
   @IsString()

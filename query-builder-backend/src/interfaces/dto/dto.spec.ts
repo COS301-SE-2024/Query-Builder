@@ -86,7 +86,7 @@ describe('dto', () => {
         it('should fail validation when value is invalid', async () => {
           const raw = {
             type: 'p',
-            value: [],
+            value: undefined,
             column: 'column1',
             operator: '='
           };

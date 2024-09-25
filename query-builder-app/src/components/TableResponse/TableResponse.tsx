@@ -25,6 +25,7 @@ import { createClient } from './../../utils/supabase/client';
 import SaveQueryModal from '../SaveQueryModal/SaveQueryModal';
 import { Metadata } from '../Report/Report';
 import { navigateToAuth } from '../../app/authentication/actions';
+import toast, { Toaster } from 'react-hot-toast';
 
 interface Column {
   key: string;
@@ -136,6 +137,13 @@ export default function TableResponse(props: TableResponseProps) {
       if(json.response && json.response.message == 'You do not have a backend session'){
           navigateToAuth();
       }
+      else if(json.response && json.response.message){
+        toast.error(json.response.message, {id: "Query error"});
+      }
+      else{
+        toast.error("Please check your query and try again", {id: "Query error"});
+      }
+
     }
   }
 
@@ -197,6 +205,12 @@ export default function TableResponse(props: TableResponseProps) {
         if(json.response && json.response.message == 'You do not have a backend session'){
           navigateToAuth();
         }
+        else if(json.response && json.response.message){
+          toast.error(json.response.message, {id: "Query error"});
+        }
+        else{
+          toast.error("Please check your query and try again", {id: "Query error"});
+        }
 
         return {
           items: [],
@@ -220,6 +234,7 @@ export default function TableResponse(props: TableResponseProps) {
 
   return (
     <div style={{ overflow: 'scroll', maxHeight: '80vh', overflowX: 'hidden' }}>
+      <Toaster/>
       <Table
         aria-label="Example table with dynamic content"
         sortDescriptor={tableData.sortDescriptor}

@@ -297,10 +297,12 @@ export class PostgresJsonConverterService extends JsonConverterService {
         sql += primCondition.value ? 'TRUE' : 'FALSE';
       } else if (primCondition.value == null) {
         sql += 'NULL';
-      } // number
-      else {
+      } else if (typeof primCondition.value === 'object') {
+        sql += `(${this.convertJsonToQuery(primCondition.value)})`;
+      } else // number
+      {
         sql += primCondition.value;
-      } // name = 'value'
+      }
 
       return sql;
     }
@@ -414,6 +416,8 @@ export class PostgresJsonConverterService extends JsonConverterService {
         sql += primCondition.value ? 'TRUE' : 'FALSE';
       } else if (primCondition.value == null) {
         sql += 'NULL';
+      } else if (typeof primCondition.value === 'object') {
+        sql += `(${this.convertJsonToQuery(primCondition.value)})`;
       } else {
         // number
         sql += primCondition.value;
