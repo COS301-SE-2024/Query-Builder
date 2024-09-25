@@ -45,6 +45,14 @@ export default function FilterList(props: FilterListProps){
     //React hook to fetch all queries
     const [queries, setQueries] = useState<CurrentQuery[]>([]);
 
+
+    //React hook to fetch all queries
+    React.useEffect(() => {
+
+        fetchAllQueries();
+
+    },[])
+
     //React hook to refetch possible conditions when table changes
     React.useEffect(() => {
 
@@ -106,6 +114,8 @@ export default function FilterList(props: FilterListProps){
                 navigateToAuth();
             } 
         }
+
+        console.log(json.query_data);
 
         setQueries(json.query_data);
     }

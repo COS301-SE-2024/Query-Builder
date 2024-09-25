@@ -37,6 +37,10 @@ export default function FilterChip(props: FilterChipProps){
     // React hook for the subquery list
     const [subquerylist, setSubqueryList] = useState<CurrentQuery[] | undefined>(props.subquerylist);
 
+    const [isQuery, setIsQuery] = useState<boolean>(isQueryParams(primitiveCondition.value));
+
+    const [initIsQuery, setInitIsQuery] = useState<boolean>(isQueryParams(primitiveCondition.value));
+
     //React hook for the string displayed on the Chip
     const [primitiveConditionString, setPrimitiveConditionString] = useState<string>("");
 
@@ -102,7 +106,13 @@ export default function FilterChip(props: FilterChipProps){
 
         output += " " + primitiveCondition.operator + " ";
 
-        output += primitiveCondition.value;
+        if(isQueryParams(primitiveCondition.value)){
+            output += "Query";
+        }
+        else
+        {
+            output += primitiveCondition.value;
+        }
 
         return output;
 
@@ -113,7 +123,7 @@ export default function FilterChip(props: FilterChipProps){
     }
 
     //not handling null which causes issues
-    function setConditionValue(valueString: string){
+    function setConditionValue(valueString: any ){
 
         let value: any;
 
@@ -129,11 +139,10 @@ export default function FilterChip(props: FilterChipProps){
         else if(isNaN(Number(valueString))){
             value = valueString;
         }
-        // TODO - handle the case where the value is a subquery
-        // else if(isQueryParams(valueString))
-        // {
-        //     value = valueString;
-        // }
+        else if(isQueryParams(valueString))
+        {
+            value = valueString;
+        }
         else{
             value = Number(valueString);
         }
@@ -235,28 +244,24 @@ export default function FilterChip(props: FilterChipProps){
                                     <Button
                                         variant="bordered"
                                         aria-label="Choose a subquery"
-                                    />
+                                    >
+                                        {isQuery ? "Query" : "Value"}
+                                    </Button>
                                 </DropdownTrigger>
                                 <DropdownMenu
                                     aria-label="Choose between a value and a subquery from dropdown menu"
                                     variant="flat"
                                     disallowEmptySelection
                                     selectionMode="single"
-                                    selectedKeys={(isQueryParams(primitiveCondition.value)) ? "OTHER" : "VALUE"}
                                     onSelectionChange={(keys) => {
                                         const key = Array.from(keys)[0];
+
                                         if(key == "VALUE"){
-                                            <Input 
-                                                aria-label="Value input field"
-                                                type="text" 
-                                                value={primitiveCondition.value?.toString()}
-                                                onValueChange={(value:string) => {
-                                                    setConditionValue(value)
-                                                }}
-                                            />
+                                            setIsQuery(false)
                                         }
                                         else{
-                                            // setConditionValue(primitiveCondition.value);
+                                            setIsQuery(true)
+                                            setConditionValue(primitiveCondition.value);
                                         }
                                     }}
 
@@ -264,17 +269,25 @@ export default function FilterChip(props: FilterChipProps){
                                     <DropdownItem key="VALUE">Value</DropdownItem>
                                     <>
                                     {
-                                    (subquerylist != undefined) ? 
-                                    subquerylist.map((subquery, index) => {
+                                    (subquerylist !== undefined) &&
+                                    (subquerylist.map((subquery, index) => {
                                         <DropdownItem key = {index}>{subquery.query_title}</DropdownItem>
-                                    })
-                                    :
-                                    <></>
+                                    }))
                                     }
+                                    {(initIsQuery) && (<DropdownItem key="OTHER">Query</DropdownItem>)}
                                     </>
-                                    <DropdownItem key="OTHER">Predefined Subquery</DropdownItem>
                                 </DropdownMenu>
                             </Dropdown>
+                            {(!isQuery) && (
+                                <Input 
+                                aria-label="Value input field"
+                                type="text" 
+                                value={primitiveCondition.value?.toString()}
+                                onValueChange={(value:string) => {
+                                setConditionValue(value)
+                                }}
+                                />
+                            )}
                             <Spacer y={4} />
                             <Button
                                 color="primary"
