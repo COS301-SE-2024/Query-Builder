@@ -769,7 +769,7 @@ export class OrgManagementService {
         org_id: org_data[0].org_id,
         name: 'Test Database',
         type: 'mysql',
-        host: '127.0.0.1',
+        host: 'capstone-qbee-db.dns.net.za',
         port: 3306
       };
 
@@ -780,7 +780,7 @@ export class OrgManagementService {
     // Add database secrets to said database
     const save_db_secrets_dto = {
       db_id: db_data[0].db_id,
-      db_secrets: '{"username": "root", "password": "password"}'
+      db_secrets: '{"username": "qbeeuser", "password": "password"}'
     };
 
     const { data: db_secrets_data } = await this.saveDbSecrets(save_db_secrets_dto, session);
