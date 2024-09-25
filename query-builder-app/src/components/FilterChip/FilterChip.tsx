@@ -9,10 +9,17 @@ import { Q } from "vitest/dist/reporters-yx5ZTtEV.js";
 
 //----------------------------INTERFACES------------------------------------//
 
+export interface CurrentQuery
+{
+    query_id: string,
+    query_title: string,
+    parameters: QueryParams
+}
+
 interface FilterChipProps {
     primitiveCondition: primitiveCondition,
     key: string,
-    // TODO - ADD SUBQUERY LIST
+    subquerylist?: CurrentQuery[],
     onChange?: (primitiveCondition: primitiveCondition) => void
     onRemove?: (key: string) => void;
   }
@@ -26,6 +33,9 @@ export default function FilterChip(props: FilterChipProps){
 
     //React hook for the data model
     const [primitiveCondition, setPrimitiveCondition] = useState<primitiveCondition>(props.primitiveCondition);
+
+    // React hook for the subquery list
+    const [subquerylist, setSubqueryList] = useState<CurrentQuery[] | undefined>(props.subquerylist);
 
     //React hook for the string displayed on the Chip
     const [primitiveConditionString, setPrimitiveConditionString] = useState<string>("");
@@ -71,6 +81,7 @@ export default function FilterChip(props: FilterChipProps){
     }, []);
 
     //helper function that generates a string representing the primitiveCondition
+    // TODO - CHANGE THIS SO THAT IT DOES NOT DISPLAY JSON
     function generatePrimitiveConditionString() : string {
 
         let output : string = "";
@@ -97,6 +108,10 @@ export default function FilterChip(props: FilterChipProps){
 
     }
 
+    function isQueryParams(object: any): object is QueryParams {
+        return object && typeof object.language === 'string' && typeof object.query_type === 'string' && typeof object.databaseName === 'string' && typeof object.table === 'object';
+    }
+
     //not handling null which causes issues
     function setConditionValue(valueString: string){
 
@@ -114,12 +129,10 @@ export default function FilterChip(props: FilterChipProps){
         else if(isNaN(Number(valueString))){
             value = valueString;
         }
-        // else if()
+        // TODO - handle the case where the value is a subquery
+        // else if(isQueryParams(valueString))
         // {
-        //     // if the value is a string that is not empty,
-        //     // TODO CHANGE THIS TO HANDLE SUBQUERY
-        //     // so if it is a subquery, put the json into the value
-        //     value = 
+        //     value = valueString;
         // }
         else{
             value = Number(valueString);
@@ -229,7 +242,7 @@ export default function FilterChip(props: FilterChipProps){
                                     variant="flat"
                                     disallowEmptySelection
                                     selectionMode="single"
-                                    selectedKeys={/* TODO - change this so that it correctly populates when loading from saved query */}
+                                    selectedKeys={(isQueryParams(primitiveCondition.value)) ? "OTHER" : "VALUE"}
                                     onSelectionChange={(keys) => {
                                         const key = Array.from(keys)[0];
                                         if(key == "VALUE"){
@@ -243,13 +256,23 @@ export default function FilterChip(props: FilterChipProps){
                                             />
                                         }
                                         else{
-                                            //TODO - HANDLE SUBQUERY
+                                            // setConditionValue(primitiveCondition.value);
                                         }
                                     }}
 
                                 >
                                     <DropdownItem key="VALUE">Value</DropdownItem>
-                                    {/* TODO - get all subqueries and display them here*/}
+                                    <>
+                                    {
+                                    (subquerylist != undefined) ? 
+                                    subquerylist.map((subquery, index) => {
+                                        <DropdownItem key = {index}>{subquery.query_title}</DropdownItem>
+                                    })
+                                    :
+                                    <></>
+                                    }
+                                    </>
+                                    <DropdownItem key="OTHER">Predefined Subquery</DropdownItem>
                                 </DropdownMenu>
                             </Dropdown>
                             <Spacer y={4} />

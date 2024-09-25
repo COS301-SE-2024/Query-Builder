@@ -5,7 +5,7 @@ import { ComparisonOperator, compoundCondition, condition, LogicalOperator, prim
 import { Button, Card, CardBody, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spacer } from "@nextui-org/react";
 import { useState } from "react"
 import { createClient } from "./../../utils/supabase/client";
-import FilterChip from "../FilterChip/FilterChip";
+import FilterChip, { CurrentQuery } from "../FilterChip/FilterChip";
 import React from "react";
 import { navigateToAuth } from "../../app/authentication/actions";
 import { v4 as uuidv4 } from 'uuid'; // Import UUID generation
@@ -41,6 +41,9 @@ export default function FilterList(props: FilterListProps){
 
     //React hook for all possible conditions you can filter by
     const [possibleConditions, setPossibleConditions] = useState<PossibleCondition[]>([]);
+
+    //React hook to fetch all queries
+    const [queries, setQueries] = useState<CurrentQuery[]>([]);
 
     //React hook to refetch possible conditions when table changes
     React.useEffect(() => {
@@ -78,6 +81,34 @@ export default function FilterList(props: FilterListProps){
     
         return token;
     };
+
+    async function fetchAllQueries()
+    {
+        let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query-management/get-subqueries`, {
+            credentials: "include",
+            method: "PUT",
+            headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + await getToken()
+            },
+            body: JSON.stringify({
+                db_id: props.databaseServerID,
+                database_name: props.database
+            })
+        });
+
+        let json = await response.json();
+
+        if(!response.ok){
+        
+            if(json.response && json.response.message == 'You do not have a backend session'){
+                navigateToAuth();
+            } 
+        }
+
+        setQueries(json.query_data);
+    }
 
     async function fetchPossibleConditions(){
         console.log("FETCHING POSSIBLE CONDITIONS");
@@ -189,6 +220,7 @@ export default function FilterList(props: FilterListProps){
                         <FilterChip
                             key={subCondition.id ?? uuidv4()} // Use the unique id as key
                             primitiveCondition={subCondition}
+                            subquerylist={queries}
                             onChange={updateCondition}
                             onRemove={() => subCondition.id && removeCondition(subCondition.id)} 
                         />
