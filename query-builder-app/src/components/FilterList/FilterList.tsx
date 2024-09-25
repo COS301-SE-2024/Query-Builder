@@ -39,7 +39,7 @@ export default function FilterList(props: FilterListProps){
         setCondition(props.condition);
     }
 
-    //React hook for all possible conditions
+    //React hook for all possible conditions you can filter by
     const [possibleConditions, setPossibleConditions] = useState<PossibleCondition[]>([]);
 
     //React hook to refetch possible conditions when table changes
