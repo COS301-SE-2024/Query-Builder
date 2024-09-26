@@ -13,6 +13,8 @@ export default function ContextMenu() {
         parameters: any;
         query_id: any;
         db_id: string;
+        description: string;
+        // type: string;
         onDelete: () => void;
     }
 
@@ -89,6 +91,8 @@ export default function ContextMenu() {
                                 parameters={queryData.parameters}
                                 query_id={queryData.query_id}
                                 db_id={queryData.db_id}
+                                description_text={queryData.description}
+                                // type_text={queryData.type}
                                 onDelete={reload}
                             />
                             <Spacer x={4} />

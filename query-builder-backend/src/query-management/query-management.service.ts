@@ -36,7 +36,8 @@ export class QueryManagementService {
       parameters: save_query_dto.parameters,
       user_id: user_data.user.id,
       db_id: save_query_dto.db_id,
-      queryTitle: save_query_dto.queryTitle
+      queryTitle: save_query_dto.queryTitle,
+      description: save_query_dto.description,
     };
 
     const { data: save_data, error: save_error } = await this.supabase
@@ -69,7 +70,7 @@ export class QueryManagementService {
     const { data: query_data, error: query_error } = await this.supabase
       .getClient()
       .from('saved_queries')
-      .select('parameters, queryTitle, saved_at, query_id, db_id')
+      .select('parameters, queryTitle, saved_at, query_id, db_id, description, type')
       .eq('user_id', user_data.user.id);
 
     if (query_error) {
@@ -215,8 +216,7 @@ export class QueryManagementService {
       const profiles: any = member.profiles;
       return {
         user_id: member.user_id,
-        first_name: profiles.first_name,
-        last_name: profiles.last_name,
+        full_name: `${profiles.first_name} ${profiles.last_name}`,
         profile_photo: profiles.profile_photo
       };
     });
@@ -255,7 +255,8 @@ export class QueryManagementService {
           user_id: shareable_member,
           db_id: query_data.db_id,
           queryTitle: query_data.queryTitle,
-          type: query_data.type
+          type: "Shared",
+          description: share_query_dto.description
         })
         .select();
 
@@ -264,7 +265,7 @@ export class QueryManagementService {
       }
       if (share_data.length === 0) {
         throw new InternalServerErrorException(
-          `Query not shared with ${shareable_member}`
+           `Query not shared with ${shareable_member}`
         );
       }
     }

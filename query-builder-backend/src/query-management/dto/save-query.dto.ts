@@ -8,12 +8,17 @@ export class Save_Query_Dto {
     @IsNotEmpty()
     db_id: string;
 
+    @IsString()
     @IsNotEmpty()
     @ValidateNested()
     @Type(() => QueryParams)
     parameters: QueryParams;
 
+    @IsString()
     @IsNotEmpty()
     queryTitle: string;
 
+    @IsString()
+    @IsNotEmpty()
+    description: string;
 }

@@ -1,4 +1,4 @@
-import { IsArray, IsNotEmpty, IsUUID } from "class-validator";
+import { IsArray, IsNotEmpty, IsUUID, IsString } from "class-validator";
 
 export class Share_Query_Dto {
     @IsUUID()
@@ -8,4 +8,8 @@ export class Share_Query_Dto {
     @IsArray()
     @IsNotEmpty()
     shareable_members: string[];
+
+    @IsString()
+    @IsNotEmpty()
+    description: string;
 }
