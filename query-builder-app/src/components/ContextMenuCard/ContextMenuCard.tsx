@@ -17,9 +17,9 @@ import { createClient } from "./../../utils/supabase/client";
 import { useRouter } from 'next/navigation';
 
 export interface User {
-    id: number;
-    name: string;
-    profileImage: string | null; // profileImage can be null
+    user_id: string;
+    full_name: string;
+    profile_photo: string | null; // profileImage can be null
 }
 
 interface ContextMenuCardProps {
@@ -29,7 +29,8 @@ interface ContextMenuCardProps {
     query_id: any;
     db_id: string;
     onDelete: () => void;
-    description?: string; // Optional description
+    description_text: string;
+    // type: string;
 }
 
 // This function gets the token from local storage.
@@ -60,19 +61,46 @@ async function removeQuery(query_id: string) {
     let json = (await response.json()).data;
 }
 
-// Sample users array
-const users: User[] = [
-    { id: 1, name: "John Doe", profileImage: "https://via.placeholder.com/150" },
-    { id: 2, name: "Jane Doe", profileImage: null }, // No image
-    { id: 3, name: "Alice Doe", profileImage: "https://via.placeholder.com/150" },
-    { id: 4, name: "Bob Doe", profileImage: null }, // No image
-    { id: 5, name: "John Smith", profileImage: "https://via.placeholder.com/150" },
-    { id: 6, name: "Jane Smith", profileImage: null }, // No image
-    { id: 7, name: "Alice Smith", profileImage: "https://via.placeholder.com/150" },
-    { id: 8, name: "Bob Smith", profileImage: null }, // No image
-];
-// const users: User[] = [
-// ];
+async function getMembers(db_id: string, query_id: string) {
+    let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query-management/get-shareable-members`, {
+        credentials: "include",
+        method: "PUT",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + await getToken()
+        },
+        body: JSON.stringify({ db_id, query_id })
+    });
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    let json = (await response.json()).data;
+    return json;
+}
+
+async function shareQuery(query_id: string, checkboxUsers: string[], description: string) {
+    console.log(query_id, checkboxUsers, description);
+    let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query-management/share-query`, {
+        credentials: "include",
+        method: "POST",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + await getToken()
+        },
+        body: JSON.stringify({ query_id: query_id, shareable_members: checkboxUsers, description: description })
+    });
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    let json = (await response.json()).data;
+    return response;
+}
 
 // Define a standard profile image URL
 const DEFAULT_PROFILE_IMAGE = "https://via.placeholder.com/150/cccccc/FFFFFF?text=No+Image";
@@ -84,14 +112,30 @@ export default function ContextMenuCard({
     query_id,
     db_id,
     onDelete,
-    description, // Here we include the description prop
+    description_text, 
+    // type: string
 }: ContextMenuCardProps) {
     const [loading, setLoading] = useState(false);
-    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    const { isOpen, onOpen, onOpenChange } = useDisclosure(); // For the delete confirmation modal
+    const { isOpen: isShareOpen, onOpen: onShareOpen, onOpenChange: onShareOpenChange } = useDisclosure(); // For the share query modal
+
     const router = useRouter();
     const [openPopup, setOpenPopup] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
     const [searchTerm, setSearchTerm] = useState(""); // State for search term
+    const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
+    const [userDescription, setUserDescription] = useState("");
+    const [checkedUsers, setCheckedUsers] = useState<User[]>([]); // Track checked state as an array of user objects
+
+    const handleCheckboxChange = (user: User, isChecked: boolean) => {
+        if (isChecked) {
+            // Add the user object to the checkedUsers if it's checked
+            setCheckedUsers((prev) => [...prev, user]);
+        } else {
+            // Remove the user object from checkedUsers if it's unchecked
+            setCheckedUsers((prev) => prev.filter((u) => u.user_id !== user.user_id));
+        }
+    };
 
     const handleDelete = async () => {
         setLoading(true);
@@ -139,36 +183,22 @@ export default function ContextMenuCard({
         };
     }, [openPopup]);
 
-    const openSharePopup = () => {
+    const openSharePopup = async () => {
+        setSelectedUsers(await getMembers(db_id, query_id));
+        console.log(selectedUsers);
         setOpenPopup(true);
     };
 
     // Filter users based on the search term
-    const filteredUsers = users.filter(user =>
-        user.name.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredUsers = selectedUsers.filter(user =>
+        user.full_name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    // Calculate card position to prevent it from going off-screen
-    const getCardPosition = () => {
-        const cardWidth = 400; // Card width
-        const cardHeight = 300; // Estimate a height for the card (adjust as needed)
-
-        const { innerWidth, innerHeight } = window; // Get viewport dimensions
-        const { top, left } = menuRef.current?.getBoundingClientRect() || { top: 0, left: 0 };
-
-        let adjustedTop = top;
-        let adjustedLeft = left;
-
-        // Adjust position if the card goes out of viewport
-        if (left + cardWidth > innerWidth) {
-            adjustedLeft = innerWidth - cardWidth - 10; // 10px padding
-        }
-        if (top + cardHeight > innerHeight) {
-            adjustedTop = innerHeight - cardHeight - 10; // 10px padding
-        }
-
-        return { top: adjustedTop, left: adjustedLeft };
-    };
+    function shareQueryHelper(query_id: string, checkedUsers: User[], userDescription: string) {
+        const test = checkedUsers.map((user) => user.user_id);
+        console.log(test);
+        alert(shareQuery(query_id, test, userDescription));
+    }
 
     return (
         <>
@@ -187,7 +217,7 @@ export default function ContextMenuCard({
                     <DropdownSection title={localDateTime}>
                         {/* Show the description as a non-interactive item */}
                         <DropdownItem key="description" isDisabled className="text-sm text-gray-500">
-                            {description || "No description available"}
+                            {description_text || "No description available"}
                         </DropdownItem>
                         <DropdownItem
                             key="retrieve"
@@ -199,68 +229,14 @@ export default function ContextMenuCard({
                         <DropdownItem
                             key="share"
                             description="Share query to other users in org"
-                            onPress={openSharePopup}
+                            onPress={async () => {
+                                onShareOpen(); // Open the share modal
+                                const members = await getMembers(db_id, query_id); // Fetch members
+                                setSelectedUsers(members); // Set the selected users
+                                console.log(selectedUsers);
+                            }}
                         >
                             Share Query
-
-                            {openPopup && (
-                                <Card
-                                    ref={menuRef}
-                                    className="absolute z-[10]"
-                                    style={{
-                                        top: `${getCardPosition().top}px`,
-                                        left: `${getCardPosition().left}px`,
-                                        width: '400px'
-                                    }}
-                                >
-                                    <CardBody>
-
-                                        {/* List of users in org */}
-                                        <h2 className="text-lg font-semibold mb-2">Select Users to Share Query</h2>
-                                        {/* Search bar for filtering users */}
-                                        <Input
-                                            placeholder="Search Users..."
-                                            className="mb-2 z-[100]"
-                                            value={searchTerm}
-                                            onChange={(e) => setSearchTerm(e.target.value)}
-                                        />
-                                        <div className="max-h-[200px] overflow-y-auto"> {/* Set max height and scroll */}
-                                            {filteredUsers.length > 0 ? (
-                                                filteredUsers.map((user) => (
-                                                    <Checkbox key={user.id} className="flex items-center space-x-2 mb-2">
-                                                        <div className="flex items-center space-x-2">
-                                                            <img
-                                                                src={user.profileImage || DEFAULT_PROFILE_IMAGE}
-                                                                alt={`${user.name}'s profile`}
-                                                                className="h-8 w-8 rounded-full"
-                                                            />
-                                                            <span className="text-sm">{user.name}</span>
-                                                        </div>
-                                                    </Checkbox>
-                                                ))
-                                            ) : (
-                                                <p className="text-sm text-gray-500">No users found.</p>
-                                            )}
-                                        </div>
-
-                                        {/* Place to enter new description */}
-                                        <div className="mt-4">
-                                            <h3 className="text-md font-medium mb-2">Enter New Description</h3>
-                                            <Textarea
-                                                placeholder="Add a new description for this query"
-                                                className="w-full z-[100]"
-                                                minRows={3}
-                                                maxRows={5}
-                                            />
-                                        </div>
-
-                                        {/* Button to share the query */}
-                                        <div className="mt-4 flex justify-end">
-                                            <Button color="primary" className="w-full">Share Query</Button>
-                                        </div>
-                                    </CardBody>
-                                </Card>
-                            )}
                         </DropdownItem>
                         <DropdownItem
                             key="delete"
@@ -298,6 +274,93 @@ export default function ContextMenuCard({
                                 <Button color="danger" onClick={handleDelete}>
                                     Delete
                                 </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+
+            {/* Share Modal */}
+            <Modal isOpen={isShareOpen} onOpenChange={onShareOpenChange}>
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader className="flex justify-between items-center">
+                                <h2 className="font-semibold">Share Query</h2>
+                            </ModalHeader>
+                            <ModalBody>
+                                {/* List of users in org */}
+                                <h2 className="text-lg font-semibold mb-2">Select Users to Share Query</h2>
+                                {/* Search bar for filtering users */}
+                                <Input
+                                    placeholder="Search Users..."
+                                    className="mb-2 z-[100]"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                                <div className="max-h-[200px] overflow-y-auto">
+                                    {filteredUsers.length > 0 ? (
+                                        filteredUsers.map((selectedUsers) => (
+                                            <Checkbox
+                                                key={selectedUsers.user_id}
+                                                className="flex items-center space-x-2 mb-2"
+                                                onChange={(e) => handleCheckboxChange(selectedUsers, e.target.checked)} // Update the checkbox based on user selection
+                                            >
+                                                <div className="flex items-center space-x-2">
+                                                    <img
+                                                        src={selectedUsers.profile_photo || DEFAULT_PROFILE_IMAGE}
+                                                        alt={`${selectedUsers.full_name}'s profile`}
+                                                        className="h-8 w-8 rounded-full"
+                                                    />
+                                                    <span className="text-sm">{selectedUsers.full_name}</span>
+                                                </div>
+                                            </Checkbox>
+                                        ))
+                                    ) : (
+                                        <p className="text-sm text-gray-500">No users found.</p>
+                                    )}
+                                </div>
+
+                                {/* Place to enter new description */}
+                                <div className="mt-4">
+                                    <h3 className="text-md font-medium mb-2">Enter New Description</h3>
+                                    <Textarea
+                                        placeholder="Add a new description for this query"
+                                        className="w-full z-[100]"
+                                        minRows={3}
+                                        maxRows={5}
+                                        onChange={(e) => setUserDescription(e.target.value)}
+                                    />
+                                </div>
+                            </ModalBody>
+                            <ModalFooter>
+                                {/* Button to share the query */}
+                                <div className="mt-4 flex justify-center w-full"> {/* Add 'w-full' to ensure the parent takes full width */}
+                                    <Button color="primary" className="w-full max-w-xs items-center" onClick={() => shareQueryHelper(query_id, checkedUsers, userDescription)}> {/* Optional: limit button width with max-w-xs */}
+                                        Share Query
+                                    </Button>
+                                </div>
+
+                                {/* Display Selected Users */}
+                                {/* <div className="mt-4">
+                                    <h3 className="font-semibold">Selected Users:</h3>
+                                    {checkedUsers.length > 0 ? (
+                                        checkedUsers.map((user) => {
+                                            return (
+                                                <div key={user.id} className="flex items-center mt-1">
+                                                    <img
+                                                        src={user.profile_photo || DEFAULT_PROFILE_IMAGE}
+                                                        alt={user.full_name}
+                                                        className="w-8 h-8 rounded-full mr-2"
+                                                    />
+                                                    <span>{user.full_name}</span>
+                                                </div>
+                                            );
+                                        })
+                                    ) : (
+                                        <div className="text-gray-500">No users selected.</div>
+                                    )}
+                                </div> */}
                             </ModalFooter>
                         </>
                     )}

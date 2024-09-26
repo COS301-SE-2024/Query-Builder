@@ -31,6 +31,7 @@ export default function SaveQueryModal(props: SaveQueryModalProps) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [queryTitle, setQueryTitle] = useState('');
   const [queryTitleBeenFocused, setQueryTitleHasBeenFocused] = useState(false);
+  const [userDescription, setUserDescription] = useState("");
 
   const isQueryTitleInvalid = React.useMemo(() => {
     if (queryTitle === "") return true;
@@ -38,7 +39,7 @@ export default function SaveQueryModal(props: SaveQueryModalProps) {
     return false;
   }, [queryTitle]);
 
-  async function saveQuery(queryTitle: String) {
+  async function saveQuery(queryTitle: string, description: string) {
 
     //save the query to the query-management/save-query endpoint
     let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query-management/save-query`, {
@@ -52,7 +53,8 @@ export default function SaveQueryModal(props: SaveQueryModalProps) {
       body: JSON.stringify({
         db_id: props.query.databaseServerID,
         parameters: props.query.queryParams,
-        queryTitle: queryTitle
+        queryTitle: queryTitle,
+        description: description,
       })
     })
 
@@ -98,6 +100,7 @@ export default function SaveQueryModal(props: SaveQueryModalProps) {
                     className="w-full"
                     minRows={3}
                     maxRows={5}
+                    onChange={(e) => setUserDescription(e.target.value)}
                   />
                 </div>
               </ModalBody>
@@ -105,7 +108,7 @@ export default function SaveQueryModal(props: SaveQueryModalProps) {
                 <Button
                   color="primary"
                   onPress={onClose}
-                  onClick={() => saveQuery(queryTitle)}
+                  onClick={() => saveQuery(queryTitle, userDescription)}
                   isDisabled={isQueryTitleInvalid}
                 >
                   Save
