@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "../../utils/supabase/server";
-import { AuthError } from "@supabase/supabase-js";
+import { AuthApiError, AuthError } from "@supabase/supabase-js";
+import { wait } from "@testing-library/user-event/dist/cjs/utils/index.js";
 
 export async function login(email: string, password: string) {
     const supabase = createClient();
@@ -17,7 +18,14 @@ export async function login(email: string, password: string) {
 
     if (error) {
         // redirect("/error");
-        throw new Error("Failed to login, please try again: " + error.message);
+        // console.log(error);
+        if(error instanceof AuthApiError || error instanceof AuthError){
+            if (error.status == 400 && error.code == 'invalid_credentials'){
+                throw new AuthError("Failed to login, please try again: Invalid credentials", 400, 'invalid_credentials');
+            }
+
+        }
+        throw new Error("Failed to login, please try again: Unexpected error");
     }
 
     if(data){
@@ -47,20 +55,49 @@ export async function signup(
         },
     };
 
-    const { data, error } = await supabase.auth.signUp(userDetails);
+    let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user-management/get-user`, {
+        credentials: "include",
+        method: "PUT",
+        headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+        },
+        body: JSON.stringify({
+            email: userDetails.email
+        })
+    });
 
-    if (error) {
-        // Check for the specific rate limit error by message
-        if (error.message === 'Email rate limit exceeded') {
-            console.log(data);
-            throw new Error('Too many sign-up attempts. Please wait and try again.');
+    let result = await (response).json();
+    if (result.statusCode === 404 && result.response.message === "User not found"){
+
+        const { data, error } = await supabase.auth.signUp(userDetails);
+
+        console.log(data);
+
+        if (error) {
+            // Check for the specific rate limit error by message
+            if (error.message && error.message.includes('Email rate limit exceeded')) {
+                console.log(data);
+                throw new Error('Too many sign-up attempts. Please wait and try again.');
+            }
+            // Handle other types of errors
+            throw new Error("Unexpected error"); // Generic error handling
         }
-        // Handle other types of errors
-        throw new Error(error.message); // Generic error handling
+    }
+    else if (result.data?.length > 0) {
+        if(result.data[0].onboarded){
+            throw new Error('This email is already taken.');
+        }
+        else{
+            throw new Error('Confirm account');
+        }  
+    }
+    else {
+        throw new Error('Unexpected error.');
     }
 
-    revalidatePath('/', 'layout');
-    redirect('/');
+    
 }
 
 export async function navigateToAuth() {
