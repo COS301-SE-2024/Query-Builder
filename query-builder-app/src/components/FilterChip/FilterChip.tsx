@@ -267,20 +267,25 @@ export default function FilterChip(props: FilterChipProps){
                                         else{
                                             setIsQuery(true)
                                             if(subquerylist !== undefined){
-                                                setConditionValue(subquerylist[key as number].parameters);
+                                                const currquery = subquerylist.find((subquery) => subquery.query_id === key);
+                                                setConditionValue(currquery?.parameters);
                                             }
                                         }
                                     }}
 
                                 >
-                                    <DropdownItem key="VALUE">Value</DropdownItem>
+                                    {/* <DropdownItem key="VALUE">Value</DropdownItem>
                                     {
-                                    // (subquerylist !== undefined && subquerylist.length !== 0) ?
-                                    // ( <> {(subquerylist.map((subquery, index) => {
-                                    //     <DropdownItem key = {index}>{subquery.query_title}</DropdownItem>
-                                    //     }))
-                                    // } </>): (<></>)
-                                    }
+                                        <>
+                                        {
+                                            subquerylist && subquerylist.length > 0 && (
+                                                subquerylist.map((subquery) => (
+                                                    <DropdownItem key={subquery.query_id}>{subquery.query_title}</DropdownItem>
+                                                ))
+                                        )
+                                        }
+                                        </>
+                                    } */}
                                     {/* {
                                         initIsQuery ? (<DropdownItem key="OTHER">Query</DropdownItem>) : (<></>)
                                     } */}
