@@ -37,6 +37,7 @@ const getToken = async () => {
 
 export default function SignedInHomePage(){
 
+    const [notVerified, setNotVerified] = React.useState('');
     //async function to query a database server
     async function queryDatabaseServer(databaseServerID: string) {
 
@@ -135,12 +136,15 @@ export default function SignedInHomePage(){
             },
         });
 
-    let json = await response.json();
+        let json = await response.json();
 
-    //the org_data property is an array of organisations
-
-        setOrganisations(json.data)
-
+        if(json.statusCode === 404){
+            setNotVerified("Please check your emails and verify your account!");
+        }
+        else{
+            //the org_data property is an array of organisations
+            setOrganisations(json.data)
+        }
     }
 
     //React hook to show the credentials modal
@@ -161,42 +165,50 @@ export default function SignedInHomePage(){
         <>
             <DatabaseCredentialsModal dbServerID={currentDBServerID} disclosure={credentialsModalDisclosure} onConnected={() => {navigateToForm(currentDBServerID)}}/>
             <div className="p-5 app">
-            <div className="flex justify-between">
-                <h1 className="text-5xl">Your Organisations</h1>
-                <AddOrganisationModal on_add={fetchOrgs} ></AddOrganisationModal>
-            </div>
-            <Spacer y={10}/>
-            {organisations ? organisations.map((org: Organisation) => (
+            { notVerified == "" ? (
                 <>
-                    <div className="flex">
-                        <h1 className="text-3xl flex-1">{org.name}</h1>
-                        <DatabaseAdditionModal org_id={org.org_id} on_add={fetchOrgs}/>
-                        <Spacer x={2} />
-                        <Button variant="bordered" color="primary">
-                            <Link href={"/organisation/" + org.org_id}>Settings</Link>
-                        </Button>
+                    <div className="flex justify-between">
+                        <h1 className="text-5xl">Your Organisations</h1>
+                        <AddOrganisationModal on_add={fetchOrgs} ></AddOrganisationModal>
+                    </div>
+                    <Spacer y={10}/>
+                    {organisations ? organisations.map((org: Organisation) => (
+                        <>
+                            <div className="flex">
+                                <h1 className="text-3xl flex-1">{org.name}</h1>
+                                <DatabaseAdditionModal org_id={org.org_id} on_add={fetchOrgs}/>
+                                <Spacer x={2} />
+                                <Button variant="bordered" color="primary">
+                                    <Link href={"/organisation/" + org.org_id}>Settings</Link>
+                                </Button>
                     </div>
 
-                    <Spacer y={5}/>
+                            <Spacer y={5}/>
 
-                    <Table 
-                        removeWrapper aria-label="table with dynamic content">
-                        <TableHeader>
-                            <TableColumn>Name</TableColumn>
-                        </TableHeader>
-                        <TableBody>
-                            {org.db_envs.map((db: Database) => 
-                                (
-                                <TableRow key={db.db_id}>
-                                    <TableCell><Link className="cursor-pointer" onPress={() => {queryDatabaseServer(db.db_id)}}>{db.name}</Link></TableCell>
-                                </TableRow>
-                                )
-                            )}
-                        </TableBody>
-                    </Table>
-                    <Spacer y={5}/>
-                </>
-            )): <></>}
+                            <Table 
+                                removeWrapper aria-label="table with dynamic content">
+                                <TableHeader>
+                                    <TableColumn>Name</TableColumn>
+                                </TableHeader>
+                                <TableBody>
+                                    {org.db_envs.map((db: Database) => 
+                                        (
+                                        <TableRow key={db.db_id}>
+                                            <TableCell><Link className="cursor-pointer" onPress={() => {queryDatabaseServer(db.db_id)}}>{db.name}</Link></TableCell>
+                                        </TableRow>
+                                        )
+                                    )}
+                                </TableBody>
+                            </Table>
+                            <Spacer y={5}/>
+                        </>
+                    )): <></>}
+                </>) : (<>
+                    <div className="flex justify-center my-auto text-xl">
+                        {notVerified}
+                    </div>
+                </>)}
+            
             </div>
         </>
 

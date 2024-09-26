@@ -149,15 +149,27 @@ export default function Authentication() {
       navigateToSignedInHomePage();
 
     } catch (error) {
-      if (error instanceof Error) {
-        toast.error(error.message);
+      if (error instanceof AuthError) {
+        toast.error("Failed to login in:\nInvalid Credentials, please check your email and password, and try again.");
+        // console.log(error);
       }
-      else {
+      else if (error instanceof Error && error.message.includes("Confirm account")) {
+        toast.error("Please check your emails and confirm your account.");
+      }
+      else if (error instanceof Error && error.message.includes("Invalid")) {
+        toast.error("Failed to login in:\nPlease check your email and password, and try again.");
+        // console.log(error);
+      }
+      else if (error instanceof Error && error.message.includes("Unexpected")) {
+        toast.error("Failed to login in:\nPlease check your emails and confirm your account and try logging in again.");
+        // console.log(error);
+      }
+      else{
         toast.error("Unexpected error, failed to login. Please try logging in again.");
       }
     }
     finally {
-      // setLoading(false);
+      setLoading(false);
     }
 
   };
@@ -171,14 +183,21 @@ export default function Authentication() {
     setLoading(true);
     try {
       await signup(firstName, lastName, email, password);
+      toast.success("Successfully signed up, please check your emails and confirm your account.");
     } catch (error) {
       if (error instanceof AuthError) {
-        toast.error(error.message);
+        toast.error("Error while signing up, please try again!");
       }
       else if (error) {
         // console.error(error);
         if (error instanceof Error && error.message.includes("Too many sign-up attempts")) {
-          toast.error(error.message);
+          toast.error("Confirmation email already sent please check your emails and confirm your account!");
+        }
+        else if (error instanceof Error && error.message.includes("This email is already taken.")) {
+          toast.error("This email is already taken, please use another email address, or please sign in using your email address");
+        }
+        else if (error instanceof Error && error.message.includes("Confirm account")) {
+          toast.error("This email is already taken, please use another email address, or please check your emails and confirm your account");
         }
         else {
           toast.error("An unexpected error occurred");

@@ -3590,7 +3590,7 @@ describe('OrgManagementService', () => {
                 remove_dbs: true,
                 invite_users: true,
                 remove_users: true,
-                update_user_roles: false,
+                update_user_roles: true,
                 view_all_dbs: true,
                 view_all_users: true,
                 update_db_access: false
