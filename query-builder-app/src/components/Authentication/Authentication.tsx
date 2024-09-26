@@ -228,9 +228,12 @@ export default function Authentication() {
   const handlePasswordReset = async (email: string) => {
     if (email) {
       const supabase = createClient();
-
-      const { data, error } = await supabase.auth.resetPasswordForEmail(email);
-
+  
+      // Specify the redirect URL here
+      const redirectTo = 'https://capstone-qbee.dns.net.za/password-reset'; // Change this to your desired URL
+  
+      const { data, error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+  
       if (data) {
         alert('Password reset link sent successfully!');
         setModalOpen(false);
