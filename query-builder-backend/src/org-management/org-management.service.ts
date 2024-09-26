@@ -777,10 +777,16 @@ export class OrgManagementService {
       db_data = db_created_data;
     }
 
+    //create a db_secrets object
+    const db_secrets = {
+      user: 'qbeeuser',
+      password: 'password'
+    }
+
     // Add database secrets to said database
     const save_db_secrets_dto = {
       db_id: db_data[0].db_id,
-      db_secrets: '{"username": "qbeeuser", "password": "password"}'
+      db_secrets: JSON.stringify(db_secrets)
     };
 
     const { data: db_secrets_data } = await this.saveDbSecrets(save_db_secrets_dto, session);
