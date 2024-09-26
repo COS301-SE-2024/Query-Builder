@@ -274,8 +274,8 @@ export default function FilterChip(props: FilterChipProps){
                                     }}
 
                                 >
-                                    {/* <DropdownItem key="VALUE">Value</DropdownItem>
-                                    {
+                                    <DropdownItem key="VALUE">Value</DropdownItem>
+                                    {/*
                                         <>
                                         {
                                             subquerylist && subquerylist.length > 0 && (
