@@ -33,13 +33,16 @@ export default function FilterChip(props: FilterChipProps){
 
     //React hook for the data model
     const [primitiveCondition, setPrimitiveCondition] = useState<primitiveCondition>(props.primitiveCondition);
-
+    
     // React hook for the subquery list
     const [subquerylist, setSubqueryList] = useState<CurrentQuery[] | undefined>(props.subquerylist);
-
+    
     const [isQuery, setIsQuery] = useState<boolean>(isQueryParams(primitiveCondition.value));
-
+    
     const [initIsQuery, setInitIsQuery] = useState<boolean>(isQueryParams(primitiveCondition.value));
+
+    //React hook for initial subquery
+    const [initSubquery, setInitSubquery] = useState<any>(primitiveCondition.value);
 
     //React hook for the string displayed on the Chip
     const [primitiveConditionString, setPrimitiveConditionString] = useState<string>("");
@@ -85,7 +88,6 @@ export default function FilterChip(props: FilterChipProps){
     }, []);
 
     //helper function that generates a string representing the primitiveCondition
-    // TODO - CHANGE THIS SO THAT IT DOES NOT DISPLAY JSON
     function generatePrimitiveConditionString() : string {
 
         let output : string = "";
@@ -258,24 +260,30 @@ export default function FilterChip(props: FilterChipProps){
 
                                         if(key == "VALUE"){
                                             setIsQuery(false)
+                                        } else if (key == "OTHER"){
+                                            setIsQuery(true)
+                                            setConditionValue(initSubquery);
                                         }
                                         else{
                                             setIsQuery(true)
-                                            setConditionValue(primitiveCondition.value);
+                                            if(subquerylist !== undefined){
+                                                setConditionValue(subquerylist[key as number].parameters);
+                                            }
                                         }
                                     }}
 
                                 >
                                     <DropdownItem key="VALUE">Value</DropdownItem>
-                                    <>
                                     {
-                                    (subquerylist !== undefined) &&
-                                    (subquerylist.map((subquery, index) => {
-                                        <DropdownItem key = {index}>{subquery.query_title}</DropdownItem>
-                                    }))
+                                    // (subquerylist !== undefined && subquerylist.length !== 0) ?
+                                    // ( <> {(subquerylist.map((subquery, index) => {
+                                    //     <DropdownItem key = {index}>{subquery.query_title}</DropdownItem>
+                                    //     }))
+                                    // } </>): (<></>)
                                     }
-                                    {(initIsQuery) && (<DropdownItem key="OTHER">Query</DropdownItem>)}
-                                    </>
+                                    {/* {
+                                        initIsQuery ? (<DropdownItem key="OTHER">Query</DropdownItem>) : (<></>)
+                                    } */}
                                 </DropdownMenu>
                             </Dropdown>
                             {(!isQuery) && (
