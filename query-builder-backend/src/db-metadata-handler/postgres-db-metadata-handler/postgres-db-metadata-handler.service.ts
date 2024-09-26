@@ -31,7 +31,7 @@ export class PostgresDbMetadataHandlerService extends DbMetadataHandlerService {
                     conditions: [
                         {
                             column: "datistemplate",
-                            operator: ComparisonOperator.IS,
+                            operator: ComparisonOperator.EQUAL,
                             value: false
                         },
                         {
