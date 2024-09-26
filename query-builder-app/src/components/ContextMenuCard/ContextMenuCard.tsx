@@ -30,7 +30,7 @@ interface ContextMenuCardProps {
     db_id: string;
     onDelete: () => void;
     description_text: string;
-    // type: string;
+    type_text: string;
 }
 
 // This function gets the token from local storage.
@@ -112,8 +112,8 @@ export default function ContextMenuCard({
     query_id,
     db_id,
     onDelete,
-    description_text, 
-    // type: string
+    description_text,
+    type_text
 }: ContextMenuCardProps) {
     const [loading, setLoading] = useState(false);
     const { isOpen, onOpen, onOpenChange } = useDisclosure(); // For the delete confirmation modal
@@ -207,6 +207,7 @@ export default function ContextMenuCard({
                     <Button
                         variant="flat"
                         className="size-full pl-1 pr-1"
+                        style={type_text === 'Shared' ? { backgroundColor: '#7cc6eb', color: 'white' } : {}}
                         color="primary"
                         disabled={loading}
                     >
