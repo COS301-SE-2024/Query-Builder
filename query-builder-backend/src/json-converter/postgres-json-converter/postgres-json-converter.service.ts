@@ -128,6 +128,7 @@ export class PostgresJsonConverterService extends JsonConverterService {
 
     while(!allReplaced){
       let newQueryString: string = queryString.replace("?QbeeParameter?", "$" + parameterNumber);
+      //all have been replaced if the replace() operation didn't change anything
       allReplaced = (newQueryString === queryString);
       queryString = newQueryString;
       parameterNumber++;
