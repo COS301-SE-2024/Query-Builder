@@ -8,6 +8,8 @@ import ContextMenuCard from './ContextMenuCard'; // Adjust the import based on y
 const mockOnDelete = vi.fn();
 const mockPush = vi.fn();
 
+global.fetch = vi.fn();
+
 // Mock the `useRouter` hook
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
@@ -46,6 +48,11 @@ describe('ContextMenuCard - Share Query', () => {
   });
 
   it('opens share popup when "Share Query" is clicked', async () => {
+    vi.spyOn(global, 'fetch').mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ data: [] }),
+    } as Response);
+
     render(<ContextMenuCard {...defaultProps} />);
 
     // Open dropdown
