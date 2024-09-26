@@ -245,7 +245,7 @@ export default function UserSettings() {
                 //     setProfilePicURL(data.publicUrl);
                 // });
             }).then(async () => {
-                await updateProfileUrl();
+                toast("Please remember to click the Update button to save your profile photo!");
             });
         }
     };
