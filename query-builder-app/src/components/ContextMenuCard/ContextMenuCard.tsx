@@ -61,8 +61,31 @@ async function removeQuery(query_id: string) {
     let json = (await response.json()).data;
 }
 
+// async function getMembers(db_id: string, query_id: string) {
+//     let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query-management/get-shareable-members`, {
+//         credentials: "include",
+//         method: "PUT",
+//         headers: {
+//             'Accept': 'application/json',
+//             'Content-Type': 'application/json',
+//             'Authorization': 'Bearer ' + await getToken()
+//         },
+//         body: JSON.stringify({ db_id, query_id })
+//     });
+
+//     if (!response.ok) {
+//         throw new Error(`HTTP error! Status: ${response.status}`);
+//     }
+
+//     let json = (await response.json()).data;
+//     return json;
+// }
+
 async function getMembers(db_id: string, query_id: string) {
-    let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query-management/get-shareable-members`, {
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3000"; // Fallback URL
+    console.log(`Fetching members from: ${backendUrl}/api/query-management/get-shareable-members`);
+
+    let response = await fetch(`${backendUrl}/api/query-management/get-shareable-members`, {
         credentials: "include",
         method: "PUT",
         headers: {
