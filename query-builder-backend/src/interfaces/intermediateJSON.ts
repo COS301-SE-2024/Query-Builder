@@ -46,7 +46,7 @@ export interface compoundCondition extends condition{
 }
 
 export interface primitiveCondition extends condition{
-    value: string | number | boolean | null,
+    value: string | number | boolean | QueryParams | null,
     tableName?: string,
     column: string,
     operator: ComparisonOperator,
@@ -87,5 +87,6 @@ export enum ComparisonOperator {
     NOT_EQUAL = "<>",
     LIKE = "LIKE",
     IS = "IS",
-    IS_NOT = "IS NOT"
+    IS_NOT = "IS NOT",
+    IN = 'IN'
 }

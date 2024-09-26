@@ -1,4 +1,6 @@
-import { IsNotEmpty, IsString, IsUUID } from "class-validator";
+import { Type } from "class-transformer";
+import { IsNotEmpty, IsUUID, ValidateNested } from "class-validator";
+import { QueryParams } from "./../../interfaces/dto/query.dto";
 
 export class Save_Query_Dto {
 
@@ -8,7 +10,9 @@ export class Save_Query_Dto {
 
     @IsString()
     @IsNotEmpty()
-    parameters: string;
+    @ValidateNested()
+    @Type(() => QueryParams)
+    parameters: QueryParams;
 
     @IsString()
     @IsNotEmpty()

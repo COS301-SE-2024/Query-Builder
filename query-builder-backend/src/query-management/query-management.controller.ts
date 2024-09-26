@@ -5,6 +5,7 @@ import { QueryManagementService } from './query-management.service';
 import { Get_Single_Query_Dto } from './dto/get-single-query.dto';
 import { Get_Shareable_Members_Dto } from './dto/get-shareable-members.dto';
 import { Share_Query_Dto } from './dto/share-query.dto';
+import { Get_Subqueries_Dto } from './dto/get-subqueries.dto';
 
 @Controller('query-management')
 export class QueryManagementController {
@@ -12,13 +13,18 @@ export class QueryManagementController {
   constructor(private readonly query_management_service: QueryManagementService) { }
 
   @Post("save-query")
-  async addDb(@Body(ValidationPipe) save_query_dto: Save_Query_Dto) {
+  async saveQuery(@Body(ValidationPipe) save_query_dto: Save_Query_Dto) {
     return this.query_management_service.saveQuery(save_query_dto);
   }
 
   @Get("get-queries")
   async getQ() {
     return this.query_management_service.getQueries();
+  }
+
+  @Put("get-subqueries")
+  async getSubqueries(@Body(ValidationPipe) get_subqueries_dto: Get_Subqueries_Dto) {
+    return this.query_management_service.getSubqueries(get_subqueries_dto);
   }
 
   @Put("get-single-query")

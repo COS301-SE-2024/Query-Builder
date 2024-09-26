@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { QueryHandlerService } from '../query-handler.service';
 import { Query } from '../../interfaces/dto/query.dto';
 
@@ -34,8 +34,14 @@ export class MySqlQueryHandlerService extends QueryHandlerService {
     
         const promise2 = new Promise((resolve, reject) => {
           connection.query(countCommand, async function (error, results, fields) {
+            //if there is an error with the query, reject
             if (error) {
-              return reject(error);
+              if(error.code == 'ER_SUBQUERY_NO_1_ROW'){
+                return reject(new InternalServerErrorException('Your saved query should only return a single row to be used as a subquery in this case'));
+              }
+              else{
+                return reject(new InternalServerErrorException('Please check your query and try again'));
+              }
             }
     
             const numRows = results[0].numRows;
@@ -52,8 +58,15 @@ export class MySqlQueryHandlerService extends QueryHandlerService {
     
             const promise3 = new Promise((resolve, reject) => {
               connection.query(queryCommand, function (error, results, fields) {
+
+                //if there is an error with the query, reject
                 if (error) {
-                  return reject(error);
+                  if(error.code == 'ER_SUBQUERY_NO_1_ROW'){
+                    return reject(new InternalServerErrorException('Your saved query should only return a single row to be used as a subquery in this case'));
+                  }
+                  else{
+                    return reject(new InternalServerErrorException('Please check your query and try again'));
+                  }
                 }
     
                 //add a unique key field to each returned row
