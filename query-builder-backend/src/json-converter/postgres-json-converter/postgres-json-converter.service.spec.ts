@@ -51,11 +51,11 @@ describe('PostgresJsonConverterService', () => {
         table: { name: 'users', columns: [{ name: 'id' }, { name: "first_name" }, { name: "last_name" }] },
     };
 
-    const expectedQuery = 'SELECT "users"."id", "users"."first_name", "users"."last_name" FROM "users"';
+    const expectedQueryString = 'SELECT "users"."id", "users"."first_name", "users"."last_name" FROM "users"';
 
     const result = service.convertJsonToQuery(queryParams);
 
-    expect(result).toEqual(expectedQuery);
+    expect(result).toEqual({queryString: expectedQueryString, parameters: []});
 
   });
 
@@ -68,11 +68,11 @@ describe('PostgresJsonConverterService', () => {
         table: { name: 'users', columns: [{ name: 'id', aggregation: AggregateFunction.COUNT, alias: "Number" }] },
     };
 
-    const expectedQuery = 'SELECT COUNT("users"."id") AS "Number" FROM "users"';
+    const expectedQueryString = 'SELECT COUNT("users"."id") AS "Number" FROM "users"';
 
     const result = service.convertJsonToQuery(queryParams);
 
-    expect(result).toEqual(expectedQuery);
+    expect(result).toEqual({queryString: expectedQueryString, parameters: []});
 
   });
 
@@ -96,11 +96,11 @@ describe('PostgresJsonConverterService', () => {
         },
     };
 
-    const expectedQuery = 'SELECT "users"."id", "actors"."role" FROM "users" JOIN "actors" ON "users"."id"="actors"."user_id"';
+    const expectedQueryString = 'SELECT "users"."id", "actors"."role" FROM "users" JOIN "actors" ON "users"."id"="actors"."user_id"';
 
     const result = service.convertJsonToQuery(queryParams);
 
-    expect(result).toEqual(expectedQuery);
+    expect(result).toEqual({queryString: expectedQueryString, parameters: []});
 
   });
 
@@ -117,11 +117,11 @@ describe('PostgresJsonConverterService', () => {
         }
     };
 
-    const expectedQuery = 'SELECT "users"."id", "users"."first_name", "users"."last_name" FROM "users" ORDER BY "first_name" DESC';
+    const expectedQueryString = 'SELECT "users"."id", "users"."first_name", "users"."last_name" FROM "users" ORDER BY "first_name" DESC';
 
     const result = service.convertJsonToQuery(queryParams);
 
-    expect(result).toEqual(expectedQuery);
+    expect(result).toEqual({queryString: expectedQueryString, parameters: []});
 
   });
 
@@ -137,11 +137,11 @@ describe('PostgresJsonConverterService', () => {
         }
     };
 
-    const expectedQuery = 'SELECT "users"."id", "users"."first_name", "users"."last_name" FROM "users" ORDER BY "first_name" ASC';
+    const expectedQueryString = 'SELECT "users"."id", "users"."first_name", "users"."last_name" FROM "users" ORDER BY "first_name" ASC';
 
     const result = service.convertJsonToQuery(queryParams);
 
-    expect(result).toEqual(expectedQuery);
+    expect(result).toEqual({queryString: expectedQueryString, parameters: []});
 
   });
 
@@ -158,11 +158,11 @@ describe('PostgresJsonConverterService', () => {
         }
     };
 
-    const expectedQuery = 'SELECT "users"."id", "users"."first_name", "users"."last_name" FROM "users" LIMIT 10 OFFSET 20';
+    const expectedQueryString = 'SELECT "users"."id", "users"."first_name", "users"."last_name" FROM "users" LIMIT 10 OFFSET 20';
 
     const result = service.convertJsonToQuery(queryParams);
 
-    expect(result).toEqual(expectedQuery);
+    expect(result).toEqual({queryString: expectedQueryString, parameters: []});
 
   });
 
@@ -241,10 +241,10 @@ describe('PostgresJsonConverterService', () => {
         }
     };
 
-    const expectedQuery = 'SELECT "users"."id", "users"."first_name", "users"."last_name" FROM "users" WHERE "age" > 18 LIMIT 10 OFFSET 20';
+    const expectedQueryString = 'SELECT "users"."id", "users"."first_name", "users"."last_name" FROM "users" WHERE "age" > $1 LIMIT 10 OFFSET 20';
     const result = service.convertJsonToQuery(queryParams);
 
-    expect(result).toEqual(expectedQuery);
+    expect(result).toEqual({queryString: expectedQueryString, parameters: [18]});
   });
 
   it('should be able to convert queries using pagination, group by, and having conditions', () => {
@@ -274,10 +274,10 @@ describe('PostgresJsonConverterService', () => {
         }
     };
 
-    const expectedQuery = 'SELECT "users"."id", "users"."first_name", "users"."last_name", AVG("users"."age") AS "AVG(age)" FROM "users" GROUP BY "users"."id", "users"."first_name", "users"."last_name" HAVING AVG("users"."age") > 18 LIMIT 10 OFFSET 20';
+    const expectedQueryString = 'SELECT "users"."id", "users"."first_name", "users"."last_name", AVG("users"."age") AS "AVG(age)" FROM "users" GROUP BY "users"."id", "users"."first_name", "users"."last_name" HAVING AVG("users"."age") > $1 LIMIT 10 OFFSET 20';
     const result = service.convertJsonToQuery(queryParams);
 
-    expect(result).toEqual(expectedQuery);
+    expect(result).toEqual({queryString: expectedQueryString, parameters: [18]});
   });
 
   it('should be able to convert queries using pagination, group by, and where conditions', () => {
@@ -305,10 +305,10 @@ describe('PostgresJsonConverterService', () => {
         }
     };
 
-    const expectedQuery = 'SELECT "users"."id", "users"."first_name", "users"."last_name", "users"."age" FROM "users" WHERE "age" > 18 LIMIT 10 OFFSET 20';
+    const expectedQueryString = 'SELECT "users"."id", "users"."first_name", "users"."last_name", "users"."age" FROM "users" WHERE "age" > $1 LIMIT 10 OFFSET 20';
     const result = service.convertJsonToQuery(queryParams);
 
-    expect(result).toEqual(expectedQuery);
+    expect(result).toEqual({queryString: expectedQueryString, parameters: [18]});
   });
 
   it('Should be able to convert a query with a join and a having, with aggregate in first table', () => {
@@ -344,7 +344,7 @@ describe('PostgresJsonConverterService', () => {
 
     const result = service.convertJsonToQuery(jsonData);
 
-    expect(result).toEqual('SELECT COUNT("city"."city_id") AS "Number of cities per country", "country"."country" FROM "city" JOIN "country" ON "city"."country_id"="country"."country_id" GROUP BY "country"."country" HAVING COUNT("city"."city_id") > 10');
+    expect(result).toEqual({queryString: 'SELECT COUNT("city"."city_id") AS "Number of cities per country", "country"."country" FROM "city" JOIN "country" ON "city"."country_id"="country"."country_id" GROUP BY "country"."country" HAVING COUNT("city"."city_id") > $1', parameters: [10]});
 
   });
 
@@ -381,7 +381,7 @@ describe('PostgresJsonConverterService', () => {
 
     const result = service.convertJsonToQuery(jsonData);
 
-    expect(result).toEqual('SELECT "country"."country", COUNT("city"."city_id") AS "Number of cities per country" FROM "country" JOIN "city" ON "country"."country_id"="city"."country_id" GROUP BY "country"."country" HAVING COUNT("city"."city_id") > 10');
+    expect(result).toEqual({queryString: 'SELECT "country"."country", COUNT("city"."city_id") AS "Number of cities per country" FROM "country" JOIN "city" ON "country"."country_id"="city"."country_id" GROUP BY "country"."country" HAVING COUNT("city"."city_id") > $1', parameters: [10]});
 
   });
 
@@ -412,7 +412,7 @@ describe('PostgresJsonConverterService', () => {
 
     }
     const result = service.convertJsonToQuery(jsonData);
-    expect(result).toEqual('SELECT "city"."city_id", "country"."country" FROM "city" JOIN "country" ON "city"."country_id"="country"."country_id" WHERE "city_id" > 10');
+    expect(result).toEqual({queryString: 'SELECT "city"."city_id", "country"."country" FROM "city" JOIN "country" ON "city"."country_id"="country"."country_id" WHERE "city_id" > $1', parameters: [10]});
   });
 
   it('Should convert a query finding country names starting with B', () => {
@@ -434,7 +434,7 @@ describe('PostgresJsonConverterService', () => {
 
     const result = service.convertJsonToQuery(jsonData);
 
-    expect(result).toEqual('SELECT "country"."country" FROM "country" WHERE "country" LIKE \'B%\'');
+    expect(result).toEqual({queryString: 'SELECT "country"."country" FROM "country" WHERE "country" LIKE $1', parameters: ['B%']});
 
   });
 
@@ -467,10 +467,10 @@ describe('PostgresJsonConverterService', () => {
         }
     };
 
-    const expectedQuery = 'SELECT COUNT(*) AS numRows FROM (SELECT "users"."id", "users"."first_name", "users"."last_name", AVG("users"."age") AS "AVG(age)" FROM "users" GROUP BY "users"."id", "users"."first_name", "users"."last_name" HAVING AVG("users"."age") > 18) AS subquery';
+    const expectedQueryString = 'SELECT COUNT(*) AS numRows FROM (SELECT "users"."id", "users"."first_name", "users"."last_name", AVG("users"."age") AS "AVG(age)" FROM "users" GROUP BY "users"."id", "users"."first_name", "users"."last_name" HAVING AVG("users"."age") > $1) AS subquery';
     const result = service.convertJsonToCountQuery(queryParams);
 
-    expect(result).toEqual(expectedQuery);
+    expect(result).toEqual({queryString: expectedQueryString, parameters: [18]});
   });
 
   it('Should be able to generate a count query for a query with a join and a having, with aggregate in first table', () => {
@@ -506,7 +506,7 @@ describe('PostgresJsonConverterService', () => {
 
     const result = service.convertJsonToCountQuery(jsonData);
 
-    expect(result).toEqual('SELECT COUNT(*) AS numRows FROM (SELECT COUNT("city"."city_id") AS "Number of cities per country", "country"."country" FROM "city" JOIN "country" ON "city"."country_id"="country"."country_id" GROUP BY "country"."country" HAVING COUNT("city"."city_id") > 10) AS subquery');
+    expect(result).toEqual({queryString: 'SELECT COUNT(*) AS numRows FROM (SELECT COUNT("city"."city_id") AS "Number of cities per country", "country"."country" FROM "city" JOIN "country" ON "city"."country_id"="country"."country_id" GROUP BY "country"."country" HAVING COUNT("city"."city_id") > $1) AS subquery', parameters: [10]});
 
   });
 

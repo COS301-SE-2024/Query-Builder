@@ -2,6 +2,11 @@ import { Injectable, InternalServerErrorException, UnauthorizedException } from 
 import { QueryHandlerService } from '../query-handler.service';
 import { Query } from 'src/interfaces/dto/query.dto';
 
+interface PreparedStatement {
+  queryString: string,
+  parameters: any[]
+}
+
 @Injectable()
 export class PostgresQueryHandlerService extends QueryHandlerService {
     
@@ -33,11 +38,11 @@ export class PostgresQueryHandlerService extends QueryHandlerService {
         let connection = this.sessionStore.get(session.id).conn;
     
         //firstly, get the number of rows of data that would be returned without pagination
-        const countCommand: string = parser.convertJsonToCountQuery(query.queryParams);
+        const countCommand: PreparedStatement = parser.convertJsonToCountQuery(query.queryParams);
         let countResults: any;
         //try the query
         try{
-          countResults = await connection.query(countCommand);
+          countResults = await connection.query(countCommand.queryString, countCommand.parameters);
         }
         catch(e){
           if(e.code === '21000'){
@@ -46,17 +51,19 @@ export class PostgresQueryHandlerService extends QueryHandlerService {
             );
           }
           else{
+            console.log(e)
+            console.log(countCommand);
             throw new InternalServerErrorException('Please check your query and try again');
           }
         }
         const numRows = countResults.rows[0].numrows;
 
         //secondly, query the database
-        const queryCommand = parser.convertJsonToQuery(query.queryParams);
+        const queryCommand: PreparedStatement = parser.convertJsonToQuery(query.queryParams);
         let queryResults: any;
         //try the query
         try{
-          queryResults = await connection.query(queryCommand);
+          queryResults = await connection.query(queryCommand.queryString, queryCommand.parameters);
         }
         catch(e){
           if(e.code === '21000'){

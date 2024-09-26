@@ -8,12 +8,18 @@ import {
 import { table, column } from '../../interfaces/dto/table.dto';
 import { QueryParams } from '../../interfaces/dto/query.dto';
 
+interface PreparedStatement {
+  queryString: string,
+  parameters: any[]
+}
+
 @Injectable()
 export class MysqlJsonConverterService extends JsonConverterService {
 
   //function to convert an entire QueryParams object into a query string
-  public convertJsonToQuery(jsonData: QueryParams) {
+  public convertJsonToQuery(jsonData: QueryParams): PreparedStatement {
     let query = '';
+    let params = [];
     jsonData.language = jsonData.language.toLowerCase();
     jsonData.query_type = jsonData.query_type.toLowerCase();
 
@@ -31,11 +37,15 @@ export class MysqlJsonConverterService extends JsonConverterService {
 
         const from = this.generateFromClause(jsonData);
 
-        const where = this.conditionWhereSQL(jsonData.condition);
+        const wherePreparedStatement = this.conditionWhereSQL(jsonData.condition);
+        const where = wherePreparedStatement.queryString;
+        params = params.concat(wherePreparedStatement.parameters);
 
         const groupBy = this.groupBySQL(jsonData);
 
-        const having = this.havingSQL(jsonData);
+        const havingPreparedStatement = this.havingSQL(jsonData);
+        const having = havingPreparedStatement.queryString;
+        params = params.concat(havingPreparedStatement.parameters);
 
         const orderBy = this.generateOrderByClause(jsonData);
 
@@ -49,12 +59,13 @@ export class MysqlJsonConverterService extends JsonConverterService {
       throw new Error('Invalid language');
     }
 
-    return query;
+    return {queryString: query, parameters: params};
   }
 
   //function that generates a query that counts the number of rows the query would return without pagination
-  public convertJsonToCountQuery(jsonData: QueryParams): string {
+  public convertJsonToCountQuery(jsonData: QueryParams): PreparedStatement {
     let query = '';
+    let params = [];
     jsonData.language = jsonData.language.toLowerCase();
     jsonData.query_type = jsonData.query_type.toLowerCase();
 
@@ -78,13 +89,17 @@ export class MysqlJsonConverterService extends JsonConverterService {
         const from = this.generateFromClause(jsonData);
 
         //Include a where clause as filters can affect the number of rows
-        const where = this.conditionWhereSQL(jsonData.condition);
+        const wherePreparedStatement = this.conditionWhereSQL(jsonData.condition);
+        const where = wherePreparedStatement.queryString;
+        params = params.concat(wherePreparedStatement.parameters);
 
         //Include a group by clause as aggregates can affect the number of rows
         const groupBy = this.groupBySQL(jsonData);
 
         //Include a having clause as filters can affect the number of rows
-        const having = this.havingSQL(jsonData);
+        const havingPreparedStatement = this.havingSQL(jsonData);
+        const having = havingPreparedStatement.queryString;
+        params = params.concat(havingPreparedStatement.parameters);
 
         //Exclude an orderBy clause sorting doesn't affect the total number of rows
 
@@ -98,7 +113,7 @@ export class MysqlJsonConverterService extends JsonConverterService {
       throw new Error('Invalid language');
     }
 
-    return query;
+    return {queryString: query, parameters: params};
   }
 
   //helper function to generate a string of a column
@@ -254,43 +269,49 @@ export class MysqlJsonConverterService extends JsonConverterService {
     return limit;
   }
 
-  conditionWhereSQL(condition: condition) {
+  conditionWhereSQL(condition: condition): PreparedStatement {
     if (!condition) {
-      return '';
+      return {queryString: '', parameters: []};
     }
 
     if (this.isPrimitiveCondition(condition)) {
       const primCondition = condition as primitiveCondition;
       if (primCondition.aggregate != null) {
-        return '';
+        return {queryString: '', parameters: []};
       }
     }
 
-    return ' WHERE ' + this.conditionWhereSQLHelp(condition);
+    const preparedStatement: PreparedStatement = this.conditionWhereSQLHelp(condition);
+
+    return {queryString: ' WHERE ' + preparedStatement.queryString, parameters: preparedStatement.parameters};
   }
 
-  conditionWhereSQLHelp(condition: condition) {
+  conditionWhereSQLHelp(condition: condition): PreparedStatement {
     if (!condition) {
-      return '';
+      return {queryString:'', parameters:[]};
     }
 
     if (this.isCompoundCondition(condition)) {
       const compCondition = condition as compoundCondition;
       let conditionsSQL = '';
+      let params = [];
 
       for (let i = 0; i < compCondition.conditions.length; i++) {
         const condSQL = this.conditionWhereSQLHelp(compCondition.conditions[i]);
-        conditionsSQL += condSQL;
+        conditionsSQL += condSQL.queryString;
+        params = params.concat(condSQL.parameters);
         if (i < compCondition.conditions.length - 1) {
           conditionsSQL += ` ${compCondition.operator} `;
         }
       }
 
-      return `(${conditionsSQL})`;
+      return {queryString: `(${conditionsSQL})`, parameters: params};
+
     } else if (this.isPrimitiveCondition(condition)) {
       const primCondition = condition as primitiveCondition;
 
       let sql = '';
+      let params = [];
 
       if (primCondition.tableName) {
         sql += `\`${primCondition.tableName}\`.`;
@@ -298,20 +319,17 @@ export class MysqlJsonConverterService extends JsonConverterService {
 
       sql += `\`${primCondition.column}\` ${primCondition.operator} `;
 
-      if (typeof primCondition.value === 'string') {
-        sql += `'${primCondition.value}'`;
-      } else if (typeof primCondition.value === 'boolean') {
-        sql += primCondition.value ? 'TRUE' : 'FALSE';
-      } else if (primCondition.value == null) {
+      if(primCondition.value == null){
         sql += 'NULL';
+      }
+      else if (typeof primCondition.value === 'string' || typeof primCondition.value === 'boolean' || typeof primCondition.value === 'number') {
+        sql += `?`;
+        params.push(primCondition.value)
       } else if (typeof primCondition.value === 'object') {
         sql += `(${this.convertJsonToQuery(primCondition.value)})`;
-      } else // number
-      {
-        sql += primCondition.value;
       }
 
-      return sql;
+      return {queryString: sql, parameters: params};
     }
   }
 
@@ -391,32 +409,47 @@ export class MysqlJsonConverterService extends JsonConverterService {
     return false;
   }
 
-  havingSQL(jsonData: QueryParams) {
+  havingSQL(jsonData: QueryParams): PreparedStatement {
     if (!jsonData.condition) {
-      return '';
+      return {queryString: '', parameters: []};
     }
 
     const havingConditions = this.getAggregateConditions(jsonData.condition);
 
-    return havingConditions.length > 0
-      ? ` HAVING ${havingConditions.join(' AND ')}`
-      : '';
+    if(havingConditions.length < 1){
+      return {queryString: '', parameters: []};
+    }
+    else{
+      let qString = ' HAVING ';
+      let params = [];
+  
+      for(let i = 0; i < havingConditions.length-1; i++){
+          qString += havingConditions[i].queryString + " AND ";
+          params = params.concat(havingConditions[i].parameters);
+      }
+
+      qString += havingConditions[havingConditions.length-1].queryString;
+      params = params.concat(havingConditions[havingConditions.length-1].parameters);
+
+      return {queryString: qString, parameters: params}
+
+    }
+
   }
 
-  getAggregateConditions(condition: condition): string[] {
-    let aggregateConditions: string[] = [];
+  getAggregateConditions(condition: condition): PreparedStatement[] {
+    let aggregateConditions: PreparedStatement[] = [];
 
     if (this.isCompoundCondition(condition)) {
       const compCondition = condition as compoundCondition;
 
       for (let i = 0; i < compCondition.conditions.length; i++) {
-        aggregateConditions.push(
-          ...this.getAggregateConditions(compCondition.conditions[i])
-        );
+        aggregateConditions = aggregateConditions.concat(this.getAggregateConditions(compCondition.conditions[i]));
       }
     } else if (this.isPrimitiveCondition(condition) && condition.aggregate) {
       const primCondition = condition as primitiveCondition;
       let sql = '';
+      let params = [];
 
       if (condition.tableName) {
         sql = `${primCondition.aggregate}(\`${condition.tableName}\`.\`${primCondition.column}\`) ${primCondition.operator} `;
@@ -424,20 +457,17 @@ export class MysqlJsonConverterService extends JsonConverterService {
         sql = `${primCondition.aggregate}(\`${primCondition.column}\`) ${primCondition.operator} `;
       }
 
-      if (typeof primCondition.value === 'string') {
-        sql += `'${primCondition.value}'`;
-      } else if (typeof primCondition.value === 'boolean') {
-        sql += primCondition.value ? 'TRUE' : 'FALSE';
-      } else if (primCondition.value == null) {
+      if(primCondition.value == null){
         sql += 'NULL';
+      }
+      else if (typeof primCondition.value === 'string' || typeof primCondition.value === 'boolean' || typeof primCondition.value === 'number') {
+        sql += `?`;
+        params.push(primCondition.value)
       } else if (typeof primCondition.value === 'object') {
         sql += `(${this.convertJsonToQuery(primCondition.value)})`;
-      } else {
-        // number
-        sql += primCondition.value;
       }
 
-      aggregateConditions.push(sql);
+      aggregateConditions.push({queryString: sql, parameters: params});
     }
 
     return aggregateConditions;

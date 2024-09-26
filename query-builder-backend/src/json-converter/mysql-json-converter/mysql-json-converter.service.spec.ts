@@ -33,11 +33,11 @@ describe('MysqlJsonConverterService', () => {
   //conditionWhereSQLHelp()
 
   it('should return an empty string if the condition is null', () => {
-      expect(service.conditionWhereSQLHelp(null)).toBe('');
+      expect(service.conditionWhereSQLHelp(null)).toEqual({queryString: "", parameters: []});
   });
 
   it('should return an empty string if the condition is undefined', () => {
-      expect(service.conditionWhereSQLHelp(undefined)).toBe('');
+      expect(service.conditionWhereSQLHelp(undefined)).toEqual({queryString: "", parameters: []});
   });
 
   it('should handle boolean true values correctly', () => {
@@ -48,7 +48,7 @@ describe('MysqlJsonConverterService', () => {
       } as primitiveCondition;
 
       const result = service.conditionWhereSQLHelp(condition);
-      expect(result).toBe('`is_active` = TRUE');
+      expect(result).toEqual({queryString: '`is_active` = ?', parameters: [true]});
   });
 
   it('should handle boolean false values correctly', () => {
@@ -59,7 +59,7 @@ describe('MysqlJsonConverterService', () => {
       } as primitiveCondition;
 
       const result = service.conditionWhereSQLHelp(condition);
-      expect(result).toBe('`is_active` = FALSE');
+      expect(result).toEqual({queryString: '`is_active` = ?', parameters: [false]});
   });
 
   //conditionWhereSQL()
@@ -74,7 +74,7 @@ describe('MysqlJsonConverterService', () => {
 
       const result = service.conditionWhereSQL(condition);
 
-      expect(result).toEqual(" WHERE `name` = 'value'");
+      expect(result).toEqual({queryString: " WHERE `name` = ?", parameters: ["value"]});
 
   });
 
@@ -98,7 +98,7 @@ describe('MysqlJsonConverterService', () => {
 
       const result = service.conditionWhereSQL(condition);
 
-      expect(result).toEqual(" WHERE (`name` = 'value' AND `age` > 18)");
+      expect(result).toEqual({queryString: " WHERE (`name` = ? AND `age` > ?)", parameters: ["value", 18]});
 
   });
 
@@ -137,7 +137,10 @@ describe('MysqlJsonConverterService', () => {
 
       const result = service.conditionWhereSQL(condition);
 
-      expect(result).toEqual(" WHERE (`name` = 'value' AND `age` > 18 AND (`city` = 'New York' OR `status` != 'inactive'))");
+      expect(result).toEqual({
+        queryString: " WHERE (`name` = ? AND `age` > ? AND (`city` = ? OR `status` != ?))",
+        parameters: ["value", 18, "New York", "inactive"]
+    });
 
   });
 
@@ -146,7 +149,7 @@ describe('MysqlJsonConverterService', () => {
 
       const result = service.conditionWhereSQL(null);
 
-      expect(result).toEqual("");
+      expect(result).toEqual({queryString: "", parameters: []});
 
   });
 
@@ -162,7 +165,7 @@ describe('MysqlJsonConverterService', () => {
 
       const result = service.getAggregateConditions(condition);
 
-      expect(result).toEqual(["SUM(`salary`) > 50000"]);
+      expect(result).toEqual([{queryString: "SUM(`salary`) > ?", parameters: [50000]}]);
   });
 
   it('should return SQL for compound aggregate conditions', () => {
@@ -186,7 +189,7 @@ describe('MysqlJsonConverterService', () => {
 
       const result = service.getAggregateConditions(condition);
 
-      expect(result).toEqual(["SUM(`salary`) > 50000", "COUNT(`id`) > 10"]);
+      expect(result).toEqual([{queryString: "SUM(`salary`) > ?", parameters: [50000]}, {queryString: "COUNT(`id`) > ?", parameters: [10]}]);
   });
 
   it('should handle string values correctly with table name', () => {
@@ -199,7 +202,7 @@ describe('MysqlJsonConverterService', () => {
       } as primitiveCondition;
 
       const result = service.getAggregateConditions(condition);
-      expect(result).toEqual([`COUNT(\`users\`.\`status\`) = 'active'`]);
+      expect(result).toEqual([{queryString: `COUNT(\`users\`.\`status\`) = ?`, parameters: ["active"]}]);
   });
 
   it('should handle string values correctly without table name', () => {
@@ -211,7 +214,7 @@ describe('MysqlJsonConverterService', () => {
       } as primitiveCondition;
 
       const result = service.getAggregateConditions(condition);
-      expect(result).toEqual([`MAX(\`status\`) = 'inactive'`]);
+      expect(result).toEqual([{queryString: `MAX(\`status\`) = ?`, parameters: ["inactive"]}]);
   });
 
   it('should handle boolean true values correctly with table name', () => {
@@ -224,7 +227,7 @@ describe('MysqlJsonConverterService', () => {
       } as primitiveCondition;
 
       const result = service.getAggregateConditions(condition);
-      expect(result).toEqual([`SUM(\`users\`.\`is_active\`) = TRUE`]);
+      expect(result).toEqual([{queryString: `SUM(\`users\`.\`is_active\`) = ?`, parameters: [true]}]);
   });
 
   it('should handle boolean false values correctly with table name', () => {
@@ -237,7 +240,7 @@ describe('MysqlJsonConverterService', () => {
       } as primitiveCondition;
 
       const result = service.getAggregateConditions(condition);
-      expect(result).toEqual([`COUNT(\`users\`.\`is_active\`) = FALSE`]);
+      expect(result).toEqual([{queryString: `COUNT(\`users\`.\`is_active\`) = ?`, parameters: [false]}]);
   });
 
   it('should handle boolean true values correctly without table name', () => {
@@ -249,7 +252,7 @@ describe('MysqlJsonConverterService', () => {
       } as primitiveCondition;
 
       const result = service.getAggregateConditions(condition);
-      expect(result).toEqual([`AVG(\`is_active\`) = TRUE`]);
+      expect(result).toEqual([{queryString: `AVG(\`is_active\`) = ?`, parameters: [true]}]);
   });
 
   it('should handle boolean false values correctly without table name', () => {
@@ -261,7 +264,7 @@ describe('MysqlJsonConverterService', () => {
       } as primitiveCondition;
 
       const result = service.getAggregateConditions(condition);
-      expect(result).toEqual([`MAX(\`is_active\`) = FALSE`]);
+      expect(result).toEqual([{queryString: `MAX(\`is_active\`) = ?`, parameters: [false]}]);
   });
 
   //havingSQL()
@@ -282,7 +285,7 @@ describe('MysqlJsonConverterService', () => {
 
       const result = service.havingSQL(jsonData);
 
-      expect(result).toEqual('');
+      expect(result).toEqual({queryString: "", parameters: []});
   });
 
   //groupBySQL()
@@ -355,11 +358,11 @@ describe('MysqlJsonConverterService', () => {
           table: { name: 'users', columns: [{ name: 'id' }, { name: "first_name" }, { name: "last_name" }] },
       };
 
-      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `sakila`.`users`';
+      const expectedQueryString = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `sakila`.`users`';
 
       const result = service.convertJsonToQuery(queryParams);
 
-      expect(result).toEqual(expectedQuery);
+      expect(result).toEqual({queryString: expectedQueryString, parameters: []});
 
   });
 
@@ -372,11 +375,11 @@ describe('MysqlJsonConverterService', () => {
           table: { name: 'users', columns: [{ name: 'id', aggregation: AggregateFunction.COUNT, alias: "Number" }] },
       };
 
-      const expectedQuery = 'SELECT COUNT(`users`.`id`) AS `Number` FROM `sakila`.`users`';
+      const expectedQueryString = 'SELECT COUNT(`users`.`id`) AS `Number` FROM `sakila`.`users`';
 
       const result = service.convertJsonToQuery(queryParams);
 
-      expect(result).toEqual(expectedQuery);
+      expect(result).toEqual({queryString: expectedQueryString, parameters: []});
 
   });
 
@@ -400,11 +403,11 @@ describe('MysqlJsonConverterService', () => {
           },
       };
 
-      const expectedQuery = 'SELECT `users`.`id`, `actors`.`role` FROM `sakila`.`users` JOIN `sakila`.`actors` ON `users`.`id`=`actors`.`user_id`';
+      const expectedQueryString = 'SELECT `users`.`id`, `actors`.`role` FROM `sakila`.`users` JOIN `sakila`.`actors` ON `users`.`id`=`actors`.`user_id`';
 
       const result = service.convertJsonToQuery(queryParams);
 
-      expect(result).toEqual(expectedQuery);
+      expect(result).toEqual({queryString: expectedQueryString, parameters: []});
 
   });
 
@@ -421,11 +424,11 @@ describe('MysqlJsonConverterService', () => {
           }
       };
 
-      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `sakila`.`users` ORDER BY `first_name` DESC';
+      const expectedQueryString = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `sakila`.`users` ORDER BY `first_name` DESC';
 
       const result = service.convertJsonToQuery(queryParams);
 
-      expect(result).toEqual(expectedQuery);
+      expect(result).toEqual({queryString: expectedQueryString, parameters: []});
 
   });
 
@@ -441,11 +444,11 @@ describe('MysqlJsonConverterService', () => {
           }
       };
 
-      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `sakila`.`users` ORDER BY `first_name` ASC';
+      const expectedQueryString = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `sakila`.`users` ORDER BY `first_name` ASC';
 
       const result = service.convertJsonToQuery(queryParams);
 
-      expect(result).toEqual(expectedQuery);
+      expect(result).toEqual({queryString: expectedQueryString, parameters: []});
 
   });
 
@@ -462,11 +465,11 @@ describe('MysqlJsonConverterService', () => {
           }
       };
 
-      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `sakila`.`users` LIMIT 10 OFFSET 20';
+      const expectedQueryString = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `sakila`.`users` LIMIT 10 OFFSET 20';
 
       const result = service.convertJsonToQuery(queryParams);
 
-      expect(result).toEqual(expectedQuery);
+      expect(result).toEqual({queryString: expectedQueryString, parameters: []});
 
   });
 
@@ -545,10 +548,10 @@ describe('MysqlJsonConverterService', () => {
           }
       };
 
-      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `sakila`.`users` WHERE `age` > 18 LIMIT 10 OFFSET 20';
+      const expectedQueryString = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name` FROM `sakila`.`users` WHERE `age` > ? LIMIT 10 OFFSET 20';
       const result = service.convertJsonToQuery(queryParams);
 
-      expect(result).toEqual(expectedQuery);
+      expect(result).toEqual({queryString: expectedQueryString, parameters: [18]});
   });
 
   it('should be able to convert queries using pagination, group by, and having conditions', () => {
@@ -578,10 +581,10 @@ describe('MysqlJsonConverterService', () => {
           }
       };
 
-      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name`, AVG(`users`.`age`) AS `AVG(age)` FROM `sakila`.`users` GROUP BY `users`.`id`, `users`.`first_name`, `users`.`last_name` HAVING AVG(`users`.`age`) > 18 LIMIT 10 OFFSET 20';
+      const expectedQueryString = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name`, AVG(`users`.`age`) AS `AVG(age)` FROM `sakila`.`users` GROUP BY `users`.`id`, `users`.`first_name`, `users`.`last_name` HAVING AVG(`users`.`age`) > ? LIMIT 10 OFFSET 20';
       const result = service.convertJsonToQuery(queryParams);
 
-      expect(result).toEqual(expectedQuery);
+      expect(result).toEqual({queryString: expectedQueryString, parameters: [18]});
   });
 
   it('should be able to convert queries using pagination, group by, and where conditions', () => {
@@ -609,10 +612,10 @@ describe('MysqlJsonConverterService', () => {
           }
       };
 
-      const expectedQuery = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name`, `users`.`age` FROM `sakila`.`users` WHERE `age` > 18 LIMIT 10 OFFSET 20';
+      const expectedQueryString = 'SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name`, `users`.`age` FROM `sakila`.`users` WHERE `age` > ? LIMIT 10 OFFSET 20';
       const result = service.convertJsonToQuery(queryParams);
 
-      expect(result).toEqual(expectedQuery);
+      expect(result).toEqual({queryString: expectedQueryString, parameters: [18]});
   });
 
   it('Should be able to convert a query with a join and a having, with aggregate in first table', () => {
@@ -648,7 +651,7 @@ describe('MysqlJsonConverterService', () => {
 
       const result = service.convertJsonToQuery(jsonData);
 
-      expect(result).toEqual('SELECT COUNT(`city`.`city_id`) AS `Number of cities per country`, `country`.`country` FROM `sakila`.`city` JOIN `sakila`.`country` ON `city`.`country_id`=`country`.`country_id` GROUP BY `country`.`country` HAVING COUNT(`city`.`city_id`) > 10');
+      expect(result).toEqual({queryString: 'SELECT COUNT(`city`.`city_id`) AS `Number of cities per country`, `country`.`country` FROM `sakila`.`city` JOIN `sakila`.`country` ON `city`.`country_id`=`country`.`country_id` GROUP BY `country`.`country` HAVING COUNT(`city`.`city_id`) > ?', parameters: [10]});
 
   });
 
@@ -685,7 +688,7 @@ describe('MysqlJsonConverterService', () => {
 
       const result = service.convertJsonToQuery(jsonData);
 
-      expect(result).toEqual('SELECT `country`.`country`, COUNT(`city`.`city_id`) AS `Number of cities per country` FROM `sakila`.`country` JOIN `sakila`.`city` ON `country`.`country_id`=`city`.`country_id` GROUP BY `country`.`country` HAVING COUNT(`city`.`city_id`) > 10');
+      expect(result).toEqual({queryString: 'SELECT `country`.`country`, COUNT(`city`.`city_id`) AS `Number of cities per country` FROM `sakila`.`country` JOIN `sakila`.`city` ON `country`.`country_id`=`city`.`country_id` GROUP BY `country`.`country` HAVING COUNT(`city`.`city_id`) > ?', parameters: [10]});
 
   });
 
@@ -716,7 +719,7 @@ describe('MysqlJsonConverterService', () => {
 
       }
       const result = service.convertJsonToQuery(jsonData);
-      expect(result).toEqual('SELECT `city`.`city_id`, `country`.`country` FROM `sakila`.`city` JOIN `sakila`.`country` ON `city`.`country_id`=`country`.`country_id` WHERE `city_id` > 10');
+      expect(result).toEqual({queryString: 'SELECT `city`.`city_id`, `country`.`country` FROM `sakila`.`city` JOIN `sakila`.`country` ON `city`.`country_id`=`country`.`country_id` WHERE `city_id` > ?', parameters: [10]});
   });
 
   it('Should convert a query finding country names starting with B', () => {
@@ -738,7 +741,7 @@ describe('MysqlJsonConverterService', () => {
 
       const result = service.convertJsonToQuery(jsonData);
 
-      expect(result).toEqual("SELECT `country`.`country` FROM `sakila`.`country` WHERE `country` LIKE 'B%'");
+      expect(result).toEqual({queryString: "SELECT `country`.`country` FROM `sakila`.`country` WHERE `country` LIKE ?", parameters: ["B%"]});
 
   });
 
@@ -771,10 +774,10 @@ describe('MysqlJsonConverterService', () => {
           }
       };
 
-      const expectedQuery = 'SELECT COUNT(*) AS numRows FROM (SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name`, AVG(`users`.`age`) AS `AVG(age)` FROM `sakila`.`users` GROUP BY `users`.`id`, `users`.`first_name`, `users`.`last_name` HAVING AVG(`users`.`age`) > 18) AS subquery';
+      const expectedQueryString = 'SELECT COUNT(*) AS numRows FROM (SELECT `users`.`id`, `users`.`first_name`, `users`.`last_name`, AVG(`users`.`age`) AS `AVG(age)` FROM `sakila`.`users` GROUP BY `users`.`id`, `users`.`first_name`, `users`.`last_name` HAVING AVG(`users`.`age`) > ?) AS subquery';
       const result = service.convertJsonToCountQuery(queryParams);
 
-      expect(result).toEqual(expectedQuery);
+      expect(result).toEqual({queryString: expectedQueryString, parameters: [18]});
   });
 
   it('Should be able to generate a count query for a query with a join and a having, with aggregate in first table', () => {
@@ -810,7 +813,7 @@ describe('MysqlJsonConverterService', () => {
 
       const result = service.convertJsonToCountQuery(jsonData);
 
-      expect(result).toEqual('SELECT COUNT(*) AS numRows FROM (SELECT COUNT(`city`.`city_id`) AS `Number of cities per country`, `country`.`country` FROM `sakila`.`city` JOIN `sakila`.`country` ON `city`.`country_id`=`country`.`country_id` GROUP BY `country`.`country` HAVING COUNT(`city`.`city_id`) > 10) AS subquery');
+      expect(result).toEqual({queryString: 'SELECT COUNT(*) AS numRows FROM (SELECT COUNT(`city`.`city_id`) AS `Number of cities per country`, `country`.`country` FROM `sakila`.`city` JOIN `sakila`.`country` ON `city`.`country_id`=`country`.`country_id` GROUP BY `country`.`country` HAVING COUNT(`city`.`city_id`) > ?) AS subquery', parameters: [10]});
 
   });
 
