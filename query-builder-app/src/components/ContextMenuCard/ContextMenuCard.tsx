@@ -197,7 +197,7 @@ export default function ContextMenuCard({
     function shareQueryHelper(query_id: string, checkedUsers: User[], userDescription: string) {
         const test = checkedUsers.map((user) => user.user_id);
         console.log(test);
-        alert(shareQuery(query_id, test, userDescription));
+        shareQuery(query_id, test, userDescription)
     }
 
     return (
