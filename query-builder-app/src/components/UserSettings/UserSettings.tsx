@@ -2,7 +2,7 @@ import "../../app/globals.css"
 import "../Authentication/Authentication.css"
 import './UserSettings.css';
 import React, { useState, useEffect } from "react";
-import { Button, Card, CardBody, CardFooter, CardHeader, Input, Image } from "@nextui-org/react";
+import { Button, Card, CardBody, CardFooter, CardHeader, Input, Image, Tooltip} from "@nextui-org/react";
 import { EditIcon } from "../OrganisationManagement/EditIcon";
 import { createClient } from "./../../utils/supabase/client";
 import toast, { Toaster } from 'react-hot-toast';
@@ -244,6 +244,8 @@ export default function UserSettings() {
                 //     console.log(data);
                 //     setProfilePicURL(data.publicUrl);
                 // });
+            }).then(async () => {
+                await updateProfileUrl();
             });
         }
     };
@@ -265,6 +267,7 @@ export default function UserSettings() {
                             />
 
                             <div className="flex flex-col justify-end absolute bottom-0">
+                            <Tooltip content="Upload a new profile picture">
                                 <label className="custom-file-upload bg-white p-1 border-2 border-slate-600 rounded-full">
                                     <input
                                         data-testid="file-input"
@@ -274,6 +277,7 @@ export default function UserSettings() {
                                     />
                                     <EditIcon className="cursor-pointer" />
                                 </label>
+                            </Tooltip>
                             </div>
                         </div>
                     </div>

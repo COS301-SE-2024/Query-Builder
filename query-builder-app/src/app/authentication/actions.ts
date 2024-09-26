@@ -9,30 +9,6 @@ import { wait } from "@testing-library/user-event/dist/cjs/utils/index.js";
 export async function login(email: string, password: string) {
     const supabase = createClient();
 
-    let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user-management/get-user`, {
-        credentials: "include",
-        method: "PUT",
-        headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-        },
-        body: JSON.stringify({
-            email: email
-        })
-    });
-
-    let result = await (response).json();
-    console.log(result);
-
-    if (await result.data.length > 0) {
-        console.log(await result.data[0].onboarded);
-
-        if(await result.data[0].onboarded == false){
-            throw new Error('Confirm account');
-        }
-    }
-
     const userDetails = {
         email: email,
         password: password,
@@ -42,7 +18,7 @@ export async function login(email: string, password: string) {
 
     if (error) {
         // redirect("/error");
-        console.log(error);
+        // console.log(error);
         if(error instanceof AuthApiError || error instanceof AuthError){
             if (error.status == 400 && error.code == 'invalid_credentials'){
                 throw new AuthError("Failed to login, please try again: Invalid credentials", 400, 'invalid_credentials');
@@ -108,9 +84,6 @@ export async function signup(
             // Handle other types of errors
             throw new Error("Unexpected error"); // Generic error handling
         }
-
-        revalidatePath('/', 'layout');
-        redirect('/');
     }
     else if (result.data?.length > 0) {
         if(result.data[0].onboarded){

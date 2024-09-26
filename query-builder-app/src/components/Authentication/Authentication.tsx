@@ -156,8 +156,12 @@ export default function Authentication() {
       else if (error instanceof Error && error.message.includes("Confirm account")) {
         toast.error("Please check your emails and confirm your account.");
       }
-      else if (error instanceof Error) {
+      else if (error instanceof Error && error.message.includes("Invalid")) {
         toast.error("Failed to login in:\nPlease check your email and password, and try again.");
+        // console.log(error);
+      }
+      else if (error instanceof Error && error.message.includes("Unexpected")) {
+        toast.error("Failed to login in:\nPlease check your emails and confirm your account and try logging in again.");
         // console.log(error);
       }
       else{

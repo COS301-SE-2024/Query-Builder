@@ -266,7 +266,13 @@ export default function OrganisationManagement() {
     }
 
     if (updateOrgName != initialOrgName) {
-      updatedDetails.name = updateOrgName;
+      if(updateOrgName == ''){
+        setUpdateOrgName(initialOrgName);
+        updatedDetails.name = initialOrgName;
+      }
+      else{
+        updatedDetails.name = updateOrgName;
+      }
     }
 
     if (profilePicURL != initialOrgLogo) {
@@ -286,6 +292,7 @@ export default function OrganisationManagement() {
     console.log(response);
     if (response.status === 200 || response.status === 201) {
       setInitialOrgName(updateOrgName);
+      setInitialOrgLogo(profilePicURL);
     }
   };
 
@@ -410,7 +417,8 @@ export default function OrganisationManagement() {
               />
 
               <div className="flex flex-col justify-end absolute bottom-0">
-                <label className="custom-file-upload bg-white p-1 border-2 border-slate-600 rounded-full">
+              <Tooltip content="Upload new logo">
+                <label className="custom-file-upload bg-white p-1 border-2 border-slate-600 rounded-full hover:bg-">
                   <input
                     data-testid="file-input"
                     type="file"
@@ -419,6 +427,7 @@ export default function OrganisationManagement() {
                   />
                   <EditIcon className="cursor-pointer" />
                 </label>
+              </Tooltip>
               </div>
             </div>
             <Spacer y={2} />
@@ -722,7 +731,7 @@ export default function OrganisationManagement() {
     }
   };
 
-  const updateProfilePicture = async () => {
+  const updateProfilePicture = React.useCallback(async () => {
     if (file != null) {
       const formData = new FormData();
       formData.append('org_id', orgServerID);
@@ -736,13 +745,15 @@ export default function OrganisationManagement() {
         },
         body: formData
       }).then(async (response) => {
-        console.log(response);
-        setProfilePicURL((await response.json()).publicUrl);
+        let data = (await response.json());
+        console.log(data);
+        setProfilePicURL(data.publicUrl);
+      }).then(async () => {
+        await updateQuery();
       });
 
-      await updateQuery();
     }
-  };
+  }, [setProfilePicURL, profilePicURL, updateQuery]);
 
   return (
     <>
