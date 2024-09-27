@@ -374,7 +374,7 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
         .getClient()
         .from('db_envs')
         .select('org_id')
-        .eq('db_id', save_db_metadata_dto.databaseServerId)
+        .eq('db_id', save_db_metadata_dto.databaseServerID)
         .single();
 
       if (org_error) {
@@ -414,7 +414,7 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
           description: save_db_metadata_dto.description
         }
       })
-      .eq('db_id', save_db_metadata_dto.databaseServerId)
+      .eq('db_id', save_db_metadata_dto.databaseServerID)
       .select();
 
     if (error) {
@@ -441,7 +441,7 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
         .getClient()
         .from('db_envs')
         .select('org_id')
-        .eq('db_id', save_table_metadata_dto.databaseServerId)
+        .eq('db_id', save_table_metadata_dto.databaseServerID)
         .single();
 
       if (org_error) {
@@ -477,7 +477,7 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
       .getClient()
       .from('db_envs')
       .select('table_meta_data')
-      .eq('db_id', save_table_metadata_dto.databaseServerId)
+      .eq('db_id', save_table_metadata_dto.databaseServerID)
       .single();
 
     if (existing_error) {
@@ -517,7 +517,7 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
       .upsert({
         table_meta_data: existing_data.table_meta_data
       })
-      .eq('db_id', save_table_metadata_dto.databaseServerId)
+      .eq('db_id', save_table_metadata_dto.databaseServerID)
       .select();
 
     if (error) {

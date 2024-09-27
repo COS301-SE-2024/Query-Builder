@@ -1,9 +1,15 @@
-import { IsArray, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID
+} from 'class-validator';
 
 export class Saved_DB_Metadata_Dto {
   @IsString()
   @IsNotEmpty()
-  databaseServerId: string;
+  databaseServerID: string;
 
   @IsString()
   @IsNotEmpty()
@@ -22,7 +28,7 @@ export class Saved_DB_Metadata_Dto {
 export class Saved_Table_Metadata_Dto {
   @IsString()
   @IsNotEmpty()
-  databaseServerId: string;
+  databaseServerID: string;
 
   @IsString()
   @IsNotEmpty()
@@ -46,7 +52,19 @@ export class Saved_Field_Metadata_Dto {
   @IsString()
   @IsUUID()
   @IsNotEmpty()
-  field_id: string;
+  databaseServerID: string;
+
+  @IsString()
+  @IsNotEmpty()
+  language: string;
+
+  @IsString()
+  @IsNotEmpty()
+  table_name: [];
+
+  @IsString()
+  @IsNotEmpty()
+  field_name: string;
 
   @IsString()
   @IsNotEmpty()
