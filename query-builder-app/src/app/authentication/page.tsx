@@ -3,6 +3,7 @@ import LandingPage from '@/components/LandingPage/StartPage';
 import { Toaster } from 'react-hot-toast';
 
 export default function Auth() {
+  
   return (
     <>
     <Toaster
