@@ -231,7 +231,7 @@ export default function Authentication() {
       const supabase = createClient();
   
       // Specify the redirect URL here
-      const redirectTo = 'https://capstone-qbee.dns.net.za/reset'; // Change this to your desired URL
+      const redirectTo = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/reset`; // Change this to your desired URL
   
       const { data, error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
   
