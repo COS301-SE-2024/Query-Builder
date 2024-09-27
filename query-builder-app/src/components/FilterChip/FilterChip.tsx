@@ -1,18 +1,26 @@
 //----------------------------IMPORTS------------------------------------//
 
-import { Button, Card, CardBody, Chip, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input, Popover, PopoverContent, PopoverTrigger, Radio, RadioGroup, Spacer } from "@nextui-org/react";
-import { AggregateFunction, column, primitiveCondition, ComparisonOperator } from "../../interfaces/intermediateJSON"
+import { Button, Card, CardBody, Chip, Dropdown, DropdownItem, DropdownMenu, DropdownSection, DropdownTrigger, Input, Popover, PopoverContent, PopoverTrigger, Radio, RadioGroup, Spacer } from "@nextui-org/react";
+import { AggregateFunction, column, primitiveCondition, ComparisonOperator, QueryParams } from "../../interfaces/intermediateJSON"
 import { FiMoreVertical } from "react-icons/fi";
 import { useEffect, useRef, useState } from "react";
 import React from "react";
 
 //----------------------------INTERFACES------------------------------------//
 
+export interface CurrentQuery
+{
+    query_id: string,
+    queryTitle: string,
+    parameters: QueryParams
+}
+
 interface FilterChipProps {
     primitiveCondition: primitiveCondition,
     key: string,
+    subquerylist?: CurrentQuery[],
     onChange?: (primitiveCondition: primitiveCondition) => void
-    onRemove?: (key: string) => void; 
+    onRemove?: (key: string) => void;
   }
 
 export default function FilterChip(props: FilterChipProps){
@@ -24,6 +32,16 @@ export default function FilterChip(props: FilterChipProps){
 
     //React hook for the data model
     const [primitiveCondition, setPrimitiveCondition] = useState<primitiveCondition>(props.primitiveCondition);
+    
+    // React hook for the subquery list
+    const [subquerylist, setSubqueryList] = useState<CurrentQuery[] | undefined>(props.subquerylist);
+    
+    const [isQuery, setIsQuery] = useState<boolean>(isQueryParams(primitiveCondition.value));
+    
+    const [initIsQuery, setInitIsQuery] = useState<boolean>(isQueryParams(primitiveCondition.value));
+
+    //React hook for initial subquery
+    const [initSubquery, setInitSubquery] = useState<any>(primitiveCondition.value);
 
     //React hook for the string displayed on the Chip
     const [primitiveConditionString, setPrimitiveConditionString] = useState<string>("");
@@ -63,7 +81,7 @@ export default function FilterChip(props: FilterChipProps){
     useEffect(() => {
       document.addEventListener('mousedown', handleClickOutside);
       return () => {
-        document.removeEventListener('mousedown', handleClickOutside);   
+        document.removeEventListener('mousedown', handleClickOutside); 
   
       };
     }, []);
@@ -89,18 +107,31 @@ export default function FilterChip(props: FilterChipProps){
 
         output += " " + primitiveCondition.operator + " ";
 
-        output += primitiveCondition.value;
+        if(isQueryParams(primitiveCondition.value)){
+            output += "Query";
+        }
+        else
+        {
+            output += primitiveCondition.value;
+        }
 
         return output;
 
     }
 
+    function isQueryParams(object: any): object is QueryParams {
+        return object && typeof object.language === 'string' && typeof object.query_type === 'string' && typeof object.databaseName === 'string' && typeof object.table === 'object';
+    }
+
     //not handling null which causes issues
-    function setConditionValue(valueString: string){
+    function setConditionValue(valueString: any ){
 
         let value: any;
 
-        if(valueString == ""){
+        if(isQueryParams(valueString)){
+            value = valueString;
+        }
+        else if(valueString == ""){
             value = valueString;
         }
         else if(valueString.toUpperCase() === "TRUE"){
@@ -199,19 +230,73 @@ export default function FilterChip(props: FilterChipProps){
                                     <DropdownItem key="LESS_THAN_EQUAL">&lt;=</DropdownItem>
                                     <DropdownItem key="GREATER_THAN_EQUAL">&gt;=</DropdownItem>
                                     <DropdownItem key="NOT_EQUAL">&lt;&gt;</DropdownItem>
+                                    <DropdownItem key="LIKE">LIKE</DropdownItem>
+                                    <DropdownItem key="IS">IS</DropdownItem>
+                                    <DropdownItem key="IS_NOT">IS NOT</DropdownItem>
+                                    <DropdownItem key="IN">IN</DropdownItem>
                                 </DropdownMenu>
                             </Dropdown>
                             <Spacer y={2}/>
                             <h2>Value</h2>
                             <Spacer y={2}/>
-                            <Input 
+                            <Dropdown>
+                                <DropdownTrigger>
+                                    <Button
+                                        variant="bordered"
+                                        aria-label="Choose a subquery"
+                                    >
+                                        {isQuery ? "Query" : "Value"}
+                                    </Button>
+                                </DropdownTrigger>
+                                <DropdownMenu
+                                    aria-label="Choose between a value and a subquery from dropdown menu"
+                                    variant="flat"
+                                    disallowEmptySelection
+                                    selectionMode="single"
+                                    onSelectionChange={(keys) => {
+                                        const key = Array.from(keys)[0];
+
+                                        if(key == "VALUE"){
+                                            setIsQuery(false)
+                                            setConditionValue(0);
+                                        } else if (key == "OTHER"){
+                                            setIsQuery(true)
+                                            setConditionValue(initSubquery);
+                                        }
+                                        else{
+                                            setIsQuery(true)
+                                            if(subquerylist !== undefined){
+                                                const currquery = subquerylist.find((subquery) => subquery.query_id === key);
+                                                setConditionValue(currquery?.parameters);
+                                            }
+                                        }
+                                    }}
+
+                                >
+                                    <DropdownSection showDivider>
+                                        <DropdownItem key="VALUE">Value</DropdownItem>
+                                    </DropdownSection>
+                                    <DropdownSection title="Choose a saved query as a subquery" items={subquerylist}>
+                                        {(item) => (
+                                        <DropdownItem
+                                            key={item.query_id}
+                                        >
+                                            {item.queryTitle}
+                                        </DropdownItem>
+                                        )}
+                                    </DropdownSection>
+                                </DropdownMenu>
+                            </Dropdown>
+                            {(!isQuery) && (
+                                <Input 
                                 aria-label="Value input field"
                                 type="text" 
                                 value={primitiveCondition.value?.toString()}
                                 onValueChange={(value:string) => {
-                                    setConditionValue(value)
+                                setConditionValue(value)
                                 }}
-                            />
+                                />
+                            )}
                             <Spacer y={4} />
                             <Button
                                 color="primary"
