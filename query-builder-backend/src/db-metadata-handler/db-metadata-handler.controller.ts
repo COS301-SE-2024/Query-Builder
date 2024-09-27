@@ -1,6 +1,7 @@
-import { Body, Controller, Inject, Put, Session, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Inject, Post, Put, Session, ValidationPipe } from '@nestjs/common';
 import { DbMetadataHandlerService } from './db-metadata-handler.service';
 import { Database_Metadata_Dto, Field_Metadata_Dto, Foreign_Key_Metadata_Dto, Server_Summary_Metadata_Dto, Table_Metadata_Dto } from './dto/metadata.dto';
+import { Saved_DB_Metadata_Dto, Saved_Field_Metadata_Dto, Saved_Foreign_Key_Metadata_Dto, Saved_Table_Metadata_Dto } from './dto/save-metadata.dto';
 
 @Controller('metadata')
 export class DbMetadataHandlerController {
@@ -31,4 +32,45 @@ export class DbMetadataHandlerController {
     async getSchemaSummary(@Body(ValidationPipe) serverSummaryMetadataDto: Server_Summary_Metadata_Dto, @Session() session: Record<string, any>){
         return this.dbMetadataHandlerService.getServerSummary(serverSummaryMetadataDto, session);
     }
+
+    @Post("save-db-metadata")
+    async saveDbMetadata(@Body(ValidationPipe) save_db_metadata_dto: Saved_DB_Metadata_Dto){
+        return this.dbMetadataHandlerService.saveDbMetadata(save_db_metadata_dto);
+    }
+
+    @Put("get-db-metadata")
+    async getSavedDbMetadata(@Body(ValidationPipe) get_db_metadata_dto: Saved_DB_Metadata_Dto){
+        return this.dbMetadataHandlerService.getSavedDbMetadata(get_db_metadata_dto);
+    }
+
+    @Post("save-table-metadata")
+    async saveTableMetadata(@Body(ValidationPipe) save_table_metadata_dto: Saved_Table_Metadata_Dto){
+        return this.dbMetadataHandlerService.saveTableMetadata(save_table_metadata_dto);
+    }
+
+    @Put("get-table-metadata")
+    async getSavedTableMetadata(@Body(ValidationPipe) get_table_metadata_dto: Saved_Table_Metadata_Dto){
+        return this.dbMetadataHandlerService.getSavedTableMetadata(get_table_metadata_dto);
+    }
+
+    @Post("save-field-metadata")
+    async saveFieldMetadata(@Body(ValidationPipe) save_field_metadata_dto: Saved_Field_Metadata_Dto){
+        return this.dbMetadataHandlerService.saveFieldMetadata(save_field_metadata_dto);
+    }
+
+    @Put("get-field-metadata")
+    async getSavedFieldMetadata(@Body(ValidationPipe) get_field_metadata_dto: Saved_Field_Metadata_Dto){
+        return this.dbMetadataHandlerService.getSavedFieldMetadata(get_field_metadata_dto);
+    }
+
+    @Post("save-foreign-key-metadata")
+    async saveForeignKeyMetadata(@Body(ValidationPipe) save_foreign_key_metadata_dto: Saved_Foreign_Key_Metadata_Dto){
+        return this.dbMetadataHandlerService.saveForeignKeyMetadata(save_foreign_key_metadata_dto);
+    }
+
+    @Put("get-foreign-key-metadata")
+    async getSavedForeignKeyMetadata(@Body(ValidationPipe) get_foreign_key_metadata_dto: Saved_Foreign_Key_Metadata_Dto){
+        return this.dbMetadataHandlerService.getSavedForeignKeyMetadata(get_foreign_key_metadata_dto);
+    }
+
 }

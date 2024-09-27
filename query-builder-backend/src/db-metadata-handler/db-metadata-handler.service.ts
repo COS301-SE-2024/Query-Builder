@@ -1,6 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { QueryHandlerService } from '../query-handler/query-handler.service';
-import { Saved_DB_Metadata_Dto, Saved_Table_Metadata_Dto } from './dto/save-metadata.dto';
+import {
+  Saved_DB_Metadata_Dto,
+  Saved_Field_Metadata_Dto,
+  Saved_Foreign_Key_Metadata_Dto,
+  Saved_Table_Metadata_Dto
+} from './dto/save-metadata.dto';
 import {
   Database_Metadata_Dto,
   Field_Metadata_Dto,
@@ -43,22 +48,25 @@ export abstract class DbMetadataHandlerService {
   ): Promise<any>;
 
   abstract saveDbMetadata(save_db_metadata_dto: Saved_DB_Metadata_Dto);
-  abstract updateDbMetadata(update_db_metadata_dto: Saved_DB_Metadata_Dto);
-  abstract deleteDbMetadata(delete_db_metadata_dto: Saved_DB_Metadata_Dto);
+  abstract getSavedDbMetadata(get_db_metadata_dto: Saved_DB_Metadata_Dto);
 
   abstract saveTableMetadata(save_table_metadata_dto: Saved_Table_Metadata_Dto);
-  abstract updateTableMetadata(update_table_metadata_dto: Saved_Table_Metadata_Dto);
-  abstract deleteTableMetadata(delete_table_metadata_dto: Saved_Table_Metadata_Dto);
+  abstract getSavedTableMetadata(
+    get_table_metadata_dto: Saved_Table_Metadata_Dto
+  );
 
-  abstract saveFieldMetadata();
-  abstract updateFieldMetadata();
-  abstract deleteFieldMetadata();
+  abstract saveFieldMetadata(save_field_metadata_dto: Saved_Field_Metadata_Dto);
+  abstract getSavedFieldMetadata(
+    get_field_metadata_dto: Saved_Field_Metadata_Dto
+  );
 
-  abstract saveForeignKeyMetadata();
-  abstract updateForeignKeyMetadata();
-  abstract deleteForeignKeyMetadata();
+  abstract saveForeignKeyMetadata(
+    save_fk_metadata_dto: Saved_Foreign_Key_Metadata_Dto
+  );
+  abstract getSavedForeignKeyMetadata(
+    get_fk_metadata_dto: Saved_Foreign_Key_Metadata_Dto
+  );
 
   abstract saveServerSummaryMetadata();
-  abstract updateServerSummaryMetadata();
-  abstract deleteServerSummaryMetadata();
+  abstract getSavedServerSummaryMetadata();
 }

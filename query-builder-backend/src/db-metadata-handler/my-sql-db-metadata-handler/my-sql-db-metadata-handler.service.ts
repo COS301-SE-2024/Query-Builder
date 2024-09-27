@@ -14,14 +14,20 @@ import {
   Server_Summary_Metadata_Dto,
   Table_Metadata_Dto
 } from '../dto/metadata.dto';
-import { Saved_DB_Metadata_Dto } from '../dto/save-metadata.dto';
-import { Supabase } from '../../supabase/supabase';
+import {
+  Saved_DB_Metadata_Dto,
+  Saved_Table_Metadata_Dto,
+  Saved_Field_Metadata_Dto,
+  Saved_Foreign_Key_Metadata_Dto
+} from '../dto/save-metadata.dto';
 import { QueryHandlerService } from '../../query-handler/query-handler.service';
+import { Supabase } from '../../supabase/supabase';
 
 @Injectable()
 export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
   constructor(
     @Inject('QueryHandlerService')
+    @Inject('Supabase')
     protected readonly queryHandlerService: QueryHandlerService,
     private readonly supabase: Supabase
   ) {
@@ -368,7 +374,7 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
         .getClient()
         .from('db_envs')
         .select('org_id')
-        .eq('db_id', save_db_metadata_dto.db_id)
+        .eq('db_id', save_db_metadata_dto.databaseServerId)
         .single();
 
       if (org_error) {
@@ -408,7 +414,7 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
           description: save_db_metadata_dto.description
         }
       })
-      .eq('db_id', save_db_metadata_dto.db_id)
+      .eq('db_id', save_db_metadata_dto.databaseServerId)
       .select();
 
     if (error) {
@@ -417,7 +423,9 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
 
     return { data: data };
   }
-  async updateDbMetadata(update_db_metadata_dto: Saved_DB_Metadata_Dto) {
+  async getSavedDbMetadata(get_db_metadata_dto: Saved_DB_Metadata_Dto) {}
+
+  async saveTableMetadata(save_table_metadata_dto: Saved_Table_Metadata_Dto) {
     // Get the user information
     const { data: user_data, error: user_error } = await this.supabase
       .getClient()
@@ -428,19 +436,19 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
     }
 
     // Get the org_id from the database
-    if (!update_db_metadata_dto.org_id) {
+    if (!save_table_metadata_dto.org_id) {
       const { data: org_data, error: org_error } = await this.supabase
         .getClient()
         .from('db_envs')
         .select('org_id')
-        .eq('db_id', update_db_metadata_dto.db_id)
+        .eq('db_id', save_table_metadata_dto.databaseServerId)
         .single();
 
       if (org_error) {
         throw org_error;
       }
 
-      update_db_metadata_dto.org_id = org_data.org_id;
+      save_table_metadata_dto.org_id = org_data.org_id;
     }
 
     // Check if the user has permission to save the metadata
@@ -449,7 +457,7 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
         .getClient()
         .from('org_members')
         .select('user_role')
-        .eq('org_id', update_db_metadata_dto.org_id)
+        .eq('org_id', save_table_metadata_dto.org_id)
         .eq('user_id', user_data.user.id)
         .single();
 
@@ -464,16 +472,52 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
       throw new Error('User does not have permission to save metadata');
     }
 
+    // Retrieve existing metadata
+    const { data: existing_data, error: existing_error } = await this.supabase
+      .getClient()
+      .from('db_envs')
+      .select('table_meta_data')
+      .eq('db_id', save_table_metadata_dto.databaseServerId)
+      .single();
+
+    if (existing_error) {
+      throw existing_error;
+    }
+
+    // Combine the existing metadata with the new metadata
+    // data = [{
+    //   table_name: 'table1',
+    //   description: 'description1'},
+    //   {table_name: 'table2',
+    //   description: 'description2'}]
+    const new_metadata = save_table_metadata_dto.table_name.map(
+      (table_name, index) => {
+        return {
+          table_name: table_name,
+          description: save_table_metadata_dto.description[index]
+        };
+      }
+    );
+
+    for (const table of new_metadata) {
+      const existing_table = existing_data.table_meta_data.data.find(
+        (t) => t.table_name === table.table_name
+      );
+      if (existing_table) {
+        existing_table.description = table.description;
+      } else {
+        existing_data.table_meta_data.push(table);
+      }
+    }
+
     // Save the metadata
     const { data, error } = await this.supabase
       .getClient()
       .from('db_envs')
       .upsert({
-        db_meta_data: {
-          description: update_db_metadata_dto.description
-        }
+        table_meta_data: existing_data.table_meta_data
       })
-      .eq('db_id', update_db_metadata_dto.db_id)
+      .eq('db_id', save_table_metadata_dto.databaseServerId)
       .select();
 
     if (error) {
@@ -482,81 +526,22 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
 
     return { data: data };
   }
-  async deleteDbMetadata(delete_db_metadata_dto: Saved_DB_Metadata_Dto) {
-    // Get the user information
-    const { data: user_data, error: user_error } = await this.supabase
-      .getClient()
-      .auth.getUser(this.supabase.getJwt());
+  async getSavedTableMetadata(
+    get_table_metadata_dto: Saved_Table_Metadata_Dto
+  ) {}
 
-    if (user_error) {
-      throw user_error;
-    }
+  async saveFieldMetadata(save_field_metadata_dto: Saved_Field_Metadata_Dto) {}
+  async getSavedFieldMetadata(
+    get_field_metadata_dto: Saved_Field_Metadata_Dto
+  ) {}
 
-    // Get the org_id from the database
-    if (!delete_db_metadata_dto.org_id) {
-      const { data: org_data, error: org_error } = await this.supabase
-        .getClient()
-        .from('db_envs')
-        .select('org_id')
-        .eq('db_id', delete_db_metadata_dto.db_id)
-        .single();
-
-      if (org_error) {
-        throw org_error;
-      }
-
-      delete_db_metadata_dto.org_id = org_data.org_id;
-    }
-
-    // Check if the user has permission to delete the metadata
-    const { data: permission_data, error: permission_error } =
-      await this.supabase
-        .getClient()
-        .from('org_members')
-        .select('user_role')
-        .eq('org_id', delete_db_metadata_dto.org_id)
-        .eq('user_id', user_data.user.id)
-        .single();
-
-    if (permission_error) {
-      throw permission_error;
-    }
-    if (
-      !permission_data ||
-      permission_data.user_role !== 'admin' ||
-      permission_data.user_role !== 'owner'
-    ) {
-      throw new Error('User does not have permission to delete metadata');
-    }
-
-    // Save the metadata
-    const { data, error } = await this.supabase
-      .getClient()
-      .from('db_envs')
-      .delete()
-      .eq('db_id', delete_db_metadata_dto.db_id)
-      .select();
-
-    if (error) {
-      throw error;
-    }
-
-    return { data: data };
-  }
-
-  async saveTableMetadata() {}
-  async updateTableMetadata() {}
-  async deleteTableMetadata() {}
-
-  async saveFieldMetadata() {}
-  async updateFieldMetadata() {}
-  async deleteFieldMetadata() {}
-
-  async saveForeignKeyMetadata() {}
-  async updateForeignKeyMetadata() {}
-  async deleteForeignKeyMetadata() {}
+  async saveForeignKeyMetadata(
+    save_fk_metadata_dto: Saved_Foreign_Key_Metadata_Dto
+  ) {}
+  async getSavedForeignKeyMetadata(
+    get_fk_metadata_dto: Saved_Foreign_Key_Metadata_Dto
+  ) {}
 
   async saveServerSummaryMetadata() {}
-  async updateServerSummaryMetadata() {}
-  async deleteServerSummaryMetadata() {}
+  async getSavedServerSummaryMetadata() {}
 }
