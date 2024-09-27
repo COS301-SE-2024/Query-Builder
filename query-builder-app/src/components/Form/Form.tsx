@@ -405,7 +405,6 @@ export default function Form() {
             </>
           </CardFooter>
         </Card>
-        <h1>{JSON.stringify(condition)}</h1>
       </div>
     </>
   );
