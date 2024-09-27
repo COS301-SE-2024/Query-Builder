@@ -8,12 +8,18 @@ import {
 import { QueryParams } from '../../interfaces/dto/query.dto';
 import { table, column } from '../../interfaces/dto/table.dto';
 
+interface PreparedStatement {
+  queryString: string,
+  parameters: any[]
+}
+
 @Injectable()
 export class PostgresJsonConverterService extends JsonConverterService {
 
   //function to convert an entire QueryParams object into a query string
-  public convertJsonToQuery(jsonData: QueryParams) {
+  public convertJsonToQuery(jsonData: QueryParams): PreparedStatement {
     let query = '';
+    let params = [];
     jsonData.language = jsonData.language.toLowerCase();
     jsonData.query_type = jsonData.query_type.toLowerCase();
 
@@ -31,17 +37,23 @@ export class PostgresJsonConverterService extends JsonConverterService {
 
         const from = this.generateFromClause(jsonData);
 
-        const where = this.conditionWhereSQL(jsonData.condition);
+        const wherePreparedStatement = this.conditionWhereSQL(jsonData.condition);
+        const where = wherePreparedStatement.queryString;
+        params = params.concat(wherePreparedStatement.parameters);
 
         const groupBy = this.groupBySQL(jsonData);
 
-        const having = this.havingSQL(jsonData);
+        const havingPreparedStatement = this.havingSQL(jsonData);
+        const having = havingPreparedStatement.queryString;
+        params = params.concat(havingPreparedStatement.parameters);
 
         const orderBy = this.generateOrderByClause(jsonData);
 
         const limit = this.generateLimitClause(jsonData);
 
         query = `SELECT ${select} FROM ${from}${where}${groupBy}${having}${orderBy}${limit}`;
+        query = this.replaceQbeeParameters(query);
+
       } else {
         throw new Error('Unsupported query type');
       }
@@ -49,12 +61,13 @@ export class PostgresJsonConverterService extends JsonConverterService {
       throw new Error('Invalid language');
     }
 
-    return query;
+    return {queryString: query, parameters: params};
   }
 
   //function that generates a query that counts the number of rows the query would return without pagination
-  public convertJsonToCountQuery(jsonData: QueryParams): string {
+  public convertJsonToCountQuery(jsonData: QueryParams): PreparedStatement {
     let query = '';
+    let params = [];
     jsonData.language = jsonData.language.toLowerCase();
     jsonData.query_type = jsonData.query_type.toLowerCase();
 
@@ -78,19 +91,25 @@ export class PostgresJsonConverterService extends JsonConverterService {
         const from = this.generateFromClause(jsonData);
 
         //Include a where clause as filters can affect the number of rows
-        const where = this.conditionWhereSQL(jsonData.condition);
+        const wherePreparedStatement = this.conditionWhereSQL(jsonData.condition);
+        const where = wherePreparedStatement.queryString;
+        params = params.concat(wherePreparedStatement.parameters);
 
         //Include a group by clause as aggregates can affect the number of rows
         const groupBy = this.groupBySQL(jsonData);
 
         //Include a having clause as filters can affect the number of rows
-        const having = this.havingSQL(jsonData);
+        const havingPreparedStatement = this.havingSQL(jsonData);
+        const having = havingPreparedStatement.queryString;
+        params = params.concat(havingPreparedStatement.parameters);
 
         //Exclude an orderBy clause sorting doesn't affect the total number of rows
 
         //Exclude a limit clause as we want to ignore pagination
 
         query = `SELECT COUNT(*) AS numRows FROM (SELECT ${select} FROM ${from}${where}${groupBy}${having}) AS subquery`;
+        query = this.replaceQbeeParameters(query);
+
       } else {
         throw new Error('Unsupported query type');
       }
@@ -98,7 +117,25 @@ export class PostgresJsonConverterService extends JsonConverterService {
       throw new Error('Invalid language');
     }
 
-    return query;
+    return {queryString: query, parameters: params};
+  }
+
+  //helper function that replaces all ?QbeeParameter?'s with numbered Postgres parameters
+  private replaceQbeeParameters(queryString: string): string{
+
+    let parameterNumber: number = 1;
+    let allReplaced: boolean = false;
+
+    while(!allReplaced){
+      let newQueryString: string = queryString.replace("?QbeeParameter?", "$" + parameterNumber);
+      //all have been replaced if the replace() operation didn't change anything
+      allReplaced = (newQueryString === queryString);
+      queryString = newQueryString;
+      parameterNumber++;
+    }
+
+    return queryString;
+
   }
 
   //helper function to generate a string of a column
@@ -262,28 +299,33 @@ export class PostgresJsonConverterService extends JsonConverterService {
     return (condition as primitiveCondition).column !== undefined;
   }
 
-  private conditionWhereSQLHelp(condition: condition) {
+  private conditionWhereSQLHelp(condition: condition): PreparedStatement {
     if (!condition) {
-      return '';
+      return {queryString:'', parameters:[]};
     }
 
     if (this.isCompoundCondition(condition)) {
       const compCondition = condition as compoundCondition;
       let conditionsSQL = '';
+      let params = [];
 
       for (let i = 0; i < compCondition.conditions.length; i++) {
         const condSQL = this.conditionWhereSQLHelp(compCondition.conditions[i]);
-        conditionsSQL += condSQL;
+        conditionsSQL += condSQL.queryString;
+        params = params.concat(condSQL.parameters);
         if (i < compCondition.conditions.length - 1) {
           conditionsSQL += ` ${compCondition.operator} `;
         }
       }
 
-      return `(${conditionsSQL})`;
+      return {queryString: `(${conditionsSQL})`, parameters: params};
+
     } else if (this.isPrimitiveCondition(condition)) {
+
       const primCondition = condition as primitiveCondition;
 
       let sql = '';
+      let params = [];
 
       if (primCondition.tableName) {
         sql += `"${primCondition.tableName}".`;
@@ -291,34 +333,35 @@ export class PostgresJsonConverterService extends JsonConverterService {
 
       sql += `"${primCondition.column}" ${primCondition.operator} `;
 
-      if (typeof primCondition.value === 'string') {
-        sql += `'${primCondition.value}'`;
-      } else if (typeof primCondition.value === 'boolean') {
-        sql += primCondition.value ? 'TRUE' : 'FALSE';
-      } else if (primCondition.value == null) {
+      if(primCondition.value == null){
         sql += 'NULL';
-      } // number
-      else {
-        sql += primCondition.value;
-      } // name = 'value'
+      }
+      else if (typeof primCondition.value === 'string' || typeof primCondition.value === 'boolean' || typeof primCondition.value === 'number') {
+        sql += `?QbeeParameter?`;
+        params.push(primCondition.value)
+      } else if (typeof primCondition.value === 'object') {
+        sql += `(${this.convertJsonToQuery(primCondition.value)})`;
+      }
 
-      return sql;
+      return {queryString: sql, parameters: params};
+
     }
   }
 
-  private conditionWhereSQL(condition: condition) {
+  private conditionWhereSQL(condition: condition): PreparedStatement {
     if (!condition) {
-      return '';
+      return {queryString: '', parameters: []};
     }
 
     if (this.isPrimitiveCondition(condition)) {
       const primCondition = condition as primitiveCondition;
       if (primCondition.aggregate != null) {
-        return '';
+        return {queryString: '', parameters: []};
       }
     }
 
-    return ' WHERE ' + this.conditionWhereSQLHelp(condition);
+    const preparedStatement: PreparedStatement = this.conditionWhereSQLHelp(condition);
+    return {queryString: ' WHERE ' + preparedStatement.queryString, parameters: preparedStatement.parameters};
   }
 
   private generateNonAggregateColumnsString(table: table): string {
@@ -387,20 +430,19 @@ export class PostgresJsonConverterService extends JsonConverterService {
     }
   }
 
-  private getAggregateConditions(condition: condition): string[] {
-    let aggregateConditions: string[] = [];
+  private getAggregateConditions(condition: condition): PreparedStatement[] {
+    let aggregateConditions: PreparedStatement[] = [];
 
     if (this.isCompoundCondition(condition)) {
       const compCondition = condition as compoundCondition;
 
       for (let i = 0; i < compCondition.conditions.length; i++) {
-        aggregateConditions.push(
-          ...this.getAggregateConditions(compCondition.conditions[i])
-        );
+        aggregateConditions = aggregateConditions.concat(this.getAggregateConditions(compCondition.conditions[i]));
       }
     } else if (this.isPrimitiveCondition(condition) && condition.aggregate) {
       const primCondition = condition as primitiveCondition;
       let sql = '';
+      let params = [];
 
       if (condition.tableName) {
         sql = `${primCondition.aggregate}("${condition.tableName}"."${primCondition.column}") ${primCondition.operator} `;
@@ -408,33 +450,45 @@ export class PostgresJsonConverterService extends JsonConverterService {
         sql = `${primCondition.aggregate}("${primCondition.column}") ${primCondition.operator} `;
       }
 
-      if (typeof primCondition.value === 'string') {
-        sql += `'${primCondition.value}'`;
-      } else if (typeof primCondition.value === 'boolean') {
-        sql += primCondition.value ? 'TRUE' : 'FALSE';
-      } else if (primCondition.value == null) {
+      if(primCondition.value == null){
         sql += 'NULL';
-      } else {
-        // number
-        sql += primCondition.value;
+      }
+      else if (typeof primCondition.value === 'string' || typeof primCondition.value === 'boolean' || typeof primCondition.value === 'number') {
+        sql += `?QbeeParameter?`;
+        params.push(primCondition.value)
+      } else if (typeof primCondition.value === 'object') {
+        sql += `(${this.convertJsonToQuery(primCondition.value)})`;
       }
 
-      aggregateConditions.push(sql);
+      aggregateConditions.push({queryString: sql, parameters: params});
     }
 
     return aggregateConditions;
   }
 
-  private havingSQL(jsonData: QueryParams) {
+  private havingSQL(jsonData: QueryParams): PreparedStatement {
     if (!jsonData.condition) {
-      return '';
+      return {queryString: '', parameters: []};
     }
 
     const havingConditions = this.getAggregateConditions(jsonData.condition);
 
-    return havingConditions.length > 0
-      ? ` HAVING ${havingConditions.join(' AND ')}`
-      : '';
+    if(havingConditions.length < 1){
+      return {queryString: '', parameters: []};
+    }
+    else{
+      let qString = ' HAVING ';
+      let params = [];
+  
+      for(let i = 0; i < havingConditions.length-1; i++){
+          qString += havingConditions[i].queryString + " AND ";
+          params = params.concat(havingConditions[i].parameters);
+      }
+      qString += havingConditions[havingConditions.length-1].queryString;
+      params = params.concat(havingConditions[havingConditions.length-1].parameters);
+      return {queryString: qString, parameters: params}
+    }
+    
   }
 
 }

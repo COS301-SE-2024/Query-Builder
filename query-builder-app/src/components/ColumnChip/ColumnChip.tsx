@@ -8,7 +8,6 @@ interface ColumnChipProps {
     column: column,
     key?: React.Key,
     onChange?: (column: column, key: React.Key) => void
-    onRemove?: (column: column) => void
 }
 
 export default function ColumnChip(props: ColumnChipProps) {
@@ -55,8 +54,8 @@ export default function ColumnChip(props: ColumnChipProps) {
             size="lg"
             endContent={
                 <div className="relative inline-block">
-                    <FiMoreVertical onClick={togglePopup} aria-label="edit" />
-                    {(openPopup) && (<Card ref={menuRef} className="absolute z-10 top-8">
+                    <FiMoreVertical onClick={togglePopup} aria-label="edit" className="cursor-pointer"/>
+                    {(openPopup) && (<Card ref={menuRef} className="absolute z-20 -top-[162px] left-[32px]">
                         <CardBody>
                             <Spacer y={2} />
                             <RadioGroup
@@ -100,17 +99,6 @@ export default function ColumnChip(props: ColumnChipProps) {
                                     color: '#333',
                                 }}
                             />
-                            <Spacer y={4} />
-                            <Button
-                                color="primary"
-                                onClick={() => {
-                                    if (props.onRemove) {
-                                        props.onRemove(column);
-                                    }
-                                }}
-                            >
-                                Remove
-                            </Button>
                             <Spacer y={2} />
                         </CardBody>
                     </Card>)}

@@ -127,8 +127,8 @@ export default function FilterChip(props: FilterChipProps){
             size="lg"
             endContent={
                 <div className="relative inline-block">
-                    <FiMoreVertical onClick={togglePopup} aria-label="edit"/>
-                    {(openPopup) && (<Card ref={menuRef} className="absolute z-1 top-8" style={{zIndex: "1"}}>
+                    <FiMoreVertical onClick={togglePopup} aria-label="edit" className="cursor-pointer"/>
+                    {(openPopup) && (<Card ref={menuRef} className="absolute z-20 -top-[168px] left-[32px]">
                         <CardBody>
                             <Spacer y={2}/>
                             <h2>Use a summary statistic</h2>

@@ -291,7 +291,7 @@ export default function TableList(props: TableListProps) {
 
     function createTableCard(tableRef: table) {
         return (
-            <Card className="w-full">
+            <Card className="w-full min-h-16">
                 <CardBody className="flex flex-row items-center space-x-2">
                     {/* div for the name */}
                     <div className="flex flex-1">

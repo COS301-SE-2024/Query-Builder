@@ -122,7 +122,7 @@ export default function AddOrganisationModal(props: AddOrganisationModalProps){
     return (
 
         <>
-        <Button onPress={onOpen} color="primary">+ Add</Button>
+        <Button onPress={onOpen} color="primary" className="text-md">+ Add</Button>
         <Modal 
           isOpen={isOpen} 
           onOpenChange={onOpenChange}

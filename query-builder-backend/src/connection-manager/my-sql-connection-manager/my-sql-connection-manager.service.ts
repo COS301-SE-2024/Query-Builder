@@ -9,6 +9,7 @@ import {
 } from '../connection-manager.service';
 import { Connect_Dto } from '../dto/connect.dto';
 import { Has_Active_Connection_Dto } from '../dto/has-active-connection.dto';
+import * as mysql from 'mysql2';
 
 @Injectable()
 export class MySqlConnectionManagerService extends ConnectionManagerService {
@@ -115,7 +116,7 @@ export class MySqlConnectionManagerService extends ConnectionManagerService {
           throw err;
         }
       }
-      const connection = require('mysql').createConnection({
+      const connection = mysql.createConnection({
         host: host,
         port: port,
         user: user,
@@ -156,7 +157,7 @@ export class MySqlConnectionManagerService extends ConnectionManagerService {
             );
             resolve({
               success: true,
-              connectionID: connection.threadID
+              connectionID: connection.threadId
             });
           }
         });

@@ -32,7 +32,9 @@ export default function QueryBuilder() {
           },
         }} />
       <Sidebar />
-      <OrganisationManagement />
+      <div className="app">
+        <OrganisationManagement />
+      </div>
     </div>
   );
 }

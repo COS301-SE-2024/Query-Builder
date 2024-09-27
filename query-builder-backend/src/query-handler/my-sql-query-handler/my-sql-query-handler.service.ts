@@ -1,6 +1,11 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { QueryHandlerService } from '../query-handler.service';
 import { Query } from '../../interfaces/dto/query.dto';
+
+interface PreparedStatement {
+  queryString: string,
+  parameters: any[]
+}
 
 @Injectable()
 export class MySqlQueryHandlerService extends QueryHandlerService {
@@ -30,19 +35,25 @@ export class MySqlQueryHandlerService extends QueryHandlerService {
         let connection = this.sessionStore.get(session.id).conn;
     
         //firstly, get the number of rows of data that would be returned without pagination
-        const countCommand: string = parser.convertJsonToCountQuery(query.queryParams);
+        const countCommand: PreparedStatement = parser.convertJsonToCountQuery(query.queryParams);
     
         const promise2 = new Promise((resolve, reject) => {
-          connection.query(countCommand, async function (error, results, fields) {
+          connection.execute(countCommand.queryString, countCommand.parameters, async function (error, results, fields) {
+            //if there is an error with the query, reject
             if (error) {
-              return reject(error);
+              if(error.code == 'ER_SUBQUERY_NO_1_ROW'){
+                return reject(new InternalServerErrorException('Your saved query should only return a single row to be used as a subquery in this case'));
+              }
+              else{
+                return reject(new InternalServerErrorException('Please check your query and try again'));
+              }
             }
     
             const numRows = results[0].numRows;
     
             //secondly, query the database
     
-            let queryCommand: string;
+            let queryCommand: PreparedStatement;
     
             try {
               queryCommand = parser.convertJsonToQuery(query.queryParams);
@@ -51,9 +62,16 @@ export class MySqlQueryHandlerService extends QueryHandlerService {
             }
     
             const promise3 = new Promise((resolve, reject) => {
-              connection.query(queryCommand, function (error, results, fields) {
+              connection.execute(queryCommand.queryString, queryCommand.parameters, function (error, results, fields) {
+
+                //if there is an error with the query, reject
                 if (error) {
-                  return reject(error);
+                  if(error.code == 'ER_SUBQUERY_NO_1_ROW'){
+                    return reject(new InternalServerErrorException('Your saved query should only return a single row to be used as a subquery in this case'));
+                  }
+                  else{
+                    return reject(new InternalServerErrorException('Please check your query and try again'));
+                  }
                 }
     
                 //add a unique key field to each returned row

@@ -151,6 +151,7 @@ export default function TableForm(props: TableFormProps){
                                     className="max-h-[50vh] overflow-y-auto"
                                     aria-label="Multiple column selection"
                                     variant="flat"
+                                    emptyContent="Loading columns..."
                                     items={allColumns}
                                     closeOnSelect={false}
                                     selectionMode="multiple"
