@@ -45,7 +45,7 @@ export default function Page() {
   };
 
   return (
-    <div className="bg-gray-800 bg-opacity-50 h-screen flex items-center justify-center">
+    <div className="bg-gray-800 h-screen flex items-center justify-center">
       <div className="bg-white shadow-2xl rounded-2xl p-8 w-[400px]">
         <div className="flex justify-center">
           <h1 className="text-4xl font-bold text-gray-900">Reset Password</h1>
