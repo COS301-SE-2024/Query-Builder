@@ -33,6 +33,12 @@ global.fetch = vi.fn((url: string, config: any) => {
           json: () => Promise.resolve({ data: [{name: "first_name"}, {name: "last_name"}] }),
       })
   }
+  else{
+    return Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve({ query_data: [{query_id: "id", queryTitle: "title", parameters: {}}] }),
+  })
+  }
 
 }) as Mock;
 
@@ -81,7 +87,7 @@ describe('FilterList basic rendering tests', () => {
         }
       }
   
-      const { baseElement } = render(<FilterList databaseServerID="1234" table={tableProp} condition={undefined}/>);
+      const { baseElement } = render(<FilterList database="sakila" language="mysql" databaseServerID="1234" table={tableProp} condition={undefined}/>);
       expect(baseElement).toBeTruthy();
   
     });
@@ -114,7 +120,7 @@ describe('FilterList filter selection tests', () => {
 
     }
 
-    render(<FilterList databaseServerID="1234" table={tableProp} condition={conditionProp} onChange={updateCondition}/>);
+    render(<FilterList database="sakila" language="mysql" databaseServerID="1234" table={tableProp} condition={conditionProp} onChange={updateCondition}/>);
   
     //create a user that can perform actions
     const user = userEvent.setup();
