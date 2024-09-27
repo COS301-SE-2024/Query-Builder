@@ -215,6 +215,7 @@ export default function Authentication() {
 
 
   const [isModalOpen, setModalOpen] = useState(false);
+  const [resetPassword, setResetPassword] = useState<boolean>(false);
 
   const handleForgotPasswordClick = () => {
     onOpenChange();
@@ -230,7 +231,7 @@ export default function Authentication() {
       const supabase = createClient();
   
       // Specify the redirect URL here
-      const redirectTo = 'https://capstone-qbee.dns.net.za/password-reset'; // Change this to your desired URL
+      const redirectTo = 'https://capstone-qbee.dns.net.za/reset'; // Change this to your desired URL
   
       const { data, error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
   
@@ -519,7 +520,7 @@ export default function Authentication() {
                         />
                       </div>
 
-                      <div className='item-end' style={{ display: 'flex', justifyContent: 'flex-end', width: '100%', zIndex: 1000 }}>
+                      <div className='item-end hover:underline' style={{ display: 'flex', justifyContent: 'flex-end', width: '100%', zIndex: 1000 }}>
                         <a
                           href="#"
                           style={{
