@@ -8,7 +8,22 @@ interface ForgotPasswordModalProps {
 }
 
 const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({ isOpen, onClose, onSubmit }) => {
+  
+  //React hook for the email value
   const [email, setEmail] = useState('');
+
+  //React hook for whether the field has been focused yet or not
+  const [emailHasBeenFocused, setEmailHasBeenFocused] = useState(false);
+
+  //Function to validate the email address
+  const validateEmail = (value: any) =>
+    value.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$/i);
+
+  const isEmailInvalid = React.useMemo(() => {
+    if (email === '') return true;
+
+    return validateEmail(email) ? false : true;
+  }, [email]);
 
   if (!isOpen) return null;
 
@@ -19,10 +34,15 @@ const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({ isOpen, onClo
         <h2>Reset Password</h2>
         <p>Enter your email address to receive a password reset link.</p>
         <Input
+          variant="bordered"
           type="email"
           placeholder="Enter your email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onValueChange={setEmail}
+          onFocus={() => {setEmailHasBeenFocused(true)}}
+          isInvalid={emailHasBeenFocused && isEmailInvalid}
+          color={!emailHasBeenFocused? 'primary': isEmailInvalid? 'danger': 'success'}
+          errorMessage="Please enter a valid email address"
         />
         {/* Centering the button */}
         <div className="button-container">
@@ -47,6 +67,7 @@ const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({ isOpen, onClo
         }
 
         .modal {
+          position: fixed;
           background-color: white;
           padding: 20px 30px;
           border-radius: 8px;
@@ -58,7 +79,7 @@ const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({ isOpen, onClo
 
         .close-icon {
           position: absolute;
-          top: 10px;
+          top: 0px;
           right: 15px;
           font-size: 24px;
           cursor: pointer;

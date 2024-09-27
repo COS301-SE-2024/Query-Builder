@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { createClient } from '../../utils/supabase/client';
 import { useRouter } from 'next/navigation';
 import { Button, Input } from '@nextui-org/react';
+import { Toaster, toast } from 'react-hot-toast';
 
 export default function Page() {
   const [password, setPassword] = useState('');
@@ -18,8 +19,8 @@ export default function Page() {
       setError(''); // Clear error
       const success = await sendResetPassword();
       if (success) {
-        alert('Password has been reset successfully!');
-        router.push('/signedInHome'); // Redirect user after successful reset
+        toast.success('Password has been reset successfully!');
+        router.push('/'); // Redirect user after successful reset
       }
     } else {
       setError('Passwords do not match');
@@ -46,13 +47,14 @@ export default function Page() {
 
   return (
     <div className="bg-gray-800 bg-opacity-50 h-screen flex items-center justify-center">
+      <Toaster/>
       <div className="bg-white shadow-2xl rounded-2xl p-8 w-[400px]">
         <div className="flex justify-center">
           <h1 className="text-4xl font-bold text-gray-900">Reset Password</h1>
         </div>
         <div className="grid gap-4 mt-6">
           <div className="grid">
-            <label className="text-gray-700">Enter your password:</label>
+            <label className="text-gray-700">Enter a new password:</label>
             <Input
               type={showPassword ? 'text' : 'password'}
               name="password"
@@ -62,7 +64,7 @@ export default function Page() {
             />
           </div>
           <div className="grid">
-            <label className="text-gray-700">Confirm your password:</label>
+            <label className="text-gray-700">Confirm your new password:</label>
             <Input
               type={showPassword ? 'text' : 'password'}
               name="confirmPassword"
