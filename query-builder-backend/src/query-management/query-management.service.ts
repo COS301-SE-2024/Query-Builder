@@ -273,34 +273,6 @@ export class QueryManagementService {
     return { message: 'Query shared successfully' };
   }
 
-  async getDbAndOrgInformation(db_id: string): Promise<{ db_data: { org_id: string; name: string }; org_data: { org_name: string } }> {
-    // Fetch database information
-    const { data: db_data, error: db_error } = await this.supabase
-        .getClient()
-        .from('db_envs')
-        .select('org_id, name')
-        .eq('db_id', db_id)
-        .single();
-
-    if (db_error) {
-        throw new Error(`Error fetching database information: ${db_error.message}`);
-    }
-
-    // Fetch organization information based on the org_id from db_data
-    const { data: org_data, error: org_error } = await this.supabase
-        .getClient()
-        .from('orgs')
-        .select('org_name')
-        .eq('org_id', db_data.org_id)
-        .single();
-
-    if (org_error) {
-        throw new Error(`Error fetching organization information: ${org_error.message}`);
-    }
-
-    return { db_data, org_data };
-}
-
 }
 
 

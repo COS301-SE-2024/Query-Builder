@@ -43,28 +43,6 @@ const getToken = async () => {
     return token;
 };
 
-async function getInformation(db_id: string) {
-    let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query-management/get-db-and-org-information`, {
-        credentials: "include",
-        method: "POST",
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + await getToken()
-        },
-        body: JSON.stringify(db_id)
-    });
-
-    console.log(response);
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-
-    let json = await response.json();
-    return json;
-}
-
 async function removeQuery(query_id: string) {
     let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query-management/delete-query`, {
         credentials: "include",
@@ -234,35 +212,6 @@ export default function ContextMenuCard({
         shareQuery(query_id, test, userDescription)
         onShareOpenChange();
     }
-
-    async function getInformationHelper(db_id: string) {
-        try {
-            const data = await getInformation(db_id);
-            // Assuming the structure of the returned data includes db_data and org_data
-            const orgName = data.org_data.org_name; // Access the organization name
-            console.log({ dbName: data.db_data.name, orgName });
-            const ssss = `${data.db_data.name} ${orgName}`;
-            setdborginfo(ssss);
-        } catch (error) {
-            console.error('Error fetching information:', error);
-            throw error; // Rethrow the error if needed
-        }
-    };
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                setLoading(true); // Set loading state
-                const fullName = await getInformationHelper(db_id); // Call your async function
-            } catch (error) {
-                console.error('Error fetching information:', error);
-            } finally {
-                setLoading(false); // Reset loading state
-            }
-        };
-
-        fetchData(); // Invoke the fetch function
-    }, [db_id]); // Dependency array to re-fetch if db_id changes
 
     return (
         <>
