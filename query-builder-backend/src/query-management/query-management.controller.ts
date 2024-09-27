@@ -47,4 +47,9 @@ export class QueryManagementController {
     return this.query_management_service.shareQuery(share_query_dto);
   }
 
+  @Post("get-db-and-org-information")
+  async getDbAndOrgInformation(@Body(ValidationPipe) db_id: string) {
+    return this.query_management_service.getDbAndOrgInformation(db_id);
+  }
+
 }
