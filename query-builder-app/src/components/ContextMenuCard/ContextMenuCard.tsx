@@ -15,6 +15,7 @@ import {
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
 import { createClient } from "./../../utils/supabase/client";
 import { useRouter } from 'next/navigation';
+import toast from "react-hot-toast";
 
 export interface User {
     user_id: string;
@@ -96,7 +97,12 @@ async function shareQuery(query_id: string, checkboxUsers: string[], description
     });
 
     if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        // throw new Error(`HTTP error! Status: ${response.status}`);
+        toast.error("Error sharing query. Please try again later.");
+    }
+    else
+    {
+        toast.success("Query shared successfully!");
     }
 
     let json = (await response.json()).data;
@@ -197,8 +203,8 @@ export default function ContextMenuCard({
 
     function shareQueryHelper(query_id: string, checkedUsers: User[], userDescription: string) {
         const test = checkedUsers.map((user) => user.user_id);
-        console.log(test);
         shareQuery(query_id, test, userDescription)
+        onShareOpenChange();
     }
 
     return (
