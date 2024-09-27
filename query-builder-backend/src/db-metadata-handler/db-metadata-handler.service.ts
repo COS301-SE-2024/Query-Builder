@@ -21,6 +21,22 @@ export abstract class DbMetadataHandlerService {
     protected readonly queryHandlerService: QueryHandlerService
   ) {}
 
+  async deepMerge(target, source) {
+    for (const key in source) {
+      if (source[key] instanceof Object && key in target) {
+        Object.assign(
+          source[key],
+          await this.deepMerge(target[key], source[key])
+        );
+      }
+    }
+
+    // Object.assign() does not throw away the original target object,
+    // it merges source properties into it, hence creating a deep merge
+    Object.assign(target || {}, source);
+    return target;
+  }
+
   abstract getDatabaseMetadata(
     databaseMetadataDto: Database_Metadata_Dto,
     session: Record<string, any>

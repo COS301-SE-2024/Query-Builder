@@ -42,35 +42,4 @@ export class DbMetadataHandlerController {
     async getSavedDbMetadata(@Body(ValidationPipe) get_db_metadata_dto: Saved_DB_Metadata_Dto){
         return this.dbMetadataHandlerService.getSavedDbMetadata(get_db_metadata_dto);
     }
-
-    @Post("save-table-metadata")
-    async saveTableMetadata(@Body(ValidationPipe) save_table_metadata_dto: Saved_Table_Metadata_Dto){
-        return this.dbMetadataHandlerService.saveTableMetadata(save_table_metadata_dto);
-    }
-
-    @Put("get-table-metadata")
-    async getSavedTableMetadata(@Body(ValidationPipe) get_table_metadata_dto: Saved_Table_Metadata_Dto){
-        return this.dbMetadataHandlerService.getSavedTableMetadata(get_table_metadata_dto);
-    }
-
-    @Post("save-field-metadata")
-    async saveFieldMetadata(@Body(ValidationPipe) save_field_metadata_dto: Saved_Field_Metadata_Dto){
-        return this.dbMetadataHandlerService.saveFieldMetadata(save_field_metadata_dto);
-    }
-
-    @Put("get-field-metadata")
-    async getSavedFieldMetadata(@Body(ValidationPipe) get_field_metadata_dto: Saved_Field_Metadata_Dto){
-        return this.dbMetadataHandlerService.getSavedFieldMetadata(get_field_metadata_dto);
-    }
-
-    @Post("save-foreign-key-metadata")
-    async saveForeignKeyMetadata(@Body(ValidationPipe) save_foreign_key_metadata_dto: Saved_Foreign_Key_Metadata_Dto){
-        return this.dbMetadataHandlerService.saveForeignKeyMetadata(save_foreign_key_metadata_dto);
-    }
-
-    @Put("get-foreign-key-metadata")
-    async getSavedForeignKeyMetadata(@Body(ValidationPipe) get_foreign_key_metadata_dto: Saved_Foreign_Key_Metadata_Dto){
-        return this.dbMetadataHandlerService.getSavedForeignKeyMetadata(get_foreign_key_metadata_dto);
-    }
-
 }
