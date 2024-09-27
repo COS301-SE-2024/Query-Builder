@@ -60,15 +60,15 @@ export class Saved_Field_Metadata_Dto {
 
   @IsString()
   @IsNotEmpty()
-  table_name: [];
+  table_name: string;
 
   @IsString()
   @IsNotEmpty()
-  field_name: string;
+  field_name: string[];
 
   @IsString()
   @IsNotEmpty()
-  description: string;
+  description: string[];
 }
 
 export class Saved_Foreign_Key_Metadata_Dto {
