@@ -79,8 +79,20 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
         }
       }
     };
+    const response = await this.queryHandlerService.queryDatabase(query, session);
 
-    return await this.queryHandlerService.queryDatabase(query, session);
+    const externalMetadata = await this.getSavedDbMetadata(databaseMetadataDto);
+
+    response.data.map((db) => {
+      externalMetadata.data.map((emDB) => {
+        if(db.database === emDB.database)
+        {
+          db.description = emDB.description;
+        }
+      });
+    })
+
+    return response;
   }
 
   async getTableMetadata(
