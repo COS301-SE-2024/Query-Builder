@@ -399,8 +399,7 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
     }
     if (
       !permission_data ||
-      permission_data.user_role !== 'admin' ||
-      permission_data.user_role !== 'owner'
+      permission_data.user_role === 'member'
     ) {
       throw new Error('User does not have permission to save metadata');
     }
@@ -409,7 +408,7 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
     const { data, error } = await this.supabase
       .getClient()
       .from('db_envs')
-      .upsert({
+      .update({
         db_meta_data: {
           description: save_db_metadata_dto.description
         }
