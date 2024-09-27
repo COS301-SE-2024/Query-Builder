@@ -33,6 +33,12 @@ global.fetch = vi.fn((url: string, config: any) => {
           json: () => Promise.resolve({ data: [{name: "first_name"}, {name: "last_name"}] }),
       })
   }
+  else{
+    return Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve({ query_data: [{query_id: "id", queryTitle: "title", parameters: {}}] }),
+  })
+  }
 
 }) as Mock;
 
