@@ -217,7 +217,7 @@ export default function ContextMenuCard({
 
     return (
         <>
-            <Dropdown>
+            <Dropdown className="w-[250px]">
                 <DropdownTrigger>
                     <Button
                         variant="flat"
@@ -231,13 +231,62 @@ export default function ContextMenuCard({
                 </DropdownTrigger>
                 <DropdownMenu aria-label="Static Actions" closeOnSelect={false}>
                     <DropdownSection title={localDateTime}>
-                        <DropdownItem key="description" isDisabled className="text-sm text-gray-500">
-                            {"Organization: " + db_envs.organisations.name || "No org information available"}
-                            <br></br>
-                            {"Database: " + db_envs.name || "No db information available"}
+                        <DropdownItem
+                            isDisabled
+                            style={{
+                                maxWidth: '250px', // Set your preferred max width
+                                whiteSpace: 'normal', // Allow text to wrap
+                                overflowWrap: 'break-word', // Allow long words to break
+                                overflow: 'visible', // Ensure overflow is visible
+                                display: 'block', // Ensure block-level display
+                                wordBreak: 'break-all', // Break long words if necessary
+                            }}
+                            className="text-sm text-gray-500"
+                        >
+                            <div style={{
+                                wordBreak: 'break-all', // Ensures breaking of long words
+                                overflowWrap: 'break-word', // Break long words if necessary
+                            }}>
+                                {"Organization: " + (db_envs.organisations.name || "No org information available")}
+                                <br />
+                                {"Database: " + (db_envs.name || "No db information available")}
+                            </div>
                         </DropdownItem>
-                        <DropdownItem key="description" isDisabled className="text-sm text-gray-500">
-                            {description_text || "No description available"}
+                        <DropdownItem
+                            isDisabled
+                            style={{
+                                maxWidth: '250px', // Set your preferred max width
+                                whiteSpace: 'normal', // Allow text to wrap normally
+                                overflowWrap: 'break-word', // Allow long words to break
+                                display: 'block', // Ensure block-level display
+                                wordBreak: 'break-all', // Break long words if necessary
+                                overflow: 'hidden', // Prevent overflow
+                            }}
+                            className="text-sm text-gray-500"
+                        >
+                            Description:
+                            <div style={{ padding: '20px', backgroundColor: '#f0f0f0', zIndex: 100 }}>
+                                <div
+                                    style={{
+                                        maxWidth: '250px', // Set your preferred max width
+                                        maxHeight: '150px', // Set your preferred max height
+                                        whiteSpace: 'normal', // Allow text to wrap normally
+                                        overflowWrap: 'break-word', // Allow long words to break
+                                        display: 'block', // Ensure block-level display
+                                        wordBreak: 'break-all', // Break long words if necessary
+                                        overflowY: 'auto', // Make vertical overflow scrollable
+                                        overflowX: 'hidden', // Prevent horizontal overflow
+                                    }}
+                                    className="text-sm text-gray-500"
+                                >
+                                    <div style={{
+                                        wordBreak: 'break-all', // Ensures breaking of long words
+                                        overflowWrap: 'break-word', // Break long words if necessary
+                                    }}>
+                                        {description_text || "No description available"}
+                                    </div>
+                                </div>
+                            </div>
                         </DropdownItem>
                         <DropdownItem
                             key="retrieve"
@@ -349,10 +398,15 @@ export default function ContextMenuCard({
                                     <h3 className="text-md font-medium mb-2">Enter New Description</h3>
                                     <Textarea
                                         placeholder="Add a new description for this query"
-                                        className="w-full z-[100]"
+                                        className="w-full"
                                         minRows={3}
                                         maxRows={5}
-                                        onChange={(e) => setUserDescription(e.target.value)}
+                                        maxLength={190} // Limit the number of characters
+                                        onChange={(e) => {
+                                            if (e.target.value.length <= 190) {
+                                                setUserDescription(e.target.value);
+                                            }
+                                        }}
                                     />
                                 </div>
                             </ModalBody>
