@@ -217,7 +217,7 @@ export default function ContextMenuCard({
 
     return (
         <>
-            <Dropdown className="w-[250px]">
+            <Dropdown className="w-[300px]">
                 <DropdownTrigger>
                     <Button
                         variant="flat"
@@ -234,7 +234,7 @@ export default function ContextMenuCard({
                         <DropdownItem
                             isDisabled
                             style={{
-                                maxWidth: '250px', // Set your preferred max width
+                                maxWidth: '300px', // Set your preferred max width
                                 whiteSpace: 'normal', // Allow text to wrap
                                 overflowWrap: 'break-word', // Allow long words to break
                                 overflow: 'visible', // Ensure overflow is visible
@@ -255,7 +255,7 @@ export default function ContextMenuCard({
                         <DropdownItem
                             isDisabled
                             style={{
-                                maxWidth: '250px', // Set your preferred max width
+                                maxWidth: '300px', // Set your preferred max width
                                 whiteSpace: 'normal', // Allow text to wrap normally
                                 overflowWrap: 'break-word', // Allow long words to break
                                 display: 'block', // Ensure block-level display
