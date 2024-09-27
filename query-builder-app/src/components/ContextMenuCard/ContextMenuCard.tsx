@@ -10,7 +10,7 @@ import {
     Card,
     Checkbox,
     Textarea,
-    Input
+    Input,
 } from "@nextui-org/react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
 import { createClient } from "./../../utils/supabase/client";
@@ -42,6 +42,26 @@ const getToken = async () => {
     console.log(token);
     return token;
 };
+
+async function getInformation(db_id: string) {
+    let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query-management/get-db-and-org-information`, {
+        credentials: "include",
+        method: "POST",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + await getToken()
+        },
+        body: JSON.stringify(db_id)
+    });
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    let json = await response.json();
+    return json;
+}
 
 async function removeQuery(query_id: string) {
     let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query-management/delete-query`, {
@@ -212,6 +232,12 @@ export default function ContextMenuCard({
         onShareOpenChange();
     }
 
+    function getInformationHelper(db_id: string) {
+        getInformation(db_id).then((data) => {
+            console.log(data);
+        });
+    }
+
     return (
         <>
             <Dropdown>
@@ -228,6 +254,9 @@ export default function ContextMenuCard({
                 </DropdownTrigger>
                 <DropdownMenu aria-label="Static Actions" closeOnSelect={false}>
                     <DropdownSection title={localDateTime}>
+                        <DropdownItem key="description" isDisabled className="text-sm text-gray-500">
+                                {getInformationHelper(db_id)}
+                        </DropdownItem>
                         {/* Show the description as a non-interactive item */}
                         <DropdownItem key="description" isDisabled className="text-sm text-gray-500">
                             {description_text || "No description available"}
