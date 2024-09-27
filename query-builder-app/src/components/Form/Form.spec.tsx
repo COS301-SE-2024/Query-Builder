@@ -34,7 +34,7 @@ global.fetch = vi.fn((url: string, config: any) => {
             json: () => Promise.resolve({data: [{database: "sakila"}]}),
       })
   }
-  if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/get-db-type`){
+  else if(url == `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/get-db-type`){
     return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({type: 'mysql'}),
