@@ -16,6 +16,7 @@ export default function ContextMenu() {
         description: string;
         type: string;
         onDelete: () => void;
+        db_envs: any;
     }
 
     const getToken = async () => {
@@ -94,6 +95,7 @@ export default function ContextMenu() {
                                 description_text={queryData.description}
                                 type_text={queryData.type}
                                 onDelete={reload}
+                                db_envs={queryData.db_envs}
                             />
                             <Spacer x={4} />
                         </React.Fragment>
