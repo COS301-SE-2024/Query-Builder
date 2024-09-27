@@ -32,6 +32,7 @@ interface ContextMenuCardProps {
     onDelete: () => void;
     description_text: string;
     type_text: string;
+    db_envs: any;
 }
 
 // This function gets the token from local storage.
@@ -119,7 +120,8 @@ export default function ContextMenuCard({
     db_id,
     onDelete,
     description_text,
-    type_text
+    type_text,
+    db_envs
 }: ContextMenuCardProps) {
     const [loading, setLoading] = useState(false);
     const { isOpen, onOpen, onOpenChange } = useDisclosure(); // For the delete confirmation modal
@@ -230,7 +232,9 @@ export default function ContextMenuCard({
                 <DropdownMenu aria-label="Static Actions" closeOnSelect={false}>
                     <DropdownSection title={localDateTime}>
                         <DropdownItem key="description" isDisabled className="text-sm text-gray-500">
-                            {dborginfo || "No db & org information available"}
+                            {"Organization: " + db_envs.organisations.name || "No org information available"}
+                            <br></br>
+                            {"Database: " + db_envs.name || "No db information available"}
                         </DropdownItem>
                         <DropdownItem key="description" isDisabled className="text-sm text-gray-500">
                             {description_text || "No description available"}
@@ -239,8 +243,8 @@ export default function ContextMenuCard({
                             key="retrieve"
                             description="Retrieve saved query"
                             onClick={() => {
-                                handleRetrieve();
                                 toast.loading("Retrieving query...");
+                                handleRetrieve();
                             }}
                         >
                             Retrieve Query
