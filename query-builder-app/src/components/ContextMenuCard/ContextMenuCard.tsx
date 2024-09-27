@@ -202,6 +202,11 @@ export default function ContextMenuCard({
     );
 
     function shareQueryHelper(query_id: string, checkedUsers: User[], userDescription: string) {
+        if(checkedUsers.length == 0)
+        {
+            toast.error("Please select at least one user to share the query with.");
+            return;
+        }
         const test = checkedUsers.map((user) => user.user_id);
         shareQuery(query_id, test, userDescription)
         onShareOpenChange();
@@ -325,7 +330,7 @@ export default function ContextMenuCard({
                                             </Checkbox>
                                         ))
                                     ) : (
-                                        <p className="text-sm text-gray-500">No users found.</p>
+                                        <p className="text-sm text-gray-500">No users found...</p>
                                     )}
                                 </div>
 
