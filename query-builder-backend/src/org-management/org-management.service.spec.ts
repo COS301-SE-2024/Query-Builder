@@ -3593,7 +3593,7 @@ describe('OrgManagementService', () => {
                 update_user_roles: true,
                 view_all_dbs: true,
                 view_all_users: true,
-                update_db_access: false
+                update_db_access: true
               }
             });
           });
