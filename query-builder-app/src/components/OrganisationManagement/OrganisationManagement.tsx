@@ -102,6 +102,9 @@ export default function OrganisationManagement() {
   const [searchTerm, setSearchTerm] = useState(""); // State for search term
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
   const [dbAccessID, setdbAccessID] = useState("");
+  const [deleteDatabaseID, setDeleteDatabaseID] = useState("");
+  const [databaseName, setDatabaseName] = useState("");
+  const { isOpen: isDeleteDBOpen, onOpen: onDeleteDBOpen, onOpenChange: onDeleteDBOpenChange } = useDisclosure();
   const { isOpen: isDBAccessOpen, onOpen: onDBAccessOpen, onOpenChange: onDBAccessOpenChange } = useDisclosure(); // For the db access modal
 
   const handleCheckboxChange = async (dbID:string, user: User, isChecked: boolean) => {
@@ -551,6 +554,7 @@ export default function OrganisationManagement() {
                   {/* <EditUserModal org_id={orgServerID} user_id={user.profiles.user_id} on_add={getMembers} /> */}
                   <EditIcon onClick={async () => {
                     const members = await getDBAccessMembers(db.db_id); // Fetch members
+                    setDatabaseName(db.name);
                     setSelectedUsers(members);
                     setdbAccessID(db.db_id);
                     onDBAccessOpen();
@@ -559,7 +563,13 @@ export default function OrganisationManagement() {
               </Tooltip>
               <Tooltip color="danger" content="Delete database">
                 <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                  <DeleteIcon onClick={() => deleteDatabaseFromOrg(db.db_id)}/>
+                  <DeleteIcon onClick={() => {
+                    setDatabaseName(db.name);
+                    setDeleteDatabaseID(db.db_id);
+                    onDeleteDBOpen();
+                  }
+                    // deleteDatabaseFromOrg(db.db_id)
+                  }/>
                 </span>
               </Tooltip>
               
@@ -1099,7 +1109,35 @@ export default function OrganisationManagement() {
                         )}
                     </ModalContent>
                 </Modal>
-
+                <Modal isOpen={isDeleteDBOpen} onOpenChange={onDeleteDBOpenChange} >
+                  <ModalContent>
+                    {(onClose) => (
+                      <>
+                        <ModalHeader className="flex flex-row items-center justify-center text-center">
+                          <span>Delete {databaseName}</span>
+                        </ModalHeader>
+                        <ModalBody className="text-center">
+                          <p className="text-lg">Are you sure you want to delete the database?</p>
+                          <p className="text-sm text-gray-500">This action cannot be undone.</p>
+                        </ModalBody>
+                        <ModalFooter className="flex flex-row items-center justify-center space-x-4">
+                          <Button color="primary" onPress={onClose}>
+                            Cancel
+                          </Button>
+                          <Button
+                            as={Link}
+                            href={"/organisation/" + orgServerID}
+                            color="danger"
+                            type="button"
+                            onClick={() => deleteDatabaseFromOrg(deleteDatabaseID)}
+                          >
+                              Delete
+                          </Button>
+                        </ModalFooter>
+                      </>
+                    )}
+                  </ModalContent>
+                </Modal>
               </CardBody>
             </Card>
           </Tab>
