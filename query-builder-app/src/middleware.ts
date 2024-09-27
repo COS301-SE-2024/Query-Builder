@@ -4,6 +4,15 @@ import { cookies } from "next/headers";
 
 export async function middleware(request: NextRequest) {
 
+    const res = NextResponse.next();
+
+    const publicUrls = ['/reset']
+
+    if(publicUrls.includes(request.nextUrl.pathname))
+    {
+        return res;
+    }
+
     const {supabase, response} = createClient(request);
     const {data : {user}} = await supabase.auth.getUser();
 

@@ -124,7 +124,6 @@ export default function StartPage() {
                     <div className="flex flex-col justify-end">
                         <div className="flex flex-col text-center justify-center text-policy-link">
                             <span className="">QBee</span>
-                            <span className=""><Link className="hover:underline hover:text-default-cl" href="/cookies">Cookie Policy</Link> | <Link className="hover:underline hover:text-default-cl" href="/privacy">Privacy Policy</Link></span>
                         </div>
                     </div>
                 </div>
