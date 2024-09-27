@@ -236,15 +236,16 @@ export default function Authentication() {
       const { data, error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
   
       if (data) {
-        alert('Password reset link sent successfully!');
+        toast.success('Password reset link sent successfully!');
         setModalOpen(false);
       } else if (error) {
-        alert('Error sending password reset link');
+        toast.error('Error sending password reset link, maybe try again later?');
       }
     } else {
-      alert('Please enter a valid email address');
+      toast.error('Please enter a valid email address');
     }
   };
+
 
   return (
     <>
