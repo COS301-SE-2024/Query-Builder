@@ -100,8 +100,7 @@ async function shareQuery(query_id: string, checkboxUsers: string[], description
         // throw new Error(`HTTP error! Status: ${response.status}`);
         toast.error("Error sharing query. Please try again later.");
     }
-    else
-    {
+    else {
         toast.success("Query shared successfully!");
     }
 
@@ -154,6 +153,7 @@ export default function ContextMenuCard({
             setLoading(false);
             onDelete();
             onOpenChange();
+            toast.success("Query deleted successfully!");
         }
     };
 
@@ -161,6 +161,7 @@ export default function ContextMenuCard({
         let query = parameters;
         console.log(query);
         router.push("/" + db_id + "/" + query_id);
+        toast.dismiss();
     };
 
     const localDateTime = new Date(saved_at).toLocaleString([], {
@@ -202,8 +203,7 @@ export default function ContextMenuCard({
     );
 
     function shareQueryHelper(query_id: string, checkedUsers: User[], userDescription: string) {
-        if(checkedUsers.length == 0)
-        {
+        if (checkedUsers.length == 0) {
             toast.error("Please select at least one user to share the query with.");
             return;
         }
@@ -235,7 +235,10 @@ export default function ContextMenuCard({
                         <DropdownItem
                             key="retrieve"
                             description="Retrieve saved query"
-                            onClick={handleRetrieve}
+                            onClick={() => {
+                                handleRetrieve();
+                                toast.loading("Retrieving query...");
+                            }}
                         >
                             Retrieve Query
                         </DropdownItem>
