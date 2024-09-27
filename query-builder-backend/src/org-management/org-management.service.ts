@@ -833,7 +833,7 @@ export class OrgManagementService {
       );
     }
 
-    if (!org_data[0].role_permissions.add_dbs) {
+    if (!org_data[0].role_permissions.update_db_access) {
       throw new UnauthorizedException(
         'You do not have permission to give database access to other users'
       );
@@ -1066,7 +1066,7 @@ export class OrgManagementService {
               update_user_roles: true,
               view_all_dbs: true,
               view_all_users: true,
-              update_db_access: false
+              update_db_access: true
             };
           }
           break;
@@ -1364,7 +1364,7 @@ export class OrgManagementService {
       );
     }
 
-    if (!org_data[0].role_permissions.add_dbs) {
+    if (!org_data[0].role_permissions.update_db_access) {
       throw new UnauthorizedException(
         'You do not have permission to remove database access for other users'
       );
@@ -1375,7 +1375,7 @@ export class OrgManagementService {
       .from('db_access')
       .delete()
       .eq('user_id', remove_db_access_dto.user_id)
-      .eq('db_id', remove_db_access_dto.user_id)
+      .eq('db_id', remove_db_access_dto.db_id)
       .select();
 
     if (db_error) {
@@ -1418,7 +1418,7 @@ export class OrgManagementService {
       .from('org_members')
       .select('user_id, user_role, profiles(*)')
       .eq('org_id', org_data.org_id)
-      .neq('user_id', user_data.user.id)
+      // .neq('user_id', user_data.user.id)
       .neq('user_role', 'owner');
 
     if (members_error) {
