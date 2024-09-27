@@ -414,14 +414,14 @@ export default function OrganisationManagement() {
   async function deleteDatabaseFromOrg(dbID: string) {
     // TO DO: deleteDatabaseFromOrg
     try {
-      let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/remove-member`, {
+      let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/remove-db`, {
         method: "DELETE",
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + await getToken(),
         },
-        body: JSON.stringify({ org_id: orgServerID, user_id: userId })
+        body: JSON.stringify({ org_id: orgServerID, db_id: dbID })
       })
 
       if (!response.ok) {
