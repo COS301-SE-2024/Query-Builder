@@ -1,6 +1,6 @@
 //----------------------------IMPORTS------------------------------------//
 
-import { Button, Card, CardBody, Chip, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Input, Popover, PopoverContent, PopoverTrigger, Radio, RadioGroup, Spacer } from "@nextui-org/react";
+import { Button, Card, CardBody, Chip, Dropdown, DropdownItem, DropdownMenu, DropdownSection, DropdownTrigger, Input, Popover, PopoverContent, PopoverTrigger, Radio, RadioGroup, Spacer } from "@nextui-org/react";
 import { AggregateFunction, column, primitiveCondition, ComparisonOperator, QueryParams } from "../../interfaces/intermediateJSON"
 import { FiMoreVertical } from "react-icons/fi";
 import { useEffect, useRef, useState } from "react";
@@ -12,7 +12,7 @@ import { Q } from "vitest/dist/reporters-yx5ZTtEV.js";
 export interface CurrentQuery
 {
     query_id: string,
-    query_title: string,
+    queryTitle: string,
     parameters: QueryParams
 }
 
@@ -59,6 +59,13 @@ export default function FilterChip(props: FilterChipProps){
         setPrimitiveConditionString(generatePrimitiveConditionString);
 
     },[primitiveCondition])
+
+    React.useEffect(() => {
+
+        console.log("Printing subquery list");
+        console.log(subquerylist);
+
+    },[subquerylist])
 
     //----------------------------HELPER FUNCTIONS------------------------------------//
 
@@ -129,7 +136,11 @@ export default function FilterChip(props: FilterChipProps){
 
         let value: any;
 
-        if(valueString == ""){
+        if(isQueryParams(valueString)){
+            console.log("IS QUERY PARAMS");
+            value = valueString;
+        }
+        else if(valueString == ""){
             value = valueString;
         }
         else if(valueString.toUpperCase() === "TRUE"){
@@ -139,10 +150,6 @@ export default function FilterChip(props: FilterChipProps){
             value = false;
         }
         else if(isNaN(Number(valueString))){
-            value = valueString;
-        }
-        else if(isQueryParams(valueString))
-        {
             value = valueString;
         }
         else{
@@ -260,6 +267,7 @@ export default function FilterChip(props: FilterChipProps){
 
                                         if(key == "VALUE"){
                                             setIsQuery(false)
+                                            setConditionValue(0);
                                         } else if (key == "OTHER"){
                                             setIsQuery(true)
                                             setConditionValue(initSubquery);
@@ -274,21 +282,18 @@ export default function FilterChip(props: FilterChipProps){
                                     }}
 
                                 >
-                                    <DropdownItem key="VALUE">Value</DropdownItem>
-                                    {/*
-                                        <>
-                                        {
-                                            subquerylist && subquerylist.length > 0 && (
-                                                subquerylist.map((subquery) => (
-                                                    <DropdownItem key={subquery.query_id}>{subquery.query_title}</DropdownItem>
-                                                ))
-                                        )
-                                        }
-                                        </>
-                                    } */}
-                                    {/* {
-                                        initIsQuery ? (<DropdownItem key="OTHER">Query</DropdownItem>) : (<></>)
-                                    } */}
+                                    <DropdownSection showDivider>
+                                        <DropdownItem key="VALUE">Value</DropdownItem>
+                                    </DropdownSection>
+                                    <DropdownSection title="Choose a saved query as a subquery" items={subquerylist}>
+                                        {(item) => (
+                                        <DropdownItem
+                                            key={item.query_id}
+                                        >
+                                            {item.queryTitle}
+                                        </DropdownItem>
+                                        )}
+                                    </DropdownSection>
                                 </DropdownMenu>
                             </Dropdown>
                             {(!isQuery) && (
