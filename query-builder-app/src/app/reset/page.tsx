@@ -20,7 +20,7 @@ export default function Page() {
       const success = await sendResetPassword();
       if (success) {
         toast.success('Password has been reset successfully!');
-        router.push('/'); // Redirect user after successful reset
+        router.push('/'); // Redirect user after successful reset to signed-in home page
       }
     } else {
       setError('Passwords do not match');
