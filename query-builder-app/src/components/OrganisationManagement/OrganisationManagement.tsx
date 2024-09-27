@@ -413,6 +413,34 @@ export default function OrganisationManagement() {
 
   async function deleteDatabaseFromOrg(dbID: string) {
     // TO DO: deleteDatabaseFromOrg
+    try {
+      let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/remove-member`, {
+        method: "DELETE",
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + await getToken(),
+        },
+        body: JSON.stringify({ org_id: orgServerID, user_id: userId })
+      })
+
+      if (!response.ok) {
+        // console.log("YOURR ERROR " + (response.status) + " " + (response.statusText);
+        if (response.status === 401) {
+          toast.error("You are not authorized to delete the database from the organisation!");
+          return;
+        }
+        else {
+          toast.error("Failed to delete the database from the organisation. \nPlease try again!");
+          return;
+        }
+      } else {
+        toast.success("Successfully deleted the database from the organisation.");
+      }
+
+    } catch (error) {
+      toast.error("Error while trying to delete the database, please try again!");
+    }
   }
 
   async function deleteOrganisation() {
