@@ -1,9 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { DbMetadataHandlerService } from '../db-metadata-handler.service';
-import { Database_Metadata_Dto, Table_Metadata_Dto, Field_Metadata_Dto, Foreign_Key_Metadata_Dto, Server_Summary_Metadata_Dto } from '../dto/metadata.dto';
+import {
+  Database_Metadata_Dto,
+  Table_Metadata_Dto,
+  Field_Metadata_Dto,
+  Foreign_Key_Metadata_Dto,
+  Server_Summary_Metadata_Dto
+} from '../dto/metadata.dto';
 import { Query } from './../../interfaces/dto/query.dto';
-import { ComparisonOperator, compoundCondition, LogicalOperator, primitiveCondition } from './../../interfaces/dto/conditions.dto';
-import { Saved_DB_Metadata_Dto, Saved_Table_Metadata_Dto } from '../dto/save-metadata.dto';
+import {
+  ComparisonOperator,
+  compoundCondition,
+  LogicalOperator,
+  primitiveCondition
+} from './../../interfaces/dto/conditions.dto';
+import { Saved_DB_Metadata_Dto } from '../dto/save-metadata.dto';
 
 @Injectable()
 export class PostgresDbMetadataHandlerService extends DbMetadataHandlerService {
@@ -322,31 +333,19 @@ export class PostgresDbMetadataHandlerService extends DbMetadataHandlerService {
   saveDbMetadata(save_db_metadata_dto: Saved_DB_Metadata_Dto) {
     throw new Error('Method not implemented.');
   }
-  getSavedDbMetadata() {
+  getSavedDbMetadata(get_db_metadata_dto: Database_Metadata_Dto) {
     throw new Error('Method not implemented.');
   }
-  saveTableMetadata(save_table_metadata_dto: Saved_Table_Metadata_Dto) {
+  getSavedTableMetadata(get_table_metadata_dto: Table_Metadata_Dto) {
     throw new Error('Method not implemented.');
   }
-  getSavedTableMetadata() {
+  getSavedFieldMetadata(get_field_metadata_dto: Field_Metadata_Dto) {
     throw new Error('Method not implemented.');
   }
-  saveFieldMetadata() {
+  getSavedForeignKeyMetadata(get_fk_metadata_dto: Foreign_Key_Metadata_Dto) {
     throw new Error('Method not implemented.');
   }
-  getSavedFieldMetadata() {
-    throw new Error('Method not implemented.');
-  }
-  saveForeignKeyMetadata() {
-    throw new Error('Method not implemented.');
-  }
-  getSavedForeignKeyMetadata() {
-    throw new Error('Method not implemented.');
-  }
-  saveServerSummaryMetadata() {
-    throw new Error('Method not implemented.');
-  }
-  getSavedServerSummaryMetadata() {
+  getSavedServerSummaryMetadata(get_summary_metadata_dto: Server_Summary_Metadata_Dto) {
     throw new Error('Method not implemented.');
   }
 }

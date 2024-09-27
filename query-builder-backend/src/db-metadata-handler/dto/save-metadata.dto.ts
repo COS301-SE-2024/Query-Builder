@@ -7,6 +7,7 @@ import {
   IsUUID,
   ValidateNested
 } from 'class-validator';
+import exp from 'constants';
 
 export class Database_Metadata_Dto {
   @IsString()
@@ -63,7 +64,7 @@ export class Table_Metadata_Dto {
 export class Field_Metadata_Dto {
   @IsString()
   @IsNotEmpty()
-  field_name: string;
+  column_name: string;
 
   @IsOptional()
   @IsString()
@@ -114,77 +115,4 @@ export class Saved_DB_Metadata_Dto {
   @ValidateNested()
   @Type(() => Database_Metadata_Dto)
   db_metadata: Database_Metadata_Dto;
-}
-
-export class Saved_Table_Metadata_Dto {
-  @IsString()
-  @IsNotEmpty()
-  databaseServerID: string;
-
-  @IsString()
-  @IsNotEmpty()
-  language: string;
-
-  @IsOptional()
-  @IsString()
-  @IsNotEmpty()
-  org_id?: string;
-
-  @IsString()
-  @IsNotEmpty()
-  schema_name: string;
-
-  @IsArray()
-  @IsNotEmpty()
-  @ValidateNested({ each: true })
-  @Type(() => Table_Metadata_Dto)
-  tables: Table_Metadata_Dto[];
-}
-
-export class Saved_Field_Metadata_Dto {
-  @IsString()
-  @IsUUID()
-  @IsNotEmpty()
-  databaseServerID: string;
-
-  @IsString()
-  @IsNotEmpty()
-  language: string;
-
-  @IsOptional()
-  @IsString()
-  @IsNotEmpty()
-  org_id?: string;
-
-  @IsString()
-  @IsNotEmpty()
-  table_name: string;
-
-  @IsArray()
-  @IsNotEmpty()
-  field_name: string[];
-
-  @IsArray()
-  @IsNotEmpty()
-  description: string[];
-}
-
-export class Saved_Foreign_Key_Metadata_Dto {
-  @IsString()
-  @IsUUID()
-  @IsNotEmpty()
-  databaseServerID: string;
-
-  @IsString()
-  @IsNotEmpty()
-  language: string;
-
-  @IsOptional()
-  @IsString()
-  @IsNotEmpty()
-  org_id?: string;
-
-  @IsString()
-  @IsNotEmpty()
-  description: string;
 }

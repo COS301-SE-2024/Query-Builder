@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Get } from '@nestjs/common';
 import { DbMetadataHandlerService } from '../db-metadata-handler.service';
 import { Query } from '../../interfaces/dto/query.dto';
 import {
@@ -14,12 +14,7 @@ import {
   Server_Summary_Metadata_Dto,
   Table_Metadata_Dto
 } from '../dto/metadata.dto';
-import {
-  Saved_DB_Metadata_Dto,
-  Saved_Table_Metadata_Dto,
-  Saved_Field_Metadata_Dto,
-  Saved_Foreign_Key_Metadata_Dto
-} from '../dto/save-metadata.dto';
+import { Saved_DB_Metadata_Dto } from '../dto/save-metadata.dto';
 import { QueryHandlerService } from '../../query-handler/query-handler.service';
 import { Supabase } from '../../supabase/supabase';
 
@@ -422,8 +417,7 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
           }
         ]
       };
-    }
-    else {
+    } else {
       // Check if the database already exists
       const existing_db = existing_data.db_info.databases.find(
         (db) => db.schema_name === save_db_metadata_dto.db_metadata.schema_name
@@ -431,7 +425,45 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
 
       if (existing_db) {
         // Update the existing database
-        this.deepMerge(existing_db, save_db_metadata_dto.db_metadata);
+        if (save_db_metadata_dto.db_metadata.tables) {
+          for (const new_table of save_db_metadata_dto.db_metadata.tables) {
+            const existing_table = existing_db.tables.find(
+              (table) => table.table_name === new_table.table_name
+            );
+
+            if (existing_table) {
+              // Update the existing table
+              existing_table.description = new_table.description;
+
+              if (new_table.fields && existing_table.fields) {
+                for (const new_field of new_table.fields) {
+                  const existing_field = existing_table.fields.find(
+                    (field) => field.column_name === new_field.column_name
+                  );
+
+                  if (existing_field) {
+                    // Update the existing field
+                    existing_field.description = new_field.description;
+                  } else {
+                    // Add the new field
+                    existing_table.fields.push({
+                      column_name: new_field.column_name,
+                      description: new_field.description
+                    });
+                  }
+                }
+              } else {
+                // Add the new fields
+                existing_table.fields = new_table.fields;
+              }
+            } else {
+              // Add the new table
+              existing_db.tables.push({
+                ...new_table
+              });
+            }
+          }
+        }
       } else {
         // Add the new database
         existing_data.db_info.databases.push({
@@ -456,233 +488,22 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
 
     return { data: data };
   }
-  async getSavedDbMetadata(get_db_metadata_dto: Saved_DB_Metadata_Dto) {}
 
-  async saveTableMetadata(save_table_metadata_dto: Saved_Table_Metadata_Dto) {
-    // Get the user information
-    const { data: user_data, error: user_error } = await this.supabase
-      .getClient()
-      .auth.getUser(this.supabase.getJwt());
-
-    if (user_error) {
-      throw user_error;
-    }
-
-    // Get the org_id from the database
-    if (!save_table_metadata_dto.org_id) {
-      const { data: org_data, error: org_error } = await this.supabase
-        .getClient()
-        .from('db_envs')
-        .select('org_id')
-        .eq('db_id', save_table_metadata_dto.databaseServerID)
-        .single();
-
-      if (org_error) {
-        throw org_error;
-      }
-
-      save_table_metadata_dto.org_id = org_data.org_id;
-    }
-
-    // Check if the user has permission to save the metadata
-    const { data: permission_data, error: permission_error } =
-      await this.supabase
-        .getClient()
-        .from('org_members')
-        .select('user_role')
-        .eq('org_id', save_table_metadata_dto.org_id)
-        .eq('user_id', user_data.user.id)
-        .single();
-
-    if (permission_error) {
-      throw permission_error;
-    }
-    if (!permission_data || permission_data.user_role === 'member') {
-      throw new Error('User does not have permission to save metadata');
-    }
-
-    // Retrieve existing metadata for the specific database schema
-    const { data: existing_data, error: existing_error } = await this.supabase
-      .getClient()
-      .from('db_envs')
-      .select('db_info')
-      .eq('db_id', save_table_metadata_dto.databaseServerID)
-      .contains('db_info->databases', [{ schema_name: save_table_metadata_dto.schema_name }])
-      .single();
-
-    if (existing_error) {
-      throw existing_error;
-    }
-
-    // Combine the existing metadata with the new metadata
-    // data = [{
-    //   table_name: 'table1',
-    //   description: 'description1'},
-    //   {table_name: 'table2',
-    //   description: 'description2'}]
-    const new_metadata = save_table_metadata_dto.table_name.map(
-      (table_name, index) => {
-        return {
-          table_name: table_name,
-          description: save_table_metadata_dto.description[index]
-        };
-      }
-    );
-
-    if (existing_data.db_info) {
-      for (const new_table of new_metadata) {
-        const existing_table = existing_data.table_meta_data.find(
-          (table) => table.table_name === new_table.table_name
-        );
-
-        if (existing_table) {
-          existing_table.description = new_table.description;
-        } else {
-          existing_data.table_meta_data.push(new_table);
-        }
-      }
-    } else {
-      existing_data.table_meta_data = new_metadata;
-    }
-
-    // Save the metadata
-    const { data, error } = await this.supabase
-      .getClient()
-      .from('db_envs')
-      .update({
-        table_meta_data: existing_data.table_meta_data
-      })
-      .eq('db_id', save_table_metadata_dto.databaseServerID)
-      .select();
-
-    if (error) {
-      throw error;
-    }
-
-    return { data: data };
+  getSavedDbMetadata(get_db_metadata_dto: Database_Metadata_Dto) {
+    throw new Error('Method not implemented.');
   }
-  async getSavedTableMetadata(
-    get_table_metadata_dto: Saved_Table_Metadata_Dto
-  ) {}
-
-  async saveFieldMetadata(save_field_metadata_dto: Saved_Field_Metadata_Dto) {
-    // Get the user information
-    const { data: user_data, error: user_error } = await this.supabase
-      .getClient()
-      .auth.getUser(this.supabase.getJwt());
-
-    if (user_error) {
-      throw user_error;
-    }
-
-    // Get the org_id from the database
-    if (!save_field_metadata_dto.org_id) {
-      const { data: org_data, error: org_error } = await this.supabase
-        .getClient()
-        .from('db_envs')
-        .select('org_id')
-        .eq('db_id', save_field_metadata_dto.databaseServerID)
-        .single();
-
-      if (org_error) {
-        throw org_error;
-      }
-
-      save_field_metadata_dto.org_id = org_data.org_id;
-    }
-
-    // Check if the user has permission to save the metadata
-    const { data: permission_data, error: permission_error } =
-      await this.supabase
-        .getClient()
-        .from('org_members')
-        .select('user_role')
-        .eq('org_id', save_field_metadata_dto.org_id)
-        .eq('user_id', user_data.user.id)
-        .single();
-
-    if (permission_error) {
-      throw permission_error;
-    }
-    if (!permission_data || permission_data.user_role === 'member') {
-      throw new Error('User does not have permission to save metadata');
-    }
-
-    // Retrieve existing metadata
-    const { data: existing_data, error: existing_error } = await this.supabase
-      .getClient()
-      .from('db_envs')
-      .select('fields_meta_data')
-      .eq('db_id', save_field_metadata_dto.databaseServerID)
-      .single();
-
-    if (existing_error) {
-      throw existing_error;
-    }
-
-    // Combine the existing metadata with the new metadata
-    // data = [{
-    //   table_name: 'table1',
-    //   field_name: ['field1', 'field2'],
-    //   description: ['description1', 'description2']},
-    //   {table_name: 'table2',
-    //   field_name: ['field3', 'field4'],
-    //   description: ['description3', 'description4']}]
-    const new_metadata = save_field_metadata_dto.field_name.map(
-      (field_name, index) => {
-        return {
-          table_name: save_field_metadata_dto.table_name,
-          name: field_name,
-          description: save_field_metadata_dto.description[index]
-        };
-      }
-    );
-
-    if (existing_data.fields_meta_data) {
-      for (const new_field of new_metadata) {
-        const existing_field = existing_data.fields_meta_data.find(
-          (field) =>
-            field.table_name === new_field.table_name &&
-            field.field_name === new_field.name
-        );
-
-        if (existing_field) {
-          existing_field.description = new_field.description;
-        } else {
-          existing_data.fields_meta_data.push(new_field);
-        }
-      }
-    } else {
-      existing_data.fields_meta_data = new_metadata;
-    }
-
-    // Save the metadata
-    const { data, error } = await this.supabase
-      .getClient()
-      .from('db_envs')
-      .update({
-        fields_meta_data: existing_data.fields_meta_data
-      })
-      .eq('db_id', save_field_metadata_dto.databaseServerID)
-      .select();
-
-    if (error) {
-      throw error;
-    }
-
-    return { data: data };
+  getSavedTableMetadata(get_table_metadata_dto: Table_Metadata_Dto) {
+    throw new Error('Method not implemented.');
   }
-  async getSavedFieldMetadata(
-    get_field_metadata_dto: Saved_Field_Metadata_Dto
-  ) {}
-
-  async saveForeignKeyMetadata(
-    save_fk_metadata_dto: Saved_Foreign_Key_Metadata_Dto
-  ) {}
-  async getSavedForeignKeyMetadata(
-    get_fk_metadata_dto: Saved_Foreign_Key_Metadata_Dto
-  ) {}
-
-  async saveServerSummaryMetadata() {}
-  async getSavedServerSummaryMetadata() {}
+  getSavedFieldMetadata(get_field_metadata_dto: Field_Metadata_Dto) {
+    throw new Error('Method not implemented.');
+  }
+  getSavedForeignKeyMetadata(get_fk_metadata_dto: Foreign_Key_Metadata_Dto) {
+    throw new Error('Method not implemented.');
+  }
+  getSavedServerSummaryMetadata(
+    get_summary_metadata_dto: Server_Summary_Metadata_Dto
+  ) {
+    throw new Error('Method not implemented.');
+  }
 }
