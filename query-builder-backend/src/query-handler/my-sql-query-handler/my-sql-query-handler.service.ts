@@ -45,7 +45,6 @@ export class MySqlQueryHandlerService extends QueryHandlerService {
                 return reject(new InternalServerErrorException('Your saved query should only return a single row to be used as a subquery in this case'));
               }
               else{
-                console.log(error);
                 return reject(new InternalServerErrorException('Please check your query and try again'));
               }
             }
