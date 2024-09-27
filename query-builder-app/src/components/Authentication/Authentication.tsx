@@ -227,7 +227,7 @@ export default function Authentication() {
   };
 
   const handlePasswordReset = async (email: string) => {
-    if (email) {
+    if (await checkEmailExists(email)) {
       const supabase = createClient();
   
       // Specify the redirect URL here
@@ -235,16 +235,40 @@ export default function Authentication() {
   
       const { data, error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
   
-      if (data) {
+       if (error) {
+        toast.error('Error sending password reset link, maybe try again later?');
+      }else if (data) {
         toast.success('Password reset link sent successfully!');
         setModalOpen(false);
-      } else if (error) {
-        toast.error('Error sending password reset link, maybe try again later?');
       }
     } else {
       toast.error('Please enter a valid email address');
     }
   };
+
+  async function checkEmailExists(email: string) {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user-management/get-user`, {
+        credentials: "include",
+        method: "PUT",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+        },
+        body: JSON.stringify({ email }),
+    });
+
+    const result = await response.json();
+
+    // Check if the response indicates that the user exists
+    if (result.statusCode === 404) {
+        return false; // User not found, email does not exist
+    } else if (result.data?.length > 0) {
+        return true; // User exists
+    }
+
+    throw new Error('Unexpected error.'); // Handle unexpected responses
+}
 
 
   return (
