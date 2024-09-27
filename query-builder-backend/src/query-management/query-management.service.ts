@@ -272,4 +272,33 @@ export class QueryManagementService {
 
     return { message: 'Query shared successfully' };
   }
+
+  async getDbAndOrgInformation(db_id: string) {
+    const { data: db_data, error: db_error } = await this.supabase
+      .getClient()
+      .from('db_envs')
+      .select('org_id, name')
+      .eq('db_id', db_id)
+      .single();
+
+    if (db_error) {
+      throw db_error;
+    }
+
+    const { data: org_data, error: org_error } = await this.supabase
+      .getClient()
+      .from('orgs')
+      .select('org_name')
+      .eq('org_id', db_data.org_id)
+      .single();
+
+    if (org_error) {
+      throw org_error;
+    }
+
+    return { db_data, org_data };
+  }
+
 }
+
+
