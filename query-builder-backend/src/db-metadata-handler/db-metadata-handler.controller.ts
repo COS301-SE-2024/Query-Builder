@@ -42,4 +42,19 @@ export class DbMetadataHandlerController {
     async getSavedDbMetadata(@Body(ValidationPipe) get_db_metadata_dto: Database_Metadata_Dto){
         return this.dbMetadataHandlerService.getSavedDbMetadata(get_db_metadata_dto);
     }
+
+    @Put("get-table-metadata")
+    async getSavedTableMetadata(@Body(ValidationPipe) get_table_metadata_dto: Table_Metadata_Dto){
+        return this.dbMetadataHandlerService.getSavedTableMetadata(get_table_metadata_dto);
+    }
+
+    @Put("get-field-metadata")
+    async getSavedFieldMetadata(@Body(ValidationPipe) get_field_metadata_dto: Field_Metadata_Dto){
+        return this.dbMetadataHandlerService.getSavedFieldMetadata(get_field_metadata_dto);
+    }
+
+    @Put('get-foreign-key-metadata')
+    async getSavedForeignKeyMetadata(@Body(ValidationPipe) foreignKeyMetadataDto: Foreign_Key_Metadata_Dto){
+        return this.dbMetadataHandlerService.getSavedForeignKeyMetadata(foreignKeyMetadataDto);
+    }
 }
