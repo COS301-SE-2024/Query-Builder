@@ -30,6 +30,7 @@ import { Create_Hash_Dto } from './dto/create-hash.dto';
 import * as crypto from 'crypto';
 import { Has_Saved_Db_Creds_Dto } from './dto/has-saved-db-creds.dto';
 import { Get_Db_Type_Dto } from './dto/get-db-type.dto';
+import { Get_Shareable_Members_Dto } from './dto/get-shareable-members.dto';
 
 @Injectable()
 export class OrgManagementService {
@@ -832,7 +833,7 @@ export class OrgManagementService {
       );
     }
 
-    if (!org_data[0].role_permissions.add_dbs) {
+    if (!org_data[0].role_permissions.update_db_access) {
       throw new UnauthorizedException(
         'You do not have permission to give database access to other users'
       );
@@ -1065,7 +1066,7 @@ export class OrgManagementService {
               update_user_roles: true,
               view_all_dbs: true,
               view_all_users: true,
-              update_db_access: false
+              update_db_access: true
             };
           }
           break;
@@ -1363,7 +1364,7 @@ export class OrgManagementService {
       );
     }
 
-    if (!org_data[0].role_permissions.add_dbs) {
+    if (!org_data[0].role_permissions.update_db_access) {
       throw new UnauthorizedException(
         'You do not have permission to remove database access for other users'
       );
@@ -1374,7 +1375,7 @@ export class OrgManagementService {
       .from('db_access')
       .delete()
       .eq('user_id', remove_db_access_dto.user_id)
-      .eq('db_id', remove_db_access_dto.user_id)
+      .eq('db_id', remove_db_access_dto.db_id)
       .select();
 
     if (db_error) {
@@ -1385,5 +1386,73 @@ export class OrgManagementService {
     }
 
     return { data: db_data };
+  }
+
+  async getDBAccessMembers(
+    get_shareable_members_dto: Get_Shareable_Members_Dto
+  ) {
+    const { data: user_data, error: user_error } = await this.supabase
+      .getClient()
+      .auth.getUser(this.supabase.getJwt());
+
+    if (user_error) {
+      throw user_error;
+    }
+
+    const { data: org_data, error: org_error } = await this.supabase
+      .getClient()
+      .from('db_envs')
+      .select('org_id')
+      .eq('db_id', get_shareable_members_dto.db_id)
+      .single();
+
+    if (org_error) {
+      throw org_error;
+    }
+    if (!org_data) {
+      throw new NotFoundException('Organization not found');
+    }
+
+    const { data: members_data, error: members_error } = await this.supabase
+      .getClient()
+      .from('org_members')
+      .select('user_id, user_role, profiles(*)')
+      .eq('org_id', org_data.org_id)
+      // .neq('user_id', user_data.user.id)
+      .neq('user_role', 'owner');
+
+    if (members_error) {
+      throw members_error;
+    }
+
+    // Filter out the members who dont have access to the database in the query
+    const { data: db_access_data, error: db_access_error } = await this.supabase
+      .getClient()
+      .from('db_access')
+      .select('user_id')
+      .eq('db_id', get_shareable_members_dto.db_id)
+      .in(
+        'user_id',
+        members_data.map((member) => member.user_id)
+      );
+
+    if (db_access_error) {
+      throw db_access_error;
+    }
+
+    const accessSet = new Set(db_access_data.map((db_access) => db_access.user_id));
+
+    // Map the members_data to include the 'access' field
+    const updated_members_data = members_data.map((member) => {
+      const profiles: any = member.profiles;
+      return {
+        user_id: member.user_id,
+        full_name: `${profiles.first_name} ${profiles.last_name}`,
+        profile_photo: profiles.profile_photo,
+        access: accessSet.has(member.user_id) // true if the user_id is in the access set, false otherwise
+      };
+    });
+
+    return { data: updated_members_data };
   }
 }

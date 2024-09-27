@@ -36,6 +36,7 @@ import { Join_Org_Dto } from './dto/join-org.dto';
 import { Create_Hash_Dto } from './dto/create-hash.dto';
 import { Has_Saved_Db_Creds_Dto } from './dto/has-saved-db-creds.dto';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Get_Shareable_Members_Dto } from './dto/get-shareable-members.dto';
 
 @ApiTags('org-management')
 @Controller('org-management')
@@ -287,5 +288,10 @@ export class OrgManagementController {
     @Body(ValidationPipe) remove_db_access_dto: Remove_Db_Access_Dto
   ) {
     return this.org_management_service.removeDbAccess(remove_db_access_dto);
+  }
+
+  @Put("get-dbaccess-members")
+  async getShareableMembers(@Body(ValidationPipe) get_shareable_members_dto: Get_Shareable_Members_Dto) {
+    return this.org_management_service.getDBAccessMembers(get_shareable_members_dto);
   }
 }
