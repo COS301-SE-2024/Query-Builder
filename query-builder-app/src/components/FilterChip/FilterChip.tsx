@@ -59,13 +59,6 @@ export default function FilterChip(props: FilterChipProps){
 
     },[primitiveCondition])
 
-    React.useEffect(() => {
-
-        console.log("Printing subquery list");
-        console.log(subquerylist);
-
-    },[subquerylist])
-
     //----------------------------HELPER FUNCTIONS------------------------------------//
 
     //helper functions for toggling the popup
@@ -136,7 +129,6 @@ export default function FilterChip(props: FilterChipProps){
         let value: any;
 
         if(isQueryParams(valueString)){
-            console.log("IS QUERY PARAMS");
             value = valueString;
         }
         else if(valueString == ""){

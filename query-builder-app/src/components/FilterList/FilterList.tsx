@@ -60,12 +60,6 @@ export default function FilterList(props: FilterListProps){
 
     },[props.table])
 
-    React.useEffect(() => {
-
-        console.log(JSON.stringify(possibleConditions))
-
-    },[possibleConditions])
-
     //React hook for when the data model has changed
     React.useEffect(() => {
 
@@ -84,8 +78,6 @@ export default function FilterList(props: FilterListProps){
 
         const supabase = createClient();
         const token = (await supabase.auth.getSession()).data.session?.access_token
-    
-        console.log(token)
     
         return token;
     };
@@ -115,13 +107,10 @@ export default function FilterList(props: FilterListProps){
             } 
         }
 
-        console.log(json.query_data);
-
         setQueries(json.query_data);
     }
 
     async function fetchPossibleConditions(){
-        console.log("FETCHING POSSIBLE CONDITIONS");
 
         let tableRef: table = props.table;
 
@@ -152,8 +141,6 @@ export default function FilterList(props: FilterListProps){
             }
           
         }
-
-        console.log(json.data)
 
         for(let item of json.data){
             newPossibleConditions.push({tableName: tableRef.name, column: item.name});
@@ -187,8 +174,6 @@ export default function FilterList(props: FilterListProps){
                 }
               
             }
-
-            console.log(json.data)
 
             for(let item of json.data){
                 newPossibleConditions.push({tableName: tableRef.name, column: item.name});
