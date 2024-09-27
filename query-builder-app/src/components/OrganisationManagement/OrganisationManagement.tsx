@@ -1074,7 +1074,7 @@ export default function OrganisationManagement() {
                                     <div className="max-h-[200px] overflow-y-auto">
                                         {filteredUsers.length > 0 ? (
                                             filteredUsers.map((selectedUsers) => (
-                                              <Tooltip className="mb-2 ml-3" content= {selectedUsers.access ? "Revoke Access" : "Grant access"}>
+                                              <Tooltip key={selectedUsers.user_id} className="mb-2 ml-3" content= {selectedUsers.access ? "Revoke Access" : "Grant access"}>
                                                 <Checkbox
                                                     key={selectedUsers.user_id}
                                                     className="flex items-center space-x-2 mb-2"
