@@ -55,6 +55,8 @@ async function getInformation(db_id: string) {
         body: JSON.stringify(db_id)
     });
 
+    console.log(response);
+
     if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
     }
@@ -152,6 +154,7 @@ export default function ContextMenuCard({
     const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
     const [userDescription, setUserDescription] = useState("");
     const [checkedUsers, setCheckedUsers] = useState<User[]>([]); // Track checked state as an array of user objects
+    const [dborginfo, setdborginfo] = useState("");
 
     const handleCheckboxChange = (user: User, isChecked: boolean) => {
         if (isChecked) {
@@ -232,11 +235,34 @@ export default function ContextMenuCard({
         onShareOpenChange();
     }
 
-    function getInformationHelper(db_id: string) {
-        getInformation(db_id).then((data) => {
-            console.log(data);
-        });
-    }
+    async function getInformationHelper(db_id: string) {
+        try {
+            const data = await getInformation(db_id);
+            // Assuming the structure of the returned data includes db_data and org_data
+            const orgName = data.org_data.org_name; // Access the organization name
+            console.log({ dbName: data.db_data.name, orgName });
+            const ssss = `${data.db_data.name} ${orgName}`;
+            setdborginfo(ssss);
+        } catch (error) {
+            console.error('Error fetching information:', error);
+            throw error; // Rethrow the error if needed
+        }
+    };
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true); // Set loading state
+                const fullName = await getInformationHelper(db_id); // Call your async function
+            } catch (error) {
+                console.error('Error fetching information:', error);
+            } finally {
+                setLoading(false); // Reset loading state
+            }
+        };
+
+        fetchData(); // Invoke the fetch function
+    }, [db_id]); // Dependency array to re-fetch if db_id changes
 
     return (
         <>
@@ -255,9 +281,8 @@ export default function ContextMenuCard({
                 <DropdownMenu aria-label="Static Actions" closeOnSelect={false}>
                     <DropdownSection title={localDateTime}>
                         <DropdownItem key="description" isDisabled className="text-sm text-gray-500">
-                                {getInformationHelper(db_id)}
+                            {dborginfo || "No db & org information available"}
                         </DropdownItem>
-                        {/* Show the description as a non-interactive item */}
                         <DropdownItem key="description" isDisabled className="text-sm text-gray-500">
                             {description_text || "No description available"}
                         </DropdownItem>
@@ -345,19 +370,19 @@ export default function ContextMenuCard({
                                 />
                                 <div className="max-h-[200px] overflow-y-auto">
                                     {filteredUsers.length > 0 ? (
-                                        filteredUsers.map((selectedUsers) => (
+                                        filteredUsers.map((user) => (
                                             <Checkbox
-                                                key={selectedUsers.user_id}
+                                                key={user.user_id}
                                                 className="flex items-center space-x-2 mb-2"
-                                                onChange={(e) => handleCheckboxChange(selectedUsers, e.target.checked)} // Update the checkbox based on user selection
+                                                onChange={(e) => handleCheckboxChange(user, e.target.checked)} // Update the checkbox based on user selection
                                             >
                                                 <div className="flex items-center space-x-2">
                                                     <img
-                                                        src={selectedUsers.profile_photo || DEFAULT_PROFILE_IMAGE}
-                                                        alt={`${selectedUsers.full_name}'s profile`}
+                                                        src={user.profile_photo || DEFAULT_PROFILE_IMAGE}
+                                                        alt={`${user.full_name}'s profile`}
                                                         className="h-8 w-8 rounded-full"
                                                     />
-                                                    <span className="text-sm">{selectedUsers.full_name}</span>
+                                                    <span className="text-sm">{user.full_name}</span>
                                                 </div>
                                             </Checkbox>
                                         ))
@@ -380,32 +405,15 @@ export default function ContextMenuCard({
                             </ModalBody>
                             <ModalFooter>
                                 {/* Button to share the query */}
-                                <div className="mt-4 flex justify-center w-full"> {/* Add 'w-full' to ensure the parent takes full width */}
-                                    <Button color="primary" className="w-full max-w-xs items-center" onClick={() => shareQueryHelper(query_id, checkedUsers, userDescription)}> {/* Optional: limit button width with max-w-xs */}
+                                <div className="mt-4 flex justify-center w-full">
+                                    <Button
+                                        color="primary"
+                                        className="w-full max-w-xs items-center"
+                                        onClick={() => shareQueryHelper(query_id, checkedUsers, userDescription)}
+                                    >
                                         Share Query
                                     </Button>
                                 </div>
-
-                                {/* Display Selected Users */}
-                                {/* <div className="mt-4">
-                                    <h3 className="font-semibold">Selected Users:</h3>
-                                    {checkedUsers.length > 0 ? (
-                                        checkedUsers.map((user) => {
-                                            return (
-                                                <div key={user.id} className="flex items-center mt-1">
-                                                    <img
-                                                        src={user.profile_photo || DEFAULT_PROFILE_IMAGE}
-                                                        alt={user.full_name}
-                                                        className="w-8 h-8 rounded-full mr-2"
-                                                    />
-                                                    <span>{user.full_name}</span>
-                                                </div>
-                                            );
-                                        })
-                                    ) : (
-                                        <div className="text-gray-500">No users selected.</div>
-                                    )}
-                                </div> */}
                             </ModalFooter>
                         </>
                     )}
