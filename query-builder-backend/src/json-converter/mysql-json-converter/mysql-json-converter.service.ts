@@ -326,7 +326,9 @@ export class MysqlJsonConverterService extends JsonConverterService {
         sql += `?`;
         params.push(primCondition.value)
       } else if (typeof primCondition.value === 'object') {
-        sql += `(${this.convertJsonToQuery(primCondition.value)})`;
+        const preparedStatement: PreparedStatement = this.convertJsonToQuery(primCondition.value);
+        sql += `(${preparedStatement.queryString})`;
+        params = params.concat(preparedStatement.parameters);
       }
 
       return {queryString: sql, parameters: params};
@@ -464,7 +466,9 @@ export class MysqlJsonConverterService extends JsonConverterService {
         sql += `?`;
         params.push(primCondition.value)
       } else if (typeof primCondition.value === 'object') {
-        sql += `(${this.convertJsonToQuery(primCondition.value)})`;
+        const preparedStatement: PreparedStatement = this.convertJsonToQuery(primCondition.value);
+        sql += `(${preparedStatement.queryString})`;
+        params = params.concat(preparedStatement.parameters);
       }
 
       aggregateConditions.push({queryString: sql, parameters: params});
