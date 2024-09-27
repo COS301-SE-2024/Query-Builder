@@ -190,7 +190,21 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
       }
     };
 
-    return await this.queryHandlerService.queryDatabase(query, session);
+    const response = await this.queryHandlerService.queryDatabase(query, session);
+
+    const externalMetadata = await this.getSavedFieldMetadata(fieldMetadataDto);
+
+    response.data.map((field) =>
+    {
+      externalMetadata.data.map(emField => {
+        if(field.name == emField.name)
+        {
+          field.description = emField.description;
+        }
+      });
+    });
+
+    return response;
   }
 
   async getForeignKeyMetadata(
