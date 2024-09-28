@@ -36,6 +36,7 @@ import TableList from '../TableList/TableList';
 import FilterList from '../FilterList/FilterList';
 import { navigateToAuth } from '../../app/authentication/actions';
 import SaveQueryModal from '../SaveQueryModal/SaveQueryModal';
+import { Toaster } from 'react-hot-toast';
 
 //----------------------------INTERFACES------------------------------------//
 
@@ -259,6 +260,30 @@ export default function Form() {
 
   return (
     <>
+    <Toaster
+    position="top-center"
+    reverseOrder={false}
+    gutter={8}
+    containerClassName=""
+    containerStyle={{}}
+    toastOptions={{
+        // Define default options
+        className: '',
+        duration: 5000,
+        style: {
+        color: '#000',
+        background: '#fff',
+        },
+
+        // Default options for specific types
+        success: {
+        duration: 3000,
+        iconTheme: {
+            primary: 'green',
+            secondary: 'black',
+        },
+        },
+    }}/>
       <div className="app overflow-visible">
         <Card className="overflow-visible">
           <CardHeader>

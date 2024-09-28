@@ -10,11 +10,12 @@ import {
     Card,
     Checkbox,
     Textarea,
-    Input
+    Input,
 } from "@nextui-org/react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
 import { createClient } from "./../../utils/supabase/client";
 import { useRouter } from 'next/navigation';
+import toast from "react-hot-toast";
 
 export interface User {
     user_id: string;
@@ -31,6 +32,7 @@ interface ContextMenuCardProps {
     onDelete: () => void;
     description_text: string;
     type_text: string;
+    db_envs: any;
 }
 
 // This function gets the token from local storage.
@@ -96,7 +98,11 @@ async function shareQuery(query_id: string, checkboxUsers: string[], description
     });
 
     if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        // throw new Error(`HTTP error! Status: ${response.status}`);
+        toast.error("Error sharing query. Please try again later.");
+    }
+    else {
+        toast.success("Query shared successfully!");
     }
 
     let json = (await response.json()).data;
@@ -114,7 +120,8 @@ export default function ContextMenuCard({
     db_id,
     onDelete,
     description_text,
-    type_text
+    type_text,
+    db_envs
 }: ContextMenuCardProps) {
     const [loading, setLoading] = useState(false);
     const { isOpen, onOpen, onOpenChange } = useDisclosure(); // For the delete confirmation modal
@@ -127,6 +134,7 @@ export default function ContextMenuCard({
     const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
     const [userDescription, setUserDescription] = useState("");
     const [checkedUsers, setCheckedUsers] = useState<User[]>([]); // Track checked state as an array of user objects
+    const [dborginfo, setdborginfo] = useState("");
 
     const handleCheckboxChange = (user: User, isChecked: boolean) => {
         if (isChecked) {
@@ -148,6 +156,7 @@ export default function ContextMenuCard({
             setLoading(false);
             onDelete();
             onOpenChange();
+            toast.success("Query deleted successfully!");
         }
     };
 
@@ -155,6 +164,7 @@ export default function ContextMenuCard({
         let query = parameters;
         console.log(query);
         router.push("/" + db_id + "/" + query_id);
+        toast.dismiss();
     };
 
     const localDateTime = new Date(saved_at).toLocaleString([], {
@@ -196,14 +206,18 @@ export default function ContextMenuCard({
     );
 
     function shareQueryHelper(query_id: string, checkedUsers: User[], userDescription: string) {
+        if (checkedUsers.length == 0) {
+            toast.error("Please select at least one user to share the query with.");
+            return;
+        }
         const test = checkedUsers.map((user) => user.user_id);
-        console.log(test);
         shareQuery(query_id, test, userDescription)
+        onShareOpenChange();
     }
 
     return (
         <>
-            <Dropdown>
+            <Dropdown className="w-[300px]">
                 <DropdownTrigger>
                     <Button
                         variant="flat"
@@ -217,14 +231,69 @@ export default function ContextMenuCard({
                 </DropdownTrigger>
                 <DropdownMenu aria-label="Static Actions" closeOnSelect={false}>
                     <DropdownSection title={localDateTime}>
-                        {/* Show the description as a non-interactive item */}
-                        <DropdownItem key="description" isDisabled className="text-sm text-gray-500">
-                            {description_text || "No description available"}
+                        <DropdownItem
+                            isDisabled
+                            style={{
+                                maxWidth: '300px', // Set your preferred max width
+                                whiteSpace: 'normal', // Allow text to wrap
+                                overflowWrap: 'break-word', // Allow long words to break
+                                overflow: 'visible', // Ensure overflow is visible
+                                display: 'block', // Ensure block-level display
+                                wordBreak: 'break-all', // Break long words if necessary
+                            }}
+                            className="text-sm text-gray-500"
+                        >
+                            <div style={{
+                                wordBreak: 'break-all', // Ensures breaking of long words
+                                overflowWrap: 'break-word', // Break long words if necessary
+                            }}>
+                                {"Organization: " + (db_envs.organisations.name || "No org information available")}
+                                <br />
+                                {"Database: " + (db_envs.name || "No db information available")}
+                            </div>
+                        </DropdownItem>
+                        <DropdownItem
+                            isDisabled
+                            style={{
+                                maxWidth: '300px', // Set your preferred max width
+                                whiteSpace: 'normal', // Allow text to wrap normally
+                                overflowWrap: 'break-word', // Allow long words to break
+                                display: 'block', // Ensure block-level display
+                                wordBreak: 'break-all', // Break long words if necessary
+                                overflow: 'hidden', // Prevent overflow
+                            }}
+                            className="text-sm text-gray-500"
+                        >
+                            Description:
+                            <div style={{ padding: '20px', backgroundColor: '#f0f0f0', zIndex: 100 }}>
+                                <div
+                                    style={{
+                                        maxWidth: '250px', // Set your preferred max width
+                                        maxHeight: '150px', // Set your preferred max height
+                                        whiteSpace: 'normal', // Allow text to wrap normally
+                                        overflowWrap: 'break-word', // Allow long words to break
+                                        display: 'block', // Ensure block-level display
+                                        wordBreak: 'break-all', // Break long words if necessary
+                                        overflowY: 'auto', // Make vertical overflow scrollable
+                                        overflowX: 'hidden', // Prevent horizontal overflow
+                                    }}
+                                    className="text-sm text-gray-500"
+                                >
+                                    <div style={{
+                                        wordBreak: 'break-all', // Ensures breaking of long words
+                                        overflowWrap: 'break-word', // Break long words if necessary
+                                    }}>
+                                        {description_text || "No description available"}
+                                    </div>
+                                </div>
+                            </div>
                         </DropdownItem>
                         <DropdownItem
                             key="retrieve"
                             description="Retrieve saved query"
-                            onClick={handleRetrieve}
+                            onClick={() => {
+                                handleRetrieve();
+                            }}
                         >
                             Retrieve Query
                         </DropdownItem>
@@ -302,24 +371,24 @@ export default function ContextMenuCard({
                                 />
                                 <div className="max-h-[200px] overflow-y-auto">
                                     {filteredUsers.length > 0 ? (
-                                        filteredUsers.map((selectedUsers) => (
+                                        filteredUsers.map((user) => (
                                             <Checkbox
-                                                key={selectedUsers.user_id}
+                                                key={user.user_id}
                                                 className="flex items-center space-x-2 mb-2"
-                                                onChange={(e) => handleCheckboxChange(selectedUsers, e.target.checked)} // Update the checkbox based on user selection
+                                                onChange={(e) => handleCheckboxChange(user, e.target.checked)} // Update the checkbox based on user selection
                                             >
                                                 <div className="flex items-center space-x-2">
                                                     <img
-                                                        src={selectedUsers.profile_photo || DEFAULT_PROFILE_IMAGE}
-                                                        alt={`${selectedUsers.full_name}'s profile`}
+                                                        src={user.profile_photo || DEFAULT_PROFILE_IMAGE}
+                                                        alt={`${user.full_name}'s profile`}
                                                         className="h-8 w-8 rounded-full"
                                                     />
-                                                    <span className="text-sm">{selectedUsers.full_name}</span>
+                                                    <span className="text-sm">{user.full_name}</span>
                                                 </div>
                                             </Checkbox>
                                         ))
                                     ) : (
-                                        <p className="text-sm text-gray-500">No users found.</p>
+                                        <p className="text-sm text-gray-500">No users found...</p>
                                     )}
                                 </div>
 
@@ -328,41 +397,29 @@ export default function ContextMenuCard({
                                     <h3 className="text-md font-medium mb-2">Enter New Description</h3>
                                     <Textarea
                                         placeholder="Add a new description for this query"
-                                        className="w-full z-[100]"
+                                        className="w-full"
                                         minRows={3}
                                         maxRows={5}
-                                        onChange={(e) => setUserDescription(e.target.value)}
+                                        maxLength={190} // Limit the number of characters
+                                        onChange={(e) => {
+                                            if (e.target.value.length <= 190) {
+                                                setUserDescription(e.target.value);
+                                            }
+                                        }}
                                     />
                                 </div>
                             </ModalBody>
                             <ModalFooter>
                                 {/* Button to share the query */}
-                                <div className="mt-4 flex justify-center w-full"> {/* Add 'w-full' to ensure the parent takes full width */}
-                                    <Button color="primary" className="w-full max-w-xs items-center" onClick={() => shareQueryHelper(query_id, checkedUsers, userDescription)}> {/* Optional: limit button width with max-w-xs */}
+                                <div className="mt-4 flex justify-center w-full">
+                                    <Button
+                                        color="primary"
+                                        className="w-full max-w-xs items-center"
+                                        onClick={() => shareQueryHelper(query_id, checkedUsers, userDescription)}
+                                    >
                                         Share Query
                                     </Button>
                                 </div>
-
-                                {/* Display Selected Users */}
-                                {/* <div className="mt-4">
-                                    <h3 className="font-semibold">Selected Users:</h3>
-                                    {checkedUsers.length > 0 ? (
-                                        checkedUsers.map((user) => {
-                                            return (
-                                                <div key={user.id} className="flex items-center mt-1">
-                                                    <img
-                                                        src={user.profile_photo || DEFAULT_PROFILE_IMAGE}
-                                                        alt={user.full_name}
-                                                        className="w-8 h-8 rounded-full mr-2"
-                                                    />
-                                                    <span>{user.full_name}</span>
-                                                </div>
-                                            );
-                                        })
-                                    ) : (
-                                        <div className="text-gray-500">No users selected.</div>
-                                    )}
-                                </div> */}
                             </ModalFooter>
                         </>
                     )}

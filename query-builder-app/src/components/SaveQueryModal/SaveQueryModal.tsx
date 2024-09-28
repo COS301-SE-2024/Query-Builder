@@ -100,7 +100,12 @@ export default function SaveQueryModal(props: SaveQueryModalProps) {
                     className="w-full"
                     minRows={3}
                     maxRows={5}
-                    onChange={(e) => setUserDescription(e.target.value)}
+                    maxLength={190} // Limit the number of characters
+                    onChange={(e) => {
+                      if (e.target.value.length <= 190) {
+                        setUserDescription(e.target.value);
+                      }
+                    }}
                   />
                 </div>
               </ModalBody>
