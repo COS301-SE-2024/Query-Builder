@@ -18,8 +18,8 @@ export default function QueryBuilder() {
           className: '',
           duration: 5000,
           style: {
-            background: '#363636',
-            color: '#fff',
+            color: '#000',
+            background: '#fff',
           },
 
           // Default options for specific types
