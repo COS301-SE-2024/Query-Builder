@@ -2,6 +2,7 @@
   "databases": [
     {
       "schema_name": "sakila",
+      "description": "sakila database",
       "tables": [
         {
           "table_name": "ah",
@@ -21,7 +22,7 @@
             }
           ],
           "foreign_keys": [
-            {
+            { 
               "table_schema": "sakila",
               "table_name": "film_actor",
               "column_name": "film_id",
