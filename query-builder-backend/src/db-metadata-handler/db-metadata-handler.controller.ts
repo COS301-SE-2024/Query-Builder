@@ -57,4 +57,9 @@ export class DbMetadataHandlerController {
     async getSavedForeignKeyMetadata(@Body(ValidationPipe) foreignKeyMetadataDto: Foreign_Key_Metadata_Dto){
         return this.dbMetadataHandlerService.getSavedForeignKeyMetadata(foreignKeyMetadataDto);
     }
+
+    @Put('get-server-summary-metadata')
+    async getSavedSummaryMetadata(@Body(ValidationPipe) serverSummaryMetadataDto: Server_Summary_Metadata_Dto){
+        return this.dbMetadataHandlerService.getSavedServerSummaryMetadata(serverSummaryMetadataDto);
+    }
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { DbMetadataHandlerService } from '../db-metadata-handler.service';
 import {
   Database_Metadata_Dto,
@@ -21,8 +21,10 @@ import { QueryHandlerService } from '../../query-handler/query-handler.service';
 @Injectable()
 export class PostgresDbMetadataHandlerService extends DbMetadataHandlerService {
   constructor(
-    private readonly supabase: Supabase,
-    protected readonly queryHandlerService: QueryHandlerService
+    @Inject('QueryHandlerService')
+    @Inject('Supabase')
+    protected readonly queryHandlerService: QueryHandlerService,
+    private readonly supabase: Supabase
   ) {
     super(queryHandlerService);
   }
@@ -709,6 +711,50 @@ export class PostgresDbMetadataHandlerService extends DbMetadataHandlerService {
   async getSavedServerSummaryMetadata(
     get_summary_metadata_dto: Server_Summary_Metadata_Dto
   ) {
-    throw new Error('Method not implemented.');
+    // Get the user information
+    const { data: user_data, error: user_error } = await this.supabase
+      .getClient()
+      .auth.getUser(this.supabase.getJwt());
+
+    if (user_error) {
+      throw user_error;
+    }
+
+    // Get the org_id from the database
+    const { data: org_data, error: org_error } = await this.supabase
+      .getClient()
+      .from('db_envs')
+      .select('org_id')
+      .eq('db_id', get_summary_metadata_dto.databaseServerID)
+      .single();
+
+    if (org_error) {
+      throw org_error;
+    }
+
+    // Get the metadata
+    const { data: metadata_data, error: metadata_error } = await this.supabase
+      .getClient()
+      .from('db_envs')
+      .select('db_info')
+      .eq('db_id', get_summary_metadata_dto.databaseServerID)
+      .single();
+
+    if (metadata_error) {
+      throw metadata_error;
+    }
+
+    // Process the metadata, such that it only returns the schema_name and the description of each database
+    if (!metadata_data.db_info) {
+      return { data: [] };
+    }
+
+    const processed_data = metadata_data.db_info.databases.map((db) => {
+      return {
+        ...db
+      };
+    });
+
+    return { data: processed_data };
   }
 }
