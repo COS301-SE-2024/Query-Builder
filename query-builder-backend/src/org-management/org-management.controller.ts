@@ -45,9 +45,9 @@ export class OrgManagementController {
 
   @Get('get-org')
   @ApiOperation({
-    summary: 'Get the organization that the user is logged in to'
+    summary: 'Get the organizations of the logged-in user'
   })
-  @ApiResponse({status: 200, description: 'The organization that the user is logged in to'})
+  @ApiResponse({status: 200, description: 'The organizations of the logged-in user'})
   @ApiResponse({status: 401, description: 'Unauthorized'})
   async getOrgLoggedIn() {
     return this.org_management_service.getOrgLoggedIn();
@@ -55,7 +55,7 @@ export class OrgManagementController {
 
   @Put('get-org')
   @ApiOperation({
-    summary: 'Get organization details'
+    summary: 'Get organization details provided an identifier for the organisation'
   })
   @ApiResponse({status: 200, description: 'Organization details retrieved successfully'})
   @ApiResponse({status: 400, description: 'Invalid request'})

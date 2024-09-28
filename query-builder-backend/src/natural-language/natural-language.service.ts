@@ -233,7 +233,7 @@ export class NaturalLanguageService {
     }
   }
 
-  async gemini_query(
+  private async gemini_query(
     naturalLanguageQuery: Natural_Language_Query_Dto,
     session: Record<string, any>
   ) {
