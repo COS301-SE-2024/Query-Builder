@@ -17,6 +17,5 @@ export class Save_Query_Dto {
   queryTitle: string;
 
   @IsString()
-  @IsNotEmpty()
   description: string;
 }
