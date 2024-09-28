@@ -21,7 +21,7 @@ vitest.mock("./../../utils/supabase/client", () => {
           }}
       })
   }
-})
+});
 
 //Mock out API calls
 global.fetch = vi.fn(() =>
@@ -53,7 +53,7 @@ describe('DatabaseAdditionModal modal popup tests', () => {
   it('it should open the modal upon clicking the button', async () => {
 
     //create a user that can perform actions
-    const user = userEvent.setup()
+    const user = userEvent.setup();
 
     //render the component
     render(<DatabaseAdditionModal org_id={"1234"} on_add={()=>{}}/>);
@@ -73,7 +73,7 @@ describe('DatabaseAdditionModal modal popup tests', () => {
   it('The Database Server Name field should be displayed', async () => {
 
     //create a user that can perform actions
-    const user = userEvent.setup()
+    const user = userEvent.setup();
 
     //render the component
     render(<DatabaseAdditionModal org_id={"1234"} on_add={()=>{}}/>);
@@ -92,7 +92,7 @@ describe('DatabaseAdditionModal modal popup tests', () => {
   it('The URL field should be displayed', async () => {
 
     //create a user that can perform actions
-    const user = userEvent.setup()
+    const user = userEvent.setup();
 
     //render the component
     render(<DatabaseAdditionModal org_id={"1234"} on_add={()=>{}}/>);
@@ -115,7 +115,7 @@ describe('DatabaseAdditionModal add database tests', () => {
   it('Should be able to fill out the fields and add a database', async () => {
 
     //create a user that can perform actions
-    const user = userEvent.setup()
+    const user = userEvent.setup();
 
     //render the component
     render(<DatabaseAdditionModal org_id={"1234"} on_add={()=>{}}/>);
@@ -141,7 +141,7 @@ describe('DatabaseAdditionModal add database tests', () => {
     //get the add button
     const addButton = screen.getByText("Add");
 
-    //click the connect button
+    //click the add button
     await user.click(addButton);
 
   }, {timeout: 10000})
