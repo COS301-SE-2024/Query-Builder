@@ -66,7 +66,20 @@ export class PostgresDbMetadataHandlerService extends DbMetadataHandlerService {
       }
     };
 
-    return await this.queryHandlerService.queryDatabase(query, session);
+
+    const response =  await this.queryHandlerService.queryDatabase(query, session);
+
+    const externalMetadata = await this.getSavedDbMetadata(databaseMetadataDto);
+
+    response.data.map((db) => {
+      externalMetadata.data.map((emDB) => {
+        if (db.database === emDB.database) {
+          db.description = emDB.description;
+        }
+      });
+    });
+
+    return response;
   }
 
   async getTableMetadata(
@@ -105,6 +118,16 @@ export class PostgresDbMetadataHandlerService extends DbMetadataHandlerService {
       query,
       session
     );
+
+    const externalMetadata = await this.getSavedTableMetadata(tableMetadataDto);
+
+    response.data.map((table) => {
+      externalMetadata.data.map((emTable) => {
+        if (table.table_name === emTable.table_name) {
+          table.description = emTable.description;
+        }
+      });
+    });
 
     return response.data;
   }
@@ -151,7 +174,19 @@ export class PostgresDbMetadataHandlerService extends DbMetadataHandlerService {
       }
     };
 
-    return await this.queryHandlerService.queryDatabase(query, session);
+    const response = await this.queryHandlerService.queryDatabase(query, session);
+
+    const externalMetadata = await this.getSavedFieldMetadata(fieldMetadataDto);
+
+    response.data.map((field) => {
+      externalMetadata.data.map((emField) => {
+        if(field.name === emField.name) {
+          field.description = emField.description;
+        }
+      });
+    });
+
+    return response;
   }
 
   async getForeignKeyMetadata(
