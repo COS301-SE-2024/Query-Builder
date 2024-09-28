@@ -292,7 +292,6 @@ export default function ContextMenuCard({
                             key="retrieve"
                             description="Retrieve saved query"
                             onClick={() => {
-                                toast.loading("Retrieving query...");
                                 handleRetrieve();
                             }}
                         >
