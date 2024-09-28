@@ -37,21 +37,29 @@ global.fetch = vi.fn((url: string, config: any) => {
       return Promise.resolve({
             ok: true,
             json: () => Promise.resolve({data: [{
-              created_at: "",
-              logo: "",
               name: "Mock Org",
               org_id: "MockOrgID",
               db_envs: [
                 {
-                  created_at: "",
                   name: "Mock Database Server",
-                  db_id: "MockDBID",
-                  db_info: "",
-                  type: "mysql"
+                  db_id: "MockDBID"
                 }
               ],
               org_members: [
-                "Member1"
+                {
+                  role_permissions: {
+                    add_dbs: true,
+                    is_owner: true,
+                    remove_dbs: true,
+                    update_dbs: true,
+                    invite_users: true,
+                    remove_users: true,
+                    view_all_dbs: true,
+                    view_all_users: true,
+                    update_db_access: true,
+                    update_user_roles: true
+                  }
+                }
               ]
             }]}),
       });
@@ -100,21 +108,29 @@ describe('SignedInHomePage querying tests', () => {
           return Promise.resolve({
                 ok: true,
                 json: () => Promise.resolve({data: [{
-                  created_at: "",
-                  logo: "",
                   name: "Mock Org",
                   org_id: "MockOrgID",
                   db_envs: [
                     {
-                      created_at: "",
                       name: "Mock Database Server",
-                      db_id: "MockDBID",
-                      db_info: "",
-                      type: "mysql"
+                      db_id: "MockDBID"
                     }
                   ],
                   org_members: [
-                    "Member1"
+                    {
+                      role_permissions: {
+                        add_dbs: true,
+                        is_owner: true,
+                        remove_dbs: true,
+                        update_dbs: true,
+                        invite_users: true,
+                        remove_users: true,
+                        view_all_dbs: true,
+                        view_all_users: true,
+                        update_db_access: true,
+                        update_user_roles: true
+                      }
+                    }
                   ]
                 }]}),
           });
@@ -154,21 +170,29 @@ describe('SignedInHomePage querying tests', () => {
           return Promise.resolve({
                 ok: true,
                 json: () => Promise.resolve({data: [{
-                  created_at: "",
-                  logo: "",
                   name: "Mock Org",
                   org_id: "MockOrgID",
                   db_envs: [
                     {
-                      created_at: "",
                       name: "Mock Database Server",
-                      db_id: "MockDBID",
-                      db_info: "",
-                      type: "mysql"
+                      db_id: "MockDBID"
                     }
                   ],
                   org_members: [
-                    "Member1"
+                    {
+                      role_permissions: {
+                        add_dbs: true,
+                        is_owner: true,
+                        remove_dbs: true,
+                        update_dbs: true,
+                        invite_users: true,
+                        remove_users: true,
+                        view_all_dbs: true,
+                        view_all_users: true,
+                        update_db_access: true,
+                        update_user_roles: true
+                      }
+                    }
                   ]
                 }]}),
           });
@@ -220,21 +244,29 @@ describe('SignedInHomePage querying tests', () => {
           return Promise.resolve({
                 ok: true,
                 json: () => Promise.resolve({data: [{
-                  created_at: "",
-                  logo: "",
                   name: "Mock Org",
                   org_id: "MockOrgID",
                   db_envs: [
                     {
-                      created_at: "",
                       name: "Mock Database Server",
-                      db_id: "MockDBID",
-                      db_info: "",
-                      type: "mysql"
+                      db_id: "MockDBID"
                     }
                   ],
                   org_members: [
-                    "Member1"
+                    {
+                      role_permissions: {
+                        add_dbs: true,
+                        is_owner: true,
+                        remove_dbs: true,
+                        update_dbs: true,
+                        invite_users: true,
+                        remove_users: true,
+                        view_all_dbs: true,
+                        view_all_users: true,
+                        update_db_access: true,
+                        update_user_roles: true
+                      }
+                    }
                   ]
                 }]}),
           });
@@ -287,21 +319,29 @@ describe('SignedInHomePage querying tests', () => {
           return Promise.resolve({
                 ok: true,
                 json: () => Promise.resolve({data: [{
-                  created_at: "",
-                  logo: "",
                   name: "Mock Org",
                   org_id: "MockOrgID",
                   db_envs: [
                     {
-                      created_at: "",
                       name: "Mock Database Server",
-                      db_id: "MockDBID",
-                      db_info: "",
-                      type: "mysql"
+                      db_id: "MockDBID"
                     }
                   ],
                   org_members: [
-                    "Member1"
+                    {
+                      role_permissions: {
+                        add_dbs: true,
+                        is_owner: true,
+                        remove_dbs: true,
+                        update_dbs: true,
+                        invite_users: true,
+                        remove_users: true,
+                        view_all_dbs: true,
+                        view_all_users: true,
+                        update_db_access: true,
+                        update_user_roles: true
+                      }
+                    }
                   ]
                 }]}),
           });
@@ -356,21 +396,29 @@ describe('SignedInHomePage querying tests', () => {
           return Promise.resolve({
                 ok: true,
                 json: () => Promise.resolve({data: [{
-                  created_at: "",
-                  logo: "",
                   name: "Mock Org",
                   org_id: "MockOrgID",
                   db_envs: [
                     {
-                      created_at: "",
                       name: "Mock Database Server",
-                      db_id: "MockDBID",
-                      db_info: "",
-                      type: "mysql"
+                      db_id: "MockDBID"
                     }
                   ],
                   org_members: [
-                    "Member1"
+                    {
+                      role_permissions: {
+                        add_dbs: true,
+                        is_owner: true,
+                        remove_dbs: true,
+                        update_dbs: true,
+                        invite_users: true,
+                        remove_users: true,
+                        view_all_dbs: true,
+                        view_all_users: true,
+                        update_db_access: true,
+                        update_user_roles: true
+                      }
+                    }
                   ]
                 }]}),
           });
