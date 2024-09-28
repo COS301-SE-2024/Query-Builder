@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, Inject } from '@nestjs/common';
+import { Injectable, BadRequestException, Inject, InternalServerErrorException } from '@nestjs/common';
 import { Natural_Language_Query_Dto } from './dto/natural-language-query.dto';
 import { ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
@@ -7,7 +7,7 @@ import { Query, QueryParams } from '../interfaces/dto/query.dto';
 import { DbMetadataHandlerService } from '../db-metadata-handler/db-metadata-handler.service';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
-import { Schema, z } from 'zod';
+import { z } from 'zod';
 import { zodResponseFormat } from "openai/helpers/zod";
 
 @Injectable()
