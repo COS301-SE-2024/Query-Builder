@@ -62,7 +62,7 @@ describe('PostgresDbMetadataHandlerService', () => {
         { databaseServerID: '1234', language: 'postgresql' },
         {}
       )
-    ).toEqual({ data: [{ database: 'sakila' }] });
+    ).toEqual({ data: [{ database: 'sakila', description: 'sakila database' }] });
   });
 
   it("should return the QueryHandlerService's results.data for tables metadata", async () => {
@@ -85,14 +85,14 @@ describe('PostgresDbMetadataHandlerService', () => {
         },
         {}
       )
-    ).toEqual([{ table_name: 'film' }]);
+    ).toEqual([{ table_name: 'film', description: 'Test Desc' }]);
   });
 
   it("should return the QueryHandlerService's results for fields metadata", async () => {
-    testData = [{ column_name: 'first_name' }];
+    testData = [{ name: 'first_name' }];
     jest.spyOn(service, 'getSavedFieldMetadata').mockResolvedValueOnce(
       Promise.resolve(
-        { data: [{ name: 'title', description: 'The movie title' }] }
+        { data: [{ name: 'first_name', description: 'The first name' }] }
       )
     );
     expect(
@@ -105,21 +105,14 @@ describe('PostgresDbMetadataHandlerService', () => {
         },
         {}
       )
-    ).toEqual({ data: [{ column_name: 'first_name' }] });
+    ).toEqual({ data: [{ name: 'first_name', description: 'The first name' }] });
   });
 
   it("should return the QueryHandlerService's results.data for foreign key metadata, for keys pointing away and to the table", async () => {
     testData = [{ column_name: 'first_name' }];
     jest.spyOn(service, 'getSavedForeignKeyMetadata').mockResolvedValueOnce(
       Promise.resolve({
-        data: [
-          {
-            table_name: 'film_actor',
-            column_name: 'film_id',
-            table_schema: 'sakila',
-            referenced_column_name: 'film_id'
-          }
-        ]
+        data: []
       })
     );
     expect(
