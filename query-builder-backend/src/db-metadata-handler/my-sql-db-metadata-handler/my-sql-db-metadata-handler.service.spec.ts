@@ -3,8 +3,6 @@ import { MySqlDbMetadataHandlerService } from './my-sql-db-metadata-handler.serv
 import { Supabase } from '../../supabase/supabase';
 import { QueryHandlerModule } from '../../query-handler/query-handler.module';
 import { SupabaseModule } from '../../supabase/supabase.module';
-import { QueryHandlerService } from '../../query-handler/query-handler.service';
-import { SupabaseClient } from '@supabase/supabase-js';
 import { Query } from '../../../dist/interfaces/intermediateJSON';
 
 jest.mock('../../supabase/supabase.ts', () => ({
@@ -35,10 +33,9 @@ describe('MySqlDbMetadataHandlerService', () => {
   let service: MySqlDbMetadataHandlerService;
   let module: TestingModule;
   let supabase: Supabase;
-  let queryHandlerService: QueryHandlerService;
   let testData = undefined;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     module = await Test.createTestingModule({
       imports: [QueryHandlerModule, SupabaseModule],
       providers: [
