@@ -6,8 +6,6 @@ import {
     DropdownMenu,
     DropdownItem,
     DropdownSection,
-    CardBody,
-    Card,
     Checkbox,
     Textarea,
     Input,
@@ -16,6 +14,8 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure
 import { createClient } from "./../../utils/supabase/client";
 import { useRouter } from 'next/navigation';
 import toast from "react-hot-toast";
+import { navigateToForm } from "../../app/serverActions";
+import DatabaseCredentialsModal from "../DatabaseCredentialsModal/DatabaseCredentialsModal";
 
 export interface User {
     user_id: string;
@@ -134,7 +134,7 @@ export default function ContextMenuCard({
     const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
     const [userDescription, setUserDescription] = useState("");
     const [checkedUsers, setCheckedUsers] = useState<User[]>([]); // Track checked state as an array of user objects
-    const [dborginfo, setdborginfo] = useState("");
+    const credentialsModalDisclosure = useDisclosure();
 
     const handleCheckboxChange = (user: User, isChecked: boolean) => {
         if (isChecked) {
@@ -161,9 +161,7 @@ export default function ContextMenuCard({
     };
 
     const handleRetrieve = async () => {
-        let query = parameters;
-        console.log(query);
-        router.push("/" + db_id + "/" + query_id);
+        queryDatabaseServer(db_id);
         toast.dismiss();
     };
 
@@ -215,8 +213,92 @@ export default function ContextMenuCard({
         onShareOpenChange();
     }
 
+    //async function to query a database server
+    async function queryDatabaseServer(databaseServerID: string) {
+
+        //first determine whether the user already has an active connection to the database server
+        let hasActiveConnectionResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/has-active-connection`, {
+            credentials: "include",
+            method: "POST",
+            headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + await getToken()
+            },
+            body: JSON.stringify({
+                databaseServerID: databaseServerID
+            })
+        });
+
+        const hasActiveConnection = (await hasActiveConnectionResponse.json()).hasActiveConnection;
+
+        //if the user has an active connection to the database server, navigate straight to the form
+        if(hasActiveConnection === true){
+            navigateToForm(databaseServerID, query_id);
+        }
+        //otherwise proceed to open a connection to the database server
+        else{
+
+            //determine whether the user has db secrets saved for the database server
+            let dbSecretsSavedResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/has-saved-db-credentials`, {
+                credentials: "include",
+                method: "POST",
+                headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + await getToken()
+                },
+                body: JSON.stringify({
+                    db_id: databaseServerID
+                })
+            });
+
+            const dbSecretsSaved = (await dbSecretsSavedResponse.json()).saved_db_credentials;
+
+            //if the user doesn't have db credentials saved for that database, then prompt them for their credentials
+            if(dbSecretsSaved === false){
+                credentialsModalDisclosure.onOpen();
+            }
+            else{
+
+                //attempt a connection to the database, using saved credentials
+                //call the api/connect endpoint, and exclude databaseServerCredentials
+                let connectionResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/connect`, {
+                    credentials: "include",
+                    method: "PUT",
+                    headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + await getToken()
+                    },
+                    body: JSON.stringify({
+                        databaseServerID: databaseServerID
+                    })
+                });
+
+                let json = await connectionResponse.json();
+
+                //if connection was successful, navigate to the form
+                if(connectionResponse.ok === true && json.success === true){
+                    navigateToForm(databaseServerID, query_id);
+                }
+                //if the connection was not successful, display an appropriate error message
+                else if(connectionResponse.ok === false && json.response && json.response.message){
+                    toast.error(json.response.message);
+                }
+                else{
+                    toast.error("Something went wrong. Please try again");
+                }
+
+            }
+
+        }
+
+    }
+
     return (
         <>
+            <DatabaseCredentialsModal dbServerID={db_id} disclosure={credentialsModalDisclosure} onConnected={() => {navigateToForm(db_id, query_id)}}/>
             <Dropdown className="w-[300px]">
                 <DropdownTrigger>
                     <Button
