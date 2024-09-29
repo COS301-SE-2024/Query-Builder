@@ -112,22 +112,28 @@ export default function Form() {
   };
 
   //callback function for TableList
-  const updateTable = useCallback((updatedTable: table) => {
-    setQuery((previousQueryState) => ({
-      ...previousQueryState,
-      queryParams: {
-        ...previousQueryState.queryParams,
-        table: updatedTable,
-      },
-    }));
-  }, []);
+  const updateTable = useCallback(
+    (updatedTable: table) => {
+      setQuery((previousQueryState) => ({
+        ...previousQueryState,
+        queryParams: {
+          ...previousQueryState.queryParams,
+          table: updatedTable,
+        },
+      }));
+    },
+    [query.queryParams.table.columns.length],
+  );
 
   //callback function for FilterList
-  const updateCondition = useCallback((updatedCondition: compoundCondition) => {
-    if (updatedCondition.conditions.length > 0) {
-      setCondition(updatedCondition);
-    }
-  }, []);
+  const updateCondition = useCallback(
+    (updatedCondition: compoundCondition) => {
+      if (updatedCondition.conditions.length > 0) {
+        setCondition(updatedCondition);
+      }
+    },
+    [condition],
+  );
 
   const removeAllCondition = useCallback(() => {
     setCondition(undefined);
