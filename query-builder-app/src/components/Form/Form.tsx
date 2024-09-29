@@ -36,6 +36,7 @@ import TableList from '../TableList/TableList';
 import FilterList from '../FilterList/FilterList';
 import { navigateToAuth } from '../../app/authentication/actions';
 import SaveQueryModal from '../SaveQueryModal/SaveQueryModal';
+import { Toaster } from 'react-hot-toast';
 
 //----------------------------INTERFACES------------------------------------//
 
@@ -92,7 +93,7 @@ export default function Form() {
     const supabase = createClient();
     const token = (await supabase.auth.getSession()).data.session?.access_token;
 
-    console.log(token);
+    // console.log(token);
 
     return token;
   };
@@ -259,6 +260,30 @@ export default function Form() {
 
   return (
     <>
+    <Toaster
+    position="top-center"
+    reverseOrder={false}
+    gutter={8}
+    containerClassName=""
+    containerStyle={{}}
+    toastOptions={{
+        // Define default options
+        className: '',
+        duration: 5000,
+        style: {
+        color: '#000',
+        background: '#fff',
+        },
+
+        // Default options for specific types
+        success: {
+        duration: 3000,
+        iconTheme: {
+            primary: 'green',
+            secondary: 'black',
+        },
+        },
+    }}/>
       <div className="app overflow-visible">
         <Card className="overflow-visible">
           <CardHeader>
@@ -267,9 +292,9 @@ export default function Form() {
             </div>
           </CardHeader>
           <CardBody className="overflow-visible">
-            {/* Select a database */}
             <h2>Select a database: <span style={{ color: 'red' }}>*</span></h2>
             <Spacer y={2} />
+            {/* Select a database */}
             <Card className="w-full">
               <CardBody className="flex flex-row items-center space-x-2">
                 {
@@ -358,7 +383,6 @@ export default function Form() {
                     </div>
                   </Tooltip>
                 </div>
-                <SaveQueryModal query={query} />
                 <Button
                   color="primary"
                   onClick={() => {
@@ -381,7 +405,7 @@ export default function Form() {
                 >
                   Clear Form
                 </Button>
-                {/* {JSON.stringify(getMergedQuery(), null, 2)}  */}
+                {query.queryParams.table.columns.length > 0 && (<SaveQueryModal query={query} />)}
               </div>
               <Modal
                 isOpen={isOpen}

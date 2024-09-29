@@ -70,8 +70,9 @@ export class QueryManagementService {
     const { data: query_data, error: query_error } = await this.supabase
       .getClient()
       .from('saved_queries')
-      .select('parameters, queryTitle, saved_at, query_id, db_id, description, type')
-      .eq('user_id', user_data.user.id);
+      .select('parameters, queryTitle, saved_at, query_id, db_id, description, type, db_envs(name, organisations(name))')
+      .eq('user_id', user_data.user.id)
+      .order('saved_at', {ascending: false});
 
     if (query_error) {
       throw query_error;
@@ -272,4 +273,7 @@ export class QueryManagementService {
 
     return { message: 'Query shared successfully' };
   }
+
 }
+
+

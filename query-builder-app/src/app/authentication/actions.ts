@@ -73,12 +73,12 @@ export async function signup(
 
         const { data, error } = await supabase.auth.signUp(userDetails);
 
-        console.log(data);
+        // console.log(data);
 
         if (error) {
             // Check for the specific rate limit error by message
             if (error.message && error.message.includes('Email rate limit exceeded')) {
-                console.log(data);
+                // console.log(data);
                 throw new Error('Too many sign-up attempts. Please wait and try again.');
             }
             // Handle other types of errors

@@ -58,7 +58,7 @@ export default function UserSettings() {
 
                 //   console.log((await response.json()));
                 let json = (await response.json()).data[0];
-                console.log(json);
+                // console.log(json);
                 setInitialFirstName(json.first_name);
                 setUpdateFirstName(json.first_name);
                 setInitialLastName(json.last_name);
@@ -120,7 +120,7 @@ export default function UserSettings() {
             updatedDetails.last_name = updateLastName;
         }
 
-        console.log(updatedDetails);
+        // console.log(updatedDetails);
 
         let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user-management/update-user`, {
             // credentials: "include",
@@ -156,7 +156,7 @@ export default function UserSettings() {
             updatedDetails.profile_photo = profilePicURL;
         }
 
-        console.log(updatedDetails);
+        // console.log(updatedDetails);
 
         let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user-management/update-user`, {
             // credentials: "include",
@@ -182,7 +182,7 @@ export default function UserSettings() {
             updatedDetails.email = updateEmail;
         }
 
-        console.log(updatedDetails);
+        // console.log(updatedDetails);
 
         let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user-management/update-user-email`, {
             method: "PATCH",
@@ -193,7 +193,7 @@ export default function UserSettings() {
             },
             body: JSON.stringify(updatedDetails)
         })
-        console.log(response)
+        // console.log(response)
     };
 
     const validateEmail = (value: any) =>
@@ -229,7 +229,7 @@ export default function UserSettings() {
         if (file != null) {
             const formData = new FormData();
             formData.append('file', file);
-            console.log(formData.get('file'));
+            // console.log(formData.get('file'));
 
             let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user-management/upload-profile-photo`, {
                 method: "POST",

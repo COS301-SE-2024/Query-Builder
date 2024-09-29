@@ -2,7 +2,7 @@ import "../../app/globals.css"
 import "../Authentication/Authentication.css"
 import './OrganisationManagement.css';
 import React, { useState, useEffect } from "react";
-import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Image, Spacer, Card, CardBody, CardHeader, Input, Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, User, Chip, Tooltip, getKeyValue } from "@nextui-org/react";
+import { AvatarIcon, Button, Checkbox, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Image, Spacer, Card, CardBody, CardHeader, Input, Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, User, Chip, Tooltip, getKeyValue } from "@nextui-org/react";
 import { createClient } from "./../../utils/supabase/client";
 import { DeleteIcon } from "./DeleteIcon";
 import { useParams } from 'next/navigation'
@@ -13,6 +13,7 @@ import { navigateToForm } from "../../app/serverActions";
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import DatabaseCredentialsModal from "../DatabaseCredentialsModal/DatabaseCredentialsModal";
+import MetaDataHandler from "../MetaDataHandler/MetaDataHandler";
 
 
 interface UpdateOrganisation {
@@ -38,6 +39,13 @@ interface Organisation {
   org_members: String[];
 }
 
+export interface User {
+  user_id: string;
+  full_name: string;
+  profile_photo: string | null; // profileImage can be null
+  access: boolean;
+}
+
 const getToken = async () => {
 
   const supabase = createClient();
@@ -51,6 +59,28 @@ const getUser = async () => {
   // console.log((await supabase.auth.getSession()).data.session);
   return loggedInUser;
 };
+
+const DEFAULT_PROFILE_IMAGE = "https://via.placeholder.com/150/cccccc/FFFFFF?text=No+Image";
+
+async function getDBAccessMembers(db_id: string) {
+  let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/get-dbaccess-members`, {
+      credentials: "include",
+      method: "PUT",
+      headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + await getToken()
+      },
+      body: JSON.stringify({ db_id })
+  });
+
+  if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+  }
+
+  let json = (await response.json()).data;
+  return json;
+}
 
 export default function OrganisationManagement() {
 
@@ -70,7 +100,83 @@ export default function OrganisationManagement() {
   const [organisations, setOrganisations] = React.useState([]);
   const credentialsModalDisclosure = useDisclosure();
   const [currentDBServerID, setCurrentDBServerID] = React.useState('');
+  const [searchTerm, setSearchTerm] = useState(""); // State for search term
+  const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
+  const [dbAccessID, setdbAccessID] = useState("");
+  const [deleteDatabaseID, setDeleteDatabaseID] = useState("");
+  const [databaseName, setDatabaseName] = useState("");
+  const { isOpen: isDeleteDBOpen, onOpen: onDeleteDBOpen, onOpenChange: onDeleteDBOpenChange } = useDisclosure();
+  const { isOpen: isDBAccessOpen, onOpen: onDBAccessOpen, onOpenChange: onDBAccessOpenChange } = useDisclosure(); // For the db access modal
 
+  const handleCheckboxChange = async (dbID:string, user: User, isChecked: boolean) => {
+      if (isChecked) {
+          // Add the user object to the checkedUsers if it's checked
+          try {
+            let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/give-db-access`, {
+              method: "POST",
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + await getToken(),
+              },
+              body: JSON.stringify({ user_id: user.user_id, db_id: dbID, org_id: orgServerID, }),
+            });
+            
+            
+            if (!response.ok) {
+              // console.log("YOURR ERROR " + (response.status) + " " + (response.statusText);
+              if (response.status === 401) {
+                toast.error("You are not authorized to update database access for a member!");
+                return;
+              }
+              else {
+                toast.error("Failed to update database access for a member. \nPlease try again!");
+                return;
+              }
+            } else {
+              toast.success("Successfully granted database access");
+            }
+      
+          } catch (error) {
+            toast.error("Unexpected error while trying to give member database access!");
+          }
+      } else {
+          // Remove the user object from checkedUsers if it's unchecked
+          try {
+            let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/remove-db-access`, {
+              method: "DELETE",
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + await getToken(),
+              },
+              body: JSON.stringify({ user_id: user.user_id, db_id: dbID, org_id: orgServerID, }),
+            });
+            
+            
+            if (!response.ok) {
+              // console.log("YOURR ERROR " + (response.status) + " " + (response.statusText);
+              if (response.status === 401) {
+                toast.error("You are not authorized to update database access for a member!");
+                return;
+              }
+              else {
+                toast.error("Failed to update database access for a member. \nPlease try again!");
+                return;
+              }
+            } else {
+              toast.success("Successfully revoked database access");
+            }
+      
+          } catch (error) {
+            toast.error("Unexpected error while trying to give member database access!");
+          }
+      }
+
+      const members = await getDBAccessMembers(dbID); // Fetch members
+      setSelectedUsers(members);
+  };
+  
   async function queryDatabaseServer(databaseServerID: string) {
 
     //first determine whether the user already has an active connection to the database server
@@ -180,7 +286,7 @@ export default function OrganisationManagement() {
       }
 
       let membersData = ((await response.json()).data);
-      console.log(membersData);
+      // console.log(membersData);
       setOrgMembers(membersData);
 
       getUser().then((user) => {
@@ -261,7 +367,7 @@ export default function OrganisationManagement() {
     };
 
     if (updateOrgName === initialOrgName && profilePicURL === initialOrgLogo) {
-      console.log("No Updates")
+      // console.log("No Updates")
       return;
     }
 
@@ -278,7 +384,7 @@ export default function OrganisationManagement() {
     if (profilePicURL != initialOrgLogo) {
       updatedDetails.logo = profilePicURL;
     }
-    console.log(updatedDetails);
+    // console.log(updatedDetails);
 
     let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/update-org`, {
       method: "PATCH",
@@ -289,7 +395,7 @@ export default function OrganisationManagement() {
       },
       body: JSON.stringify(updatedDetails)
     });
-    console.log(response);
+    // console.log(response);
     if (response.status === 200 || response.status === 201) {
       setInitialOrgName(updateOrgName);
       setInitialOrgLogo(profilePicURL);
@@ -307,6 +413,38 @@ export default function OrganisationManagement() {
       body: JSON.stringify({ org_id: orgServerID, user_id: userId })
     })
     await getMembers();
+  }
+
+  async function deleteDatabaseFromOrg(dbID: string) {
+    // TO DO: deleteDatabaseFromOrg
+    try {
+      let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/remove-db`, {
+        method: "DELETE",
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + await getToken(),
+        },
+        body: JSON.stringify({ org_id: orgServerID, db_id: dbID })
+      })
+
+      if (!response.ok) {
+        // console.log("YOURR ERROR " + (response.status) + " " + (response.statusText);
+        if (response.status === 401) {
+          toast.error("You are not authorized to delete the database from the organisation!");
+          return;
+        }
+        else {
+          toast.error("Failed to delete the database from the organisation. \nPlease try again!");
+          return;
+        }
+      } else {
+        toast.success("Successfully deleted the database from the organisation.");
+      }
+
+    } catch (error) {
+      toast.error("Error while trying to delete the database, please try again!");
+    }
   }
 
   async function deleteOrganisation() {
@@ -333,7 +471,7 @@ export default function OrganisationManagement() {
       },
       body: JSON.stringify({ org_id: orgServerID, user_id: userId })
     })
-    console.log(response);
+    // console.log(response);
     getMembers();
   }
 
@@ -398,6 +536,67 @@ export default function OrganisationManagement() {
         return user.profiles.phone;
     }
   }, [hasAdminPermission, orgMembers]);
+
+  const filteredUsers = selectedUsers.filter(user =>
+      user.full_name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const renderDBCell = React.useCallback((db: any, columnKey: any) => {
+    switch (columnKey) {
+      case "name":
+        return (
+          <Link  href="" onClick={() => {queryDatabaseServer(db.db_id)}}>{db.name}</Link>
+        );
+      case "actions":
+        if (hasAdminPermission) {
+            let editControls = (<>
+              <Tooltip content="Edit database access">
+                <span className="text-lg text-default-400 h-5 w-5 flex justify-center mt-1 cursor-pointer active:opacity-50">
+                  {/* <EditUserModal org_id={orgServerID} user_id={user.profiles.user_id} on_add={getMembers} /> */}
+                  <EditIcon onClick={async () => {
+                    const members = await getDBAccessMembers(db.db_id); // Fetch members
+                    setDatabaseName(db.name);
+                    setSelectedUsers(members);
+                    setdbAccessID(db.db_id);
+                    onDBAccessOpen();
+                  }}/>
+                </span>
+              </Tooltip>
+              <Tooltip color="danger" content="Delete database">
+                <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                  <DeleteIcon onClick={() => {
+                    setDatabaseName(db.name);
+                    setDeleteDatabaseID(db.db_id);
+                    onDeleteDBOpen();
+                  }
+                    // deleteDatabaseFromOrg(db.db_id)
+                  }/>
+                </span>
+              </Tooltip>
+              <Tooltip content="Edit database metadata">
+                <span className="text-lg cursor-pointer active:opacity-50">
+                  <MetaDataHandler db_id={db.db_id} org_id={orgServerID} on_add={()=>{}}/>
+                </span>
+              </Tooltip>
+              
+              {/* TO DO: EDIT DATABASE METADATA */}
+
+            </>
+            );
+            return (
+              <div className="relative flex items-center gap-2">
+                {editControls}
+              </div>
+            );
+        }
+        else {
+          return (<></>);
+        }
+      default:
+        return (<></>);
+    }
+  }, [hasAdminPermission, orgMembers]);
+
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   const renderUpdatePage = React.useCallback(() => {
@@ -675,7 +874,7 @@ export default function OrganisationManagement() {
       hashCode = (await response.json()).data[0].hash;
       try {
         await navigator.clipboard.writeText(hashCode);
-        console.log('Content copied to clipboard');
+        // console.log('Content copied to clipboard');
       } catch (err) {
         console.error('Failed to copy: ', err);
 
@@ -707,6 +906,11 @@ export default function OrganisationManagement() {
   const columns = [
     { name: "NAME", uid: "name" },
     { name: "ROLE", uid: "role" },
+    { name: "ACTIONS", uid: "actions" },
+  ];
+
+  const databaseColumns = [
+    { name: "DATABASE NAME", uid: "name" },
     { name: "ACTIONS", uid: "actions" },
   ];
 
@@ -746,7 +950,7 @@ export default function OrganisationManagement() {
         body: formData
       }).then(async (response) => {
         let data = (await response.json());
-        console.log(data);
+        // console.log(data);
         setProfilePicURL(data.publicUrl);
       }).then(async () => {
         await updateQuery();
@@ -830,21 +1034,23 @@ export default function OrganisationManagement() {
                     <DatabaseCredentialsModal dbServerID={currentDBServerID} disclosure={credentialsModalDisclosure} onConnected={() => {navigateToForm(currentDBServerID)}}/>
                     {organisations ? organisations.map((org: Organisation) => (
                       <>
-                          <Table 
-                              aria-label="Organisation Database Table"
-                              removeWrapper >
-                              <TableHeader>
-                                  <TableColumn>Name</TableColumn>
-                              </TableHeader>
-                              <TableBody>
-                                  {org.db_envs.map((db: Database) => 
+                          <Table aria-label="Organisation Database Table">
+                            <TableHeader columns={databaseColumns}>
+                              {(column) => (
+                                <TableColumn key={column.uid}>
+                                  {column.name}
+                                </TableColumn>
+                              )}
+                            </TableHeader>
+                            <TableBody>
+                               {org.db_envs.map((db: Database) => 
                                       (
                                       <TableRow key={db.db_id}>
-                                          <TableCell><Link  href="" onClick={() => {queryDatabaseServer(db.db_id)}}>{db.name}</Link></TableCell>
+                                          {(columnKey) => <TableCell>{renderDBCell(db, columnKey)}</TableCell>}
                                       </TableRow>
                                       )
-                                  )}
-                              </TableBody>
+                                )}
+                            </TableBody>
                           </Table>
                       </>
                   )): <></>}
@@ -854,7 +1060,90 @@ export default function OrganisationManagement() {
                     </>
                   )}
                 {/* TODO: Get end point to only show available databases in the organisation */}
+                <Modal isOpen={isDBAccessOpen} onOpenChange={onDBAccessOpenChange}>
+                    <ModalContent>
+                        {(onClose) => (
+                            <>
+                                <ModalHeader className="flex justify-between items-center">
+                                    <h2 className="font-semibold"> Database Access </h2>
+                                </ModalHeader>
+                                <ModalBody>
+                                    {/* List of users in org */}
+                                    <h2 className="text-lg font-semibold mb-2">Edit database access for the members of the organisation</h2>
+                                    {/* Search bar for filtering users */}
+                                    <Input
+                                        placeholder="Search Users..."
+                                        className="mb-2 z-[100]"
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                    />
+                                    <div className="max-h-[200px] overflow-y-auto">
+                                        {filteredUsers.length > 0 ? (
+                                            filteredUsers.map((selectedUsers) => (
+                                              <Tooltip key={selectedUsers.user_id} className="mb-2 ml-3" content= {selectedUsers.access ? "Revoke Access" : "Grant access"}>
+                                                <Checkbox
+                                                    key={selectedUsers.user_id}
+                                                    className="flex items-center space-x-2 mb-2"
+                                                    isSelected = {selectedUsers.access}
+                                                    onChange={(e) => handleCheckboxChange(dbAccessID,selectedUsers, e.target.checked)} // Update the checkbox based on user selection
+                                                >
+                                                    <div className="flex items-center space-x-2">
+                                                        <img
+                                                            src={selectedUsers.profile_photo || DEFAULT_PROFILE_IMAGE}
+                                                            alt={`${selectedUsers.full_name}'s profile`}
+                                                            className="h-8 w-8 rounded-full"
+                                                        />
+                                                        <span className="text-sm">{selectedUsers.full_name}</span>
+                                                    </div>
+                                                </Checkbox>
+                                              </Tooltip>
+                                            ))
+                                        ) : (
+                                            <p className="text-sm text-gray-500">No users found.</p>
+                                        )}
+                                    </div>
+                                </ModalBody>
+                                <ModalFooter>
+                                    <div className="mt-4 flex justify-center w-full">
+                                        <Button color="primary" className="w-full max-w-xs items-center" onClick={onClose}>
+                                          Cancel
+                                        </Button>
+                                    </div>
 
+                                </ModalFooter>
+                            </>
+                        )}
+                    </ModalContent>
+                </Modal>
+                <Modal isOpen={isDeleteDBOpen} onOpenChange={onDeleteDBOpenChange} >
+                  <ModalContent>
+                    {(onClose) => (
+                      <>
+                        <ModalHeader className="flex flex-row items-center justify-center text-center">
+                          <span>Delete {databaseName}</span>
+                        </ModalHeader>
+                        <ModalBody className="text-center">
+                          <p className="text-lg">Are you sure you want to delete the database?</p>
+                          <p className="text-sm text-gray-500">This action cannot be undone.</p>
+                        </ModalBody>
+                        <ModalFooter className="flex flex-row items-center justify-center space-x-4">
+                          <Button color="primary" onPress={onClose}>
+                            Cancel
+                          </Button>
+                          <Button
+                            as={Link}
+                            href={"/organisation/" + orgServerID}
+                            color="danger"
+                            type="button"
+                            onClick={() => deleteDatabaseFromOrg(deleteDatabaseID)}
+                          >
+                              Delete
+                          </Button>
+                        </ModalFooter>
+                      </>
+                    )}
+                  </ModalContent>
+                </Modal>
               </CardBody>
             </Card>
           </Tab>

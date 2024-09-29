@@ -31,6 +31,11 @@ vi.mock('./../../utils/supabase/client', () => ({
 }));
 
 describe('ContextMenuCard - Share Query', () => {
+  const validDbEnvs = {
+    organisations: { name: 'Test Organization' },
+    name: 'Test Database',
+  };
+
   const defaultProps = {
     queryTitle: 'Test Query',
     saved_at: '2024-08-10',
@@ -40,6 +45,7 @@ describe('ContextMenuCard - Share Query', () => {
     onDelete: mockOnDelete,
     description_text: 'Sample description',
     type_text: '',
+    db_envs: validDbEnvs, // Ensure db_envs is defined
   };
 
   // Reset mock states before each test
@@ -68,13 +74,11 @@ describe('ContextMenuCard - Share Query', () => {
   });
 
   it('filters users based on search input', async () => {
-    // Mock user data
     const mockUsers = [
       { user_id: '1', full_name: 'John Doe', profile_photo: null },
       { user_id: '2', full_name: 'Jane Doe', profile_photo: null },
     ];
 
-    // Mock the `getMembers` function to return users
     vi.spyOn(global, 'fetch').mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ data: mockUsers }),
@@ -82,19 +86,13 @@ describe('ContextMenuCard - Share Query', () => {
 
     render(<ContextMenuCard {...defaultProps} />);
 
-    // Open dropdown
     fireEvent.click(screen.getByText('Test Query'));
-
-    // Click on "Share Query"
     fireEvent.click(screen.getByText('Share Query'));
 
-    // Wait for the users to be loaded and check if they are rendered
     await waitFor(() => expect(screen.getByText('John Doe')).toBeInTheDocument());
 
-    // Type into the search input to filter users
     fireEvent.change(screen.getByPlaceholderText('Search Users...'), { target: { value: 'John' } });
 
-    // Ensure only 'John Doe' is visible and 'Jane Doe' is filtered out
     expect(screen.getByText('John Doe')).toBeInTheDocument();
     expect(screen.queryByText('Jane Doe')).not.toBeInTheDocument();
   });
@@ -110,18 +108,16 @@ describe('ContextMenuCard - Share Query', () => {
         onDelete={vi.fn()}
         description_text="Test description"
         type_text=""
+        db_envs={validDbEnvs} // Ensure db_envs is defined
       />
     );
 
-    // Trigger the dropdown to open
     fireEvent.click(screen.getByRole('button', { name: /Test Query/i }));
 
-    // Click the share button inside the dropdown
     const dropdownMenu = screen.getByRole('menu');
     const shareButton = within(dropdownMenu).getByRole('menuitem', { name: /Share Query/i });
     fireEvent.click(shareButton);
 
-    // Expect the modal to be in the document
     await waitFor(() => {
       const dialog = screen.getByRole('dialog');
       expect(dialog).toBeInTheDocument();
@@ -131,16 +127,11 @@ describe('ContextMenuCard - Share Query', () => {
   it('renders the Share Query button inside the popup', async () => {
     render(<ContextMenuCard {...defaultProps} />);
 
-    // Open dropdown
     fireEvent.click(screen.getByText('Test Query'));
-
-    // Click on "Share Query" to open the user selection popup
     fireEvent.click(screen.getByText('Share Query'));
 
-    // Ensure that the modal opens
-    const popup = await screen.findByRole('dialog'); // Assuming the modal is a dialog
+    const popup = await screen.findByRole('dialog');
 
-    // Check that the "Share Query" button is present in the modal
     const shareButton = within(popup).getByRole('button', { name: 'Share Query' });
     expect(shareButton).toBeInTheDocument();
   });

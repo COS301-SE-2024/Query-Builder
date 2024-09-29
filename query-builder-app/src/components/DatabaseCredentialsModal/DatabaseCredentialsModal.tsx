@@ -3,7 +3,6 @@ import "../../app/globals.css"
 import React, { useState } from "react";
 import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Input, Checkbox, Tooltip} from "@nextui-org/react";
 import { createClient } from "./../../utils/supabase/client";
-import { navigateToForm } from "../../app/serverActions";
 import { EyeFilledIcon } from "../Authentication/EyeFilledIcon";
 import { EyeSlashFilledIcon } from "../Authentication/EyeSlashFilledIcon";
 import toast from "react-hot-toast";
@@ -109,7 +108,7 @@ export default function DatabaseCredentialsModal(props: DatabaseCredentialsModal
 
           let json = await response.json();
 
-          if(!response.ok && "You do not have a backend session"){
+          if(!response.ok && json.response && json.response.message == 'You do not have a backend session'){
             navigateToAuth();
           }
 

@@ -37,7 +37,7 @@ const getToken = async () => {
     const supabase = createClient();
     const token = (await supabase.auth.getSession()).data.session?.access_token
   
-    console.log(token)
+    // console.log(token)
   
     return token;
 };
@@ -72,7 +72,7 @@ export default function EditUserModal(props: EditUserModalProps){
     const updateRole = async () => {
 
       if((selectedRoleValue != "member") && (selectedRoleValue != "admin")) {
-        console.log("error");
+        // console.log("error");
         return;
       }
 
@@ -82,7 +82,7 @@ export default function EditUserModal(props: EditUserModalProps){
         user_role: selectedRoleValue
       };
 
-      console.log(updatedDetails);
+      // console.log(updatedDetails);
 
       let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/update-member`, {
           method: "PATCH",

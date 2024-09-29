@@ -103,7 +103,7 @@ export class compoundCondition extends condition {
     ({ value }) =>
       value.map((item: any) => {
         if (
-          item.condtions !== undefined ||
+          item.conditions !== undefined ||
           (item.operator !== undefined && item.operator in LogicalOperator)
         ) {
           return Object.assign(new compoundCondition(), item);

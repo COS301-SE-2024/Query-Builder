@@ -25,7 +25,7 @@ const getToken = async () => {
   const supabase = createClient();
   const token = (await supabase.auth.getSession()).data.session?.access_token
 
-  console.log(token)
+  // console.log(token)
 
   return token;
 };
@@ -74,13 +74,13 @@ export default function DatabaseAdditionModal(props: DatabaseAdditionModalProps)
     async function addDatabase(name: string, type: string, host:string, port: number){
 
       //log request body
-      console.log("BODY OF REQUEST: " + JSON.stringify({
-        org_id: props.org_id,
-        name: name,
-        type: type,
-        host: host,
-        port: port
-      }))
+      // console.log("BODY OF REQUEST: " + JSON.stringify({
+      //   org_id: props.org_id,
+      //   name: name,
+      //   type: type,
+      //   host: host,
+      //   port: port
+      // }))
 
       //call the add-db API endpoint
       let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/add-db`, {
@@ -102,7 +102,7 @@ export default function DatabaseAdditionModal(props: DatabaseAdditionModalProps)
 
       //log response body
       let addDBResponse = await response.json();
-      console.log("ADD DB RESPONSE " + JSON.stringify(addDBResponse));
+      // console.log("ADD DB RESPONSE " + JSON.stringify(addDBResponse));
 
       //call the on_add callback so parent component can refetch the modified databases
       props.on_add();

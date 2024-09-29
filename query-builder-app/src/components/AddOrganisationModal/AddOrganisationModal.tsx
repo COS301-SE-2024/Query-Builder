@@ -21,7 +21,7 @@ const getToken = async () => {
   const supabase = createClient();
   const token = (await supabase.auth.getSession()).data.session?.access_token
 
-  console.log(token)
+  // console.log(token)
 
   return token;
 };
@@ -64,7 +64,7 @@ export default function AddOrganisationModal(props: AddOrganisationModalProps){
 
       let json = await response.json();
 
-      console.log("CREATE ORG RESPONSE " + JSON.stringify(json));
+      // console.log("CREATE ORG RESPONSE " + JSON.stringify(json));
 
       props.on_add();
 

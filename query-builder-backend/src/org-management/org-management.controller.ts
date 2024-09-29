@@ -36,6 +36,7 @@ import { Join_Org_Dto } from './dto/join-org.dto';
 import { Create_Hash_Dto } from './dto/create-hash.dto';
 import { Has_Saved_Db_Creds_Dto } from './dto/has-saved-db-creds.dto';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Get_Shareable_Members_Dto } from './dto/get-shareable-members.dto';
 
 @ApiTags('org-management')
 @Controller('org-management')
@@ -44,9 +45,9 @@ export class OrgManagementController {
 
   @Get('get-org')
   @ApiOperation({
-    summary: 'Get the organization that the user is logged in to'
+    summary: 'Get the organizations of the logged-in user'
   })
-  @ApiResponse({status: 200, description: 'The organization that the user is logged in to'})
+  @ApiResponse({status: 200, description: 'The organizations of the logged-in user'})
   @ApiResponse({status: 401, description: 'Unauthorized'})
   async getOrgLoggedIn() {
     return this.org_management_service.getOrgLoggedIn();
@@ -54,7 +55,7 @@ export class OrgManagementController {
 
   @Put('get-org')
   @ApiOperation({
-    summary: 'Get organization details'
+    summary: 'Get organization details provided an identifier for the organisation'
   })
   @ApiResponse({status: 200, description: 'Organization details retrieved successfully'})
   @ApiResponse({status: 400, description: 'Invalid request'})
@@ -287,5 +288,10 @@ export class OrgManagementController {
     @Body(ValidationPipe) remove_db_access_dto: Remove_Db_Access_Dto
   ) {
     return this.org_management_service.removeDbAccess(remove_db_access_dto);
+  }
+
+  @Put("get-dbaccess-members")
+  async getShareableMembers(@Body(ValidationPipe) get_shareable_members_dto: Get_Shareable_Members_Dto) {
+    return this.org_management_service.getDBAccessMembers(get_shareable_members_dto);
   }
 }

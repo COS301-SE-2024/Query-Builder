@@ -10,20 +10,30 @@ import toast from "react-hot-toast";
 
 
 interface Database {
-  created_at: String;
   name: String;
   db_id: any;
-  db_info: any;
-  type: String;
+}
+
+interface Member {
+    role_permissions: {
+        add_dbs: boolean,
+        is_owner: boolean,
+        remove_dbs: boolean,
+        update_dbs: boolean,
+        invite_users: boolean,
+        remove_users: boolean,
+        view_all_dbs: boolean,
+        view_all_users: boolean,
+        update_db_access: boolean,
+        update_user_roles: boolean
+    }
 }
 
 interface Organisation {
-  created_at: String;
-  logo: String;
   name: String;
   org_id: String;
   db_envs: Database[];
-  org_members: String[];
+  org_members: Member[];
 }
 
 // This function gets the token from local storage.
@@ -154,7 +164,7 @@ export default function SignedInHomePage(){
     const [currentDBServerID, setCurrentDBServerID] = React.useState('');
 
   //React hook to hold the user's organisations
-  const [organisations, setOrganisations] = React.useState([]);
+  const [organisations, setOrganisations] = React.useState<Organisation[]>([]);
 
   //React hook to fetch the user's organisations upon rerender of the component
   React.useEffect(() => {
@@ -176,7 +186,7 @@ export default function SignedInHomePage(){
                         <>
                             <div className="flex">
                                 <h1 className="text-3xl flex-1">{org.name}</h1>
-                                <DatabaseAdditionModal org_id={org.org_id} on_add={fetchOrgs}/>
+                                {org.org_members[0].role_permissions.add_dbs && (<DatabaseAdditionModal org_id={org.org_id} on_add={fetchOrgs}/>)}
                                 <Spacer x={2} />
                                 <Button variant="bordered" color="primary">
                                     <Link href={"/organisation/" + org.org_id}>Settings</Link>
