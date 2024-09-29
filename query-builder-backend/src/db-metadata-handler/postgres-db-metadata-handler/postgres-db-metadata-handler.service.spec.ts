@@ -130,7 +130,9 @@ describe('PostgresDbMetadataHandlerService', () => {
 
   it("should return the QueryHandlerService's results for server summary metadata", async () => {
     testData = [{ table_name: 'actor', column_name: 'first_name' }];
-
+    jest.spyOn(service, 'getSavedDbMetadata').mockResolvedValueOnce({
+      data: []
+    });
     expect(
       await service.getServerSummary(
         { databaseServerID: '1234', language: 'postgresql' },
