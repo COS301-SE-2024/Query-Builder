@@ -69,7 +69,7 @@ export default function ContextMenu() {
         : [];
 
     return (
-        <div className="size-full pl-3 pr-3 mt-2">
+        <div className="size-full pl-3 pr-3 mt-2 flex flex-col">
             <Input
                 fullWidth
                 color="primary"
@@ -82,7 +82,7 @@ export default function ContextMenu() {
                 }}
             />
             <Spacer y={2} />
-            <ScrollShadow hideScrollBar style={{ minHeight: '40vh', maxHeight: '150vh', height: '50vh' }}>
+            <ScrollShadow hideScrollBar className="flex-grow-1">
                 {filteredQueries.length > 0 ? (
                     filteredQueries.map((queryData: ContextMenuCardProps, index: number) => (
                         <React.Fragment key={index}>

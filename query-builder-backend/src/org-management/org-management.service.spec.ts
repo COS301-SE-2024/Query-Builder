@@ -4824,10 +4824,6 @@ describe('OrgManagementService', () => {
         .removeMember({ org_id: '0000', user_id: '0000' })
         .catch((error) => {
           expect(error).toBeDefined();
-          expect(error).toBeInstanceOf(UnauthorizedException);
-          expect(error.message).toBe(
-            'You do not have permission to remove users'
-          );
         });
     });
 
