@@ -2,11 +2,13 @@ import { Injectable, BadRequestException, Inject, InternalServerErrorException }
 import { Natural_Language_Query_Dto } from './dto/natural-language-query.dto';
 import { ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
-import { GenerativeModel, GoogleGenerativeAI } from '@google/generative-ai';
+import { GenerativeModel, GoogleGenerativeAI} from '@google/generative-ai';
 import { Query, QueryParams } from '../interfaces/dto/query.dto';
 import { DbMetadataHandlerService } from '../db-metadata-handler/db-metadata-handler.service';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
+import { z } from 'zod';
+import { zodResponseFormat } from "openai/helpers/zod";
 
 @Injectable()
 export class NaturalLanguageService {
@@ -26,7 +28,7 @@ export class NaturalLanguageService {
 
     //Initialise the Gemini instance
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    this.geminiModel = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    this.geminiModel = genAI.getGenerativeModel({ model: 'gemini-1.5-flash', generationConfig: {responseMimeType: "application/json"} });
   }
 
   public async naturalLanguageQuery(naturalLanguageQuery: Natural_Language_Query_Dto, session: Record<string, any>){
@@ -51,44 +53,34 @@ export class NaturalLanguageService {
     //otherwise run both LLM requests in parallel and try to choose the best
     else {
 
-      let open_ai_result;
-      let gemini_result;
-      let errors = [];
-
-      try {
-        open_ai_result = await this.open_ai_query(
-          naturalLanguageQuery,
-          session
-        );
-      } catch (error) {
-        open_ai_result = { query: null };
-        errors.push({ source: 'openAI', error: error.message });
+      try{
+        const [open_ai_result, gemini_result] = await Promise.all([
+          this.open_ai_query(naturalLanguageQuery, session),
+          this.gemini_query(naturalLanguageQuery, session)
+        ].map(p => p.catch((e) => {console.log(e); return e;})));
+        
+        if (open_ai_result.query && gemini_result.query) {
+          // this.my_logger.log('Both queries returned a query');
+          console.log("both succeeded, returning OpenAI");
+          return open_ai_result.query; // or gemini_result.query, based on your preference
+        } else if (open_ai_result.query) {
+          // this.my_logger.log('Only openAI query returned a query');
+          console.log("returning openAI");
+          return open_ai_result.query;
+        } else if (gemini_result.query) {
+          // this.my_logger.log('Only gemini query returned a query');
+          console.log("returning Gemini");
+          return gemini_result.query;
+        } else {
+          throw new InternalServerErrorException(
+            `Malformed query results.}`
+          );
+        }
+      }
+      catch(error){
+        throw error;
       }
 
-      try {
-        gemini_result = await this.gemini_query(
-          naturalLanguageQuery,
-          session
-        );
-      } catch (error) {
-        gemini_result = { query: null };
-        errors.push({ source: 'gemini', error: error.message });
-      }
-
-      if (open_ai_result.query && gemini_result.query) {
-        // this.my_logger.log('Both queries returned a query');
-        return gemini_result.query; // or gemini_result.query, based on your preference
-      } else if (open_ai_result?.query) {
-        // this.my_logger.log('Only openAI query returned a query');
-        return open_ai_result.query;
-      } else if (gemini_result?.query) {
-        // this.my_logger.log('Only gemini query returned a query');
-        return gemini_result.query;
-      } else {
-        throw new InternalServerErrorException(
-          `Malformed query result. Errors: ${JSON.stringify(errors)}`
-        );
-      }
     }
   }
 
@@ -98,6 +90,9 @@ export class NaturalLanguageService {
   ) {
     try {
       //-----------Fetch DB metadata to inform the LLM of the database server's structure-----------//
+
+      console.log("starting openAI");
+
       const metadataSummary =
         await this.dbMetadataHandlerService.getServerSummary(
           {
@@ -121,9 +116,7 @@ export class NaturalLanguageService {
       prompt += `export interface QueryParams {
                             databaseName: string,
                             table: table,
-                            condition?: condition,
-                            sortParams?: SortParams,
-                            pageParams?: PageParams
+                            condition?: condition
                         }
 
                         export interface table {
@@ -158,17 +151,6 @@ export class NaturalLanguageService {
                             column: string,
                             operator: ComparisonOperator,
                             aggregate?: AggregateFunction
-                        }
-
-                        export interface SortParams {
-                            column: string,
-                            direction?: "ascending"|"descending"
-                        }
-
-                        export interface PageParams {
-                            //note pageNumbers are indexed from 1
-                            pageNumber: number,
-                            rowsPerPage: number
                         }
 
                         export enum AggregateFunction {
@@ -203,18 +185,20 @@ export class NaturalLanguageService {
       //--------------------Get the JSON intermediate form result from the LLM---------------------//
 
       const openAiResponse = await this.openAiService.chat.completions.create({
-        model: 'gpt-4o',
-        messages: [{ role: 'user', content: prompt }]
+        model: 'gpt-4o-2024-08-06',
+        messages: [{ role: 'user', content: prompt }],
+        response_format: zodResponseFormat(this.generateZodSchema(), "QueryParams")
       });
 
       const textResponse = openAiResponse.choices[0].message.content;
 
-      //-------------------Sanitize the text response--------------------------//
+      //-------------------Clean the text response--------------------------//
+
       const cleanedTextResponse = textResponse
         .replace(/```/g, '') // Remove code block markers
         .replace(/(: |:)undefined/g, ': null'); // Replace undefined with null
 
-      console.log(cleanedTextResponse);
+      console.log("finishing openAI");
 
       let jsonResponse;
       try {
@@ -227,6 +211,10 @@ export class NaturalLanguageService {
 
       jsonResponse.language = naturalLanguageQuery.language;
       jsonResponse.query_type = 'select';
+
+      jsonResponse = this.removeEmpty(jsonResponse);
+
+      console.log("OpenAI " + JSON.stringify(jsonResponse));
 
       await this.validate_QueryParams_DTO(jsonResponse);
 
@@ -250,6 +238,7 @@ export class NaturalLanguageService {
     session: Record<string, any>
   ) {
     try {
+      console.log("starting Gemini");
       //-----------Fetch DB metadata to inform the LLM of the database server's structure-----------//
       const metadataSummary =
         await this.dbMetadataHandlerService.getServerSummary(
@@ -274,9 +263,7 @@ export class NaturalLanguageService {
       prompt += `export interface QueryParams {
                             databaseName: string,
                             table: table,
-                            condition?: condition,
-                            sortParams?: SortParams,
-                            pageParams?: PageParams
+                            condition?: condition
                         }
 
                         export interface table {
@@ -311,17 +298,6 @@ export class NaturalLanguageService {
                             column: string,
                             operator: ComparisonOperator,
                             aggregate?: AggregateFunction
-                        }
-
-                        export interface SortParams {
-                            column: string,
-                            direction?: "ascending"|"descending"
-                        }
-
-                        export interface PageParams {
-                            //note pageNumbers are indexed from 1
-                            pageNumber: number,
-                            rowsPerPage: number
                         }
 
                         export enum AggregateFunction {
@@ -472,11 +448,13 @@ export class NaturalLanguageService {
       const response = await result.response;
       const textResponse = await response.text();
 
-      //-------------------Sanitize the text response--------------------------//
+      //-------------------Clean the text response--------------------------//
       const cleanedTextResponse = textResponse
         .replace(/```/g, '') // Remove code block markers
         .replace(/(: |:)undefined/g, ': null') // Replace undefined with null
         .replace(/(\r\n|\n|\r)/gm, ''); // Remove newlines
+
+        console.log("finishing gemini");
 
       let jsonResponse;
       try {
@@ -489,6 +467,10 @@ export class NaturalLanguageService {
 
       jsonResponse.language = naturalLanguageQuery.language;
       jsonResponse.query_type = 'select';
+
+      jsonResponse = this.removeEmpty(jsonResponse);
+
+      console.log("GEMINI " + JSON.stringify(jsonResponse));
 
       await this.validate_QueryParams_DTO(jsonResponse);
 
@@ -536,4 +518,60 @@ export class NaturalLanguageService {
 
     return { message: 'Validation passed' };
   }
+
+  private generateZodSchema(){
+
+    const column = z.object({
+      name: z.string(),
+      aggregation: z.enum(['COUNT', 'SUM', 'AVG', 'MIN', 'MAX']).nullable(),
+      alias: z.string().nullable()
+    });
+
+    const join = z.object({
+      table1MatchingColumnName: z.string(),
+      table2: z.lazy(() => table),
+      table2MatchingColumnName: z.string()
+    });
+
+    const table = z.object({
+      name: z.string(),
+      columns: z.array(column),
+      join: join.nullable()
+    });
+
+    const primitiveCondition = z.object({
+      value: z.union([z.string(), z.number(), z.boolean(), z.null()]),
+      tableName: z.string().nullable(),
+      column: z.string(),
+      operator: z.enum(['=', '<', '>', '<=', '>=', '<>', 'LIKE', 'IS', 'IS NOT']),
+      aggregate: z.enum(['COUNT', 'SUM', 'AVG', 'MIN', 'MAX']).nullable(),
+    });
+
+    const compoundCondition = z.object({
+      conditions: z.array(primitiveCondition),
+      operator: z.enum(['AND', 'OR', 'NOT'])
+    });
+
+    const QueryParams = z.object({
+      databaseName: z.string(),
+      table: table,
+      condition: primitiveCondition.nullable()
+    });
+
+    return QueryParams;
+
+  }
+
+  private removeEmpty(obj){
+    if (Array.isArray(obj)) { 
+      return obj
+          .map(v => (v && typeof v === 'object') ? this.removeEmpty(v) : v)
+          .filter(v => !(v == null)); 
+    } else { 
+      return Object.entries(obj)
+          .map(([k, v]) => [k, v && typeof v === 'object' ? this.removeEmpty(v) : v])
+          .reduce((a, [k, v]) => (v == null ? a : (a[k]=v, a)), {});
+    } 
+  }
+
 }

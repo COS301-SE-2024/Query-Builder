@@ -121,8 +121,7 @@ export default function NaturalLanguage() {
         body: JSON.stringify({
           databaseServerID: databaseServerID[0],
           query: value,
-          language: language,
-          llm: 'gemini'
+          language: language
         }),
       },
     );

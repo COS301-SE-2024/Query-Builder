@@ -83,7 +83,7 @@ export class QueryParams {
   @Transform(
     ({ value }) => {
       if (
-        value.condtions !== undefined ||
+        value.conditions !== undefined ||
         (value.operator !== undefined && value.operator in LogicalOperator)
       ) {
         return Object.assign(new compoundCondition(), value);
