@@ -1243,33 +1243,61 @@ export class OrgManagementService {
   }
 
   async removeMember(remove_member_dto: Remove_Member_Dto) {
-    const { data: user_data, error: owner_error } = await this.supabase
+
+    //remover_data contains information about the user doing the removing
+    const { data: remover_data, error: remover_error } = await this.supabase
       .getClient()
       .auth.getUser(this.supabase.getJwt());
 
-    if (owner_error) {
-      throw owner_error;
+    if (remover_error) {
+      throw remover_error;
     }
 
-    const { data: org_data, error: org_error } = await this.supabase
+    //get the line showing that the user doing the removing is a member of the organisation
+    const { data: remover_member_data, error: remover_member_error } = await this.supabase
       .getClient()
       .from('org_members')
       .select()
       .eq('org_id', remove_member_dto.org_id)
-      .eq('user_id', user_data.user.id);
+      .eq('user_id', remover_data.user.id);
 
-    if (org_error) {
-      throw org_error;
+    if (remover_member_error) {
+      throw remover_member_error;
     }
-    if (org_data.length === 0 || org_data[0].verified === false) {
+    if (remover_member_data.length === 0) {
       throw new UnauthorizedException(
         'You are not a member of this organisation'
       );
     }
 
-    if (org_data[0].role_permissions.remove_users === false) {
+    //get the line showing that the user being removed is a member of the organisation
+    const { data: removee_member_data, error: removee_member_error } = await this.supabase
+    .getClient()
+    .from('org_members')
+    .select()
+    .eq('org_id', remove_member_dto.org_id)
+    .eq('user_id', remove_member_dto.user_id);
+
+    if (removee_member_error) {
+      throw removee_member_error;
+    }
+    if (removee_member_data.length === 0) {
       throw new UnauthorizedException(
-        'You do not have permission to remove users'
+        'The person you are trying to remove is not a member of this organisation'
+      );
+    }
+
+    //remove_member_dto.user_id is the id of the user being removed
+    //you can not remove the owner of an organisation
+    if(removee_member_data[0].user_role === "owner"){
+      throw new UnauthorizedException(
+        'You can not remove the owner of the organisation'
+      );
+    }
+    //you need to have the permission to remove users if you are trying to remove someone other than yourself
+    else if (remover_member_data[0].role_permissions.remove_users === false && remover_data.user.id !== remove_member_dto.user_id) {
+      throw new UnauthorizedException(
+        'You do not have permission to remove users other than yourself'
       );
     }
 
