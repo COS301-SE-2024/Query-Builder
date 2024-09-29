@@ -425,7 +425,7 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
 
       if (existing_db) {
         // Update the existing database
-        if (save_db_metadata_dto.db_metadata.tables) {
+        if (existing_db.tables && save_db_metadata_dto.db_metadata.tables) {
           for (const new_table of save_db_metadata_dto.db_metadata.tables) {
             const existing_table = existing_db.tables.find(
               (table) => table.table_name === new_table.table_name
@@ -452,11 +452,11 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
                     });
                   }
                 }
-              } else {
+              } else if (new_table.fields) {
                 // Add the new fields
                 existing_table.fields = new_table.fields;
               }
-              if(new_table.foreign_keys && existing_table.foreign_keys){
+              if (new_table.foreign_keys && existing_table.foreign_keys) {
                 for (const new_fk of new_table.foreign_keys) {
                   let existing_fk = existing_table.foreign_keys.find(
                     (fk) => fk.column_name === new_fk.column_name
@@ -477,6 +477,8 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
               });
             }
           }
+        } else if (save_db_metadata_dto.db_metadata.tables) {
+          existing_db.tables = save_db_metadata_dto.db_metadata.tables;
         }
       } else {
         // Add the new database
