@@ -13,6 +13,7 @@ import { navigateToForm } from "../../app/serverActions";
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import DatabaseCredentialsModal from "../DatabaseCredentialsModal/DatabaseCredentialsModal";
+import MetaDataHandler from "../MetaDataHandler/MetaDataHandler";
 
 
 interface UpdateOrganisation {
@@ -570,6 +571,11 @@ export default function OrganisationManagement() {
                   }
                     // deleteDatabaseFromOrg(db.db_id)
                   }/>
+                </span>
+              </Tooltip>
+              <Tooltip content="Delete database">
+                <span className="text-lg cursor-pointer active:opacity-50">
+                  <MetaDataHandler db_id={db.db_id} org_id={orgServerID} on_add={()=>{}}/>
                 </span>
               </Tooltip>
               
