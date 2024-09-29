@@ -12,7 +12,9 @@ description: Testing Policy for QBee
 - Cypress is used for integration testing
 - CodeCov is used to monitor code coverage
 
->**Note:** Vitest was chosen for the frontend as it extends Jest by providing interfaces that can more easily be used to test the frontend.
+>**Note:** *Vitest* was chosen for the frontend as it extends *Jest* by providing interfaces that can more easily be used to test the frontend.  
+*Cypress* was chosen for integration testing as it is widely used, had good documentation and is easy to set up.  
+*CodeCov* was used as, initially alternatives were tried but multiple issues were encountered, whereas CodeCov was easy to set up and use and provided good GitHub integrations.
 
 ## Aims
 The main aim of testing is to ensure that the application is working as expected. This includes:
