@@ -293,8 +293,23 @@ export default function MetaDataHandler(props: MetaDataHandlerProps){
 
     }
 
-    async function getMetaData(org_id: string, db_id: string) {
-        let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query-management/share-query`, {
+    const handleDatabaseSelection = (key: any) => {
+
+        setDatabaseName(key);
+        fetchAllTables(key);
+
+    };
+
+    async function updateDatabaseDescription(description: string) {
+        if(databaseName == ""){
+            toast.error("Please select a database");
+            return;
+        }
+        if(description == ""){
+            toast.error("Please enter a description for the table."); 
+            return;
+        }
+        let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/save-db-metadata`, {
             credentials: "include",
             method: "POST",
             headers: {
@@ -302,24 +317,73 @@ export default function MetaDataHandler(props: MetaDataHandlerProps){
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + await getToken()
             },
-            body: JSON.stringify({ })
+            body: JSON.stringify({ 
+                databaseServerID: dbID,
+                language: databaseLanguage,
+                org_id: orgId,
+                db_metadata: {
+                    schema_name: databaseName,
+                    description: description
+                }
+            })
         });
     
         if (!response.ok) {
             // throw new Error(`HTTP error! Status: ${response.status}`);
-            toast.error("Error retrieving metadata. Please try again later.");
+            toast.error("Error updating database description. Please try again later.");
         }
-    
-        let json = (await response.json()).data;
-        return response;
+        else {
+            toast.success("Successfully updated database description.");
+        }
     }
 
-    const handleDatabaseSelection = (key: any) => {
+    async function updateTableDescription(description: string) {
+        if(table.name == ""){
+            toast.error("Please select a table");
+            return;
+        }
+        if(description == ""){
+            toast.error("Please enter a description for the table."); 
+            return;
+        }
 
-        setDatabaseName(key);
-        fetchAllTables(key);
+        let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/save-db-metadata`, {
+            credentials: "include",
+            method: "POST",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + await getToken()
+            },
+            body: JSON.stringify({ 
+                databaseServerID: dbID,
+                language: databaseLanguage,
+                org_id: orgId,
+                db_metadata: {
+                    schema_name: databaseName,
+                    tables:[
+                        {
+                            table_name: table.name,
+                            description: description,
+                        }
+                    ]
+                    
+                }
+            })
+        });
+    
+        if (!response.ok) {
+            // throw new Error(`HTTP error! Status: ${response.status}`);
+            toast.error("Error updating table description. Please try again later.");
+        }
+        else {
+            toast.success("Successfully updated table description.");
+        }
+    }
 
-    };
+    async function updateColumnDescription(description: string) {
+        
+    }
 
     return (
 
@@ -358,7 +422,7 @@ export default function MetaDataHandler(props: MetaDataHandlerProps){
                             <div className="flex flex-1">
                                 {databaseName}
                             </div>
-                            <EditDescriptionMetaData description={"// add pulled description from the database"} type={databaseName} on_add={() => {/* Add function to Edit description*/}}/>
+                            <EditDescriptionMetaData description={"// add pulled description from the database"} type={databaseName} on_add={updateDatabaseDescription}/>
                         </div>
                         
                         )
@@ -399,7 +463,7 @@ export default function MetaDataHandler(props: MetaDataHandlerProps){
                                         <div className="flex flex-1">
                                             {table?.name}
                                         </div>
-                                        <EditDescriptionMetaData description={"// add pulled description from the database"} type={table.name} on_add={() => {/* Add function to Edit description*/}}/>
+                                        <EditDescriptionMetaData description={"// add pulled description from the database"} type={table.name} on_add={updateTableDescription}/>
                                     </div>)
                                 }
 
