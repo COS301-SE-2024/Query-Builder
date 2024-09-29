@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, Inject } from '@nestjs/common';
+import { Injectable, BadRequestException, Inject, InternalServerErrorException } from '@nestjs/common';
 import { Natural_Language_Query_Dto } from './dto/natural-language-query.dto';
 import { ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
@@ -29,7 +29,70 @@ export class NaturalLanguageService {
     this.geminiModel = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
   }
 
-  async open_ai_query(
+  public async naturalLanguageQuery(naturalLanguageQuery: Natural_Language_Query_Dto, session: Record<string, any>){
+    
+    //if the LLM to use is specified
+    //to be openAI
+    if (naturalLanguageQuery.llm === 'openAI') {
+      const { query } = await this.open_ai_query(
+        naturalLanguageQuery,
+        session
+      );
+      return query;
+    } 
+    //to be gemini
+    else if (naturalLanguageQuery.llm === 'gemini') {
+      const { query } = await this.gemini_query(
+        naturalLanguageQuery,
+        session
+      );
+      return query;
+    }
+    //otherwise run both LLM requests in parallel and try to choose the best
+    else {
+
+      let open_ai_result;
+      let gemini_result;
+      let errors = [];
+
+      try {
+        open_ai_result = await this.open_ai_query(
+          naturalLanguageQuery,
+          session
+        );
+      } catch (error) {
+        open_ai_result = { query: null };
+        errors.push({ source: 'openAI', error: error.message });
+      }
+
+      try {
+        gemini_result = await this.gemini_query(
+          naturalLanguageQuery,
+          session
+        );
+      } catch (error) {
+        gemini_result = { query: null };
+        errors.push({ source: 'gemini', error: error.message });
+      }
+
+      if (open_ai_result.query && gemini_result.query) {
+        // this.my_logger.log('Both queries returned a query');
+        return gemini_result.query; // or gemini_result.query, based on your preference
+      } else if (open_ai_result?.query) {
+        // this.my_logger.log('Only openAI query returned a query');
+        return open_ai_result.query;
+      } else if (gemini_result?.query) {
+        // this.my_logger.log('Only gemini query returned a query');
+        return gemini_result.query;
+      } else {
+        throw new InternalServerErrorException(
+          `Malformed query result. Errors: ${JSON.stringify(errors)}`
+        );
+      }
+    }
+  }
+
+  private async open_ai_query(
     naturalLanguageQuery: Natural_Language_Query_Dto,
     session: Record<string, any>
   ) {
@@ -140,7 +203,7 @@ export class NaturalLanguageService {
       //--------------------Get the JSON intermediate form result from the LLM---------------------//
 
       const openAiResponse = await this.openAiService.chat.completions.create({
-        model: 'gpt-4',
+        model: 'gpt-4o',
         messages: [{ role: 'user', content: prompt }]
       });
 
@@ -150,6 +213,8 @@ export class NaturalLanguageService {
       const cleanedTextResponse = textResponse
         .replace(/```/g, '') // Remove code block markers
         .replace(/(: |:)undefined/g, ': null'); // Replace undefined with null
+
+      console.log(cleanedTextResponse);
 
       let jsonResponse;
       try {
@@ -180,7 +245,7 @@ export class NaturalLanguageService {
     }
   }
 
-  async gemini_query(
+  private async gemini_query(
     naturalLanguageQuery: Natural_Language_Query_Dto,
     session: Record<string, any>
   ) {

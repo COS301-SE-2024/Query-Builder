@@ -1,13 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NaturalLanguageService } from './natural-language.service';
 import { ConfigService } from '@nestjs/config';
-import { DbMetadataHandlerModule } from '../db-metadata-handler/db-metadata-handler.module';
 import OpenAI from 'openai';
 import { GenerativeModel, GoogleGenerativeAI } from '@google/generative-ai';
 import { AppService } from '../app.service';
-import { DbMetadataHandlerService } from '../db-metadata-handler/db-metadata-handler.service';
 import { MyLoggerModule } from '../my-logger/my-logger.module';
 import { BadRequestException } from '@nestjs/common';
+import { Query } from './../interfaces/dto/query.dto';
 
 jest.mock('openai', () => {
   return {
@@ -75,7 +74,8 @@ describe('NaturalLanguageService', () => {
     const naturalLanguageQuery = {
       databaseServerID: '0000',
       query: 'Give me all the actors with the first name Nick',
-      language: 'mysql'
+      language: 'mysql',
+      llm: 'openAI'
     };
     const session = {};
 
@@ -110,11 +110,16 @@ describe('NaturalLanguageService', () => {
         }
       ]
     } as any);
-
-    const result = await service.open_ai_query(naturalLanguageQuery, session);
+    
+    const result = await service.naturalLanguageQuery(naturalLanguageQuery, session);
 
     expect(result).toEqual({
-      query: {...query, queryParams: {...query.queryParams, language: 'mysql', query_type: 'select'}}
+      ...query,
+      queryParams: {
+        ...query.queryParams,
+        language: 'mysql',
+        query_type: 'select'
+      }
     });
   });
 
@@ -122,7 +127,8 @@ describe('NaturalLanguageService', () => {
     const naturalLanguageQuery = {
       databaseServerID: '0000',
       query: 'Give me country names starting with B',
-      language: 'mysql'
+      language: 'mysql',
+      llm: 'gemini'
     };
     const session = {};
 
@@ -154,10 +160,15 @@ describe('NaturalLanguageService', () => {
       }
     } as any);
 
-    const result = await service.gemini_query(naturalLanguageQuery, session);
+    const result = await service.naturalLanguageQuery(naturalLanguageQuery, session);
 
     expect(result).toEqual({
-      query: {...query, queryParams: {...query.queryParams, language: 'mysql', query_type: 'select'}}
+      ...query,
+      queryParams: {
+        ...query.queryParams,
+        language: 'mysql',
+        query_type: 'select'
+      }
     });
   });
 
@@ -171,12 +182,13 @@ describe('NaturalLanguageService', () => {
     const naturalLanguageQuery = {
       databaseServerID: '0000',
       query: 'Give me all the actors with the first name Nick',
-      language: 'mysql'
+      language: 'mysql',
+      llm: 'openAI'
     };
     const session = {};
 
     await expect(
-      service.open_ai_query(naturalLanguageQuery, session)
+      service.naturalLanguageQuery(naturalLanguageQuery, session)
     ).rejects.toThrow(BadRequestException);
   });
 
@@ -190,12 +202,14 @@ describe('NaturalLanguageService', () => {
     const naturalLanguageQuery = {
       databaseServerID: '0000',
       query: 'Give me country names starting with B',
-      language: 'mysql'
+      language: 'mysql',
+      llm: 'gemini'
     };
     const session = {};
 
     await expect(
-      service.gemini_query(naturalLanguageQuery, session)
+      service.naturalLanguageQuery(naturalLanguageQuery, session)
     ).rejects.toThrow(BadRequestException);
   });
+
 });

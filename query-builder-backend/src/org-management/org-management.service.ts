@@ -73,27 +73,9 @@ export class OrgManagementService {
     return { data };
   }
 
-  async getOrgLoggedIn_H1(org_ids) {
-    const { data: org_data, error: org_data_error } = await this.supabase
-      .getClient()
-      .from('organisations')
-      .select('org_id, created_at, name, logo, org_members(*), db_envs(*)')
-      .in(
-        'org_id',
-        org_ids.map((org) => org.org_id)
-      );
-
-    if (org_data_error) {
-      throw org_data_error;
-    }
-    if (org_data.length === 0) {
-      throw new NotFoundException('Organisation not found');
-    }
-
-    return { org_data };
-  }
-
   async getOrgLoggedIn() {
+
+    //get the currently logged-in user
     const { data, error } = await this.supabase
       .getClient()
       .auth.getUser(this.supabase.getJwt());
@@ -102,25 +84,36 @@ export class OrgManagementService {
       throw error;
     }
 
+    //get the id of the currently logged-in user
     const user_id = data.user.id;
 
-    const { data: org_ids, error: org_error } = await this.supabase
+    //do inner joins across 4 tables to get the organisations a user is in,
+    //and the db_envs they have access to in them
+    const { data: org_data, error: org_data_error } = await this.supabase
       .getClient()
-      .from('org_members')
-      .select('org_id')
-      // .select('org_id, created_at, name, logo, org_members(*), db_envs(*)')
-      .eq('user_id', user_id);
+      .from('organisations')
+      .select('org_id, name, org_members!inner(role_permissions), db_envs!inner(db_id, name, db_access!inner(user_id))')
+      .eq('org_members.user_id', user_id);
 
-    if (org_error) {
-      throw org_error;
+    if (org_data_error) {
+      throw org_data_error;
     }
-    if (org_ids.length === 0) {
+    if (org_data.length === 0) {
       throw new NotFoundException('Organisation not found');
     }
 
-    const { org_data } = await this.getOrgLoggedIn_H1(org_ids);
+    // Remove db_envs the user doesn't have access to
+    for (let org of org_data) {
+      org.db_envs = org.db_envs.filter(db_env => {
+        return db_env.db_access.some(access => access.user_id === user_id);
+      }).map(db_env => {
+        delete db_env.db_access;
+        return db_env;
+      });
+    }
 
     return { data: org_data };
+
   }
 
   async getMembers_H1(orgId: string, userId: string) {
