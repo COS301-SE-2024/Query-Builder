@@ -18,7 +18,7 @@ const getToken = async () => {
     const supabase = createClient();
     const token = (await supabase.auth.getSession()).data.session?.access_token
   
-    console.log(token)
+    // console.log(token)
   
     return token;
 };
@@ -225,7 +225,7 @@ export default function MetaDataHandler(props: MetaDataHandlerProps){
                 );
             
                 let json = await response.json();
-                console.log(json);
+                // console.log(json);
             
                 if(response.ok){
             

@@ -10,7 +10,7 @@ const getToken = async () => {
     const supabase = createClient();
     const token = (await supabase.auth.getSession()).data.session?.access_token
   
-    console.log(token)
+    // console.log(token)
   
     return token;
 };

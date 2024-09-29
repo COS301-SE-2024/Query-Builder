@@ -286,7 +286,7 @@ export default function OrganisationManagement() {
       }
 
       let membersData = ((await response.json()).data);
-      console.log(membersData);
+      // console.log(membersData);
       setOrgMembers(membersData);
 
       getUser().then((user) => {
@@ -367,7 +367,7 @@ export default function OrganisationManagement() {
     };
 
     if (updateOrgName === initialOrgName && profilePicURL === initialOrgLogo) {
-      console.log("No Updates")
+      // console.log("No Updates")
       return;
     }
 
@@ -384,7 +384,7 @@ export default function OrganisationManagement() {
     if (profilePicURL != initialOrgLogo) {
       updatedDetails.logo = profilePicURL;
     }
-    console.log(updatedDetails);
+    // console.log(updatedDetails);
 
     let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/update-org`, {
       method: "PATCH",
@@ -395,7 +395,7 @@ export default function OrganisationManagement() {
       },
       body: JSON.stringify(updatedDetails)
     });
-    console.log(response);
+    // console.log(response);
     if (response.status === 200 || response.status === 201) {
       setInitialOrgName(updateOrgName);
       setInitialOrgLogo(profilePicURL);
@@ -471,7 +471,7 @@ export default function OrganisationManagement() {
       },
       body: JSON.stringify({ org_id: orgServerID, user_id: userId })
     })
-    console.log(response);
+    // console.log(response);
     getMembers();
   }
 
@@ -874,7 +874,7 @@ export default function OrganisationManagement() {
       hashCode = (await response.json()).data[0].hash;
       try {
         await navigator.clipboard.writeText(hashCode);
-        console.log('Content copied to clipboard');
+        // console.log('Content copied to clipboard');
       } catch (err) {
         console.error('Failed to copy: ', err);
 
@@ -950,7 +950,7 @@ export default function OrganisationManagement() {
         body: formData
       }).then(async (response) => {
         let data = (await response.json());
-        console.log(data);
+        // console.log(data);
         setProfilePicURL(data.publicUrl);
       }).then(async () => {
         await updateQuery();

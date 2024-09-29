@@ -17,7 +17,7 @@ const Sidebar = () => {
     const signOut = async () => {
         setLoading(true);
         const { error } = await supabase.auth.signOut();
-        console.log(error);
+        // console.log(error);
         router.push("/");
     }
 

@@ -51,8 +51,8 @@ export class PostgresQueryHandlerService extends QueryHandlerService {
             );
           }
           else{
-            console.log(e)
-            console.log(countCommand);
+            // console.log(e)
+            // console.log(countCommand);
             throw new InternalServerErrorException('Please check your query and try again');
           }
         }

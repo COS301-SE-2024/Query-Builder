@@ -91,7 +91,7 @@ export default function TableList(props: TableListProps) {
 
     React.useEffect(() => {
 
-        console.log(joinableTables);
+        // console.log(joinableTables);
 
     }, [joinableTables])
 

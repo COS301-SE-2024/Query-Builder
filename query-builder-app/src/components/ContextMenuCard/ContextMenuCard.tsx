@@ -40,7 +40,7 @@ const getToken = async () => {
     const supabase = createClient();
     const token = (await supabase.auth.getSession()).data.session?.access_token;
 
-    console.log(token);
+    // console.log(token);
     return token;
 };
 
@@ -85,7 +85,7 @@ async function getMembers(db_id: string, query_id: string) {
 
 
 async function shareQuery(query_id: string, checkboxUsers: string[], description: string) {
-    console.log(query_id, checkboxUsers, description);
+    // console.log(query_id, checkboxUsers, description);
     let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/query-management/share-query`, {
         credentials: "include",
         method: "POST",
@@ -194,7 +194,7 @@ export default function ContextMenuCard({
 
     const openSharePopup = async () => {
         setSelectedUsers(await getMembers(db_id, query_id));
-        console.log(selectedUsers);
+        // console.log(selectedUsers);
         setOpenPopup(true);
     };
 
@@ -386,7 +386,7 @@ export default function ContextMenuCard({
                                 onShareOpen(); // Open the share modal
                                 const members = await getMembers(db_id, query_id); // Fetch members
                                 setSelectedUsers(members); // Set the selected users
-                                console.log(selectedUsers);
+                                // console.log(selectedUsers);
                             }}
                         >
                             Share Query
