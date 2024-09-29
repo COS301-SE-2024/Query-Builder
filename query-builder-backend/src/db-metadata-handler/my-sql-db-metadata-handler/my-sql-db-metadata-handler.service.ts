@@ -411,78 +411,83 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
     // Combine the existing metadata with the new metadata. first check if the db_info is empty
     if (!existing_data.db_info) {
       existing_data.db_info = {
-        databases: [
-          {
-            ...save_db_metadata_dto.db_metadata
-          }
-        ]
+      databases: [
+        {
+        ...save_db_metadata_dto.db_metadata
+        }
+      ]
       };
     } else {
       // Check if the database already exists
       const existing_db = existing_data.db_info.databases.find(
-        (db) => db.schema_name === save_db_metadata_dto.db_metadata.schema_name
+      (db) => db.schema_name === save_db_metadata_dto.db_metadata.schema_name
       );
 
       if (existing_db) {
-        // Update the existing database
-        if (save_db_metadata_dto.db_metadata.tables) {
-          for (const new_table of save_db_metadata_dto.db_metadata.tables) {
-            const existing_table = existing_db.tables.find(
-              (table) => table.table_name === new_table.table_name
+      // Update the existing database
+      if (save_db_metadata_dto.db_metadata.tables) {
+        for (const new_table of save_db_metadata_dto.db_metadata.tables) {
+        const existing_table = existing_db.tables.find(
+          (table) => table.table_name === new_table.table_name
+        );
+
+        if (existing_table) {
+          // Update the existing table
+          existing_table.description = new_table.description;
+
+          if (new_table.fields) {
+          if (!existing_table.fields) {
+            existing_table.fields = [];
+          }
+          for (const new_field of new_table.fields) {
+            const existing_field = existing_table.fields.find(
+            (field) => field.column_name === new_field.column_name
             );
 
-            if (existing_table) {
-              // Update the existing table
-              existing_table.description = new_table.description;
-
-              if (new_table.fields && existing_table.fields) {
-                for (const new_field of new_table.fields) {
-                  const existing_field = existing_table.fields.find(
-                    (field) => field.column_name === new_field.column_name
-                  );
-
-                  if (existing_field) {
-                    // Update the existing field
-                    existing_field.description = new_field.description;
-                  } else {
-                    // Add the new field
-                    existing_table.fields.push({
-                      column_name: new_field.column_name,
-                      description: new_field.description
-                    });
-                  }
-                }
-              } else {
-                // Add the new fields
-                existing_table.fields = new_table.fields;
-              }
-              if(new_table.foreign_keys && existing_table.foreign_keys){
-                for (const new_fk of new_table.foreign_keys) {
-                  let existing_fk = existing_table.foreign_keys.find(
-                    (fk) => fk.column_name === new_fk.column_name
-                  );
-                  if (existing_fk) {
-                    // Update the existing foreign key
-                    existing_fk = new_fk;
-                  } else {
-                    // Add the new foreign key
-                    existing_table.foreign_keys.push(new_fk);
-                  }
-                }
-              }
+            if (existing_field) {
+            // Update the existing field
+            existing_field.description = new_field.description;
             } else {
-              // Add the new table
-              existing_db.tables.push({
-                ...new_table
-              });
+            // Add the new field
+            existing_table.fields.push({
+              column_name: new_field.column_name,
+              description: new_field.description
+            });
             }
           }
+          }
+
+          if (new_table.foreign_keys) {
+          if (!existing_table.foreign_keys) {
+            existing_table.foreign_keys = [];
+          }
+          for (const new_fk of new_table.foreign_keys) {
+            const existing_fk = existing_table.foreign_keys.find(
+            (fk) => fk.column_name === new_fk.column_name
+            );
+
+            if (existing_fk) {
+            // Update the existing foreign key
+            Object.assign(existing_fk, new_fk);
+            } else {
+            // Add the new foreign key
+            existing_table.foreign_keys.push(new_fk);
+            }
+          }
+          }
+        } else {
+          // Add the new table
+          existing_db.tables.push({
+          ...new_table
+          });
         }
+        }
+      }
       } else {
-        // Add the new database
-        existing_data.db_info.databases.push({
-          ...save_db_metadata_dto.db_metadata
-        });
+      // Add the new database
+      existing_data.db_info.databases.push({
+        ...save_db_metadata_dto.db_metadata
+      });
       }
     }
 
