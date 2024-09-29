@@ -5,9 +5,10 @@ import { QueryHandlerModule } from '../query-handler/query-handler.module';
 import { MySqlDbMetadataHandlerService } from './my-sql-db-metadata-handler/my-sql-db-metadata-handler.service';
 import { PostgresDbMetadataHandlerService } from './postgres-db-metadata-handler/postgres-db-metadata-handler.service';
 import { DbMetadataHandlerFactory } from './db-metadata-handler.factory';
+import { SupabaseModule } from '../supabase/supabase.module';
 
 @Module({
-  imports: [QueryHandlerModule],
+  imports: [QueryHandlerModule, SupabaseModule],
   controllers: [DbMetadataHandlerController],
   providers: [
     {

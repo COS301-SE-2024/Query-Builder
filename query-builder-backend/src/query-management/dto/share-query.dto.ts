@@ -10,6 +10,5 @@ export class Share_Query_Dto {
     shareable_members: string[];
 
     @IsString()
-    @IsNotEmpty()
     description: string;
 }

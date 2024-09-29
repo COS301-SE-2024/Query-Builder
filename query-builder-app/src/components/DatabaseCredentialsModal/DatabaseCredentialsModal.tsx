@@ -109,7 +109,7 @@ export default function DatabaseCredentialsModal(props: DatabaseCredentialsModal
 
           let json = await response.json();
 
-          if(!response.ok && "You do not have a backend session"){
+          if(!response.ok && json.response && json.response.message == 'You do not have a backend session'){
             navigateToAuth();
           }
 

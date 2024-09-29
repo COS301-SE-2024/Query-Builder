@@ -71,7 +71,8 @@ export class QueryManagementService {
       .getClient()
       .from('saved_queries')
       .select('parameters, queryTitle, saved_at, query_id, db_id, description, type, db_envs(name, organisations(name))')
-      .eq('user_id', user_data.user.id);
+      .eq('user_id', user_data.user.id)
+      .order('saved_at', {ascending: false});
 
     if (query_error) {
       throw query_error;

@@ -1,0 +1,42 @@
+{
+  "databases": [
+    {
+      "schema_name": "sakila",
+      "description": "sakila database",
+      "tables": [
+        {
+          "table_name": "ah",
+          "description": "Table containing information about people",
+          "columns": [
+            {
+              "column_name": "id",
+              "description": "Primary key"
+            },
+            {
+              "column_name": "name",
+              "description": "Name of the person"
+            },
+            {
+              "column_name": "age",
+              "description": "Age of the person"
+            }
+          ],
+          "foreign_keys": [
+            { 
+              "table_schema": "sakila",
+              "table_name": "film_actor",
+              "column_name": "film_id",
+              "referenced_column_name": "film_id"
+            },
+            {
+              "column_name": "film_id",
+              "referenced_table_schema": "sakila",
+              "table_name": "film",
+              "referenced_column_name": "film_id"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
