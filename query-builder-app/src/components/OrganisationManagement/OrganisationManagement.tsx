@@ -573,7 +573,7 @@ export default function OrganisationManagement() {
                   }/>
                 </span>
               </Tooltip>
-              <Tooltip content="Delete database">
+              <Tooltip content="Edit database metadata">
                 <span className="text-lg cursor-pointer active:opacity-50">
                   <MetaDataHandler db_id={db.db_id} org_id={orgServerID} on_add={()=>{}}/>
                 </span>

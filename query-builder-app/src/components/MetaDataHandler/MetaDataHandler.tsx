@@ -432,7 +432,7 @@ export default function MetaDataHandler(props: MetaDataHandlerProps){
                         //include the add button if no database is selected yet
                             <Dropdown>
                             <DropdownTrigger>
-                                <Button variant="bordered">+</Button>
+                                <Button variant="bordered">{databaseName !== ""? "Change":"+"}</Button>
                             </DropdownTrigger>
                             <DropdownMenu
                                 className="max-h-[50vh] overflow-y-auto"
@@ -474,7 +474,7 @@ export default function MetaDataHandler(props: MetaDataHandlerProps){
                                                 variant="bordered"
                                                 aria-label="choose table button"
                                             >
-                                                +
+                                                {table.name !== ""? "Change":"+"}
                                             </Button>
                                         </DropdownTrigger>
                                         {joinableTables.length > 0 && (
