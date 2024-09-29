@@ -293,6 +293,7 @@ export default function Form() {
               Select a database: <span style={{ color: 'red' }}>*</span>
             </h2>
             <Spacer y={2} />
+            {/* Select a database */}
             <Card className="w-full">
               <CardBody className="flex flex-row items-center space-x-2">
                 {
