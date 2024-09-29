@@ -36,7 +36,7 @@ describe('MySqlDbMetadataHandlerService', () => {
   let module: TestingModule;
   let supabase: Supabase;
   let queryHandlerService: QueryHandlerService;
-  let data = undefined;
+  let testData = undefined;
 
   beforeAll(async () => {
     module = await Test.createTestingModule({
@@ -51,7 +51,7 @@ describe('MySqlDbMetadataHandlerService', () => {
           provide: 'QueryHandlerService',
           useValue: {
             queryDatabase(query: Query, session: Record<string, any>) {
-              return { data };
+              return { data: testData };
             }
           }
         }
@@ -69,7 +69,7 @@ describe('MySqlDbMetadataHandlerService', () => {
   });
 
   it("should return the QueryHandlerService's results for databases metadata", async () => {
-    data = [{ database: 'sakila' }];
+    testData = [{ database: 'sakila' }];
 
     expect(
       await service.getDatabaseMetadata(
@@ -80,7 +80,7 @@ describe('MySqlDbMetadataHandlerService', () => {
   });
 
   it("should return the QueryHandlerService's results.data for tables metadata", async () => {
-    data = [{ table_name: 'film' }];
+    testData = [{ table_name: 'film' }];
 
     expect(
       await service.getTableMetadata(
@@ -91,7 +91,7 @@ describe('MySqlDbMetadataHandlerService', () => {
   });
 
   it("should return the QueryHandlerService's results for fields metadata", async () => {
-    data = [{ column_name: 'first_name' }];
+    testData = [{ column_name: 'first_name' }];
 
     expect(
       await service.getFieldMetadata(
@@ -107,7 +107,7 @@ describe('MySqlDbMetadataHandlerService', () => {
   });
 
   it("should return the QueryHandlerService's results.data for foreign key metadata, for keys pointing away and to the table", async () => {
-    data = [{ column_name: 'first_name' }];
+    testData = [{ column_name: 'first_name' }];
 
     expect(
       await service.getForeignKeyMetadata(
@@ -123,7 +123,7 @@ describe('MySqlDbMetadataHandlerService', () => {
   });
 
   it("should return the QueryHandlerService's results for server summary metadata", async () => {
-    data = [
+    testData = [
       {
         database_name: 'sakila',
         table_name: 'actor',
@@ -148,6 +148,8 @@ describe('MySqlDbMetadataHandlerService', () => {
   });
 
   describe('should save database metadata', () => {
+    let spy: jest.SpyInstance;
+
     let saveDbMetadataDto = {
       databaseServerID: '1234',
       language: 'mysql',
@@ -191,12 +193,22 @@ describe('MySqlDbMetadataHandlerService', () => {
     };
 
     describe('JWT token branch', () => {
+      beforeEach(() => {
+        spy = jest.spyOn(supabase, 'getClient');
+      });
+
+      afterEach(() => {
+        spy.mockRestore();
+      });
+
       it('should return the correct error message when the jwt token is invalid', async () => {
-        await jest.spyOn(supabase, 'getClient').mockReturnValueOnce({
+        spy.mockReturnValueOnce({
           auth: {
-            getUser: jest.fn().mockReturnValue({ data: null, error: 'error' })
+            getUser: jest
+              .fn()
+              .mockReturnValue({ data: undefined, error: 'error' })
           }
-        } as unknown as SupabaseClient);
+        } as any);
 
         await service.saveDbMetadata(saveDbMetadataDto).catch((error) => {
           expect(error).toEqual('error');
@@ -204,26 +216,29 @@ describe('MySqlDbMetadataHandlerService', () => {
       });
 
       describe('org_id branch', () => {
-        beforeEach(async () => {
-          await jest.spyOn(supabase, 'getClient').mockReturnValueOnce({
+        beforeEach(() => {
+          spy.mockReturnValueOnce({
             auth: {
               getUser: jest
                 .fn()
                 .mockReturnValue({ data: { user: { id: 'user_id' } } })
             }
-          } as unknown as SupabaseClient);
+          } as any);
         });
 
         describe('org_id not given', () => {
+          beforeEach(() => {
+            saveDbMetadataDto.org_id = undefined;
+          });
+
           it('should return the correct error when there is an issue fetching the org_id', async () => {
-            await jest.spyOn(supabase, 'getClient').mockReturnValueOnce({
+            spy.mockReturnValueOnce({
               from: jest.fn().mockReturnThis(),
               select: jest.fn().mockReturnThis(),
               eq: jest.fn().mockReturnThis(),
               single: jest.fn().mockReturnThis(),
-              data: undefined,
               error: 'error'
-            } as unknown as SupabaseClient);
+            } as any);
 
             await service.saveDbMetadata(saveDbMetadataDto).catch((error) => {
               expect(error).toEqual('error');
@@ -231,25 +246,25 @@ describe('MySqlDbMetadataHandlerService', () => {
           });
 
           describe('user_role branch', () => {
-            beforeEach(async () => {
-              await jest.spyOn(supabase, 'getClient').mockReturnValueOnce({
+            beforeEach(() => {
+              spy.mockReturnValueOnce({
                 from: jest.fn().mockReturnThis(),
                 select: jest.fn().mockReturnThis(),
                 eq: jest.fn().mockReturnThis(),
                 single: jest.fn().mockReturnThis(),
-                data: { org_id: 'org_id' }
-              } as unknown as SupabaseClient);
+                data: { org_id: 'nice' }
+              } as any);
             });
 
             it('should return the correct error when there is an issue fetching the user_role', async () => {
-              await jest.spyOn(supabase, 'getClient').mockReturnValueOnce({
+              spy.mockReturnValueOnce({
                 from: jest.fn().mockReturnThis(),
                 select: jest.fn().mockReturnThis(),
                 eq: jest.fn().mockReturnThis(),
                 single: jest.fn().mockReturnThis(),
                 data: undefined,
                 error: 'error'
-              } as unknown as SupabaseClient);
+              } as any);
 
               await service.saveDbMetadata(saveDbMetadataDto).catch((error) => {
                 expect(error).toEqual('error');
@@ -257,57 +272,59 @@ describe('MySqlDbMetadataHandlerService', () => {
             });
 
             it('should return the correct error when the user_role is member', async () => {
-              await jest.spyOn(supabase, 'getClient').mockReturnValueOnce({
+              spy.mockReturnValueOnce({
                 from: jest.fn().mockReturnThis(),
                 select: jest.fn().mockReturnThis(),
                 eq: jest.fn().mockReturnThis(),
                 single: jest.fn().mockReturnThis(),
-                data: { user_role: 'member' }
-              } as unknown as SupabaseClient);
+                data: { user_role: 'member' },
+                error: undefined
+              } as any);
 
               await service.saveDbMetadata(saveDbMetadataDto).catch((error) => {
-                expect(error).toEqual(
-                  'YUser does not have permission to save metadata'
+                expect(error.message).toEqual(
+                  'User does not have permission to save metadata'
                 );
               });
             });
 
             it('should return the correct error when there is no user_role', async () => {
-              await jest.spyOn(supabase, 'getClient').mockReturnValueOnce({
+              spy.mockReturnValueOnce({
                 from: jest.fn().mockReturnThis(),
                 select: jest.fn().mockReturnThis(),
                 eq: jest.fn().mockReturnThis(),
                 single: jest.fn().mockReturnThis(),
-                data: { user_role: undefined }
-              } as unknown as SupabaseClient);
+                data: undefined,
+                error: undefined
+              } as any);
 
               await service.saveDbMetadata(saveDbMetadataDto).catch((error) => {
-                expect(error).toEqual(
+                expect(error.message).toEqual(
                   'User does not have permission to save metadata'
                 );
               });
             });
 
             describe('db_info select branch', () => {
-              beforeEach(async () => {
-                await jest.spyOn(supabase, 'getClient').mockReturnValueOnce({
+              beforeEach(() => {
+                spy.mockReturnValueOnce({
                   from: jest.fn().mockReturnThis(),
                   select: jest.fn().mockReturnThis(),
                   eq: jest.fn().mockReturnThis(),
                   single: jest.fn().mockReturnThis(),
                   data: { user_role: 'admin' }
-                } as unknown as SupabaseClient);
+                } as any);
               });
 
               it('should return the correct error when there is an issue fetching the db_info', async () => {
-                await jest.spyOn(supabase, 'getClient').mockReturnValueOnce({
+                spy.mockReturnValueOnce({
                   from: jest.fn().mockReturnThis(),
                   select: jest.fn().mockReturnThis(),
                   eq: jest.fn().mockReturnThis(),
                   single: jest.fn().mockReturnThis(),
                   data: undefined,
                   error: 'error'
-                } as unknown as SupabaseClient);
+                } as any);
 
                 await service
                   .saveDbMetadata(saveDbMetadataDto)
@@ -316,89 +333,802 @@ describe('MySqlDbMetadataHandlerService', () => {
                   });
               });
 
-              describe('db_info update branch', () => {
-                beforeEach(async () => {
-                  await jest.spyOn(supabase, 'getClient').mockReturnValueOnce({
-                    from: jest.fn().mockReturnThis(),
-                    select: jest.fn().mockReturnThis(),
-                    eq: jest.fn().mockReturnThis(),
-                    single: jest.fn().mockReturnThis(),
-                    data: {
-                      db_info: undefined
-                    }
-                  } as unknown as SupabaseClient);
-                });
-
-                it('should return the correct error when there is an issue updating the db_info', async () => {
-                  await jest.spyOn(supabase, 'getClient').mockReturnValueOnce({
-                    from: jest.fn().mockReturnThis(),
-                    update: jest.fn().mockReturnThis(),
-                    eq: jest.fn().mockReturnThis(),
-                    select: jest.fn().mockReturnThis(),
-                    single: jest.fn().mockReturnThis(),
-                    data: undefined,
-                    error: 'error'
-                  } as unknown as SupabaseClient);
-
-                  await service
-                    .saveDbMetadata(saveDbMetadataDto)
-                    .catch((error) => {
-                      expect(error).toEqual('error');
-                    });
-                });
-
-                it('should return the correct data when the db_info is updated', async () => {
-                  await jest.spyOn(supabase, 'getClient').mockReturnValueOnce({
-                    from: jest.fn().mockReturnThis(),
-                    update: jest.fn().mockReturnThis(),
-                    eq: jest.fn().mockReturnThis(),
-                    select: jest.fn().mockReturnThis(),
-                    single: jest.fn().mockReturnThis(),
-                    data: { db_info: saveDbMetadataDto.db_metadata }
-                  } as unknown as SupabaseClient);
-
-                  const result =
-                    await service.saveDbMetadata(saveDbMetadataDto);
-
-                  expect(result).toEqual({
-                    data: {
-                      db_info: {
-                        schema_name: 'sakila',
-                        description: 'sakila database',
-                        tables: [
-                          {
-                            table_name: 'film',
-                            description: 'Test Desc',
-                            fields: [
-                              {
-                                column_name: 'title',
-                                description: 'The movie title'
-                              }
-                            ],
-                            foreign_keys: [
-                              {
-                                table_schema: 'sakila',
-                                table_name: 'film_actor',
-                                column_name: 'film_id',
-                                referenced_column_name: 'film_id'
-                              }
-                            ]
-                          },
-                          {
-                            table_name: 'film_actor',
-                            description: 'joining table',
-                            foreign_keys: [
-                              {
-                                column_name: 'film_id',
-                                referenced_table_schema: 'sakila',
-                                table_name: 'film',
-                                referenced_column_name: 'film_id'
-                              }
-                            ]
-                          }
-                        ]
+              describe('combine existing and new metadata branch', () => {
+                describe('no existing metadata branch', () => {
+                  beforeEach(() => {
+                    spy.mockReturnValueOnce({
+                      from: jest.fn().mockReturnThis(),
+                      select: jest.fn().mockReturnThis(),
+                      eq: jest.fn().mockReturnThis(),
+                      single: jest.fn().mockReturnThis(),
+                      data: {
+                        db_info: undefined
                       }
-                    }
+                    } as any);
+                  });
+
+                  it('should return the correct error when there is an issue updating the db_info', async () => {
+                    spy.mockReturnValueOnce({
+                      from: jest.fn().mockReturnThis(),
+                      update: jest.fn().mockReturnThis(),
+                      eq: jest.fn().mockReturnThis(),
+                      select: jest.fn().mockReturnThis(),
+                      single: jest.fn().mockReturnThis(),
+                      data: undefined,
+                      error: 'error'
+                    } as any);
+
+                    await service
+                      .saveDbMetadata(saveDbMetadataDto)
+                      .catch((error) => {
+                        expect(error).toEqual('error');
+                      });
+                  });
+
+                  it('should return the correct data when the db_info is updated', async () => {
+                    spy.mockReturnValueOnce({
+                      from: jest.fn().mockReturnThis(),
+                      update: jest.fn().mockReturnThis(),
+                      eq: jest.fn().mockReturnThis(),
+                      select: jest.fn().mockReturnThis(),
+                      single: jest.fn().mockReturnThis(),
+                      data: { db_info: saveDbMetadataDto.db_metadata }
+                    } as any);
+
+                    const result =
+                      await service.saveDbMetadata(saveDbMetadataDto);
+
+                    expect(result).toEqual({
+                      data: {
+                        db_info: {
+                          schema_name: 'sakila',
+                          description: 'sakila database',
+                          tables: [
+                            {
+                              table_name: 'film',
+                              description: 'Test Desc',
+                              fields: [
+                                {
+                                  column_name: 'title',
+                                  description: 'The movie title'
+                                }
+                              ],
+                              foreign_keys: [
+                                {
+                                  table_schema: 'sakila',
+                                  table_name: 'film_actor',
+                                  column_name: 'film_id',
+                                  referenced_column_name: 'film_id'
+                                }
+                              ]
+                            },
+                            {
+                              table_name: 'film_actor',
+                              description: 'joining table',
+                              foreign_keys: [
+                                {
+                                  column_name: 'film_id',
+                                  referenced_table_schema: 'sakila',
+                                  table_name: 'film',
+                                  referenced_column_name: 'film_id'
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    });
+                  });
+                });
+
+                describe('existing metadata branch', () => {
+                  it('should return the correct data when the schema is not in the db_info.databases array', async () => {
+                    spy.mockReturnValueOnce({
+                      from: jest.fn().mockReturnThis(),
+                      select: jest.fn().mockReturnThis(),
+                      eq: jest.fn().mockReturnThis(),
+                      single: jest.fn().mockReturnThis(),
+                      data: {
+                        db_info: {
+                          databases: []
+                        }
+                      }
+                    } as any);
+
+                    spy.mockReturnValueOnce({
+                      from: jest.fn().mockReturnThis(),
+                      update: jest.fn().mockReturnThis(),
+                      eq: jest.fn().mockReturnThis(),
+                      select: jest.fn().mockReturnThis(),
+                      single: jest.fn().mockReturnThis(),
+                      data: { db_info: saveDbMetadataDto.db_metadata }
+                    } as any);
+
+                    const result =
+                      await service.saveDbMetadata(saveDbMetadataDto);
+
+                    expect(result).toEqual({
+                      data: {
+                        db_info: {
+                          schema_name: 'sakila',
+                          description: 'sakila database',
+                          tables: [
+                            {
+                              table_name: 'film',
+                              description: 'Test Desc',
+                              fields: [
+                                {
+                                  column_name: 'title',
+                                  description: 'The movie title'
+                                }
+                              ],
+                              foreign_keys: [
+                                {
+                                  table_schema: 'sakila',
+                                  table_name: 'film_actor',
+                                  column_name: 'film_id',
+                                  referenced_column_name: 'film_id'
+                                }
+                              ]
+                            },
+                            {
+                              table_name: 'film_actor',
+                              description: 'joining table',
+                              foreign_keys: [
+                                {
+                                  column_name: 'film_id',
+                                  referenced_table_schema: 'sakila',
+                                  table_name: 'film',
+                                  referenced_column_name: 'film_id'
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    });
+                  });
+                  it('should return the correct data when the schema is in the db_info.databases array and must be updated', async () => {
+                    spy.mockReturnValueOnce({
+                      from: jest.fn().mockReturnThis(),
+                      select: jest.fn().mockReturnThis(),
+                      eq: jest.fn().mockReturnThis(),
+                      single: jest.fn().mockReturnThis(),
+                      data: {
+                        db_info: {
+                          databases: [
+                            {
+                              schema_name: 'sakila',
+                              description: 'sakila database',
+                              tables: []
+                            }
+                          ]
+                        }
+                      }
+                    } as any);
+
+                    spy.mockReturnValueOnce({
+                      from: jest.fn().mockReturnThis(),
+                      update: jest.fn().mockReturnThis(),
+                      eq: jest.fn().mockReturnThis(),
+                      select: jest.fn().mockReturnThis(),
+                      single: jest.fn().mockReturnThis(),
+                      data: { db_info: saveDbMetadataDto.db_metadata }
+                    } as any);
+
+                    const result =
+                      await service.saveDbMetadata(saveDbMetadataDto);
+
+                    expect(result).toEqual({
+                      data: {
+                        db_info: {
+                          schema_name: 'sakila',
+                          description: 'sakila database',
+                          tables: [
+                            {
+                              table_name: 'film',
+                              description: 'Test Desc',
+                              fields: [
+                                {
+                                  column_name: 'title',
+                                  description: 'The movie title'
+                                }
+                              ],
+                              foreign_keys: [
+                                {
+                                  table_schema: 'sakila',
+                                  table_name: 'film_actor',
+                                  column_name: 'film_id',
+                                  referenced_column_name: 'film_id'
+                                }
+                              ]
+                            },
+                            {
+                              table_name: 'film_actor',
+                              description: 'joining table',
+                              foreign_keys: [
+                                {
+                                  column_name: 'film_id',
+                                  referenced_table_schema: 'sakila',
+                                  table_name: 'film',
+                                  referenced_column_name: 'film_id'
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    });
+                  });
+
+                  it('should return the correct data when the table is not in the db_info.databases.tables array', async () => {
+                    spy.mockReturnValueOnce({
+                      from: jest.fn().mockReturnThis(),
+                      select: jest.fn().mockReturnThis(),
+                      eq: jest.fn().mockReturnThis(),
+                      single: jest.fn().mockReturnThis(),
+                      data: {
+                        db_info: {
+                          databases: [
+                            {
+                              schema_name: 'sakila',
+                              description: 'sakila database',
+                              tables: []
+                            }
+                          ]
+                        }
+                      }
+                    } as any);
+
+                    spy.mockReturnValueOnce({
+                      from: jest.fn().mockReturnThis(),
+                      update: jest.fn().mockReturnThis(),
+                      eq: jest.fn().mockReturnThis(),
+                      select: jest.fn().mockReturnThis(),
+                      single: jest.fn().mockReturnThis(),
+                      data: { db_info: saveDbMetadataDto.db_metadata }
+                    } as any);
+
+                    const result =
+                      await service.saveDbMetadata(saveDbMetadataDto);
+
+                    expect(result).toEqual({
+                      data: {
+                        db_info: {
+                          schema_name: 'sakila',
+                          description: 'sakila database',
+                          tables: [
+                            {
+                              table_name: 'film',
+                              description: 'Test Desc',
+                              fields: [
+                                {
+                                  column_name: 'title',
+                                  description: 'The movie title'
+                                }
+                              ],
+                              foreign_keys: [
+                                {
+                                  table_schema: 'sakila',
+                                  table_name: 'film_actor',
+                                  column_name: 'film_id',
+                                  referenced_column_name: 'film_id'
+                                }
+                              ]
+                            },
+                            {
+                              table_name: 'film_actor',
+                              description: 'joining table',
+                              foreign_keys: [
+                                {
+                                  column_name: 'film_id',
+                                  referenced_table_schema: 'sakila',
+                                  table_name: 'film',
+                                  referenced_column_name: 'film_id'
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    });
+                  });
+                  it('should return the correct data when the table is in the db_info.databases.tables array and must be updated', async () => {
+                    spy.mockReturnValueOnce({
+                      from: jest.fn().mockReturnThis(),
+                      select: jest.fn().mockReturnThis(),
+                      eq: jest.fn().mockReturnThis(),
+                      single: jest.fn().mockReturnThis(),
+                      data: {
+                        db_info: {
+                          databases: [
+                            {
+                              schema_name: 'sakila',
+                              description: 'sakila database',
+                              tables: [
+                                {
+                                  table_name: 'film',
+                                  description: 'Test Desc',
+                                  fields: [],
+                                  foreign_keys: []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    } as any);
+
+                    spy.mockReturnValueOnce({
+                      from: jest.fn().mockReturnThis(),
+                      update: jest.fn().mockReturnThis(),
+                      eq: jest.fn().mockReturnThis(),
+                      select: jest.fn().mockReturnThis(),
+                      single: jest.fn().mockReturnThis(),
+                      data: { db_info: saveDbMetadataDto.db_metadata }
+                    } as any);
+
+                    const result =
+                      await service.saveDbMetadata(saveDbMetadataDto);
+
+                    expect(result).toEqual({
+                      data: {
+                        db_info: {
+                          schema_name: 'sakila',
+                          description: 'sakila database',
+                          tables: [
+                            {
+                              table_name: 'film',
+                              description: 'Test Desc',
+                              fields: [
+                                {
+                                  column_name: 'title',
+                                  description: 'The movie title'
+                                }
+                              ],
+                              foreign_keys: [
+                                {
+                                  table_schema: 'sakila',
+                                  table_name: 'film_actor',
+                                  column_name: 'film_id',
+                                  referenced_column_name: 'film_id'
+                                }
+                              ]
+                            },
+                            {
+                              table_name: 'film_actor',
+                              description: 'joining table',
+                              foreign_keys: [
+                                {
+                                  column_name: 'film_id',
+                                  referenced_table_schema: 'sakila',
+                                  table_name: 'film',
+                                  referenced_column_name: 'film_id'
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    });
+                  });
+
+                  it('should return the correct data when the field is not in the db_info.databases.tables.fields array', async () => {
+                    spy.mockReturnValueOnce({
+                      from: jest.fn().mockReturnThis(),
+                      select: jest.fn().mockReturnThis(),
+                      eq: jest.fn().mockReturnThis(),
+                      single: jest.fn().mockReturnThis(),
+                      data: {
+                        db_info: {
+                          databases: [
+                            {
+                              schema_name: 'sakila',
+                              description: 'sakila database',
+                              tables: [
+                                {
+                                  table_name: 'film',
+                                  description: 'Test Desc',
+                                  fields: [],
+                                  foreign_keys: []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    } as any);
+
+                    spy.mockReturnValueOnce({
+                      from: jest.fn().mockReturnThis(),
+                      update: jest.fn().mockReturnThis(),
+                      eq: jest.fn().mockReturnThis(),
+                      select: jest.fn().mockReturnThis(),
+                      single: jest.fn().mockReturnThis(),
+                      data: { db_info: saveDbMetadataDto.db_metadata }
+                    } as any);
+
+                    const result =
+                      await service.saveDbMetadata(saveDbMetadataDto);
+
+                    expect(result).toEqual({
+                      data: {
+                        db_info: {
+                          schema_name: 'sakila',
+                          description: 'sakila database',
+                          tables: [
+                            {
+                              table_name: 'film',
+                              description: 'Test Desc',
+                              fields: [
+                                {
+                                  column_name: 'title',
+                                  description: 'The movie title'
+                                }
+                              ],
+                              foreign_keys: [
+                                {
+                                  table_schema: 'sakila',
+                                  table_name: 'film_actor',
+                                  column_name: 'film_id',
+                                  referenced_column_name: 'film_id'
+                                }
+                              ]
+                            },
+                            {
+                              table_name: 'film_actor',
+                              description: 'joining table',
+                              foreign_keys: [
+                                {
+                                  column_name: 'film_id',
+                                  referenced_table_schema: 'sakila',
+                                  table_name: 'film',
+                                  referenced_column_name: 'film_id'
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    });
+                  });
+                  it('should return the correct data when the field is in the db_info.databases.tables.fields array and must be updated', async () => {
+                    spy.mockReturnValueOnce({
+                      from: jest.fn().mockReturnThis(),
+                      select: jest.fn().mockReturnThis(),
+                      eq: jest.fn().mockReturnThis(),
+                      single: jest.fn().mockReturnThis(),
+                      data: {
+                        db_info: {
+                          databases: [
+                            {
+                              schema_name: 'sakila',
+                              description: 'sakila database',
+                              tables: [
+                                {
+                                  table_name: 'film',
+                                  description: 'Test Desc',
+                                  fields: [
+                                    {
+                                      column_name: 'title',
+                                      description: 'The movie title'
+                                    }
+                                  ],
+                                  foreign_keys: []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    } as any);
+
+                    spy.mockReturnValueOnce({
+                      from: jest.fn().mockReturnThis(),
+                      update: jest.fn().mockReturnThis(),
+                      eq: jest.fn().mockReturnThis(),
+                      select: jest.fn().mockReturnThis(),
+                      single: jest.fn().mockReturnThis(),
+                      data: { db_info: saveDbMetadataDto.db_metadata }
+                    } as any);
+
+                    const result =
+                      await service.saveDbMetadata(saveDbMetadataDto);
+
+                    expect(result).toEqual({
+                      data: {
+                        db_info: {
+                          schema_name: 'sakila',
+                          description: 'sakila database',
+                          tables: [
+                            {
+                              table_name: 'film',
+                              description: 'Test Desc',
+                              fields: [
+                                {
+                                  column_name: 'title',
+                                  description: 'The movie title'
+                                }
+                              ],
+                              foreign_keys: [
+                                {
+                                  table_schema: 'sakila',
+                                  table_name: 'film_actor',
+                                  column_name: 'film_id',
+                                  referenced_column_name: 'film_id'
+                                }
+                              ]
+                            },
+                            {
+                              table_name: 'film_actor',
+                              description: 'joining table',
+                              foreign_keys: [
+                                {
+                                  column_name: 'film_id',
+                                  referenced_table_schema: 'sakila',
+                                  table_name: 'film',
+                                  referenced_column_name: 'film_id'
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    });
+                  });
+                  it('should return the correct data when the fields array does not exist', async () => {
+                    spy.mockReturnValueOnce({
+                      from: jest.fn().mockReturnThis(),
+                      select: jest.fn().mockReturnThis(),
+                      eq: jest.fn().mockReturnThis(),
+                      single: jest.fn().mockReturnThis(),
+                      data: {
+                        db_info: {
+                          databases: [
+                            {
+                              schema_name: 'sakila',
+                              description: 'sakila database',
+                              tables: [
+                                {
+                                  table_name: 'film',
+                                  description: 'Test Desc',
+                                  foreign_keys: []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    } as any);
+
+                    spy.mockReturnValueOnce({
+                      from: jest.fn().mockReturnThis(),
+                      update: jest.fn().mockReturnThis(),
+                      eq: jest.fn().mockReturnThis(),
+                      select: jest.fn().mockReturnThis(),
+                      single: jest.fn().mockReturnThis(),
+                      data: { db_info: saveDbMetadataDto.db_metadata }
+                    } as any);
+
+                    const result =
+                      await service.saveDbMetadata(saveDbMetadataDto);
+
+                    expect(result).toEqual({
+                      data: {
+                        db_info: {
+                          schema_name: 'sakila',
+                          description: 'sakila database',
+                          tables: [
+                            {
+                              table_name: 'film',
+                              description: 'Test Desc',
+                              fields: [
+                                {
+                                  column_name: 'title',
+                                  description: 'The movie title'
+                                }
+                              ],
+                              foreign_keys: [
+                                {
+                                  table_schema: 'sakila',
+                                  table_name: 'film_actor',
+                                  column_name: 'film_id',
+                                  referenced_column_name: 'film_id'
+                                }
+                              ]
+                            },
+                            {
+                              table_name: 'film_actor',
+                              description: 'joining table',
+                              foreign_keys: [
+                                {
+                                  column_name: 'film_id',
+                                  referenced_table_schema: 'sakila',
+                                  table_name: 'film',
+                                  referenced_column_name: 'film_id'
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    });
+                  });
+
+                  it('should return the correct data when the foreign key is not in the db_info.databases.tables.foreign_keys array', async () => {
+                    spy.mockReturnValueOnce({
+                      from: jest.fn().mockReturnThis(),
+                      select: jest.fn().mockReturnThis(),
+                      eq: jest.fn().mockReturnThis(),
+                      single: jest.fn().mockReturnThis(),
+                      data: {
+                        db_info: {
+                          databases: [
+                            {
+                              schema_name: 'sakila',
+                              description: 'sakila database',
+                              tables: [
+                                {
+                                  table_name: 'film',
+                                  description: 'Test Desc',
+                                  fields: [
+                                    {
+                                      column_name: 'title',
+                                      description: 'The movie title'
+                                    }
+                                  ],
+                                  foreign_keys: []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    } as any);
+
+                    spy.mockReturnValueOnce({
+                      from: jest.fn().mockReturnThis(),
+                      update: jest.fn().mockReturnThis(),
+                      eq: jest.fn().mockReturnThis(),
+                      select: jest.fn().mockReturnThis(),
+                      single: jest.fn().mockReturnThis(),
+                      data: { db_info: saveDbMetadataDto.db_metadata }
+                    } as any);
+
+                    const result =
+                      await service.saveDbMetadata(saveDbMetadataDto);
+
+                    expect(result).toEqual({
+                      data: {
+                        db_info: {
+                          schema_name: 'sakila',
+                          description: 'sakila database',
+                          tables: [
+                            {
+                              table_name: 'film',
+                              description: 'Test Desc',
+                              fields: [
+                                {
+                                  column_name: 'title',
+                                  description: 'The movie title'
+                                }
+                              ],
+                              foreign_keys: [
+                                {
+                                  table_schema: 'sakila',
+                                  table_name: 'film_actor',
+                                  column_name: 'film_id',
+                                  referenced_column_name: 'film_id'
+                                }
+                              ]
+                            },
+                            {
+                              table_name: 'film_actor',
+                              description: 'joining table',
+                              foreign_keys: [
+                                {
+                                  column_name: 'film_id',
+                                  referenced_table_schema: 'sakila',
+                                  table_name: 'film',
+                                  referenced_column_name: 'film_id'
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    });
+                  });
+                  it('should return the correct data when the foreign key is in the db_info.databases.tables.foreign_keys array and must be updated', async () => {
+                    spy.mockReturnValueOnce({
+                      from: jest.fn().mockReturnThis(),
+                      select: jest.fn().mockReturnThis(),
+                      eq: jest.fn().mockReturnThis(),
+                      single: jest.fn().mockReturnThis(),
+                      data: {
+                        db_info: {
+                          databases: [
+                            {
+                              schema_name: 'sakila',
+                              description: 'sakila database',
+                              tables: [
+                                {
+                                  table_name: 'film',
+                                  description: 'Test Desc',
+                                  fields: [
+                                    {
+                                      column_name: 'title',
+                                      description: 'The movie title'
+                                    }
+                                  ],
+                                  foreign_keys: [
+                                    {
+                                      table_schema: 'sakila',
+                                      table_name: 'film_actor',
+                                      column_name: 'film_id',
+                                      referenced_column_name: 'film_id'
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    } as any);
+
+                    spy.mockReturnValueOnce({
+                      from: jest.fn().mockReturnThis(),
+                      update: jest.fn().mockReturnThis(),
+                      eq: jest.fn().mockReturnThis(),
+                      select: jest.fn().mockReturnThis(),
+                      single: jest.fn().mockReturnThis(),
+                      data: { db_info: saveDbMetadataDto.db_metadata }
+                    } as any);
+
+                    const result =
+                      await service.saveDbMetadata(saveDbMetadataDto);
+
+                    expect(result).toEqual({
+                      data: {
+                        db_info: {
+                          schema_name: 'sakila',
+                          description: 'sakila database',
+                          tables: [
+                            {
+                              table_name: 'film',
+                              description: 'Test Desc',
+                              fields: [
+                                {
+                                  column_name: 'title',
+                                  description: 'The movie title'
+                                }
+                              ],
+                              foreign_keys: [
+                                {
+                                  table_schema: 'sakila',
+                                  table_name: 'film_actor',
+                                  column_name: 'film_id',
+                                  referenced_column_name: 'film_id'
+                                }
+                              ]
+                            },
+                            {
+                              table_name: 'film_actor',
+                              description: 'joining table',
+                              foreign_keys: [
+                                {
+                                  column_name: 'film_id',
+                                  referenced_table_schema: 'sakila',
+                                  table_name: 'film',
+                                  referenced_column_name: 'film_id'
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    });
                   });
                 });
               });
@@ -407,20 +1137,20 @@ describe('MySqlDbMetadataHandlerService', () => {
         });
 
         describe('org_id given', () => {
-          beforeAll(async () => {
+          beforeAll(() => {
             saveDbMetadataDto.org_id = '0000';
           });
 
           describe('user_role branch', () => {
             it('should return the correct error when there is an issue fetching the user_role', async () => {
-              await jest.spyOn(supabase, 'getClient').mockReturnValueOnce({
+              spy.mockReturnValueOnce({
                 from: jest.fn().mockReturnThis(),
                 select: jest.fn().mockReturnThis(),
                 eq: jest.fn().mockReturnThis(),
                 single: jest.fn().mockReturnThis(),
                 data: undefined,
                 error: 'error'
-              } as unknown as SupabaseClient);
+              } as any);
 
               await service.saveDbMetadata(saveDbMetadataDto).catch((error) => {
                 expect(error).toEqual('error');
@@ -428,57 +1158,58 @@ describe('MySqlDbMetadataHandlerService', () => {
             });
 
             it('should return the correct error when the user_role is member', async () => {
-              await jest.spyOn(supabase, 'getClient').mockReturnValueOnce({
+              spy.mockReturnValueOnce({
                 from: jest.fn().mockReturnThis(),
                 select: jest.fn().mockReturnThis(),
                 eq: jest.fn().mockReturnThis(),
                 single: jest.fn().mockReturnThis(),
                 data: { user_role: 'member' }
-              } as unknown as SupabaseClient);
+              } as any);
 
               await service.saveDbMetadata(saveDbMetadataDto).catch((error) => {
-                expect(error).toEqual(
-                  'YUser does not have permission to save metadata'
+                expect(error.message).toEqual(
+                  'User does not have permission to save metadata'
                 );
               });
             });
 
             it('should return the correct error when there is no user_role', async () => {
-              await jest.spyOn(supabase, 'getClient').mockReturnValueOnce({
+              spy.mockReturnValueOnce({
                 from: jest.fn().mockReturnThis(),
                 select: jest.fn().mockReturnThis(),
                 eq: jest.fn().mockReturnThis(),
                 single: jest.fn().mockReturnThis(),
-                data: { user_role: undefined }
-              } as unknown as SupabaseClient);
+                data: undefined,
+                error: undefined
+              } as any);
 
               await service.saveDbMetadata(saveDbMetadataDto).catch((error) => {
-                expect(error).toEqual(
+                expect(error.message).toEqual(
                   'User does not have permission to save metadata'
                 );
               });
             });
 
             describe('db_info select branch', () => {
-              beforeEach(async () => {
-                await jest.spyOn(supabase, 'getClient').mockReturnValueOnce({
+              beforeEach(() => {
+                spy.mockReturnValueOnce({
                   from: jest.fn().mockReturnThis(),
                   select: jest.fn().mockReturnThis(),
                   eq: jest.fn().mockReturnThis(),
                   single: jest.fn().mockReturnThis(),
                   data: { user_role: 'admin' }
-                } as unknown as SupabaseClient);
+                } as any);
               });
 
               it('should return the correct error when there is an issue fetching the db_info', async () => {
-                await jest.spyOn(supabase, 'getClient').mockReturnValueOnce({
+                spy.mockReturnValueOnce({
                   from: jest.fn().mockReturnThis(),
                   select: jest.fn().mockReturnThis(),
                   eq: jest.fn().mockReturnThis(),
                   single: jest.fn().mockReturnThis(),
                   data: undefined,
                   error: 'error'
-                } as unknown as SupabaseClient);
+                } as any);
 
                 await service
                   .saveDbMetadata(saveDbMetadataDto)
@@ -488,8 +1219,8 @@ describe('MySqlDbMetadataHandlerService', () => {
               });
 
               describe('db_info update branch', () => {
-                beforeEach(async () => {
-                  await jest.spyOn(supabase, 'getClient').mockReturnValueOnce({
+                beforeEach(() => {
+                  spy.mockReturnValueOnce({
                     from: jest.fn().mockReturnThis(),
                     select: jest.fn().mockReturnThis(),
                     eq: jest.fn().mockReturnThis(),
@@ -497,11 +1228,11 @@ describe('MySqlDbMetadataHandlerService', () => {
                     data: {
                       db_info: undefined
                     }
-                  } as unknown as SupabaseClient);
+                  } as any);
                 });
 
                 it('should return the correct error when there is an issue updating the db_info', async () => {
-                  await jest.spyOn(supabase, 'getClient').mockReturnValueOnce({
+                  spy.mockReturnValueOnce({
                     from: jest.fn().mockReturnThis(),
                     update: jest.fn().mockReturnThis(),
                     eq: jest.fn().mockReturnThis(),
@@ -509,7 +1240,7 @@ describe('MySqlDbMetadataHandlerService', () => {
                     single: jest.fn().mockReturnThis(),
                     data: undefined,
                     error: 'error'
-                  } as unknown as SupabaseClient);
+                  } as any);
 
                   await service
                     .saveDbMetadata(saveDbMetadataDto)
@@ -519,14 +1250,14 @@ describe('MySqlDbMetadataHandlerService', () => {
                 });
 
                 it('should return the correct data when the db_info is updated', async () => {
-                  await jest.spyOn(supabase, 'getClient').mockReturnValueOnce({
+                  spy.mockReturnValueOnce({
                     from: jest.fn().mockReturnThis(),
                     update: jest.fn().mockReturnThis(),
                     eq: jest.fn().mockReturnThis(),
                     select: jest.fn().mockReturnThis(),
                     single: jest.fn().mockReturnThis(),
                     data: { db_info: saveDbMetadataDto.db_metadata }
-                  } as unknown as SupabaseClient);
+                  } as any);
 
                   const result =
                     await service.saveDbMetadata(saveDbMetadataDto);
@@ -580,85 +1311,1051 @@ describe('MySqlDbMetadataHandlerService', () => {
     });
   });
 
-  it('should get saved database metadata', async () => {
-    const getDbMetadataDto = { databaseServerID: '1234', language: 'mysql' };
+  describe('should get saved database metadata', () => {
+    describe('JWT token branch', () => {
+      let spy: jest.SpyInstance;
 
-    const result = await service.getSavedDbMetadata(getDbMetadataDto);
+      beforeEach(() => {
+        spy = jest.spyOn(supabase, 'getClient');
+      });
 
-    expect(result).toEqual({
-      data: [{ database: 'sakila', description: 'Sakila Database' }]
-    });
-  });
+      afterEach(() => {
+        spy.mockRestore();
+      });
 
-  it('should get saved table metadata', async () => {
-    const getTableMetadataDto = {
-      databaseServerID: '1234',
-      language: 'mysql',
-      database: 'sakila'
-    };
+      it('should return the correct error message when the jwt token is invalid', async () => {
+        spy.mockReturnValueOnce({
+          auth: {
+            getUser: jest
+              .fn()
+              .mockReturnValue({ data: undefined, error: 'error' })
+          }
+        } as any);
 
-    const result = await service.getSavedTableMetadata(getTableMetadataDto);
+        await service
+          .getSavedDbMetadata({
+            databaseServerID: '1234',
+            language: 'mysql'
+          })
+          .catch((error) => {
+            expect(error).toEqual('error');
+          });
+      });
 
-    expect(result).toEqual({
-      data: [{ table_name: 'actor', description: 'Actor Table' }]
-    });
-  });
-
-  it('should get saved field metadata', async () => {
-    const getFieldMetadataDto = {
-      databaseServerID: '1234',
-      language: 'mysql',
-      database: 'sakila',
-      table: 'actor'
-    };
-
-    const result = await service.getSavedFieldMetadata(getFieldMetadataDto);
-
-    expect(result).toEqual({
-      data: [{ name: 'first_name', description: 'First Name' }]
-    });
-  });
-
-  it('should get saved foreign key metadata', async () => {
-    const getFkMetadataDto = {
-      databaseServerID: '1234',
-      language: 'mysql',
-      database: 'sakila',
-      table: 'actor'
-    };
-
-    const result = await service.getSavedForeignKeyMetadata(getFkMetadataDto);
-
-    expect(result).toEqual({ data: [{ column_name: 'first_name' }] });
-  });
-
-  it('should get saved server summary metadata', async () => {
-    const getSummaryMetadataDto = {
-      databaseServerID: '1234',
-      language: 'mysql'
-    };
-
-    const result = await service.getSavedServerSummaryMetadata(
-      getSummaryMetadataDto
-    );
-
-    expect(result).toEqual({
-      data: [
-        {
-          schema_name: 'sakila',
-          description: 'Sakila Database',
-          tables: [
-            {
-              table_name: 'actor',
-              description: 'Actor Table',
-              fields: [
-                { column_name: 'first_name', description: 'First Name' }
-              ],
-              foreign_keys: [{ column_name: 'first_name' }]
+      describe('org_id branch', () => {
+        beforeEach(() => {
+          spy.mockReturnValueOnce({
+            auth: {
+              getUser: jest
+                .fn()
+                .mockReturnValue({ data: { user: { id: 'user_id' } } })
             }
-          ]
-        }
-      ]
+          } as any);
+        });
+
+        it('should return the correct error when there is an issue fetching the org_id', async () => {
+          spy.mockReturnValueOnce({
+            from: jest.fn().mockReturnThis(),
+            select: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockReturnThis(),
+            single: jest.fn().mockReturnThis(),
+            error: 'error'
+          } as any);
+
+          await service
+            .getSavedDbMetadata({
+              databaseServerID: '1234',
+              language: 'mysql'
+            })
+            .catch((error) => {
+              expect(error).toEqual('error');
+            });
+        });
+
+        describe('metadata select branch', () => {
+          beforeEach(() => {
+            spy.mockReturnValueOnce({
+              from: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockReturnThis(),
+              single: jest.fn().mockReturnThis(),
+              data: { org_id: 'nice' }
+            } as any);
+          });
+
+          it('should return the correct error when there is an issue fetching the metadata', async () => {
+            spy.mockReturnValueOnce({
+              from: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockReturnThis(),
+              single: jest.fn().mockReturnThis(),
+              data: undefined,
+              error: 'error'
+            } as any);
+
+            await service
+              .getSavedDbMetadata({
+                databaseServerID: '1234',
+                language: 'mysql'
+              })
+              .catch((error) => {
+                expect(error).toEqual('error');
+              });
+          });
+
+          it('should return the correct data when the metadata does not exist', async () => {
+            spy.mockReturnValueOnce({
+              from: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockReturnThis(),
+              single: jest.fn().mockReturnThis(),
+              data: { db_info: undefined }
+            } as any);
+
+            const result = await service.getSavedDbMetadata({
+              databaseServerID: '1234',
+              language: 'mysql'
+            });
+
+            expect(result).toEqual({ data: [] });
+          });
+
+          it('should return the correct data when the metadata exists', async () => {
+            spy.mockReturnValueOnce({
+              from: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockReturnThis(),
+              single: jest.fn().mockReturnThis(),
+              data: {
+                db_info: {
+                  databases: [
+                    {
+                      schema_name: 'sakila',
+                      description: 'Sakila Database',
+                      tables: []
+                    }
+                  ]
+                }
+              }
+            } as any);
+
+            const result = await service.getSavedDbMetadata({
+              databaseServerID: '1234',
+              language: 'mysql'
+            });
+
+            expect(result).toEqual({
+              data: [
+                {
+                  database: 'sakila',
+                  description: 'Sakila Database'
+                }
+              ]
+            });
+          });
+        });
+      });
+    });
+  });
+
+  describe('should get saved table metadata', () => {
+    describe('JWT token branch', () => {
+      let spy: jest.SpyInstance;
+
+      beforeEach(() => {
+        spy = jest.spyOn(supabase, 'getClient');
+      });
+
+      afterEach(() => {
+        spy.mockRestore();
+      });
+
+      it('should return the correct error message when the jwt token is invalid', async () => {
+        spy.mockReturnValueOnce({
+          auth: {
+            getUser: jest
+              .fn()
+              .mockReturnValue({ data: undefined, error: 'error' })
+          }
+        } as any);
+
+        await service
+          .getSavedTableMetadata({
+            databaseServerID: '1234',
+            language: 'mysql',
+            database: 'sakila'
+          })
+          .catch((error) => {
+            expect(error).toEqual('error');
+          });
+      });
+
+      describe('org_id branch', () => {
+        beforeEach(() => {
+          spy.mockReturnValueOnce({
+            auth: {
+              getUser: jest
+                .fn()
+                .mockReturnValue({ data: { user: { id: 'user_id' } } })
+            }
+          } as any);
+        });
+
+        it('should return the correct error when there is an issue fetching the org_id', async () => {
+          spy.mockReturnValueOnce({
+            from: jest.fn().mockReturnThis(),
+            select: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockReturnThis(),
+            single: jest.fn().mockReturnThis(),
+            error: 'error'
+          } as any);
+
+          await service
+            .getSavedTableMetadata({
+              databaseServerID: '1234',
+              language: 'mysql',
+              database: 'sakila'
+            })
+            .catch((error) => {
+              expect(error).toEqual('error');
+            });
+        });
+
+        describe('metadata select branch', () => {
+          beforeEach(() => {
+            spy.mockReturnValueOnce({
+              from: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockReturnThis(),
+              single: jest.fn().mockReturnThis(),
+              data: { org_id: 'nice' }
+            } as any);
+          });
+
+          it('should return the correct error when there is an issue fetching the metadata', async () => {
+            spy.mockReturnValueOnce({
+              from: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockReturnThis(),
+              single: jest.fn().mockReturnThis(),
+              data: undefined,
+              error: 'error'
+            } as any);
+
+            await service
+              .getSavedTableMetadata({
+                databaseServerID: '1234',
+                language: 'mysql',
+                database: 'sakila'
+              })
+              .catch((error) => {
+                expect(error).toEqual('error');
+              });
+          });
+
+          it('should return the correct data when the metadata does not exist', async () => {
+            spy.mockReturnValueOnce({
+              from: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockReturnThis(),
+              single: jest.fn().mockReturnThis(),
+              data: { db_info: undefined }
+            } as any);
+
+            const result = await service.getSavedTableMetadata({
+              databaseServerID: '1234',
+              language: 'mysql',
+              database: 'sakila'
+            });
+
+            expect(result).toEqual({ data: [] });
+          });
+
+          it('should return the correct data when database metadata does not exist', async () => {
+            spy.mockReturnValueOnce({
+              from: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockReturnThis(),
+              single: jest.fn().mockReturnThis(),
+              data: { db_info: { databases: [] } }
+            } as any);
+
+            const result = await service.getSavedTableMetadata({
+              databaseServerID: '1234',
+              language: 'mysql',
+              database: 'sakila'
+            });
+
+            expect(result).toEqual({ data: [] });
+          });
+
+          it('should return the correct data when table metadata does not exist', async () => {
+            spy.mockReturnValueOnce({
+              from: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockReturnThis(),
+              single: jest.fn().mockReturnThis(),
+              data: {
+                db_info: {
+                  databases: [
+                    {
+                      schema_name: 'sakila',
+                      description: 'Sakila Database'
+                    }
+                  ]
+                }
+              }
+            } as any);
+
+            const result = await service.getSavedTableMetadata({
+              databaseServerID: '1234',
+              language: 'mysql',
+              database: 'sakila'
+            });
+
+            expect(result).toEqual({ data: [] });
+          });
+
+          it('should return the correct data when the metadata exists', async () => {
+            spy.mockReturnValueOnce({
+              from: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockReturnThis(),
+              single: jest.fn().mockReturnThis(),
+              data: {
+                db_info: {
+                  databases: [
+                    {
+                      schema_name: 'sakila',
+                      description: 'Sakila Database',
+                      tables: [
+                        { table_name: 'actor', description: 'Actor Table' }
+                      ]
+                    }
+                  ]
+                }
+              }
+            } as any);
+
+            const result = await service.getSavedTableMetadata({
+              databaseServerID: '1234',
+              language: 'mysql',
+              database: 'sakila'
+            });
+
+            expect(result).toEqual({
+              data: [{ table_name: 'actor', description: 'Actor Table' }]
+            });
+          });
+        });
+      });
+    });
+  });
+
+  describe('should get saved field metadata', () => {
+    describe('JWT token branch', () => {
+      let spy: jest.SpyInstance;
+
+      beforeEach(() => {
+        spy = jest.spyOn(supabase, 'getClient');
+      });
+
+      afterEach(() => {
+        spy.mockRestore();
+      });
+
+      it('should return the correct error message when the jwt token is invalid', async () => {
+        spy.mockReturnValueOnce({
+          auth: {
+            getUser: jest
+              .fn()
+              .mockReturnValue({ data: undefined, error: 'error' })
+          }
+        } as any);
+
+        await service
+          .getSavedFieldMetadata({
+            databaseServerID: '1234',
+            language: 'mysql',
+            database: 'sakila',
+            table: 'actor'
+          })
+          .catch((error) => {
+            expect(error).toEqual('error');
+          });
+      });
+
+      describe('org_id branch', () => {
+        beforeEach(() => {
+          spy.mockReturnValueOnce({
+            auth: {
+              getUser: jest
+                .fn()
+                .mockReturnValue({ data: { user: { id: 'user_id' } } })
+            }
+          } as any);
+        });
+
+        it('should return the correct error when there is an issue fetching the org_id', async () => {
+          spy.mockReturnValueOnce({
+            from: jest.fn().mockReturnThis(),
+            select: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockReturnThis(),
+            single: jest.fn().mockReturnThis(),
+            error: 'error'
+          } as any);
+
+          await service
+            .getSavedFieldMetadata({
+              databaseServerID: '1234',
+              language: 'mysql',
+              database: 'sakila',
+              table: 'actor'
+            })
+            .catch((error) => {
+              expect(error).toEqual('error');
+            });
+        });
+
+        describe('metadata select branch', () => {
+          beforeEach(() => {
+            spy.mockReturnValueOnce({
+              from: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockReturnThis(),
+              single: jest.fn().mockReturnThis(),
+              data: { org_id: 'nice' }
+            } as any);
+          });
+
+          it('should return the correct error when there is an issue fetching the metadata', async () => {
+            spy.mockReturnValueOnce({
+              from: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockReturnThis(),
+              single: jest.fn().mockReturnThis(),
+              data: undefined,
+              error: 'error'
+            } as any);
+
+            await service
+              .getSavedFieldMetadata({
+                databaseServerID: '1234',
+                language: 'mysql',
+                database: 'sakila',
+                table: 'actor'
+              })
+              .catch((error) => {
+                expect(error).toEqual('error');
+              });
+          });
+
+          it('should return the correct data when the metadata does not exist', async () => {
+            spy.mockReturnValueOnce({
+              from: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockReturnThis(),
+              single: jest.fn().mockReturnThis(),
+              data: { db_info: undefined }
+            } as any);
+
+            const result = await service.getSavedFieldMetadata({
+              databaseServerID: '1234',
+              language: 'mysql',
+              database: 'sakila',
+              table: 'actor'
+            });
+
+            expect(result).toEqual({ data: [] });
+          });
+
+          it('should return the correct data when databases array is empty', async () => {
+            spy.mockReturnValueOnce({
+              from: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockReturnThis(),
+              single: jest.fn().mockReturnThis(),
+              data: { db_info: { databases: [] } }
+            } as any);
+
+            const result = await service.getSavedFieldMetadata({
+              databaseServerID: '1234',
+              language: 'mysql',
+              database: 'sakila',
+              table: 'actor'
+            });
+
+            expect(result).toEqual({ data: [] });
+          });
+
+          it('should return the correct data when table metadata does not exist', async () => {
+            spy.mockReturnValueOnce({
+              from: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockReturnThis(),
+              single: jest.fn().mockReturnThis(),
+              data: {
+                db_info: {
+                  databases: [
+                    {
+                      schema_name: 'sakila',
+                      description: 'Sakila Database'
+                    }
+                  ]
+                }
+              }
+            } as any);
+
+            const result = await service.getSavedFieldMetadata({
+              databaseServerID: '1234',
+              language: 'mysql',
+              database: 'sakila',
+              table: 'actor'
+            });
+
+            expect(result).toEqual({ data: [] });
+          });
+
+          it('should return the correct data when table metadata is empty', async () => {
+            spy.mockReturnValueOnce({
+              from: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockReturnThis(),
+              single: jest.fn().mockReturnThis(),
+              data: {
+                db_info: {
+                  databases: [
+                    {
+                      schema_name: 'sakila',
+                      description: 'Sakila Database',
+                      tables: []
+                    }
+                  ]
+                }
+              }
+            } as any);
+
+            const result = await service.getSavedFieldMetadata({
+              databaseServerID: '1234',
+              language: 'mysql',
+              database: 'sakila',
+              table: 'actor'
+            });
+
+            expect(result).toEqual({ data: [] });
+          });
+
+          it('should return the correct data when fields metadata does not exist', async () => {
+            spy.mockReturnValueOnce({
+              from: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockReturnThis(),
+              single: jest.fn().mockReturnThis(),
+              data: {
+                db_info: {
+                  databases: [
+                    {
+                      schema_name: 'sakila',
+                      description: 'Sakila Database',
+                      tables: [
+                        { table_name: 'actor', description: 'Actor Table' }
+                      ]
+                    }
+                  ]
+                }
+              }
+            } as any);
+
+            const result = await service.getSavedFieldMetadata({
+              databaseServerID: '1234',
+              language: 'mysql',
+              database: 'sakila',
+              table: 'actor'
+            });
+
+            expect(result).toEqual({ data: [] });
+          });
+
+          it('should return the correct data when the metadata exists', async () => {
+            spy.mockReturnValueOnce({
+              from: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockReturnThis(),
+              single: jest.fn().mockReturnThis(),
+              data: {
+                db_info: {
+                  databases: [
+                    {
+                      schema_name: 'sakila',
+                      description: 'Sakila Database',
+                      tables: [
+                        {
+                          table_name: 'actor',
+                          fields: [
+                            {
+                              column_name: 'first_name',
+                              description: 'First Name'
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            } as any);
+
+            const result = await service.getSavedFieldMetadata({
+              databaseServerID: '1234',
+              language: 'mysql',
+              database: 'sakila',
+              table: 'actor'
+            });
+
+            expect(result).toEqual({
+              data: [{ name: 'first_name', description: 'First Name' }]
+            });
+          });
+        });
+      });
+    });
+  });
+
+  describe('should get saved foreign key metadata', () => {
+    describe('JWT token branch', () => {
+      let spy: jest.SpyInstance;
+
+      beforeEach(() => {
+        spy = jest.spyOn(supabase, 'getClient');
+      });
+
+      afterEach(() => {
+        spy.mockRestore();
+      });
+
+      it('should return the correct error message when the jwt token is invalid', async () => {
+        spy.mockReturnValueOnce({
+          auth: {
+            getUser: jest
+              .fn()
+              .mockReturnValue({ data: undefined, error: 'error' })
+          }
+        } as any);
+
+        await service
+          .getSavedForeignKeyMetadata({
+            databaseServerID: '1234',
+            language: 'mysql',
+            database: 'sakila',
+            table: 'actor'
+          })
+          .catch((error) => {
+            expect(error).toEqual('error');
+          });
+      });
+
+      describe('org_id branch', () => {
+        beforeEach(() => {
+          spy.mockReturnValueOnce({
+            auth: {
+              getUser: jest
+                .fn()
+                .mockReturnValue({ data: { user: { id: 'user_id' } } })
+            }
+          } as any);
+        });
+
+        it('should return the correct error when there is an issue fetching the org_id', async () => {
+          spy.mockReturnValueOnce({
+            from: jest.fn().mockReturnThis(),
+            select: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockReturnThis(),
+            single: jest.fn().mockReturnThis(),
+            error: 'error'
+          } as any);
+
+          await service
+            .getSavedForeignKeyMetadata({
+              databaseServerID: '1234',
+              language: 'mysql',
+              database: 'sakila',
+              table: 'actor'
+            })
+            .catch((error) => {
+              expect(error).toEqual('error');
+            });
+        });
+
+        describe('metadata select branch', () => {
+          beforeEach(() => {
+            spy.mockReturnValueOnce({
+              from: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockReturnThis(),
+              single: jest.fn().mockReturnThis(),
+              data: { org_id: 'nice' }
+            } as any);
+          });
+
+          it('should return the correct error when there is an issue fetching the metadata', async () => {
+            spy.mockReturnValueOnce({
+              from: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockReturnThis(),
+              single: jest.fn().mockReturnThis(),
+              data: undefined,
+              error: 'error'
+            } as any);
+
+            await service
+              .getSavedForeignKeyMetadata({
+                databaseServerID: '1234',
+                language: 'mysql',
+                database: 'sakila',
+                table: 'actor'
+              })
+              .catch((error) => {
+                expect(error).toEqual('error');
+              });
+          });
+
+          it('should return the correct data when the metadata does not exist', async () => {
+            spy.mockReturnValueOnce({
+              from: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockReturnThis(),
+              single: jest.fn().mockReturnThis(),
+              data: { db_info: undefined }
+            } as any);
+
+            const result = await service.getSavedForeignKeyMetadata({
+              databaseServerID: '1234',
+              language: 'mysql',
+              database: 'sakila',
+              table: 'actor'
+            });
+
+            expect(result).toEqual({ data: [] });
+          });
+
+          it('should return the correct data when databases array is empty', async () => {
+            spy.mockReturnValueOnce({
+              from: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockReturnThis(),
+              single: jest.fn().mockReturnThis(),
+              data: { db_info: { databases: [] } }
+            } as any);
+
+            const result = await service.getSavedForeignKeyMetadata({
+              databaseServerID: '1234',
+              language: 'mysql',
+              database: 'sakila',
+              table: 'actor'
+            });
+
+            expect(result).toEqual({ data: [] });
+          });
+
+          it('should return the correct data when table metadata does not exist', async () => {
+            spy.mockReturnValueOnce({
+              from: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockReturnThis(),
+              single: jest.fn().mockReturnThis(),
+              data: {
+                db_info: {
+                  databases: [
+                    {
+                      schema_name: 'sakila',
+                      description: 'Sakila Database'
+                    }
+                  ]
+                }
+              }
+            } as any);
+
+            const result = await service.getSavedForeignKeyMetadata({
+              databaseServerID: '1234',
+              language: 'mysql',
+              database: 'sakila',
+              table: 'actor'
+            });
+
+            expect(result).toEqual({ data: [] });
+          });
+
+          it('should return the correct data when table metadata is empty', async () => {
+            spy.mockReturnValueOnce({
+              from: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockReturnThis(),
+              single: jest.fn().mockReturnThis(),
+              data: {
+                db_info: {
+                  databases: [
+                    {
+                      schema_name: 'sakila',
+                      description: 'Sakila Database',
+                      tables: []
+                    }
+                  ]
+                }
+              }
+            } as any);
+
+            const result = await service.getSavedForeignKeyMetadata({
+              databaseServerID: '1234',
+              language: 'mysql',
+              database: 'sakila',
+              table: 'actor'
+            });
+
+            expect(result).toEqual({ data: [] });
+          });
+
+          it('should return the correct data when fields metadata does not exist', async () => {
+            spy.mockReturnValueOnce({
+              from: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockReturnThis(),
+              single: jest.fn().mockReturnThis(),
+              data: {
+                db_info: {
+                  databases: [
+                    {
+                      schema_name: 'sakila',
+                      description: 'Sakila Database',
+                      tables: [
+                        { table_name: 'actor', description: 'Actor Table' }
+                      ]
+                    }
+                  ]
+                }
+              }
+            } as any);
+
+            const result = await service.getSavedForeignKeyMetadata({
+              databaseServerID: '1234',
+              language: 'mysql',
+              database: 'sakila',
+              table: 'actor'
+            });
+
+            expect(result).toEqual({ data: [] });
+          });
+
+          it('should return the correct data when the metadata exists', async () => {
+            spy.mockReturnValueOnce({
+              from: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockReturnThis(),
+              single: jest.fn().mockReturnThis(),
+              data: {
+                db_info: {
+                  databases: [
+                    {
+                      schema_name: 'sakila',
+                      description: 'Sakila Database',
+                      tables: [
+                        {
+                          table_name: 'actor',
+                          foreign_keys: [
+                            {
+                              column_name: 'first_name',
+                              description: 'First Name'
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            } as any);
+
+            const result = await service.getSavedForeignKeyMetadata({
+              databaseServerID: '1234',
+              language: 'mysql',
+              database: 'sakila',
+              table: 'actor'
+            });
+
+            expect(result).toEqual({
+              data: [{ column_name: 'first_name', description: 'First Name' }]
+            });
+          });
+        });
+      });
+    });
+  });
+
+  describe('should get saved server summary metadata', () => {
+    describe('JWT token branch', () => {
+      let spy: jest.SpyInstance;
+
+      beforeEach(() => {
+        spy = jest.spyOn(supabase, 'getClient');
+      });
+
+      afterEach(() => {
+        spy.mockRestore();
+      });
+
+      it('should return the correct error message when the jwt token is invalid', async () => {
+        spy.mockReturnValueOnce({
+          auth: {
+            getUser: jest
+              .fn()
+              .mockReturnValue({ data: undefined, error: 'error' })
+          }
+        } as any);
+
+        await service
+          .getSavedServerSummaryMetadata({
+            databaseServerID: '1234',
+            language: 'mysql'
+          })
+          .catch((error) => {
+            expect(error).toEqual('error');
+          });
+      });
+
+      describe('org_id branch', () => {
+        beforeEach(() => {
+          spy.mockReturnValueOnce({
+            auth: {
+              getUser: jest
+                .fn()
+                .mockReturnValue({ data: { user: { id: 'user_id' } } })
+            }
+          } as any);
+        });
+
+        it('should return the correct error when there is an issue fetching the org_id', async () => {
+          spy.mockReturnValueOnce({
+            from: jest.fn().mockReturnThis(),
+            select: jest.fn().mockReturnThis(),
+            eq: jest.fn().mockReturnThis(),
+            single: jest.fn().mockReturnThis(),
+            error: 'error'
+          } as any);
+
+          await service
+            .getSavedServerSummaryMetadata({
+              databaseServerID: '1234',
+              language: 'mysql'
+            })
+            .catch((error) => {
+              expect(error).toEqual('error');
+            });
+        });
+
+        describe('metadata select branch', () => {
+          beforeEach(() => {
+            spy.mockReturnValueOnce({
+              from: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockReturnThis(),
+              single: jest.fn().mockReturnThis(),
+              data: { org_id: 'nice' }
+            } as any);
+          });
+
+          it('should return the correct error when there is an issue fetching the metadata', async () => {
+            spy.mockReturnValueOnce({
+              from: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockReturnThis(),
+              single: jest.fn().mockReturnThis(),
+              data: undefined,
+              error: 'error'
+            } as any);
+
+            await service
+              .getSavedServerSummaryMetadata({
+                databaseServerID: '1234',
+                language: 'mysql'
+              })
+              .catch((error) => {
+                expect(error).toEqual('error');
+              });
+          });
+
+          it('should return the correct data when the metadata does not exist', async () => {
+            spy.mockReturnValueOnce({
+              from: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockReturnThis(),
+              single: jest.fn().mockReturnThis(),
+              data: { db_info: undefined }
+            } as any);
+
+            const result = await service.getSavedServerSummaryMetadata({
+              databaseServerID: '1234',
+              language: 'mysql'
+            });
+
+            expect(result).toEqual({ data: [] });
+          });
+
+          it('should return the correct data when the metadata exists', async () => {
+            spy.mockReturnValueOnce({
+              from: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockReturnThis(),
+              single: jest.fn().mockReturnThis(),
+              data: {
+                db_info: {
+                  databases: [
+                    {
+                      schema_name: 'sakila',
+                      description: 'Sakila Database',
+                      tables: [
+                        {
+                          table_name: 'actor',
+                          description: 'Actor Table',
+                          fields: [
+                            {
+                              column_name: 'first_name',
+                              description: 'First Name'
+                            }
+                          ],
+                          foreign_keys: [{ column_name: 'first_name' }]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            } as any);
+
+            const result = await service.getSavedServerSummaryMetadata({
+              databaseServerID: '1234',
+              language: 'mysql'
+            });
+
+            expect(result).toEqual({
+              data: [
+                {
+                  schema_name: 'sakila',
+                  description: 'Sakila Database',
+                  tables: [
+                    {
+                      table_name: 'actor',
+                      description: 'Actor Table',
+                      fields: [
+                        { column_name: 'first_name', description: 'First Name' }
+                      ],
+                      foreign_keys: [{ column_name: 'first_name' }]
+                    }
+                  ]
+                }
+              ]
+            });
+          });
+        });
+      });
     });
   });
 });

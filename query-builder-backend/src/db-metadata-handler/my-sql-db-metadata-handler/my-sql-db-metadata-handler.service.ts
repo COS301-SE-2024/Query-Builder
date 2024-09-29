@@ -456,6 +456,20 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
                 // Add the new fields
                 existing_table.fields = new_table.fields;
               }
+              if(new_table.foreign_keys && existing_table.foreign_keys){
+                for (const new_fk of new_table.foreign_keys) {
+                  let existing_fk = existing_table.foreign_keys.find(
+                    (fk) => fk.column_name === new_fk.column_name
+                  );
+                  if (existing_fk) {
+                    // Update the existing foreign key
+                    existing_fk = new_fk;
+                  } else {
+                    // Add the new foreign key
+                    existing_table.foreign_keys.push(new_fk);
+                  }
+                }
+              }
             } else {
               // Add the new table
               existing_db.tables.push({
