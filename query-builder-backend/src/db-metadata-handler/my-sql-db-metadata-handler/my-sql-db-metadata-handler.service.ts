@@ -80,7 +80,19 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
       }
     };
 
-    return await this.queryHandlerService.queryDatabase(query, session);
+    const response = await this.queryHandlerService.queryDatabase(query, session);
+
+    const externalMetadata = await this.getSavedDbMetadata(databaseMetadataDto);
+
+    response.data.map((db) => {
+      externalMetadata.data.map((emDB) => {
+        if (db.database === emDB.database) {
+          db.description = emDB.description;
+        }
+      });
+    });
+
+    return response;
   }
 
   async getTableMetadata(
@@ -119,6 +131,16 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
       query,
       session
     );
+
+    const externalMetadata = await this.getSavedTableMetadata(tableMetadataDto);
+
+    response.data.map((table) => {
+      externalMetadata.data.map((emTable) => {
+        if (table.table_name === emTable.table_name) {
+          table.description = emTable.description;
+        }
+      });
+    });
 
     return response.data;
   }
@@ -165,7 +187,19 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
       }
     };
 
-    return await this.queryHandlerService.queryDatabase(query, session);
+    const response = await this.queryHandlerService.queryDatabase(query, session);
+
+    const externalMetadata = await this.getSavedFieldMetadata(fieldMetadataDto);
+
+    response.data.map((field) => {
+      externalMetadata.data.map(emField => {
+        if (field.name == emField.name) {
+          field.description = emField.description;
+        }
+      });
+    });
+
+    return response;
   }
 
   async getForeignKeyMetadata(
@@ -280,7 +314,15 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
       session
     );
 
-    return fromResponse.data.concat(toResponse.data);
+    const response = fromResponse.data.concat(toResponse.data);
+
+    const externalMetadata = await this.getSavedForeignKeyMetadata(foreignKeyMetadataDto);
+
+    externalMetadata.data.map((emFK) => {
+      response.push(emFK);
+    });
+
+    return response;
   }
 
   //optimised endpoint to get a summary of the entire database server's structure
