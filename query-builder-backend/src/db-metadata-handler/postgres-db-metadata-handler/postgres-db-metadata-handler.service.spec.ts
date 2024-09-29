@@ -50,7 +50,13 @@ describe('PostgresDbMetadataHandlerService', () => {
 
   it("should return the QueryHandlerService's results for databases metadata", async () => {
     testData = [{ database: 'sakila' }];
-
+    jest.spyOn(service, 'getSavedDbMetadata').mockReturnValueOnce(
+      Promise.resolve({
+        data:
+          [
+            { database: 'sakila', description: 'sakila database' }
+          ]
+      }));
     expect(
       await service.getDatabaseMetadata(
         { databaseServerID: '1234', language: 'postgresql' },
@@ -61,7 +67,15 @@ describe('PostgresDbMetadataHandlerService', () => {
 
   it("should return the QueryHandlerService's results.data for tables metadata", async () => {
     testData = [{ table_name: 'film' }];
-
+    jest.spyOn(service, 'getSavedTableMetadata').mockResolvedValueOnce(
+      Promise.resolve({
+        data: [
+          { table_name: 'film', description: 'Test Desc' },
+          { table_name: 'film_actor', description: 'joining table' }
+        ]
+      }
+      )
+    );
     expect(
       await service.getTableMetadata(
         {
@@ -76,7 +90,11 @@ describe('PostgresDbMetadataHandlerService', () => {
 
   it("should return the QueryHandlerService's results for fields metadata", async () => {
     testData = [{ column_name: 'first_name' }];
-
+    jest.spyOn(service, 'getSavedFieldMetadata').mockResolvedValueOnce(
+      Promise.resolve(
+        { data: [{ name: 'title', description: 'The movie title' }] }
+      )
+    );
     expect(
       await service.getFieldMetadata(
         {
@@ -92,7 +110,18 @@ describe('PostgresDbMetadataHandlerService', () => {
 
   it("should return the QueryHandlerService's results.data for foreign key metadata, for keys pointing away and to the table", async () => {
     testData = [{ column_name: 'first_name' }];
-
+    jest.spyOn(service, 'getSavedForeignKeyMetadata').mockResolvedValueOnce(
+      Promise.resolve({
+        data: [
+          {
+            table_name: 'film_actor',
+            column_name: 'film_id',
+            table_schema: 'sakila',
+            referenced_column_name: 'film_id'
+          }
+        ]
+      })
+    );
     expect(
       await service.getForeignKeyMetadata(
         {
