@@ -72,8 +72,6 @@ export default function NaturalLanguage() {
     }
   }, [interimResult, results, setValue, isStopped]);
 
-  if (error) return <p>Web Speech API is not available in this browser 🤷‍</p>;
-
   const getToken = async () => {
     const supabase = createClient();
     const token = (await supabase.auth.getSession()).data.session?.access_token;
@@ -158,9 +156,16 @@ export default function NaturalLanguage() {
     setIsStopped(true);
   };
 
+  useEffect(() => {
+    if (error) {
+      toast.error("Web Speech API is unavailable in your browser, but you can still type your query below.");
+    }
+  }, [error]);
+
   return (
     <>
       <Toaster/>
+      {/* {error && toast.error("Web Speech API is not available in this browser, you can still type the query you want...")} */}
       <Card className="h-[40vh]">
         <CardHeader>Type what you would like to query</CardHeader>
         <CardBody>
@@ -183,6 +188,7 @@ export default function NaturalLanguage() {
               onClick={isRecording ? handleStopRecording : handleStartRecording}
               color={isRecording ? 'danger' : 'primary'}
               className="absolute right-10 top-1/2 transform -translate-y-1/2 w-[40px] h-[40px] flex items-center justify-center rounded-full"
+              isDisabled={!!error}
             >
               <MdMic size={20} />
             </Button>
