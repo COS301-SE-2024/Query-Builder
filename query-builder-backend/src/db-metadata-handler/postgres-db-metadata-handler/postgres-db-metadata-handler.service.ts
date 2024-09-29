@@ -67,7 +67,7 @@ export class PostgresDbMetadataHandlerService extends DbMetadataHandlerService {
     };
 
 
-    const response =  await this.queryHandlerService.queryDatabase(query, session);
+    const response = await this.queryHandlerService.queryDatabase(query, session);
 
     const externalMetadata = await this.getSavedDbMetadata(databaseMetadataDto);
 
@@ -180,7 +180,7 @@ export class PostgresDbMetadataHandlerService extends DbMetadataHandlerService {
 
     response.data.map((field) => {
       externalMetadata.data.map((emField) => {
-        if(field.name === emField.name) {
+        if (field.name === emField.name) {
           field.description = emField.description;
         }
       });
@@ -313,7 +313,16 @@ export class PostgresDbMetadataHandlerService extends DbMetadataHandlerService {
       session
     );
 
-    return fromResponse.data.concat(toResponse.data);
+    const response = fromResponse.data.concat(toResponse.data);
+
+    const externalMetadata = await this.getSavedForeignKeyMetadata(foreignKeyMetadataDto);
+
+    externalMetadata.data.map((emFK) => {
+      response.push(emFK);
+    });
+
+    return response;
+
   }
 
   async getServerSummary(

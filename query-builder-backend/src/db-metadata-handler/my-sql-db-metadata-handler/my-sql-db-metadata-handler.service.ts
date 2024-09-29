@@ -80,8 +80,6 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
       }
     };
 
-    // TODO - Do I need to add anything to check if the responses are valid?
-
     const response = await this.queryHandlerService.queryDatabase(query, session);
 
     const externalMetadata = await this.getSavedDbMetadata(databaseMetadataDto);
@@ -138,8 +136,7 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
 
     response.data.map((table) => {
       externalMetadata.data.map((emTable) => {
-        if(table.table_name === emTable.table_name)
-        {
+        if (table.table_name === emTable.table_name) {
           table.description = emTable.description;
         }
       });
@@ -194,11 +191,9 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
 
     const externalMetadata = await this.getSavedFieldMetadata(fieldMetadataDto);
 
-    response.data.map((field) =>
-    {
+    response.data.map((field) => {
       externalMetadata.data.map(emField => {
-        if(field.name == emField.name)
-        {
+        if (field.name == emField.name) {
           field.description = emField.description;
         }
       });
@@ -319,7 +314,15 @@ export class MySqlDbMetadataHandlerService extends DbMetadataHandlerService {
       session
     );
 
-    return fromResponse.data.concat(toResponse.data);
+    const response = fromResponse.data.concat(toResponse.data);
+
+    const externalMetadata = await this.getSavedForeignKeyMetadata(foreignKeyMetadataDto);
+
+    externalMetadata.data.map((emFK) => {
+      response.push(emFK);
+    });
+
+    return response;
   }
 
   //optimised endpoint to get a summary of the entire database server's structure
