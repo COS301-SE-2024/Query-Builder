@@ -3,7 +3,7 @@ import { MySqlDbMetadataHandlerService } from './my-sql-db-metadata-handler.serv
 import { Supabase } from '../../supabase/supabase';
 import { QueryHandlerModule } from '../../query-handler/query-handler.module';
 import { SupabaseModule } from '../../supabase/supabase.module';
-import { Query } from '../../../dist/interfaces/intermediateJSON';
+import { Query } from '../../interfaces/dto/query.dto';
 
 jest.mock('../../supabase/supabase.ts', () => ({
   Supabase: jest.fn().mockImplementation(() => ({
