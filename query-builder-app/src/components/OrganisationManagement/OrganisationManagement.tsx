@@ -5,6 +5,7 @@ import React, { useState, useEffect } from "react";
 import { AvatarIcon, Button, Checkbox, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Image, Spacer, Card, CardBody, CardHeader, Input, Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, User, Chip, Tooltip, getKeyValue } from "@nextui-org/react";
 import { createClient } from "./../../utils/supabase/client";
 import { DeleteIcon } from "./DeleteIcon";
+import { GroupIcon } from "./GroupIcon";
 import { useParams } from 'next/navigation'
 import EditUserModal from "./EditUserModal";
 import { EditIcon } from "./EditIcon";
@@ -551,9 +552,9 @@ export default function OrganisationManagement() {
         if (hasAdminPermission) {
             let editControls = (<>
               <Tooltip content="Edit database access">
-                <span className="text-lg text-default-400 h-5 w-5 flex justify-center mt-1 cursor-pointer active:opacity-50">
+                <span className="text-lg text-default-400 flex justify-center mt-1 cursor-pointer active:opacity-50">
                   {/* <EditUserModal org_id={orgServerID} user_id={user.profiles.user_id} on_add={getMembers} /> */}
-                  <EditIcon onClick={async () => {
+                  <GroupIcon onClick={async () => {
                     const members = await getDBAccessMembers(db.db_id); // Fetch members
                     setDatabaseName(db.name);
                     setSelectedUsers(members);
