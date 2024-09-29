@@ -64,18 +64,18 @@ const DEFAULT_PROFILE_IMAGE = "https://via.placeholder.com/150/cccccc/FFFFFF?tex
 
 async function getDBAccessMembers(db_id: string) {
   let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/get-dbaccess-members`, {
-      credentials: "include",
-      method: "PUT",
-      headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + await getToken()
-      },
-      body: JSON.stringify({ db_id })
+    credentials: "include",
+    method: "PUT",
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + await getToken()
+    },
+    body: JSON.stringify({ db_id })
   });
 
   if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+    throw new Error(`HTTP error! Status: ${response.status}`);
   }
 
   let json = (await response.json()).data;
@@ -108,153 +108,153 @@ export default function OrganisationManagement() {
   const { isOpen: isDeleteDBOpen, onOpen: onDeleteDBOpen, onOpenChange: onDeleteDBOpenChange } = useDisclosure();
   const { isOpen: isDBAccessOpen, onOpen: onDBAccessOpen, onOpenChange: onDBAccessOpenChange } = useDisclosure(); // For the db access modal
 
-  const handleCheckboxChange = async (dbID:string, user: User, isChecked: boolean) => {
-      if (isChecked) {
-          // Add the user object to the checkedUsers if it's checked
-          try {
-            let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/give-db-access`, {
-              method: "POST",
-              headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + await getToken(),
-              },
-              body: JSON.stringify({ user_id: user.user_id, db_id: dbID, org_id: orgServerID, }),
-            });
-            
-            
-            if (!response.ok) {
-              // console.log("YOURR ERROR " + (response.status) + " " + (response.statusText);
-              if (response.status === 401) {
-                toast.error("You are not authorized to update database access for a member!");
-                return;
-              }
-              else {
-                toast.error("Failed to update database access for a member. \nPlease try again!");
-                return;
-              }
-            } else {
-              toast.success("Successfully granted database access");
-            }
-      
-          } catch (error) {
-            toast.error("Unexpected error while trying to give member database access!");
-          }
-      } else {
-          // Remove the user object from checkedUsers if it's unchecked
-          try {
-            let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/remove-db-access`, {
-              method: "DELETE",
-              headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + await getToken(),
-              },
-              body: JSON.stringify({ user_id: user.user_id, db_id: dbID, org_id: orgServerID, }),
-            });
-            
-            
-            if (!response.ok) {
-              // console.log("YOURR ERROR " + (response.status) + " " + (response.statusText);
-              if (response.status === 401) {
-                toast.error("You are not authorized to update database access for a member!");
-                return;
-              }
-              else {
-                toast.error("Failed to update database access for a member. \nPlease try again!");
-                return;
-              }
-            } else {
-              toast.success("Successfully revoked database access");
-            }
-      
-          } catch (error) {
-            toast.error("Unexpected error while trying to give member database access!");
-          }
-      }
+  const handleCheckboxChange = async (dbID: string, user: User, isChecked: boolean) => {
+    if (isChecked) {
+      // Add the user object to the checkedUsers if it's checked
+      try {
+        let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/give-db-access`, {
+          method: "POST",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + await getToken(),
+          },
+          body: JSON.stringify({ user_id: user.user_id, db_id: dbID, org_id: orgServerID, }),
+        });
 
-      const members = await getDBAccessMembers(dbID); // Fetch members
-      setSelectedUsers(members);
+
+        if (!response.ok) {
+          // console.log("YOURR ERROR " + (response.status) + " " + (response.statusText);
+          if (response.status === 401) {
+            toast.error("You are not authorized to update database access for a member!");
+            return;
+          }
+          else {
+            toast.error("Failed to update database access for a member. \nPlease try again!");
+            return;
+          }
+        } else {
+          toast.success("Successfully granted database access");
+        }
+
+      } catch (error) {
+        toast.error("Unexpected error while trying to give member database access!");
+      }
+    } else {
+      // Remove the user object from checkedUsers if it's unchecked
+      try {
+        let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/remove-db-access`, {
+          method: "DELETE",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + await getToken(),
+          },
+          body: JSON.stringify({ user_id: user.user_id, db_id: dbID, org_id: orgServerID, }),
+        });
+
+
+        if (!response.ok) {
+          // console.log("YOURR ERROR " + (response.status) + " " + (response.statusText);
+          if (response.status === 401) {
+            toast.error("You are not authorized to update database access for a member!");
+            return;
+          }
+          else {
+            toast.error("Failed to update database access for a member. \nPlease try again!");
+            return;
+          }
+        } else {
+          toast.success("Successfully revoked database access");
+        }
+
+      } catch (error) {
+        toast.error("Unexpected error while trying to give member database access!");
+      }
+    }
+
+    const members = await getDBAccessMembers(dbID); // Fetch members
+    setSelectedUsers(members);
   };
-  
+
   async function queryDatabaseServer(databaseServerID: string) {
 
     //first determine whether the user already has an active connection to the database server
     let hasActiveConnectionResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/has-active-connection`, {
-        credentials: "include",
-        method: "POST",
-        headers: {
+      credentials: "include",
+      method: "POST",
+      headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + await getToken()
-        },
-        body: JSON.stringify({
-            databaseServerID: databaseServerID
-        })
+      },
+      body: JSON.stringify({
+        databaseServerID: databaseServerID
+      })
     });
 
     const hasActiveConnection = (await hasActiveConnectionResponse.json()).hasActiveConnection;
 
     //if the user has an active connection to the database server, navigate straight to the form
-    if(hasActiveConnection === true){
-        navigateToForm(databaseServerID);
+    if (hasActiveConnection === true) {
+      navigateToForm(databaseServerID);
     }
     //otherwise proceed to open a connection to the database server
-    else{
+    else {
 
-        //determine whether the user has db secrets saved for the database server
-        let dbSecretsSavedResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/has-saved-db-credentials`, {
-            credentials: "include",
-            method: "POST",
-            headers: {
+      //determine whether the user has db secrets saved for the database server
+      let dbSecretsSavedResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/has-saved-db-credentials`, {
+        credentials: "include",
+        method: "POST",
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + await getToken()
+        },
+        body: JSON.stringify({
+          db_id: databaseServerID
+        })
+      });
+
+      const dbSecretsSaved = (await dbSecretsSavedResponse.json()).saved_db_credentials;
+
+      //if the user doesn't have db credentials saved for that database, then prompt them for their credentials
+      if (dbSecretsSaved === false) {
+        credentialsModalDisclosure.onOpen();
+        setCurrentDBServerID(databaseServerID);
+      }
+      else {
+
+        //attempt a connection to the database, using saved credentials
+        //call the api/connect endpoint, and exclude databaseServerCredentials
+        let connectionResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/connect`, {
+          credentials: "include",
+          method: "PUT",
+          headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + await getToken()
-            },
-            body: JSON.stringify({
-                db_id: databaseServerID
-            })
+          },
+          body: JSON.stringify({
+            databaseServerID: databaseServerID
+          })
         });
 
-        const dbSecretsSaved = (await dbSecretsSavedResponse.json()).saved_db_credentials;
+        let json = await connectionResponse.json();
 
-        //if the user doesn't have db credentials saved for that database, then prompt them for their credentials
-        if(dbSecretsSaved === false){
-            credentialsModalDisclosure.onOpen();
-            setCurrentDBServerID(databaseServerID);
+        //if connection was successful, navigate to the form
+        if (connectionResponse.ok === true && json.success === true) {
+          navigateToForm(databaseServerID);
         }
-        else{
-
-            //attempt a connection to the database, using saved credentials
-            //call the api/connect endpoint, and exclude databaseServerCredentials
-            let connectionResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/connect`, {
-                credentials: "include",
-                method: "PUT",
-                headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + await getToken()
-                },
-                body: JSON.stringify({
-                    databaseServerID: databaseServerID
-                })
-            });
-
-            let json = await connectionResponse.json();
-
-            //if connection was successful, navigate to the form
-            if(connectionResponse.ok === true && json.success === true){
-                navigateToForm(databaseServerID);
-            }
-            //if the connection was not successful, display an appropriate error message
-            else if(connectionResponse.ok === false && json.response && json.response.message){
-                toast.error(json.response.message);
-            }
-            else{
-                toast.error("Something went wrong. Please try again");
-            }
-
+        //if the connection was not successful, display an appropriate error message
+        else if (connectionResponse.ok === false && json.response && json.response.message) {
+          toast.error(json.response.message);
         }
+        else {
+          toast.error("Something went wrong. Please try again");
+        }
+
+      }
 
     }
   }
@@ -286,7 +286,7 @@ export default function OrganisationManagement() {
       }
 
       let membersData = ((await response.json()).data);
-      // console.log(membersData);
+      console.log(membersData);
       setOrgMembers(membersData);
 
       getUser().then((user) => {
@@ -346,7 +346,7 @@ export default function OrganisationManagement() {
     try {
       getMembers();
     } catch (error) {
-      if(error instanceof Error) {
+      if (error instanceof Error) {
         toast.error(error.message);
       }
       else if (error) {
@@ -367,16 +367,16 @@ export default function OrganisationManagement() {
     };
 
     if (updateOrgName === initialOrgName && profilePicURL === initialOrgLogo) {
-      // console.log("No Updates")
+      console.log("No Updates")
       return;
     }
 
     if (updateOrgName != initialOrgName) {
-      if(updateOrgName == ''){
+      if (updateOrgName == '') {
         setUpdateOrgName(initialOrgName);
         updatedDetails.name = initialOrgName;
       }
-      else{
+      else {
         updatedDetails.name = updateOrgName;
       }
     }
@@ -384,7 +384,7 @@ export default function OrganisationManagement() {
     if (profilePicURL != initialOrgLogo) {
       updatedDetails.logo = profilePicURL;
     }
-    // console.log(updatedDetails);
+    console.log(updatedDetails);
 
     let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/org-management/update-org`, {
       method: "PATCH",
@@ -395,7 +395,7 @@ export default function OrganisationManagement() {
       },
       body: JSON.stringify(updatedDetails)
     });
-    // console.log(response);
+    console.log(response);
     if (response.status === 200 || response.status === 201) {
       setInitialOrgName(updateOrgName);
       setInitialOrgLogo(profilePicURL);
@@ -471,7 +471,7 @@ export default function OrganisationManagement() {
       },
       body: JSON.stringify({ org_id: orgServerID, user_id: userId })
     })
-    // console.log(response);
+    console.log(response);
     getMembers();
   }
 
@@ -538,56 +538,56 @@ export default function OrganisationManagement() {
   }, [hasAdminPermission, orgMembers]);
 
   const filteredUsers = selectedUsers.filter(user =>
-      user.full_name.toLowerCase().includes(searchTerm.toLowerCase())
+    user.full_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const renderDBCell = React.useCallback((db: any, columnKey: any) => {
     switch (columnKey) {
       case "name":
         return (
-          <Link  href="" onClick={() => {queryDatabaseServer(db.db_id)}}>{db.name}</Link>
+          <Link href="" onClick={() => { queryDatabaseServer(db.db_id) }}>{db.name}</Link>
         );
       case "actions":
         if (hasAdminPermission) {
-            let editControls = (<>
-              <Tooltip content="Edit database access">
-                <span className="text-lg text-default-400 h-5 w-5 flex justify-center mt-1 cursor-pointer active:opacity-50">
-                  {/* <EditUserModal org_id={orgServerID} user_id={user.profiles.user_id} on_add={getMembers} /> */}
-                  <EditIcon onClick={async () => {
-                    const members = await getDBAccessMembers(db.db_id); // Fetch members
-                    setDatabaseName(db.name);
-                    setSelectedUsers(members);
-                    setdbAccessID(db.db_id);
-                    onDBAccessOpen();
-                  }}/>
-                </span>
-              </Tooltip>
-              <Tooltip color="danger" content="Delete database">
-                <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                  <DeleteIcon onClick={() => {
-                    setDatabaseName(db.name);
-                    setDeleteDatabaseID(db.db_id);
-                    onDeleteDBOpen();
-                  }
-                    // deleteDatabaseFromOrg(db.db_id)
-                  }/>
-                </span>
-              </Tooltip>
-              <Tooltip content="Edit database metadata">
-                <span className="text-lg cursor-pointer active:opacity-50">
-                  <MetaDataHandler db_id={db.db_id} org_id={orgServerID} on_add={()=>{}}/>
-                </span>
-              </Tooltip>
-              
-              {/* TO DO: EDIT DATABASE METADATA */}
+          let editControls = (<>
+            <Tooltip content="Edit database access">
+              <span className="text-lg text-default-400 h-5 w-5 flex justify-center mt-1 cursor-pointer active:opacity-50">
+                {/* <EditUserModal org_id={orgServerID} user_id={user.profiles.user_id} on_add={getMembers} /> */}
+                <EditIcon onClick={async () => {
+                  const members = await getDBAccessMembers(db.db_id); // Fetch members
+                  setDatabaseName(db.name);
+                  setSelectedUsers(members);
+                  setdbAccessID(db.db_id);
+                  onDBAccessOpen();
+                }} />
+              </span>
+            </Tooltip>
+            <Tooltip color="danger" content="Delete database">
+              <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                <DeleteIcon onClick={() => {
+                  setDatabaseName(db.name);
+                  setDeleteDatabaseID(db.db_id);
+                  onDeleteDBOpen();
+                }
+                  // deleteDatabaseFromOrg(db.db_id)
+                } />
+              </span>
+            </Tooltip>
+            <Tooltip content="Edit database metadata">
+              <span className="text-lg cursor-pointer active:opacity-50">
+                <MetaDataHandler db_id={db.db_id} org_id={orgServerID} on_add={() => { }} />
+              </span>
+            </Tooltip>
 
-            </>
-            );
-            return (
-              <div className="relative flex items-center gap-2">
-                {editControls}
-              </div>
-            );
+            {/* TO DO: EDIT DATABASE METADATA */}
+
+          </>
+          );
+          return (
+            <div className="relative flex items-center gap-2">
+              {editControls}
+            </div>
+          );
         }
         else {
           return (<></>);
@@ -616,17 +616,17 @@ export default function OrganisationManagement() {
               />
 
               <div className="flex flex-col justify-end absolute bottom-0">
-              <Tooltip content="Upload new logo">
-                <label className="custom-file-upload bg-white p-1 border-2 border-slate-600 rounded-full hover:bg-">
-                  <input
-                    data-testid="file-input"
-                    type="file"
-                    accept=".jpg,.jpeg,.png"
-                    onInput={(event) => handleProfilePicChange(event)}
-                  />
-                  <EditIcon className="cursor-pointer" />
-                </label>
-              </Tooltip>
+                <Tooltip content="Upload new logo">
+                  <label className="custom-file-upload bg-white p-1 border-2 border-slate-600 rounded-full hover:bg-">
+                    <input
+                      data-testid="file-input"
+                      type="file"
+                      accept=".jpg,.jpeg,.png"
+                      onInput={(event) => handleProfilePicChange(event)}
+                    />
+                    <EditIcon className="cursor-pointer" />
+                  </label>
+                </Tooltip>
               </div>
             </div>
             <Spacer y={2} />
@@ -874,7 +874,7 @@ export default function OrganisationManagement() {
       hashCode = (await response.json()).data[0].hash;
       try {
         await navigator.clipboard.writeText(hashCode);
-        // console.log('Content copied to clipboard');
+        console.log('Content copied to clipboard');
       } catch (err) {
         console.error('Failed to copy: ', err);
 
@@ -950,7 +950,7 @@ export default function OrganisationManagement() {
         body: formData
       }).then(async (response) => {
         let data = (await response.json());
-        // console.log(data);
+        console.log(data);
         setProfilePicURL(data.publicUrl);
       }).then(async () => {
         await updateQuery();
@@ -964,7 +964,7 @@ export default function OrganisationManagement() {
       <div className="flex w-full flex-col">
         <Spacer y={2} />
         <div className="flex w-full flex-col">
-          <div className="organisationHeader m-auto mt-0 mb-0 flex flex-col justify-center content-center ">
+          <div className="organisationHeader m-auto mt-0 mb-0 flex flex-col items-center">
             <Image
               className="orgLogo md:rounded-1"
               // width={200}
@@ -974,7 +974,7 @@ export default function OrganisationManagement() {
               src={profilePicURL}
             />
             <Spacer y={2} />
-            <span className="m-auto justify-center content-center text-2xl ">{initialOrgName}</span>
+            <span className="text-center text-2xl">{initialOrgName}</span>
           </div>
           <Spacer y={2} />
           {renderJoinOrgHash()}
@@ -1031,29 +1031,29 @@ export default function OrganisationManagement() {
               <CardBody>
                 {errorGetMembers == "" ?
                   (<>
-                    <DatabaseCredentialsModal dbServerID={currentDBServerID} disclosure={credentialsModalDisclosure} onConnected={() => {navigateToForm(currentDBServerID)}}/>
+                    <DatabaseCredentialsModal dbServerID={currentDBServerID} disclosure={credentialsModalDisclosure} onConnected={() => { navigateToForm(currentDBServerID) }} />
                     {organisations ? organisations.map((org: Organisation) => (
                       <>
-                          <Table aria-label="Organisation Database Table">
-                            <TableHeader columns={databaseColumns}>
-                              {(column) => (
-                                <TableColumn key={column.uid}>
-                                  {column.name}
-                                </TableColumn>
-                              )}
-                            </TableHeader>
-                            <TableBody>
-                               {org.db_envs.map((db: Database) => 
-                                      (
-                                      <TableRow key={db.db_id}>
-                                          {(columnKey) => <TableCell>{renderDBCell(db, columnKey)}</TableCell>}
-                                      </TableRow>
-                                      )
-                                )}
-                            </TableBody>
-                          </Table>
+                        <Table aria-label="Organisation Database Table">
+                          <TableHeader columns={databaseColumns}>
+                            {(column) => (
+                              <TableColumn key={column.uid}>
+                                {column.name}
+                              </TableColumn>
+                            )}
+                          </TableHeader>
+                          <TableBody>
+                            {org.db_envs.map((db: Database) =>
+                            (
+                              <TableRow key={db.db_id}>
+                                {(columnKey) => <TableCell>{renderDBCell(db, columnKey)}</TableCell>}
+                              </TableRow>
+                            )
+                            )}
+                          </TableBody>
+                        </Table>
                       </>
-                  )): <></>}
+                    )) : <></>}
                   </>) : (
                     <>
                       <div className="m-4 flex flex-row text-center">{errorGetMembers}</div>
@@ -1061,59 +1061,59 @@ export default function OrganisationManagement() {
                   )}
                 {/* TODO: Get end point to only show available databases in the organisation */}
                 <Modal isOpen={isDBAccessOpen} onOpenChange={onDBAccessOpenChange}>
-                    <ModalContent>
-                        {(onClose) => (
-                            <>
-                                <ModalHeader className="flex justify-between items-center">
-                                    <h2 className="font-semibold"> Database Access </h2>
-                                </ModalHeader>
-                                <ModalBody>
-                                    {/* List of users in org */}
-                                    <h2 className="text-lg font-semibold mb-2">Edit database access for the members of the organisation</h2>
-                                    {/* Search bar for filtering users */}
-                                    <Input
-                                        placeholder="Search Users..."
-                                        className="mb-2 z-[100]"
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
-                                    />
-                                    <div className="max-h-[200px] overflow-y-auto">
-                                        {filteredUsers.length > 0 ? (
-                                            filteredUsers.map((selectedUsers) => (
-                                              <Tooltip key={selectedUsers.user_id} className="mb-2 ml-3" content= {selectedUsers.access ? "Revoke Access" : "Grant access"}>
-                                                <Checkbox
-                                                    key={selectedUsers.user_id}
-                                                    className="flex items-center space-x-2 mb-2"
-                                                    isSelected = {selectedUsers.access}
-                                                    onChange={(e) => handleCheckboxChange(dbAccessID,selectedUsers, e.target.checked)} // Update the checkbox based on user selection
-                                                >
-                                                    <div className="flex items-center space-x-2">
-                                                        <img
-                                                            src={selectedUsers.profile_photo || DEFAULT_PROFILE_IMAGE}
-                                                            alt={`${selectedUsers.full_name}'s profile`}
-                                                            className="h-8 w-8 rounded-full"
-                                                        />
-                                                        <span className="text-sm">{selectedUsers.full_name}</span>
-                                                    </div>
-                                                </Checkbox>
-                                              </Tooltip>
-                                            ))
-                                        ) : (
-                                            <p className="text-sm text-gray-500">No users found.</p>
-                                        )}
+                  <ModalContent>
+                    {(onClose) => (
+                      <>
+                        <ModalHeader className="flex justify-between items-center">
+                          <h2 className="font-semibold"> Database Access </h2>
+                        </ModalHeader>
+                        <ModalBody>
+                          {/* List of users in org */}
+                          <h2 className="text-lg font-semibold mb-2">Edit database access for the members of the organisation</h2>
+                          {/* Search bar for filtering users */}
+                          <Input
+                            placeholder="Search Users..."
+                            className="mb-2 z-[100]"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                          />
+                          <div className="max-h-[200px] overflow-y-auto">
+                            {filteredUsers.length > 0 ? (
+                              filteredUsers.map((selectedUsers) => (
+                                <Tooltip key={selectedUsers.user_id} className="mb-2 ml-3" content={selectedUsers.access ? "Revoke Access" : "Grant access"}>
+                                  <Checkbox
+                                    key={selectedUsers.user_id}
+                                    className="flex items-center space-x-2 mb-2"
+                                    isSelected={selectedUsers.access}
+                                    onChange={(e) => handleCheckboxChange(dbAccessID, selectedUsers, e.target.checked)} // Update the checkbox based on user selection
+                                  >
+                                    <div className="flex items-center space-x-2">
+                                      <img
+                                        src={selectedUsers.profile_photo || DEFAULT_PROFILE_IMAGE}
+                                        alt={`${selectedUsers.full_name}'s profile`}
+                                        className="h-8 w-8 rounded-full"
+                                      />
+                                      <span className="text-sm">{selectedUsers.full_name}</span>
                                     </div>
-                                </ModalBody>
-                                <ModalFooter>
-                                    <div className="mt-4 flex justify-center w-full">
-                                        <Button color="primary" className="w-full max-w-xs items-center" onClick={onClose}>
-                                          Cancel
-                                        </Button>
-                                    </div>
+                                  </Checkbox>
+                                </Tooltip>
+                              ))
+                            ) : (
+                              <p className="text-sm text-gray-500">No users found.</p>
+                            )}
+                          </div>
+                        </ModalBody>
+                        <ModalFooter>
+                          <div className="mt-4 flex justify-center w-full">
+                            <Button color="primary" className="w-full max-w-xs items-center" onClick={onClose}>
+                              Cancel
+                            </Button>
+                          </div>
 
-                                </ModalFooter>
-                            </>
-                        )}
-                    </ModalContent>
+                        </ModalFooter>
+                      </>
+                    )}
+                  </ModalContent>
                 </Modal>
                 <Modal isOpen={isDeleteDBOpen} onOpenChange={onDeleteDBOpenChange} >
                   <ModalContent>
@@ -1137,7 +1137,7 @@ export default function OrganisationManagement() {
                             type="button"
                             onClick={() => deleteDatabaseFromOrg(deleteDatabaseID)}
                           >
-                              Delete
+                            Delete
                           </Button>
                         </ModalFooter>
                       </>
