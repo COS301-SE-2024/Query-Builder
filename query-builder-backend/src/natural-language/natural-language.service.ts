@@ -61,15 +61,15 @@ export class NaturalLanguageService {
         
         if (open_ai_result.query && gemini_result.query) {
           // this.my_logger.log('Both queries returned a query');
-          console.log("both succeeded, returning OpenAI");
+          // console.log("both succeeded, returning OpenAI");
           return open_ai_result.query; // or gemini_result.query, based on your preference
         } else if (open_ai_result.query) {
           // this.my_logger.log('Only openAI query returned a query');
-          console.log("returning openAI");
+          // console.log("returning openAI");
           return open_ai_result.query;
         } else if (gemini_result.query) {
           // this.my_logger.log('Only gemini query returned a query');
-          console.log("returning Gemini");
+          // console.log("returning Gemini");
           return gemini_result.query;
         } else {
           throw new InternalServerErrorException(
@@ -91,7 +91,7 @@ export class NaturalLanguageService {
     try {
       //-----------Fetch DB metadata to inform the LLM of the database server's structure-----------//
 
-      console.log("starting openAI");
+      // console.log("starting openAI");
 
       const metadataSummary =
         await this.dbMetadataHandlerService.getServerSummary(
@@ -198,7 +198,7 @@ export class NaturalLanguageService {
         .replace(/```/g, '') // Remove code block markers
         .replace(/(: |:)undefined/g, ': null'); // Replace undefined with null
 
-      console.log("finishing openAI");
+      // console.log("finishing openAI");
 
       let jsonResponse;
       try {
@@ -214,7 +214,7 @@ export class NaturalLanguageService {
 
       jsonResponse = this.removeEmpty(jsonResponse);
 
-      console.log("OpenAI " + JSON.stringify(jsonResponse));
+      // console.log("OpenAI " + JSON.stringify(jsonResponse));
 
       await this.validate_QueryParams_DTO(jsonResponse);
 
@@ -238,7 +238,7 @@ export class NaturalLanguageService {
     session: Record<string, any>
   ) {
     try {
-      console.log("starting Gemini");
+      // console.log("starting Gemini");
       //-----------Fetch DB metadata to inform the LLM of the database server's structure-----------//
       const metadataSummary =
         await this.dbMetadataHandlerService.getServerSummary(
@@ -454,7 +454,7 @@ export class NaturalLanguageService {
         .replace(/(: |:)undefined/g, ': null') // Replace undefined with null
         .replace(/(\r\n|\n|\r)/gm, ''); // Remove newlines
 
-        console.log("finishing gemini");
+        // console.log("finishing gemini");
 
       let jsonResponse;
       try {
@@ -470,7 +470,7 @@ export class NaturalLanguageService {
 
       jsonResponse = this.removeEmpty(jsonResponse);
 
-      console.log("GEMINI " + JSON.stringify(jsonResponse));
+      // console.log("GEMINI " + JSON.stringify(jsonResponse));
 
       await this.validate_QueryParams_DTO(jsonResponse);
 
