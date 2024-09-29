@@ -383,7 +383,6 @@ export default function Form() {
                     </div>
                   </Tooltip>
                 </div>
-                <SaveQueryModal query={query} />
                 <Button
                   color="primary"
                   onClick={() => {
@@ -406,7 +405,7 @@ export default function Form() {
                 >
                   Clear Form
                 </Button>
-                {/* {JSON.stringify(getMergedQuery(), null, 2)}  */}
+                {query.queryParams.table.columns.length > 0 && (<SaveQueryModal query={query} />)}
               </div>
               <Modal
                 isOpen={isOpen}
