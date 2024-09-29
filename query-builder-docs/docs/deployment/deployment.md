@@ -1,5 +1,5 @@
 ---
-sidebar_position: 1
+sidebar_position: 8
 title: Deployment
 description: Deployment documentation for QBee
 ---
