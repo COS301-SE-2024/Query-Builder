@@ -164,26 +164,61 @@ QBee is the ultimate tool for modern database management and analysis.
 <br><br><br>
 
 
-## Local Setup
-Clone the repo
-```shell
+## Running the App
+The application is available at our website, however, if you want to host it youself, there are two ways.
+> **Note:** In both cases, a .env file is needed for the backend and a .env.production is necessary on the frontend when running with Docker, or a .env.local file is needed when running from source.
+> A Supabase project is also necessary. If you have any queries, contact us at ctrlaltelitesdevs@gmail.com
+
+Initially, run the following command to clone the repository:
+```bash
 git clone https://github.com/COS301-SE-2024/Query-Builder.git
 ```
 
+### Running with Docker
+This is the recommended way to run the application.
+
+From the base directory, run the following:
+```shell
+docker compose up --detach
+```
+
+The Next.js application can then be accessed at [localhost:3000] and the NestJS backend can be accessed at [localhost:3001].
+
+### Running from source
+
+> **Note:** You will have to host a redis server, this can be done by running `sudo apt install redis-server`, assuming you are using a debian based system. To run the server, run `redis-server`.
+
 Install dependencies
 ```shell
-pnpm run install-deps
+cd query-builder-app
+pnpm i
+cd ../query-builder-backend
+pnpm i
 ```
 
-Run the app locally
+Run the app locally (run the following command within the query-builder-app directory)
+1. Build the app - this only has to be done once.
 ```shell
-pnpm run app-start
+pnpm build
+```
+2. Start the app - this can be rerun multiple times
+```shell
+pnpm start
 ```
 
-Run the docs locally
+Run the backend locally (run the following command within the query-builder-backend directory)
+1. Build the backend - this only has to be done once.
 ```shell
-pnpm run docs-start
+pnpm build
 ```
+2. Start the backend - this can be rerun multiple times
+```shell
+pnpm start
+```
+
+> **Note:** This is necessary for the frontend to work and should be done in a separate terminal to the frontend
+
+The Next.js application can then be accessed at [localhost:3000] and the NestJS backend can be accessed at [localhost:55555].
 
 ## Tree Structure
 ```shell
