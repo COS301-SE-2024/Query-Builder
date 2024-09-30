@@ -231,7 +231,7 @@ function MyDocument({ tableData, chartData, metadata, date }: MyDocumentProps) {
           <View
             style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
           >
-            <Text style={styles.title}>{`Report on\n${metadata.title}`}</Text>
+            <Text style={styles.title}>{`${metadata.title}`}</Text>
             <Text
               style={styles.subtitle}
             >{`Generated on ${date.toLocaleString('en-UK', { day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZone: 'UTC' })} UTC using QBee`}</Text>
@@ -258,7 +258,7 @@ function MyDocument({ tableData, chartData, metadata, date }: MyDocumentProps) {
           <View
             style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
           >
-            <Text style={styles.title}>{`Report on\n${metadata.title}`}</Text>
+            <Text style={styles.title}>{`${metadata.title}`}</Text>
             <Text
               style={styles.subtitle}
             >{`Generated on ${date.toLocaleString('en-UK', { day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZone: 'UTC' })} UTC using QBee`}</Text>

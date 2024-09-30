@@ -73,28 +73,18 @@ export class Field_Metadata_Dto {
 }
 
 export class Foreign_Key_Metadata_Dto {
-  @IsString()
-  @IsNotEmpty()
   table_name: string;
 
-  @IsString()
-  @IsNotEmpty()
   column_name: string;
 
-  @IsString()
-  @IsNotEmpty()
   referenced_column_name: string;
 }
 
 export class R_Foreign_Key_Metadata_Dto extends Foreign_Key_Metadata_Dto {
-  @IsString()
-  @IsNotEmpty()
   referenced_table_schema: string;
 }
 
 export class O_Foreign_Key_Metadata_Dto extends Foreign_Key_Metadata_Dto {
-  @IsString()
-  @IsNotEmpty()
   table_schema: string;
 }
 

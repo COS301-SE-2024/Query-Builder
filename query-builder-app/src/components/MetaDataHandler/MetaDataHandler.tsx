@@ -12,6 +12,7 @@ import EditDescriptionMetaData from "./EditDescriptionMetaData";
 import {EditIcon} from "../OrganisationManagement/EditIcon";
 import toast from "react-hot-toast";
 import DatabaseCredentialsModal from "../DatabaseCredentialsModal/DatabaseCredentialsModal";
+import AddForeignKeyModal from "./AddForeignKeyModal";
 
 
 const getToken = async () => {
@@ -93,13 +94,20 @@ export default function MetaDataHandler(props: MetaDataHandlerProps){
     const credentialsModalDisclosure = useDisclosure();
     const [databaseName, setDatabaseName] = useState("");
     const [table, setTable] = useState<table>({name:"", columns:[]});
+    const [fields, setFields] = useState<FieldMetaData[]>([]);
+    const [selectedField, setSelectedField] = useState<FieldMetaData>({column_name:"", description:""});
     const [joinableTables, setJoinableTables] = useState<JoinableTable[]>([]);
     const [metaData, setMetaData] = useState<Metadata>();
+    const [foreignKey, setForeignKey] = useState<ReferForeignKeyMetadata>();
 
+    //---------------------------------------FETCH ALL DATABASES---------------------------------------//
 
     // Fetch databases in your server
     async function fetchDatabases() {
             //determine whether the user has db secrets saved for the database server
+            setDatabaseName("");
+            setTable({name:"", columns:[]});
+            setSelectedField({column_name:"", description:""});
             let hasActiveConnectionResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/has-active-connection`, {
                 credentials: "include",
                 method: "POST",
@@ -244,6 +252,8 @@ export default function MetaDataHandler(props: MetaDataHandlerProps){
             }
     }
 
+    //---------------------------------------FETCH ALL TABLES---------------------------------------//
+
     async function fetchAllTables(database: string) {
 
         let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/tables`, {
@@ -286,20 +296,78 @@ export default function MetaDataHandler(props: MetaDataHandlerProps){
 
     }
 
+    async function fetchAllColumns(database: string, tableName: string) {
+
+        let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/fields`, {
+            credentials: "include",
+            method: "PUT",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + await getToken()
+            },
+            body: JSON.stringify({
+                databaseServerID: dbID,
+                database: database,
+                language: databaseLanguage,
+                table: tableName
+            })
+        });
+        
+        if (!response) {
+            toast.error("Failed to fetch columns of the database");
+            return;
+        }
+        
+        let json = await response.json();
+        
+
+        if (response.ok) {
+            //set the fields hook
+            console.log(json.data);
+            setFields(json.data);
+        }
+        else{
+        
+            if(json.response && json.response.message == 'You do not have a backend session'){
+                navigateToAuth();
+            }
+            //or they might have a backend session, but need to reconnect to a new postgres database
+            else if(json.response && json.response.message == 'You do not have saved credentials for this database'){
+                credentialsModalDisclosure.onOpen();
+            }
+
+        }
+
+    }
+
     function handleTableSelection(key: any, table: table) {
 
         //if table.name is empty, add the key as the name
-            setTable((previousTableState) => {return { ...previousTableState, name: key }});
+        setTable((previousTableState) => {return { ...previousTableState, name: key }});
+        setSelectedField({column_name:"", description:""});
+        fetchAllColumns(databaseName, key);
+
+
+    }
+
+    function handleColumnSelection(key: any, selectedField: FieldMetaData) {
+
+        //if table.name is empty, add the key as the name
+        setSelectedField((previousFieldState) => {return { ...previousFieldState, column_name: key }});
+        // fetchAllColumns(databaseName, key);
 
     }
 
     const handleDatabaseSelection = (key: any) => {
 
         setDatabaseName(key);
+        setTable({name:"", columns:[]});
         fetchAllTables(key);
 
     };
 
+    //Saving Database Description
     async function updateDatabaseDescription(description: string) {
         if(databaseName == ""){
             toast.error("Please select a database");
@@ -337,6 +405,7 @@ export default function MetaDataHandler(props: MetaDataHandlerProps){
         }
     }
 
+    //Saving Table Description
     async function updateTableDescription(description: string) {
         if(table.name == ""){
             toast.error("Please select a table");
@@ -381,19 +450,112 @@ export default function MetaDataHandler(props: MetaDataHandlerProps){
         }
     }
 
+    //Saving foreign key that refers from fromTable to some other toTable
+    //from the perspective 'from' table_name, it is a 'from' foreign key
+    //so it has referenced_table_schema
+    //column_name (fromColumn)
+    //table_name (toTable)
+    //referenced_column_name (toColumn)
+    async function addForeignKey(fromTable: string, fromColumn: string, toTable: string, toColumn: string) {
+
+        let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/save-db-metadata`, {
+            credentials: "include",
+            method: "POST",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + await getToken()
+            },
+            body: JSON.stringify({ 
+                databaseServerID: dbID,
+                language: databaseLanguage,
+                org_id: orgId,
+                db_metadata: {
+                    schema_name: databaseName,
+                    tables:[
+                        {
+                            table_name: fromTable,
+                            foreign_keys: [
+                                {
+                                    column_name: fromColumn,
+                                    table_name: toTable,
+                                    referenced_column_name: toColumn,
+                                    referenced_table_schema: databaseName
+                                }
+                            ]
+                        }
+                    ]
+                    
+                }
+            })
+        });
+    
+        if (!response.ok) {
+            toast.error("Error adding foreign key. Please try again later.");
+        }
+        else {
+            toast.success("Successfully added foreign key.");
+        }
+    }
+
     async function updateColumnDescription(description: string) {
-        
+        if(selectedField.column_name == ""){
+            toast.error("Please select a column");
+            return;
+        }
+        if(description == ""){
+            toast.error("Please enter a description for the column."); 
+            return;
+        }
+
+        let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/save-db-metadata`, {
+            credentials: "include",
+            method: "POST",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + await getToken()
+            },
+            body: JSON.stringify({ 
+                databaseServerID: dbID,
+                language: databaseLanguage,
+                org_id: orgId,
+                db_metadata: {
+                    schema_name: databaseName,
+                    tables:[
+                        {
+                            table_name: table.name,
+                            fields:[
+                                {
+                                    column_name: selectedField.column_name,
+                                    description: description
+                                }
+                            ]
+                        }
+                    ]
+                    
+                }
+            })
+        });
+    
+        if (!response.ok) {
+            // throw new Error(`HTTP error! Status: ${response.status}`);
+            toast.error("Error updating table description. Please try again later.");
+        }
+        else {
+            toast.success("Successfully updated table description.");
+        }
     }
 
     return (
 
         <>
         <div>
-          <EditIcon onClick={async () => {
+          <EditIcon data-testid="editMetaPopUpTest" onClick={async () => {
             await fetchDatabases();                      
         }}/>
         </div>
-        <DatabaseCredentialsModal dbServerID={dbID} disclosure={credentialsModalDisclosure} onConnected={async () => {await fetchHelper}}/>
+        <DatabaseCredentialsModal dbServerID={dbID} disclosure={credentialsModalDisclosure} onConnected={async () => {await fetchHelper()}}/>
         <Modal 
           isOpen={ismetadataModalOpen} 
           onOpenChange={onmetadataModalOpenChange}
@@ -422,7 +584,7 @@ export default function MetaDataHandler(props: MetaDataHandlerProps){
                             <div className="flex flex-1">
                                 {databaseName}
                             </div>
-                            <EditDescriptionMetaData description={"// add pulled description from the database"} type={databaseName} on_add={updateDatabaseDescription}/>
+                            <EditDescriptionMetaData description={""} type={databaseName} on_add={updateDatabaseDescription}/>
                         </div>
                         
                         )
@@ -452,10 +614,15 @@ export default function MetaDataHandler(props: MetaDataHandlerProps){
 
                         </Card>
                         <Spacer y={2} />
-                        <h2>Select some tables: <span style={{ color: 'red' }}>*</span></h2>
-                        <Spacer y={2} />
-
                         {databaseName !== "" && ( 
+                            <>
+                            <h2>Select a table: <span style={{ color: 'red' }}>*</span></h2>
+                            <Spacer y={2} />
+                            </>)
+                        }
+
+                        {//Table editor part
+                        databaseName !== "" && ( 
                             <Card className="overflow-visible">
                             <CardBody className="flex flex-row items-center space-x-2">
                                 {databaseName !== "" && table.name && (
@@ -492,7 +659,71 @@ export default function MetaDataHandler(props: MetaDataHandlerProps){
                                         )}
                                     </Dropdown>)}
                                 </CardBody>
-                        </Card>)}
+                            </Card>)}
+
+                            {databaseName !== "" && table.name !== "" && ( 
+                                <>
+                                <Spacer y={2} />
+                                <h2>Select a column: <span style={{ color: 'red' }}>*</span></h2>
+                                <Spacer y={2} />
+                                </>)
+                            }
+
+                        {databaseName !== "" && table.name !== "" && ( 
+                            <Card className="overflow-visible">
+                            <CardBody className="flex flex-row items-center space-x-2">
+                                {databaseName !== "" && table.name !== "" &&  selectedField.column_name !== "" && (
+                                    <div className="flex flex-1">
+                                        <div className="flex flex-1">
+                                            {selectedField?.column_name}
+                                        </div>
+                                        <EditDescriptionMetaData description={""} type={selectedField.column_name} on_add={updateColumnDescription}/>
+                                    </div>)
+                                }
+
+                                {databaseName !== "" && table.name !== "" && (
+                                    <Dropdown>
+                                        <DropdownTrigger>
+                                            <Button
+                                                variant="bordered"
+                                                aria-label="choose table button"
+                                            >
+                                                {selectedField.column_name !== ""? "Change":"+"}
+                                            </Button>
+                                        </DropdownTrigger>
+                                        {fields.length > 0 && (
+                                            <DropdownMenu
+                                                className="max-h-[50vh] overflow-y-auto"
+                                                items={fields}
+                                                onAction={(key) => handleColumnSelection(key, selectedField)}
+                                            >
+                                                {(item: any) => (
+                                                    <DropdownItem key={item.name}>
+                                                        {item.name}
+                                                    </DropdownItem>
+                                                )}
+                                            </DropdownMenu>
+                                        )}
+                                    </Dropdown>)}
+                                </CardBody>
+                            </Card>)}
+
+                        {//Define new foreign key
+                        databaseName !== "" && table.name !== "" && ( 
+                            <>
+                                <Spacer y={2} />
+                                <h2>Define a new foreign key referencing another table</h2>
+                                <Spacer y={2} />
+                                <Card className="overflow-visible">
+                                <CardBody className="flex flex-row items-center space-x-2">
+
+                                    {!foreignKey && (
+                                        <AddForeignKeyModal onAdd={addForeignKey} databaseServerID={props.db_id} database={databaseName} language={databaseLanguage} allTables={joinableTables} fromTable={table.name}/>)}
+                                    </CardBody>
+                                </Card>
+                            </>
+                        )
+                        }
 
                     </CardBody>
                     </Card>

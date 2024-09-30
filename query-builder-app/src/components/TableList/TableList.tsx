@@ -328,9 +328,11 @@ export default function TableList(props: TableListProps) {
                                     onAction={(key) => handleTableSelection(key, tableRef)}
                                 >
                                     {(item: any) => (
-                                        <DropdownItem key={item.table_name}>
-                                            {item.table_name}
-                                        </DropdownItem>
+                                        <DropdownItem
+                                            key={item.table_name}
+                                            title={item.table_name}
+                                            description={item.description ? item.description : ""}
+                                        />
                                     )}
                                 </DropdownMenu>
                             )}

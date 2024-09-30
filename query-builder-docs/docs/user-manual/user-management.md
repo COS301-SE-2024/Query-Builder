@@ -2,7 +2,7 @@
 sidebar_position: 1
 ---
 
-# User management User Guide
+# User Management
 
 ### Sign Up
 When you first access the application, you will be prompted to sign up. You will need to provide your email address and a password. You will also need to agree to the terms of service and privacy policy. Once you have signed up, you will be able to log in to the application.
@@ -17,5 +17,6 @@ To log in to the application, you will need to provide your email address and pa
 ### User Profile
 Once you have logged in, you will be able to view and edit your user profile. You can update your email address, password, and other personal information. You can also upload a profile picture.
 
-![user-management-3](./../../static/img/update-user.png)
+![user-management-3](./../../static/img/final-user-settings-page.png)
 
+<!-- TODO: Add images for each step. -->

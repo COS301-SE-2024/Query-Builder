@@ -15,6 +15,7 @@ interface TableFormProps {
 
 interface SelectableColumn {
     name: string
+    description?: string
 }
 
 export default function TableForm(props: TableFormProps){
@@ -162,9 +163,7 @@ export default function TableForm(props: TableFormProps){
                                     onAction={handleColumnSelection}
                                 >
                                     {(item) => (
-                                        <DropdownItem key={item.name}>
-                                            {item.name}
-                                        </DropdownItem>
+                                        <DropdownItem key={item.name} title={item.name} description={item.description ? item.description : ""}/>
                                     )}
                                 </DropdownMenu>
                             </Dropdown>

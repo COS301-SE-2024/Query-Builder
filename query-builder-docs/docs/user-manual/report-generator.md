@@ -22,3 +22,5 @@ sidebar_position: 5
 - **Selecting the Share Option**: Click on the blue share button. A popup will appear with various sharing options.
 - **Choosing the Medium**: In the popup, select the medium through which you would like to share your report (e.g., email, social media).
 - **Sharing the Report**: Follow the prompts to complete the sharing process via the chosen medium.
+
+<!-- TODO: Add images for each step. -->
