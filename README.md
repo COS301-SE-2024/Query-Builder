@@ -39,8 +39,11 @@ QBee is the ultimate tool for modern database management and analysis.
 
 </div>
 
-<h2 align='center'> Documentation </h2>
+<h2 align='center'> Our Official Website </h2>
 
+
+<h2 align='center'> Documentation </h2>
+| [QBee official website]([capstone-qbee.dns.net.za](https://capstone-qbee.dns.net.za/)) |
 <div align="center" >
 
 [Our Documentation Website](https://cos301-se-2024.github.io/Query-Builder/)
