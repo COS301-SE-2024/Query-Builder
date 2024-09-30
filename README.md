@@ -40,10 +40,12 @@ QBee is the ultimate tool for modern database management and analysis.
 </div>
 
 <h2 align='center'> Our Official Website </h2>
+<div align="center" >
+  
+[Our QBee Website](https://capstone-qbee.dns.net.za/)
 
-
+</div>
 <h2 align='center'> Documentation </h2>
-| [QBee official website]([capstone-qbee.dns.net.za](https://capstone-qbee.dns.net.za/)) |
 <div align="center" >
 
 [Our Documentation Website](https://cos301-se-2024.github.io/Query-Builder/)
@@ -56,6 +58,7 @@ QBee is the ultimate tool for modern database management and analysis.
 | Coding Standards                | [See Coding Standards](https://cos301-se-2024.github.io/Query-Builder/docs/guides-and-standards/coding-standards)                   |
 | Software Requirements Specification | [See our complete SRS](https://cos301-se-2024.github.io/Query-Builder/docs/category/software-requirements-specification)            |
 | Architectural Requirements Document                    | [See our architecture document](https://cos301-se-2024.github.io/Query-Builder/docs/category/architectural-requirements-document)                   |
+| Testing Policy Document          | [See our testing policy document](https://cos301-se-2024.github.io/Query-Builder/docs/testing-policy/)
 
   
 </div>
