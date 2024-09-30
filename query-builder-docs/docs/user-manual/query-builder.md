@@ -25,5 +25,8 @@ You can select or deselect all columns by clicking the 'Select All' option.
 
 You are now ready to query by clicking the 'Query' button.
 
-## Drag and Drop Manipulation
-This is not implemented yet, but as we implement, this will be updated...
+### Selecting Filters
+Now that you have selected the columns you would like to query, you can now filter the data that you would like to see. This can be done by clicking the 'Add Filter' button. The filter can be configured by selecting the column you would like to filter by, the operator you would like to use, and the value you would like to filter by. They can also be used to calculate the sum, average, minimum, and maximum of a column.The filter will be applied to the data that is returned from the query.
+The filter can be removed by clicking the 'Remove Filter' button.
+
+<!-- TODO add image -->

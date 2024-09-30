@@ -19,3 +19,4 @@ Once you have logged in, you will be able to view and edit your user profile. Yo
 
 ![user-management-3](./../../static/img/update-user.png)
 
+<!-- TODO: Add images for each step. -->
