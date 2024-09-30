@@ -12,6 +12,7 @@ import EditDescriptionMetaData from "./EditDescriptionMetaData";
 import {EditIcon} from "../OrganisationManagement/EditIcon";
 import toast from "react-hot-toast";
 import DatabaseCredentialsModal from "../DatabaseCredentialsModal/DatabaseCredentialsModal";
+import AddForeignKeyModal from "./AddForeignKeyModal";
 
 
 const getToken = async () => {
@@ -97,7 +98,9 @@ export default function MetaDataHandler(props: MetaDataHandlerProps){
     const [selectedField, setSelectedField] = useState<FieldMetaData>({column_name:"", description:""});
     const [joinableTables, setJoinableTables] = useState<JoinableTable[]>([]);
     const [metaData, setMetaData] = useState<Metadata>();
+    const [foreignKey, setForeignKey] = useState<ReferForeignKeyMetadata>();
 
+    //---------------------------------------FETCH ALL DATABASES---------------------------------------//
 
     // Fetch databases in your server
     async function fetchDatabases() {
@@ -249,6 +252,8 @@ export default function MetaDataHandler(props: MetaDataHandlerProps){
             }
     }
 
+    //---------------------------------------FETCH ALL TABLES---------------------------------------//
+
     async function fetchAllTables(database: string) {
 
         let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/tables`, {
@@ -362,6 +367,7 @@ export default function MetaDataHandler(props: MetaDataHandlerProps){
 
     };
 
+    //Saving Database Description
     async function updateDatabaseDescription(description: string) {
         if(databaseName == ""){
             toast.error("Please select a database");
@@ -399,6 +405,7 @@ export default function MetaDataHandler(props: MetaDataHandlerProps){
         }
     }
 
+    //Saving Table Description
     async function updateTableDescription(description: string) {
         if(table.name == ""){
             toast.error("Please select a table");
@@ -440,6 +447,54 @@ export default function MetaDataHandler(props: MetaDataHandlerProps){
         }
         else {
             toast.success("Successfully updated table description.");
+        }
+    }
+
+    //Saving foreign key that refers from fromTable to some other toTable
+    //from the perspective 'from' table_name, it is a 'from' foreign key
+    //so it has referenced_table_schema
+    //column_name (fromColumn)
+    //table_name (toTable)
+    //referenced_column_name (toColumn)
+    async function addForeignKey(fromTable: string, fromColumn: string, toTable: string, toColumn: string) {
+
+        let response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/metadata/save-db-metadata`, {
+            credentials: "include",
+            method: "POST",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + await getToken()
+            },
+            body: JSON.stringify({ 
+                databaseServerID: dbID,
+                language: databaseLanguage,
+                org_id: orgId,
+                db_metadata: {
+                    schema_name: databaseName,
+                    tables:[
+                        {
+                            table_name: fromTable,
+                            foreign_keys: [
+                                {
+                                    column_name: fromColumn,
+                                    table_name: toTable,
+                                    referenced_column_name: toColumn,
+                                    referenced_table_schema: databaseName
+                                }
+                            ]
+                        }
+                    ]
+                    
+                }
+            })
+        });
+    
+        if (!response.ok) {
+            toast.error("Error adding foreign key. Please try again later.");
+        }
+        else {
+            toast.success("Successfully added foreign key.");
         }
     }
 
@@ -566,7 +621,8 @@ export default function MetaDataHandler(props: MetaDataHandlerProps){
                             </>)
                         }
 
-                        {databaseName !== "" && ( 
+                        {//Table editor part
+                        databaseName !== "" && ( 
                             <Card className="overflow-visible">
                             <CardBody className="flex flex-row items-center space-x-2">
                                 {databaseName !== "" && table.name && (
@@ -651,6 +707,23 @@ export default function MetaDataHandler(props: MetaDataHandlerProps){
                                     </Dropdown>)}
                                 </CardBody>
                             </Card>)}
+
+                        {//Define new foreign key
+                        databaseName !== "" && table.name !== "" && ( 
+                            <>
+                                <Spacer y={2} />
+                                <h2>Define a new foreign key referencing another table</h2>
+                                <Spacer y={2} />
+                                <Card className="overflow-visible">
+                                <CardBody className="flex flex-row items-center space-x-2">
+
+                                    {!foreignKey && (
+                                        <AddForeignKeyModal onAdd={addForeignKey} databaseServerID={props.db_id} database={databaseName} language={databaseLanguage} allTables={joinableTables} fromTable={table.name}/>)}
+                                    </CardBody>
+                                </Card>
+                            </>
+                        )
+                        }
 
                     </CardBody>
                     </Card>

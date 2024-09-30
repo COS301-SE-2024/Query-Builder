@@ -318,9 +318,11 @@ export default function Form() {
                         onAction={(key) => handleDatabaseSelection(key)}
                       >
                         {databases.map((item: any) => (
-                          <DropdownItem key={item.database}>
-                            {item.database}
-                          </DropdownItem>
+                          <DropdownItem 
+                            key={item.database}
+                            title={item.database}
+                            description={item.description ? item.description : ""}
+                          />
                         ))}
                       </DropdownMenu>
                     </Dropdown>
