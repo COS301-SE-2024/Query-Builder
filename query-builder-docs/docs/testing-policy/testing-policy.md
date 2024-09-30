@@ -31,3 +31,14 @@ To achieve the aims set out above, the team adheres to the following:
 - To keep the team accountable and to enforce the previous point, a team member is assigned as a reviewer to each pull request. The reviewer has to approve the pull request before it can be merged (in the case of the main branch, two or more reviewers are required). This ensures that the code is of a high quality and that the tests are written correctly.
 
 >**Note:** Within the frontend and backend tests, mocking is used to ensure that the tests are isolated and that they do not rely on external services, eliminating the possibility of incorrect input - isolating the case and allowing for a more accurate test.
+
+## Examples
+### GitHub Runner
+![GitHub Runner](./../../static//img/GithubActions.png)
+
+### GitHub Pull Request
+![GitHub Pull Request 1](./../../static/img/GithubPullReq1.png)
+![GitHub Pull Request 2](./../../static/img/GithubPullReq2.png)
+
+### CodeCov
+![CodeCov](./../../static/img/CodeCov.png)
