@@ -117,6 +117,7 @@ export class MySqlConnectionManagerService extends ConnectionManagerService {
         }
       }
       const connection = mysql.createConnection({
+        decimalNumbers: true,
         host: host,
         port: port,
         user: user,
